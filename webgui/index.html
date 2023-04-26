@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+    <title>architecture-simulator</title>
+  </head>
+
+  <body>
+    <p>
+      You can execute instructions. Just enter something in the box below and
+      click the button.
+    </p>
+    <input id="code" value="add x0, x1, x0" />
+    <button onclick="evaluatePython()">Run</button>
+    <table>
+      <thead><td>Register</td><td>Value</td></thead>
+      <tbody id="registers" ></tbody>
+    </table>
+    <br />
+    <br />
+    <div>Output:</div>
+    <textarea id="output" style="width: 100%;" rows="20" disabled></textarea>
+
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.22.1/full/pyodide.js"></script>
+    <script src="js/archsim.js"></script>
+  </body>
+</html>

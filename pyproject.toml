@@ -1,0 +1,16 @@
+[project]
+name = "architecture-simulator"
+version = "0.1.0"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["pyparsing"]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["architecture_simulator*"]
+
+[project.scripts]
+archsim-cli = "architecture_simulator.cli:main"
