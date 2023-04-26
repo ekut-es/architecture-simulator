@@ -1,7 +1,7 @@
 import unittest
 
 from architecture_simulator.uarch.architectural_state import RegisterFile
-from architecture_simulator.isa.rv32i_instructions import ADD
+from architecture_simulator.isa.rv32i_instructions import ADD, SUB
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 
 from architecture_simulator.isa.parser import riscv_bnf, riscv_parser
@@ -13,6 +13,12 @@ class TestInstructions(unittest.TestCase):
         add_1 = ADD(rs1=1, rs2=2, rd=0)
         state = add_1.behavior(state)
         self.assertEqual(state.register_file.registers, [14, 5, 9, 0])
+
+    def test_sub(self):
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 5, 9, 0]))
+        sub_1 = SUB(rs1=1, rs2=2, rd=0)
+        state = sub_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [-4, 5, 9, 0])
 
 
 class TestParser(unittest.TestCase):
