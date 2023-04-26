@@ -8,6 +8,15 @@
 			"type": "shell",
 			"command": "source .venv/bin/activate; python -m pytest",
 			"problemMatcher": []
+		},
+		{
+			"label": "Build Python package",
+			"type": "shell",
+			"command": "source .venv/bin/activate; python -m build",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			  }
 		}
 	]
 }
