@@ -36,3 +36,9 @@ python -m build
 - Then use the VSCode live preview feature to serve the needed files locally.
   - To do so just open `webgui/index.html` in the editor and click the 'show preview' button.
   - Alternatively start a development webserver in the project base directory: `python -m http.server`.
+
+## Branch Naming Convention
+
+* `main` current MVP
+* `devel/*` all branches for feature development
+* `fix/*` all branches that fix bugs
