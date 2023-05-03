@@ -12,10 +12,19 @@ class ADD(RTypeInstruction):
         super().__init__(rs1, rs2, rd, mnemonic="add")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
-        # rd = rs1 + rs2
+        """rd = rs1 + rs2
+
+        Args:
+            architectural_state (ArchitecturalState): _description_
+
+        Returns:
+            ArchitecturalState: _description_
+        """
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
-        architectural_state.register_file.registers[self.rd] = rs1 + rs2
+        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
+            fixedint.Int32(rs1) + fixedint.Int32(rs2)
+        )
         return architectural_state
 
 
@@ -34,8 +43,29 @@ class SUB(RTypeInstruction):
         """
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
-        architectural_state.register_file.registers[self.rd] = rs1 - rs2
+        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
+            fixedint.Int32(rs1) - fixedint.Int32(rs2)
+        )
         return architectural_state
 
 
-instruction_map = {"add": ADD, "sub": SUB}
+class SLL(RTypeInstruction):
+    def __init__(self, rs1: int, rs2: int, rd: int):
+        super().__init__(rs1, rs2, rd, mnemonic="sll")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """rd = rs1 << rs2
+
+        Args:
+            architectural_state (ArchitecturalState): _description_
+
+        Returns:
+            ArchitecturalState: _description_
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2] % 64
+        architectural_state.register_file.registers[self.rd] = rs1 << rs2
+        return architectural_state
+
+
+instruction_map = {"add": ADD, "sub": SUB, "sll": SLL}
