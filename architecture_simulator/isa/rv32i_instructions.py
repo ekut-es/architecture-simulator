@@ -2,6 +2,7 @@
 
 from .instruction_types import RTypeInstruction
 from ..uarch.architectural_state import ArchitecturalState
+import fixedint
 
 # todo: use ctypes
 
