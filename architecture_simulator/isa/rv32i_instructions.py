@@ -23,7 +23,7 @@ class ADD(RTypeInstruction):
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            fixedint.Int32(rs1) + fixedint.Int32(rs2)
+            int(fixedint.Int32(int(rs1)) + fixedint.Int32(int(rs2)))
         )
         return architectural_state
 
@@ -44,7 +44,7 @@ class SUB(RTypeInstruction):
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            fixedint.Int32(rs1) - fixedint.Int32(rs2)
+            int(fixedint.Int32(int(rs1)) - fixedint.Int32(int(rs2)))
         )
         return architectural_state
 
@@ -63,7 +63,9 @@ class SLL(RTypeInstruction):
             ArchitecturalState: _description_
         """
         rs1 = architectural_state.register_file.registers[self.rs1]
-        rs2 = architectural_state.register_file.registers[self.rs2] % 64
+        rs2 = architectural_state.register_file.registers[
+            self.rs2
+        ] % fixedint.MutableUInt32(64)
         architectural_state.register_file.registers[self.rd] = rs1 << rs2
         return architectural_state
 

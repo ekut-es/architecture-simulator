@@ -195,6 +195,18 @@ class TestInstructions(unittest.TestCase):
             state.register_file.registers, [num_32, num_max, num_31, num_580, num_0]
         )
 
+        # overshift will write zero
+        sll = SLL(rs1=1, rs2=1, rd=4)
+        state = ArchitecturalState(
+            register_file=RegisterFile(
+                registers=[num_32, num_max, num_31, num_580, num_msb]
+            )
+        )
+        state = sll.behavior(state)
+        self.assertEqual(
+            state.register_file.registers, [num_32, num_max, num_31, num_580, num_0]
+        )
+
         # higher bits do not affect shift amount
         sll = SLL(rs1=1, rs2=2, rd=3)
         state = ArchitecturalState(
