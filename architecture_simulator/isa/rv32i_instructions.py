@@ -1,10 +1,8 @@
-# from ctypes import c_int32, c_uint32, c_int8, c_int16, c_uint8, c_uint16
-
+from architecture_simulator.uarch.architectural_state import ArchitecturalState
 from .instruction_types import RTypeInstruction
+from .instruction_types import BTypeInstruction
 from ..uarch.architectural_state import ArchitecturalState
 import fixedint
-
-# todo: use ctypes
 
 
 class ADD(RTypeInstruction):
@@ -35,6 +33,58 @@ class SUB(RTypeInstruction):
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
         architectural_state.register_file.registers[self.rd] = rs1 - rs2
+        return architectural_state
+
+
+class BEQ(BTypeInstruction):
+    def __init__(self, rs1: int, rs2: int, imm: c_int32):
+        super().__init__(rs1, rs2, imm, mnemonic="beq")
+
+    def behavior(self, architectural_state: ArchitecturalState):
+        """if (x[rs1] == x[rs2]) pc += sext(imm)"""
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        if rs1 == rs2:
+            architectural_state.program_counter += self.imm - 4
+        return architectural_state
+
+
+class BNE(BTypeInstruction):
+    def __init__(self, rs1: int, rs2: int, imm: c_int32):
+        super().__init__(rs1, rs2, imm, mnemonic="bne")
+
+    def behavior(self, architectural_state: ArchitecturalState):
+        """if (x[rs1] != x[rs2]) pc += sext(imm)"""
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        if rs1 != rs2:
+            architectural_state.program_counter += self.imm - 4
+        return architectural_state
+
+
+class BLT(BTypeInstruction):
+    def __init__(self, rs1: int, rs2: int, imm: c_int32):
+        super().__init__(rs1, rs2, imm, mnemonic="blt")
+
+    def behavior(self, architectural_state: ArchitecturalState):
+        """if (x[rs1] <s x[rs2]) pc += sext(imm)"""
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        if rs1 < rs2:
+            architectural_state.program_counter += self.imm - 4
+        return architectural_state
+
+
+class BEQ(BTypeInstruction):
+    def __init__(self, rs1: int, rs2: int, imm: c_int32):
+        super().__init__(rs1, rs2, imm, mnemonic="beq")
+
+    def behavior(self, architectural_state: ArchitecturalState):
+        """if (x[rs1] == x[rs2]) pc += sext(imm)"""
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        if rs1 == rs2:
+            architectural_state.program_counter += self.imm - 4
         return architectural_state
 
 

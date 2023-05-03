@@ -17,3 +17,11 @@ class RTypeInstruction(Instruction):
         self.rs1 = rs1
         self.rs2 = rs2
         self.rd = rd
+
+
+class BTypeInstruction(Instruction):
+    def __init__(self, rs1: int, rs2: int, imm: int, **args):
+        super().__init__(**args)
+        self.rs1 = rs1
+        self.rs2 = rs2
+        self.imm = imm
