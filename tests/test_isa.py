@@ -21,6 +21,30 @@ class TestInstructions(unittest.TestCase):
         state = sub_1.behavior(state)
         self.assertEqual(state.register_file.registers, [-4, 5, 9, 0])
 
+    def test_sll(self):
+        state = ArchitecturalState(register_file=RegisterFile(registers=[]))
+
+    def test_slt(self):
+        pass
+
+    def test_sltu(self):
+        pass
+
+    def test_xor(self):
+        pass
+
+    def test_srl(self):
+        pass
+
+    def test_sra(self):
+        pass
+
+    def test_or(self):
+        pass
+
+    def test_and(self):
+        pass
+
 
 class TestParser(unittest.TestCase):
     program = """
