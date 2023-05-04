@@ -19,7 +19,7 @@ class Memory:
 
     def load_halfword(self, adress: int) -> fixedint.MutableUInt16:
         return (
-            fixedint.MutableUInt16(int(self.memory_file[adress + 1 % pow(2, 32)])) << 8
+            fixedint.MutableUInt16(int(self.memory_file[adress + 1 % pow(2, 32)]) << 8)
             | self.memory_file[adress % pow(2, 32)]
         )
 
@@ -31,11 +31,13 @@ class Memory:
 
     def load_word(self, adress: int) -> fixedint.MutableUInt32:
         return (
-            fixedint.MutableUInt32(int(self.memory_file[adress + 3 % pow(2, 32)])) << 24
-            | fixedint.MutableUInt32(int(self.memory_file[adress + 2 % pow(2, 32)]))
-            << 16
-            | fixedint.MutableUInt32(int(self.memory_file[adress + 1 % pow(2, 32)]))
-            << 8
+            fixedint.MutableUInt32(int(self.memory_file[adress + 3 % pow(2, 32)]) << 24)
+            | fixedint.MutableUInt32(
+                int(self.memory_file[adress + 2 % pow(2, 32)]) << 16
+            )
+            | fixedint.MutableUInt32(
+                int(self.memory_file[adress + 1 % pow(2, 32)]) << 8
+            )
             | fixedint.MutableUInt32(int(self.memory_file[adress % pow(2, 32)]))
         )
 
