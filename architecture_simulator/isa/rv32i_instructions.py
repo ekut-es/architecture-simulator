@@ -40,7 +40,7 @@ class BEQ(BTypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1, rs2, imm, mnemonic="beq")
 
-    def behavior(self, architectural_state: ArchitecturalState):
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """if (x[rs1] == x[rs2]) pc += sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
@@ -53,7 +53,7 @@ class BNE(BTypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1, rs2, imm, mnemonic="bne")
 
-    def behavior(self, architectural_state: ArchitecturalState):
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """if (x[rs1] != x[rs2]) pc += sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
@@ -66,7 +66,7 @@ class BLT(BTypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1, rs2, imm, mnemonic="blt")
 
-    def behavior(self, architectural_state: ArchitecturalState):
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """if (x[rs1] <s x[rs2]) pc += sext(imm)"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         rs2 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs2]))
@@ -79,7 +79,7 @@ class BGE(BTypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1, rs2, imm, mnemonic="bge")
 
-    def behavior(self, architectural_state: ArchitecturalState):
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """if (x[rs1] >= x[rs2]) pc += sext(imm)"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         rs2 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs2]))
@@ -92,7 +92,7 @@ class BLTU(BTypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1, rs2, imm, mnemonic="bltu")
 
-    def behavior(self, architectural_state: ArchitecturalState):
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """if (x[rs1] <u x[rs2]) pc += sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
@@ -105,7 +105,7 @@ class BGEU(BTypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1, rs2, imm, mnemonic="bgeu")
 
-    def behavior(self, architectural_state: ArchitecturalState):
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """if (x[rs1] >=u x[rs2]) pc += sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
