@@ -114,13 +114,4 @@ class BGEU(BTypeInstruction):
         return architectural_state
 
 
-instruction_map = {
-    "add": ADD,
-    "sub": SUB,
-    "beq": BEQ,
-    "bne": BNE,
-    "blt": BLT,
-    "bge": BGE,
-    "bltu": BLTU,
-    "bgeu": BGEU,
-}
+instruction_map = {"add": ADD, "sub": SUB}
