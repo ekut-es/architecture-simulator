@@ -63,6 +63,7 @@ class TestInstructions(unittest.TestCase):
                         (0, fixedint.MutableUInt8(1)),
                         (1, fixedint.MutableUInt8(2)),
                         (2, fixedint.MutableUInt8(3)),
+                        (3, fixedint.MutableUInt8(-1)),
                         (pow(2, 32) - 1, fixedint.MutableUInt8(4)),
                     ]
                 )
@@ -110,9 +111,15 @@ class TestInstructions(unittest.TestCase):
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [4, 1, -1, pow(2, 32) - 1])
 
+        # imm=3, rs1=0 load negative value
+        state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
+        instr = LB(imm=3, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [-1, 1, -1, pow(2, 32) - 1])
+
         # try memory acces to non existant address
         with self.assertRaises(KeyError):
-            instr = LH(imm=3, rs1=0, rd=0)
+            instr = LH(imm=4, rs1=0, rd=0)
             state = instr.behavior(state)
 
     def test_lh(self):
@@ -127,6 +134,8 @@ class TestInstructions(unittest.TestCase):
                         (3, fixedint.MutableUInt8(4)),
                         (4, fixedint.MutableUInt8(5)),
                         (5, fixedint.MutableUInt8(6)),
+                        (6, fixedint.MutableUInt8(-1)),
+                        (7, fixedint.MutableUInt8(-1)),
                         (pow(2, 32) - 2, fixedint.MutableUInt8(7)),
                         (pow(2, 32) - 1, fixedint.MutableUInt8(8)),
                     ]
@@ -181,9 +190,15 @@ class TestInstructions(unittest.TestCase):
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [2055, 2, -2, pow(2, 32) - 1])
 
+        # imm=6, rs1=0 load negative value
+        state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
+        instr = LH(imm=6, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [-1, 2, -2, pow(2, 32) - 1])
+
         # try memory acces to non existant address
         with self.assertRaises(KeyError):
-            instr = LH(imm=6, rs1=0, rd=0)
+            instr = LH(imm=8, rs1=0, rd=0)
             state = instr.behavior(state)
 
     def test_lw(self):
@@ -204,7 +219,10 @@ class TestInstructions(unittest.TestCase):
                         (9, fixedint.MutableUInt8(3)),
                         (10, fixedint.MutableUInt8(3)),
                         (11, fixedint.MutableUInt8(3)),
-                        (12, fixedint.MutableUInt8(3)),
+                        (12, fixedint.MutableUInt8(-1)),
+                        (13, fixedint.MutableUInt8(-1)),
+                        (14, fixedint.MutableUInt8(-1)),
+                        (15, fixedint.MutableUInt8(-1)),
                         (pow(2, 32) - 4, fixedint.MutableUInt8(4)),
                         (pow(2, 32) - 3, fixedint.MutableUInt8(4)),
                         (pow(2, 32) - 2, fixedint.MutableUInt8(4)),
@@ -277,9 +295,15 @@ class TestInstructions(unittest.TestCase):
             state.register_file.registers, [67372036, 4, -4, pow(2, 32) - 1]
         )
 
+        # imm=12, rs1=0 load negative value
+        state.register_file.registers = [0, 4, -4, pow(2, 32) - 1]
+        instr = LW(imm=12, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [-1, 4, -4, pow(2, 32) - 1])
+
         # try memory acces to non existant address
         with self.assertRaises(KeyError):
-            instr = LW(imm=13, rs1=0, rd=0)
+            instr = LW(imm=16, rs1=0, rd=0)
             state = instr.behavior(state)
 
 
