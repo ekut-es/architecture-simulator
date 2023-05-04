@@ -30,36 +30,79 @@ class TestInstructions(unittest.TestCase):
 
     def test_lb(self):
         state = ArchitecturalState(
-            register_file=RegisterFile(registers=[0, 10, -10]),
+            register_file=RegisterFile(registers=[0, 10, -10, pow(2, 32) - 1]),
             memory=Memory(
                 memory_file=dict(
                     [
-                        (0, fixedint.MutableUInt8(9)),
-                        (10, fixedint.MutableUInt8(10)),
-                        (20, fixedint.MutableUInt8(11)),
+                        (0, fixedint.MutableUInt8(1)),
+                        (10, fixedint.MutableUInt8(2)),
+                        (20, fixedint.MutableUInt8(3)),
                     ]
                 )
             ),
         )
-        state.register_file.registers = [0, 10, -10]
+        state.register_file.registers = [0, 10, -10, pow(2, 32) - 1]
         lb_1 = LB(imm=0, rs1=0, rd=0)
         state = lb_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [9, 10, -10])
+        self.assertEqual(state.register_file.registers, [1, 10, -10, pow(2, 32) - 1])
 
-        state.register_file.registers = [0, 10, -10]
+        state.register_file.registers = [0, 10, -10, pow(2, 32) - 1]
         lb_1 = LB(imm=10, rs1=0, rd=0)
         state = lb_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [10, 10, -10])
+        self.assertEqual(state.register_file.registers, [2, 10, -10, pow(2, 32) - 1])
 
-        state.register_file.registers = [0, 10, -10]
+        state.register_file.registers = [0, 10, -10, pow(2, 32) - 1]
         lb_1 = LB(imm=10, rs1=1, rd=0)
         state = lb_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [11, 10, -10])
+        self.assertEqual(state.register_file.registers, [3, 10, -10, pow(2, 32) - 1])
 
-        state.register_file.registers = [0, 10, -10]
+        state.register_file.registers = [0, 10, -10, pow(2, 32) - 1]
         lb_1 = LB(imm=10, rs1=2, rd=0)
         state = lb_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [9, 10, -10])
+        self.assertEqual(state.register_file.registers, [1, 10, -10, pow(2, 32) - 1])
+
+        state.register_file.registers = [0, 10, -10, pow(2, 32) - 1]
+        lb_1 = LB(imm=1, rs1=3, rd=0)
+        state = lb_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [1, 10, -10, pow(2, 32) - 1])
+
+    def test_lh(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[0, 10, -10, pow(2, 32) - 1]),
+            memory=Memory(
+                memory_file=dict(
+                    [
+                        (0, fixedint.MutableUInt8(1)),
+                        (10, fixedint.MutableUInt8(2)),
+                        (20, fixedint.MutableUInt8(3)),
+                    ]
+                )
+            ),
+        )
+        state.register_file.registers = [0, 10, -10, pow(2, 32) - 1]
+        lh_1 = LH(imm=0, rs1=0, rd=0)
+        state = lh_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [1, 10, -10, pow(2, 32) - 1])
+
+        state.register_file.registers = [0, 10, -10, pow(2, 32) - 1]
+        lb_1 = LB(imm=10, rs1=0, rd=0)
+        state = lb_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [2, 10, -10, pow(2, 32) - 1])
+
+        state.register_file.registers = [0, 10, -10, pow(2, 32) - 1]
+        lb_1 = LB(imm=10, rs1=1, rd=0)
+        state = lb_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [3, 10, -10, pow(2, 32) - 1])
+
+        state.register_file.registers = [0, 10, -10, pow(2, 32) - 1]
+        lb_1 = LB(imm=10, rs1=2, rd=0)
+        state = lb_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [1, 10, -10, pow(2, 32) - 1])
+
+        state.register_file.registers = [0, 10, -10, pow(2, 32) - 1]
+        lb_1 = LB(imm=1, rs1=3, rd=0)
+        state = lb_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [1, 10, -10, pow(2, 32) - 1])
 
 
 class TestParser(unittest.TestCase):
