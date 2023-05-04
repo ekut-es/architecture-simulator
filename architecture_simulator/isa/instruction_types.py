@@ -31,7 +31,7 @@ class BTypeInstruction(Instruction):
         if -2048 < imm or 2047 < imm:
             raise ValueError(
                 "B-Type Instruction immediate values have to be in range(-2048, 2048). Given immediate was "
-                + imm
+                + str(imm)
             )
         super().__init__(**args)
         self.rs1 = rs1

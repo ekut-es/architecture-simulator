@@ -68,8 +68,8 @@ class BLT(BTypeInstruction):
 
     def behavior(self, architectural_state: ArchitecturalState):
         """if (x[rs1] <s x[rs2]) pc += sext(imm)"""
-        rs1 = fixedint.Int32(architectural_state.register_file.registers[self.rs1])
-        rs2 = fixedint.Int32(architectural_state.register_file.registers[self.rs2])
+        rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
+        rs2 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs2]))
         if rs1 < rs2:
             architectural_state.program_counter += self.imm * 2 - 4
         return architectural_state
@@ -81,8 +81,8 @@ class BGE(BTypeInstruction):
 
     def behavior(self, architectural_state: ArchitecturalState):
         """if (x[rs1] >= x[rs2]) pc += sext(imm)"""
-        rs1 = fixedint.Int32(architectural_state.register_file.registers[self.rs1])
-        rs2 = fixedint.Int32(architectural_state.register_file.registers[self.rs2])
+        rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
+        rs2 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs2]))
         if rs1 >= rs2:
             architectural_state.program_counter += self.imm * 2 - 4
         return architectural_state
