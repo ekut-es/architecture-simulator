@@ -88,4 +88,39 @@ class BGE(BTypeInstruction):
         return architectural_state
 
 
-instruction_map = {"add": ADD, "sub": SUB}
+class BLTU(BTypeInstruction):
+    def __init__(self, rs1: int, rs2: int, imm: int):
+        super().__init__(rs1, rs2, imm, mnemonic="bltu")
+
+    def behavior(self, architectural_state: ArchitecturalState):
+        """if (x[rs1] <u x[rs2]) pc += sext(imm)"""
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        if rs1 < rs2:
+            architectural_state.program_counter += self.imm * 2 - 4
+        return architectural_state
+
+
+class BGEU(BTypeInstruction):
+    def __init__(self, rs1: int, rs2: int, imm: int):
+        super().__init__(rs1, rs2, imm, mnemonic="bgeu")
+
+    def behavior(self, architectural_state: ArchitecturalState):
+        """if (x[rs1] >=u x[rs2]) pc += sext(imm)"""
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        if rs1 >= rs2:
+            architectural_state.program_counter += self.imm * 2 - 4
+        return architectural_state
+
+
+instruction_map = {
+    "add": ADD,
+    "sub": SUB,
+    "beq": BEQ,
+    "bne": BNE,
+    "blt": BLT,
+    "bge": BGE,
+    "bltu": BLTU,
+    "bgeu": BGEU,
+}
