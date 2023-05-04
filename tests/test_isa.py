@@ -30,79 +30,126 @@ class TestInstructions(unittest.TestCase):
 
     def test_lb(self):
         state = ArchitecturalState(
-            register_file=RegisterFile(registers=[0, 10, -10, pow(2, 32) - 1]),
+            register_file=RegisterFile(registers=[0, 1, -1, pow(2, 32) - 1]),
             memory=Memory(
                 memory_file=dict(
                     [
                         (0, fixedint.MutableUInt8(1)),
-                        (10, fixedint.MutableUInt8(2)),
-                        (20, fixedint.MutableUInt8(3)),
+                        (1, fixedint.MutableUInt8(2)),
+                        (2, fixedint.MutableUInt8(3)),
+                        (pow(2, 32) - 1, fixedint.MutableUInt8(4)),
                     ]
                 )
             ),
         )
-        state.register_file.registers = [0, 10, -10, pow(2, 32) - 1]
-        lb_1 = LB(imm=0, rs1=0, rd=0)
-        state = lb_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [1, 10, -10, pow(2, 32) - 1])
+        # imm=0, rs1=0
+        state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
+        instr = LB(imm=0, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [1, 1, -1, pow(2, 32) - 1])
 
-        state.register_file.registers = [0, 10, -10, pow(2, 32) - 1]
-        lb_1 = LB(imm=10, rs1=0, rd=0)
-        state = lb_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [2, 10, -10, pow(2, 32) - 1])
+        # imm=1, rs1 =0
+        state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
+        instr = LB(imm=1, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [2, 1, -1, pow(2, 32) - 1])
 
-        state.register_file.registers = [0, 10, -10, pow(2, 32) - 1]
-        lb_1 = LB(imm=10, rs1=1, rd=0)
-        state = lb_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [3, 10, -10, pow(2, 32) - 1])
+        # imm=0, rs1=1
+        state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
+        instr = LB(imm=0, rs1=1, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [2, 1, -1, pow(2, 32) - 1])
 
-        state.register_file.registers = [0, 10, -10, pow(2, 32) - 1]
-        lb_1 = LB(imm=10, rs1=2, rd=0)
-        state = lb_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [1, 10, -10, pow(2, 32) - 1])
+        # imm=1, rs1=1
+        state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
+        instr = LB(imm=1, rs1=1, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [3, 1, -1, pow(2, 32) - 1])
 
-        state.register_file.registers = [0, 10, -10, pow(2, 32) - 1]
-        lb_1 = LB(imm=1, rs1=3, rd=0)
-        state = lb_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [1, 10, -10, pow(2, 32) - 1])
+        # imm=1, rs1=-1
+        state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
+        instr = LB(imm=1, rs1=2, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [1, 1, -1, pow(2, 32) - 1])
+
+        # imm=1, rs1=2^32-1
+        state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
+        instr = LB(imm=1, rs1=3, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [1, 1, -1, pow(2, 32) - 1])
+
+        # imm=0, rs1=-1 negative value of -1 gets converted to 2^32-1
+        state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
+        instr = LB(imm=0, rs1=2, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [4, 1, -1, pow(2, 32) - 1])
+
+        # try memory acces to non existant address
+        with self.assertRaises(KeyError):
+            instr = LH(imm=3, rs1=0, rd=0)
+            state = instr.behavior(state)
 
     def test_lh(self):
         state = ArchitecturalState(
-            register_file=RegisterFile(registers=[0, 10, -10, pow(2, 32) - 1]),
+            register_file=RegisterFile(registers=[0, 1, -1, pow(2, 32) - 1]),
             memory=Memory(
                 memory_file=dict(
                     [
                         (0, fixedint.MutableUInt8(1)),
-                        (10, fixedint.MutableUInt8(2)),
-                        (20, fixedint.MutableUInt8(3)),
+                        (1, fixedint.MutableUInt8(2)),
+                        (2, fixedint.MutableUInt8(3)),
+                        (3, fixedint.MutableUInt8(4)),
+                        (4, fixedint.MutableUInt8(5)),
+                        (5, fixedint.MutableUInt8(6)),
+                        (pow(2, 32) - 2, fixedint.MutableUInt8(7)),
+                        (pow(2, 32) - 1, fixedint.MutableUInt8(8)),
                     ]
                 )
             ),
         )
-        state.register_file.registers = [0, 10, -10, pow(2, 32) - 1]
-        lh_1 = LH(imm=0, rs1=0, rd=0)
-        state = lh_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [1, 10, -10, pow(2, 32) - 1])
+        state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
+        instr = LH(imm=0, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [513, 2, -2, pow(2, 32) - 1])
 
-        state.register_file.registers = [0, 10, -10, pow(2, 32) - 1]
-        lb_1 = LB(imm=10, rs1=0, rd=0)
-        state = lb_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [2, 10, -10, pow(2, 32) - 1])
+        state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
+        instr = LH(imm=2, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [1027, 2, -2, pow(2, 32) - 1])
 
-        state.register_file.registers = [0, 10, -10, pow(2, 32) - 1]
-        lb_1 = LB(imm=10, rs1=1, rd=0)
-        state = lb_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [3, 10, -10, pow(2, 32) - 1])
+        state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
+        instr = LH(imm=0, rs1=1, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [1027, 2, -2, pow(2, 32) - 1])
 
-        state.register_file.registers = [0, 10, -10, pow(2, 32) - 1]
-        lb_1 = LB(imm=10, rs1=2, rd=0)
-        state = lb_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [1, 10, -10, pow(2, 32) - 1])
+        state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
+        instr = LH(imm=2, rs1=1, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [1541, 2, -2, pow(2, 32) - 1])
 
-        state.register_file.registers = [0, 10, -10, pow(2, 32) - 1]
-        lb_1 = LB(imm=1, rs1=3, rd=0)
-        state = lb_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [1, 10, -10, pow(2, 32) - 1])
+        state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
+        instr = LH(imm=2, rs1=2, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [513, 2, -2, pow(2, 32) - 1])
+
+        state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
+        instr = LH(imm=1, rs1=3, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [513, 2, -2, pow(2, 32) - 1])
+
+        state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
+        instr = LH(imm=1, rs1=1, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [1284, 2, -2, pow(2, 32) - 1])
+
+        state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
+        instr = LH(imm=0, rs1=2, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [2055, 2, -2, pow(2, 32) - 1])
+
+        with self.assertRaises(KeyError):
+            instr = LH(imm=6, rs1=0, rd=0)
+            state = instr.behavior(state)
 
 
 class TestParser(unittest.TestCase):
