@@ -9,6 +9,8 @@ from architecture_simulator.isa.rv32i_instructions import (
     BNE,
     BTypeInstruction,
     SUB,
+    BGE,
+    BLTU,
 )
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 
@@ -29,6 +31,7 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.register_file.registers, [-4, 5, 9, 0])
 
     def test_btype(self):
+        # valid immediates
         try:
             BTypeInstruction(0, 0, 0, mnemonic="x")
             BTypeInstruction(0, 0, 2047, mnemonic="x")
@@ -36,6 +39,8 @@ class TestInstructions(unittest.TestCase):
         except Exception:
             print(Exception)
             self.fail("BTypeInstruction raised an exception upon instantiation")
+
+        # invalid immediates
         with self.assertRaises(ValueError):
             BTypeInstruction(0, 0, -2049, mnemonic="x")
         with self.assertRaises(ValueError):
@@ -44,37 +49,43 @@ class TestInstructions(unittest.TestCase):
     def test_beq(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=[0, 0, 1]))
 
+        # 0, 0
         state.program_counter = 0
-        beq_1 = BEQ(0, 1, 6)
-        state = beq_1.behavior(state)
+        instruction = BEQ(0, 1, 6)
+        state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
+        # 0, 1
         state.program_counter = 0
-        beq_2 = BEQ(0, 2, 6)
-        state = beq_2.behavior(state)
+        instruction = BEQ(0, 2, 6)
+        state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
+        # 0, 0 - negative immediate
         state.program_counter = 32
-        beq_1 = BEQ(0, 1, -6)
-        state = beq_1.behavior(state)
+        instruction = BEQ(0, 1, -6)
+        state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 16)
 
     def test_bne(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=[0, 0, 1]))
 
+        # 0, 0
         state.program_counter = 0
-        bne_1 = BNE(0, 1, 6)
-        state = bne_1.behavior(state)
+        instruction = BNE(0, 1, 6)
+        state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
+        # 0, 1
         state.program_counter = 0
-        bne_2 = BNE(0, 2, 6)
-        state = bne_2.behavior(state)
+        instruction = BNE(0, 2, 6)
+        state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
+        # 0, 1 - negative immediate
         state.program_counter = 32
-        bne_2 = BNE(0, 2, -6)
-        state = bne_2.behavior(state)
+        instruction = BNE(0, 2, -6)
+        state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 16)
 
     def test_blt(self):
@@ -82,39 +93,134 @@ class TestInstructions(unittest.TestCase):
             register_file=RegisterFile(registers=[0, 0, 1, pow(2, 32) - 1, pow(2, 31)])
         )
 
+        # 0, 0
         state.program_counter = 0
-        blt_1 = BLT(0, 1, 6)
-        state = blt_1.behavior(state)
+        instruction = BLT(0, 1, 6)
+        state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
+        # 1, 0
         state.program_counter = 0
-        blt_2 = BLT(2, 0, 6)
-        state = blt_2.behavior(state)
+        instruction = BLT(2, 0, 6)
+        state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
+        # 0, 1
         state.program_counter = 0
-        blt_2 = BLT(0, 2, 6)
-        state = blt_2.behavior(state)
+        instruction = BLT(0, 2, 6)
+        state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
+        # 0, 1 - negative immediate
         state.program_counter = 32
-        blt_2 = BLT(0, 2, -6)
-        state = blt_2.behavior(state)
+        instruction = BLT(0, 2, -6)
+        state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 16)
 
+        # 0, -1
         state.program_counter = 0
-        blt_2 = BLT(0, 3, 6)
-        state = blt_2.behavior(state)
+        instruction = BLT(0, 3, 6)
+        state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
+        # -1, 0
         state.program_counter = 0
-        blt_2 = BLT(3, 0, 6)
-        state = blt_2.behavior(state)
+        instruction = BLT(3, 0, 6)
+        state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
+        # -2^31, -1
         state.program_counter = 0
-        blt_2 = BLT(4, 3, 6)
-        state = blt_2.behavior(state)
+        instruction = BLT(4, 3, 6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+    def test_bge(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[0, 0, 1, pow(2, 32) - 1, pow(2, 31)])
+        )
+
+        # 0, 0
+        state.program_counter = 0
+        instruction = BGE(0, 1, 6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # 0, 1
+        state.program_counter = 0
+        instruction = BGE(0, 2, 6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 1, 0
+        state.program_counter = 0
+        instruction = BGE(2, 0, 6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # 1, 0 - negative immediate
+        state.program_counter = 32
+        instruction = BGE(2, 0, -6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 16)
+
+        # 0, -1
+        state.program_counter = 0
+        instruction = BGE(0, 3, 6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # -2^31, -1
+        state.program_counter = 0
+        instruction = BGE(4, 3, 6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+    def test_bltu(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[0, 0, 1, pow(2, 32) - 1, pow(2, 31)])
+        )
+
+        # 0, 0
+        state.program_counter = 0
+        instruction = BLTU(0, 1, 6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 1, 0
+        state.program_counter = 0
+        instruction = BLTU(2, 0, 6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 0, 1
+        state.program_counter = 0
+        instruction = BLTU(0, 2, 6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # 0, 1 - negative immediate
+        state.program_counter = 32
+        instruction = BLTU(0, 2, -6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 16)
+
+        # 0, (2^32 - 1)
+        state.program_counter = 0
+        instruction = BLTU(0, 3, 6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # (2^32 - 1), 0
+        state.program_counter = 0
+        instruction = BLTU(3, 0, 6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 2^31, (2^32 - 1)
+        state.program_counter = 0
+        instruction = BLTU(4, 3, 6)
+        state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
 
