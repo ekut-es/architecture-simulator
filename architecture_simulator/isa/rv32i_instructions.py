@@ -48,7 +48,7 @@ class LB(ITypeInstruction):
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         architectural_state.register_file.registers[
             self.rd
-        ] = architectural_state.memory.load_byte(rs1 + self.imm)
+        ] = architectural_state.memory.load_byte(int(rs1 + self.imm))
         return architectural_state
 
 
@@ -61,7 +61,7 @@ class LH(ITypeInstruction):
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         architectural_state.register_file.registers[
             self.rd
-        ] = architectural_state.memory.load_halfword(rs1 + self.imm)
+        ] = architectural_state.memory.load_halfword(int(rs1 + self.imm))
         return architectural_state
 
 
@@ -74,7 +74,7 @@ class LW(ITypeInstruction):
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         architectural_state.register_file.registers[
             self.rd
-        ] = architectural_state.memory.load_word(rs1 + self.imm)
+        ] = architectural_state.memory.load_word(int(rs1 + self.imm))
         return architectural_state
 
 
