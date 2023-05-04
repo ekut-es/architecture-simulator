@@ -1,8 +1,9 @@
 import unittest
 import fixedint
 
-from architecture_simulator.uarch.architectural_state import RegisterFile, Memory
-from architecture_simulator.isa.rv32i_instructions import ADD, SUB
+from architecture_simulator.uarch.architectural_state import RegisterFile
+from architecture_simulator.uarch.architectural_state import Memory
+from architecture_simulator.isa.rv32i_instructions import ADD, SUB, LB, LH, LW, LBU, LHU
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 
 from architecture_simulator.isa.parser import riscv_bnf, riscv_parser
@@ -26,6 +27,39 @@ class TestInstructions(unittest.TestCase):
         sub_1 = SUB(rs1=1, rs2=2, rd=0)
         state = sub_1.behavior(state)
         self.assertEqual(state.register_file.registers, [-4, 5, 9, 0])
+
+    def test_lb(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[0, 10, -10]),
+            memory=Memory(
+                memory_file=dict(
+                    [
+                        (0, fixedint.MutableUInt8(9)),
+                        (10, fixedint.MutableUInt8(10)),
+                        (20, fixedint.MutableUInt8(11)),
+                    ]
+                )
+            ),
+        )
+        state.register_file.registers = [0, 10, -10]
+        lb_1 = LB(imm=0, rs1=0, rd=0)
+        state = lb_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [9, 10, -10])
+
+        state.register_file.registers = [0, 10, -10]
+        lb_1 = LB(imm=10, rs1=0, rd=0)
+        state = lb_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [10, 10, -10])
+
+        state.register_file.registers = [0, 10, -10]
+        lb_1 = LB(imm=10, rs1=1, rd=0)
+        state = lb_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [11, 10, -10])
+
+        state.register_file.registers = [0, 10, -10]
+        lb_1 = LB(imm=10, rs1=2, rd=0)
+        state = lb_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [9, 10, -10])
 
 
 class TestParser(unittest.TestCase):
