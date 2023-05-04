@@ -48,7 +48,7 @@ class TestInstructions(unittest.TestCase):
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [1, 1, -1, pow(2, 32) - 1])
 
-        # imm=1, rs1 =0
+        # imm=1, rs1=0
         state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
         instr = LB(imm=1, rs1=0, rd=0)
         state = instr.behavior(state)
@@ -91,7 +91,7 @@ class TestInstructions(unittest.TestCase):
 
     def test_lh(self):
         state = ArchitecturalState(
-            register_file=RegisterFile(registers=[0, 1, -1, pow(2, 32) - 1]),
+            register_file=RegisterFile(registers=[0, 2, -2, pow(2, 32) - 1]),
             memory=Memory(
                 memory_file=dict(
                     [
@@ -107,48 +107,153 @@ class TestInstructions(unittest.TestCase):
                 )
             ),
         )
+        # imm=0, rs1=0
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
         instr = LH(imm=0, rs1=0, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [513, 2, -2, pow(2, 32) - 1])
 
+        # imm=2, rs1=0
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
         instr = LH(imm=2, rs1=0, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [1027, 2, -2, pow(2, 32) - 1])
 
+        # imm=0, rs1=2
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
         instr = LH(imm=0, rs1=1, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [1027, 2, -2, pow(2, 32) - 1])
 
+        # imm=2, rs1=2
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
         instr = LH(imm=2, rs1=1, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [1541, 2, -2, pow(2, 32) - 1])
 
+        # imm=2, rs1=-2
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
         instr = LH(imm=2, rs1=2, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [513, 2, -2, pow(2, 32) - 1])
 
+        # imm=1, rs1=2^32-1 equates to 0
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
         instr = LH(imm=1, rs1=3, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [513, 2, -2, pow(2, 32) - 1])
 
+        # imm=1, rs1=2 align error on memory address 3
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
         instr = LH(imm=1, rs1=1, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [1284, 2, -2, pow(2, 32) - 1])
 
+        # imm=0, rs1=-2 negative value of -2 gets converted to 2^32-2
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
         instr = LH(imm=0, rs1=2, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [2055, 2, -2, pow(2, 32) - 1])
 
+        # try memory acces to non existant address
         with self.assertRaises(KeyError):
             instr = LH(imm=6, rs1=0, rd=0)
+            state = instr.behavior(state)
+
+    def test_lw(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[0, 4, -4, pow(2, 32) - 1]),
+            memory=Memory(
+                memory_file=dict(
+                    [
+                        (0, fixedint.MutableUInt8(1)),
+                        (1, fixedint.MutableUInt8(1)),
+                        (2, fixedint.MutableUInt8(1)),
+                        (3, fixedint.MutableUInt8(1)),
+                        (4, fixedint.MutableUInt8(2)),
+                        (5, fixedint.MutableUInt8(2)),
+                        (6, fixedint.MutableUInt8(2)),
+                        (7, fixedint.MutableUInt8(2)),
+                        (8, fixedint.MutableUInt8(3)),
+                        (9, fixedint.MutableUInt8(3)),
+                        (10, fixedint.MutableUInt8(3)),
+                        (11, fixedint.MutableUInt8(3)),
+                        (12, fixedint.MutableUInt8(3)),
+                        (pow(2, 32) - 4, fixedint.MutableUInt8(4)),
+                        (pow(2, 32) - 3, fixedint.MutableUInt8(4)),
+                        (pow(2, 32) - 2, fixedint.MutableUInt8(4)),
+                        (pow(2, 32) - 1, fixedint.MutableUInt8(4)),
+                    ]
+                )
+            ),
+        )
+        # imm=0, rs1=0
+        state.register_file.registers = [0, 4, -4, pow(2, 32) - 1]
+        instr = LW(imm=0, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(
+            state.register_file.registers, [16843009, 4, -4, pow(2, 32) - 1]
+        )
+
+        # imm=4, rs1=0
+        state.register_file.registers = [0, 4, -4, pow(2, 32) - 1]
+        instr = LW(imm=4, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(
+            state.register_file.registers, [33686018, 4, -4, pow(2, 32) - 1]
+        )
+
+        # imm=0, rs1=4
+        state.register_file.registers = [0, 4, -4, pow(2, 32) - 1]
+        instr = LW(imm=0, rs1=1, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(
+            state.register_file.registers, [33686018, 4, -4, pow(2, 32) - 1]
+        )
+
+        # imm=4, rs1=4
+        state.register_file.registers = [0, 4, -4, pow(2, 32) - 1]
+        instr = LW(imm=4, rs1=1, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(
+            state.register_file.registers, [50529027, 4, -4, pow(2, 32) - 1]
+        )
+
+        # imm=4, rs1=-4
+        state.register_file.registers = [0, 4, -4, pow(2, 32) - 1]
+        instr = LW(imm=4, rs1=2, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(
+            state.register_file.registers, [16843009, 4, -4, pow(2, 32) - 1]
+        )
+
+        # imm=1, rs1=2^32-1 equates to 0
+        state.register_file.registers = [0, 4, -4, pow(2, 32) - 1]
+        instr = LW(imm=1, rs1=3, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(
+            state.register_file.registers, [16843009, 4, -4, pow(2, 32) - 1]
+        )
+
+        # imm=1, rs1=4 align error on memory address 5
+        state.register_file.registers = [0, 4, -4, pow(2, 32) - 1]
+        instr = LW(imm=1, rs1=1, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(
+            state.register_file.registers, [50463234, 4, -4, pow(2, 32) - 1]
+        )
+
+        # imm=0, rs1=-4 negative value of -4 gets converted to 2^32-4
+        state.register_file.registers = [0, 4, -4, pow(2, 32) - 1]
+        instr = LW(imm=0, rs1=2, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(
+            state.register_file.registers, [67372036, 4, -4, pow(2, 32) - 1]
+        )
+
+        # try memory acces to non existant address
+        with self.assertRaises(KeyError):
+            instr = LW(imm=13, rs1=0, rd=0)
             state = instr.behavior(state)
 
 
