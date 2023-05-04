@@ -56,7 +56,7 @@ class TestInstructions(unittest.TestCase):
         state = add.behavior(state)
         self.assertEqual(state.register_file.registers, [num_max, num_max, num_minus_2])
 
-        # 16 + (-7) = 9 non edge case addition
+        # 16 + (-7) = 9 (non edge case addition)
         add = ADD(rs1=3, rs2=4, rd=1)
         state = ArchitecturalState(
             register_file=RegisterFile(
@@ -68,7 +68,7 @@ class TestInstructions(unittest.TestCase):
             state.register_file.registers, [num_max, num_9, num_0, num_16, num_minus_7]
         )
 
-        # 0 + 0 = 0 :)
+        # 0 + 0 = 0
         add = ADD(rs1=2, rs2=2, rd=1)
         state = ArchitecturalState(
             register_file=RegisterFile(
@@ -220,6 +220,7 @@ class TestInstructions(unittest.TestCase):
         )
         state = slt.behavior(state)
         self.assertEqual(state.register_file.registers, [num_77, num_77, num_0])
+
         # numbers are treated as signed
         slt = SLT(rs1=0, rs2=1, rd=2)
         state = ArchitecturalState(
@@ -227,6 +228,7 @@ class TestInstructions(unittest.TestCase):
         )
         state = slt.behavior(state)
         self.assertEqual(state.register_file.registers, [num_min, num_max, num_1])
+
         # rs1 beeing smaller by one leads to 1
         slt = SLT(rs1=1, rs2=2, rd=0)
         state = ArchitecturalState(
@@ -234,6 +236,7 @@ class TestInstructions(unittest.TestCase):
         )
         state = slt.behavior(state)
         self.assertEqual(state.register_file.registers, [num_1, num_0, num_1])
+
         # rs1 beeing greater by one leads to 0
         slt = SLT(rs1=1, rs2=2, rd=0)
         state = ArchitecturalState(
@@ -256,6 +259,7 @@ class TestInstructions(unittest.TestCase):
         )
         state = sltu.behavior(state)
         self.assertEqual(state.register_file.registers, [num_77, num_77, num_0])
+
         # numbers are treated as unsigned
         sltu = SLTU(rs1=0, rs2=1, rd=2)
         state = ArchitecturalState(
@@ -263,6 +267,7 @@ class TestInstructions(unittest.TestCase):
         )
         state = sltu.behavior(state)
         self.assertEqual(state.register_file.registers, [num_max, num_0, num_0])
+
         # rs1 beeing smaller by one leads to 1
         sltu = SLTU(rs1=1, rs2=2, rd=0)
         state = ArchitecturalState(
@@ -270,6 +275,7 @@ class TestInstructions(unittest.TestCase):
         )
         state = sltu.behavior(state)
         self.assertEqual(state.register_file.registers, [num_1, num_0, num_1])
+
         # rs1 beeing greater by one leads to 0
         sltu = SLTU(rs1=1, rs2=2, rd=0)
         state = ArchitecturalState(
@@ -279,6 +285,7 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.register_file.registers, [num_0, num_1, num_0])
 
     def test_xor(self):
+        # Number defintions
         num_all_but_msb = fixedint.MutableUInt32(2147483647)
         num_msb = fixedint.MutableUInt32(2147483648)
         num_all_bits = fixedint.MutableUInt32(4294967295)
@@ -288,6 +295,7 @@ class TestInstructions(unittest.TestCase):
         num_b = fixedint.MutableUInt32(4294905615)  # FF FF 0F 0F
         num_c = fixedint.MutableUInt32(4080)  # 00 00 0F F0
 
+        # general test case
         xor = XOR(rs1=0, rs2=1, rd=2)
         state = ArchitecturalState(
             register_file=RegisterFile(registers=[num_all_but_msb, num_all_bits, num_0])
@@ -297,6 +305,7 @@ class TestInstructions(unittest.TestCase):
             state.register_file.registers, [num_all_but_msb, num_all_bits, num_msb]
         )
 
+        # test all combinations of bit pairs
         xor = XOR(rs1=3, rs2=4, rd=2)
         state = ArchitecturalState(
             register_file=RegisterFile(
@@ -308,6 +317,12 @@ class TestInstructions(unittest.TestCase):
             state.register_file.registers,
             [num_all_but_msb, num_all_bits, num_c, num_a, num_b],
         )
+
+        # zero xor zero = zero
+        xor = XOR(rs1=0, rs2=0, rd=1)
+        state = ArchitecturalState(register_file=RegisterFile(registers=[num_0, num_b]))
+        state = xor.behavior(state)
+        self.assertEqual(state.register_file.registers, [num_0, num_0])
 
     def test_srl(self):
         # Number definitions
@@ -397,6 +412,7 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.register_file.registers, [num_612, num_612, num_38])
 
     def test_or(self):
+        # Number definitions
         num_a = fixedint.MutableUInt32(16711698)  # 00 FF 00 12
         num_b = fixedint.MutableUInt32(252641280)  # 0F 0F 00 00
         num_c = fixedint.MutableUInt32(268369938)  # 0F FF 00 12
@@ -418,6 +434,7 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.register_file.registers, [num_a, num_b, num_c])
 
     def test_and(self):
+        # Number defintions
         num_a = fixedint.MutableUInt32(16711698)  # 00 FF 00 12
         num_b = fixedint.MutableUInt32(252641280)  # 0F 0F 00 00
         num_c = fixedint.MutableUInt32(983040)  # 00 0F 00 00
