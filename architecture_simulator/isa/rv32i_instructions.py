@@ -83,8 +83,8 @@ class SLT(RTypeInstruction):
         Returns:
             ArchitecturalState: _description_
         """
-        rs1 = int(fixedint.Int32(architectural_state.register_file.registers[self.rs1]))
-        rs2 = int(fixedint.Int32(architectural_state.register_file.registers[self.rs2]))
+        rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
+        rs2 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs2]))
         architectural_state.register_file.registers[self.rd] = (
             fixedint.MutableUInt32(1) if rs1 < rs2 else fixedint.MutableUInt32(0)
         )
