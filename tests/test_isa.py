@@ -2,7 +2,18 @@ import unittest
 import fixedint
 
 from architecture_simulator.uarch.architectural_state import RegisterFile
-from architecture_simulator.isa.rv32i_instructions import ADD, SUB, SLL, SLT, SLTU, XOR
+from architecture_simulator.isa.rv32i_instructions import (
+    ADD,
+    SUB,
+    SLL,
+    SLT,
+    SLTU,
+    XOR,
+    SRL,
+    SRA,
+    OR,
+    AND,
+)
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 
 from architecture_simulator.isa.parser import riscv_bnf, riscv_parser
@@ -152,8 +163,7 @@ class TestInstructions(unittest.TestCase):
         num_1 = fixedint.MutableUInt32(1)
         num_16 = fixedint.MutableUInt32(16)
         num_31 = fixedint.MutableUInt32(31)
-        num_32 = fixedint.MutableUInt32(32)
-        num_580 = fixedint.MutableUInt32(580)
+        num_612 = fixedint.MutableUInt32(612)
 
         # only most significant bit set shifted by one = zero
         sll = SLL(rs1=1, rs2=2, rd=0)
@@ -175,48 +185,24 @@ class TestInstructions(unittest.TestCase):
         sll = SLL(rs1=1, rs2=0, rd=4)
         state = ArchitecturalState(
             register_file=RegisterFile(
-                registers=[num_0, num_max, num_31, num_580, num_msb]
+                registers=[num_0, num_max, num_31, num_612, num_msb]
             )
         )
         state = sll.behavior(state)
         self.assertEqual(
-            state.register_file.registers, [num_0, num_max, num_31, num_580, num_max]
-        )
-
-        # shift by 32 will write zero
-        sll = SLL(rs1=1, rs2=0, rd=4)
-        state = ArchitecturalState(
-            register_file=RegisterFile(
-                registers=[num_32, num_max, num_31, num_580, num_msb]
-            )
-        )
-        state = sll.behavior(state)
-        self.assertEqual(
-            state.register_file.registers, [num_32, num_max, num_31, num_580, num_0]
-        )
-
-        # overshift will write zero
-        sll = SLL(rs1=1, rs2=1, rd=4)
-        state = ArchitecturalState(
-            register_file=RegisterFile(
-                registers=[num_32, num_max, num_31, num_580, num_msb]
-            )
-        )
-        state = sll.behavior(state)
-        self.assertEqual(
-            state.register_file.registers, [num_32, num_max, num_31, num_580, num_0]
+            state.register_file.registers, [num_0, num_max, num_31, num_612, num_max]
         )
 
         # higher bits do not affect shift amount
         sll = SLL(rs1=1, rs2=2, rd=3)
         state = ArchitecturalState(
             register_file=RegisterFile(
-                registers=[num_32, num_1, num_580, num_580, num_0]
+                registers=[num_612, num_1, num_612, num_612, num_0]
             )
         )
         state = sll.behavior(state)
         self.assertEqual(
-            state.register_file.registers, [num_32, num_1, num_580, num_16, num_0]
+            state.register_file.registers, [num_612, num_1, num_612, num_16, num_0]
         )
 
     def test_slt(self):
@@ -324,16 +310,133 @@ class TestInstructions(unittest.TestCase):
         )
 
     def test_srl(self):
-        pass
+        # Number definitions
+        num_max = fixedint.MutableUInt32(4294967295)
+        num_0 = fixedint.MutableUInt32(0)
+        num_1 = fixedint.MutableUInt32(1)
+        num_31 = fixedint.MutableUInt32(31)
+        num_612 = fixedint.MutableUInt32(612)
+
+        # one shifted by one = zero
+        srl = SRL(rs1=1, rs2=2, rd=0)
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[num_max, num_1, num_1])
+        )
+        state = srl.behavior(state)
+        self.assertEqual(state.register_file.registers, [num_0, num_1, num_1])
+
+        # FFFFFFFF shifted by 31 = one
+        srl = SRL(rs1=0, rs2=1, rd=0)
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[num_max, num_31, num_612])
+        )
+        state = srl.behavior(state)
+        self.assertEqual(state.register_file.registers, [num_1, num_31, num_612])
+
+        # shif by zero only writes state
+        srl = SRL(rs1=0, rs2=1, rd=0)
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[num_max, num_0, num_612])
+        )
+        state = srl.behavior(state)
+        self.assertEqual(state.register_file.registers, [num_max, num_0, num_612])
+
+        # higher bits do not affect shift amount
+        srl = SRL(rs1=0, rs2=1, rd=2)
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[num_31, num_612, num_612])
+        )
+        state = srl.behavior(state)
+        self.assertEqual(state.register_file.registers, [num_31, num_612, num_1])
 
     def test_sra(self):
-        pass
+        # Number definitions
+        num_all_set = fixedint.MutableUInt32(4294967295)
+        num_msb_set = fixedint.MutableUInt32(2147483648)
+        num_second_set = fixedint.MutableUInt32(1073741824)
+        num_0 = fixedint.MutableUInt32(0)
+        num_1 = fixedint.MutableUInt32(1)
+        num_30 = fixedint.MutableUInt32(30)
+        num_31 = fixedint.MutableUInt32(31)
+        num_38 = fixedint.MutableUInt32(38)
+        num_612 = fixedint.MutableUInt32(612)
+        num_2pow26 = fixedint.MutableUInt32(67108864)
+
+        # negative numbers get extended with one´s
+        sra = SRA(rs1=0, rs2=1, rd=2)
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[num_msb_set, num_31, num_0])
+        )
+        state = sra.behavior(state)
+        self.assertEqual(
+            state.register_file.registers, [num_msb_set, num_31, num_all_set]
+        )
+        # positive numbers get extended with zero´s
+        sra = SRA(rs1=0, rs2=1, rd=2)
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[num_second_set, num_30, num_all_set])
+        )
+        state = sra.behavior(state)
+        self.assertEqual(state.register_file.registers, [num_second_set, num_30, num_1])
+
+        # shift amount only affected by 5 lower bits
+        sra = SRA(rs1=0, rs2=1, rd=2)
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[num_second_set, num_612, num_all_set])
+        )
+        state = sra.behavior(state)
+        self.assertEqual(
+            state.register_file.registers, [num_second_set, num_612, num_2pow26]
+        )
+        # percision test
+        sra = SRA(rs1=0, rs2=1, rd=2)
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[num_612, num_612, num_all_set])
+        )
+        state = sra.behavior(state)
+        self.assertEqual(state.register_file.registers, [num_612, num_612, num_38])
 
     def test_or(self):
-        pass
+        num_a = fixedint.MutableUInt32(16711698)  # 00 FF 00 12
+        num_b = fixedint.MutableUInt32(252641280)  # 0F 0F 00 00
+        num_c = fixedint.MutableUInt32(268369938)  # 0F FF 00 12
+
+        # Test bit wise behavior
+        or_inst = OR(rs1=0, rs2=1, rd=2)
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[num_a, num_b, num_a])
+        )
+        state = or_inst.behavior(state)
+        self.assertEqual(state.register_file.registers, [num_a, num_b, num_c])
+
+        # Test kommutativity
+        or_inst = OR(rs1=1, rs2=0, rd=2)
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[num_a, num_b, num_a])
+        )
+        state = or_inst.behavior(state)
+        self.assertEqual(state.register_file.registers, [num_a, num_b, num_c])
 
     def test_and(self):
-        pass
+        num_a = fixedint.MutableUInt32(16711698)  # 00 FF 00 12
+        num_b = fixedint.MutableUInt32(252641280)  # 0F 0F 00 00
+        num_c = fixedint.MutableUInt32(983040)  # 00 0F 00 00
+
+        # Test bit wise behavior
+        and_inst = AND(rs1=0, rs2=1, rd=2)
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[num_a, num_b, num_a])
+        )
+        state = and_inst.behavior(state)
+        self.assertEqual(state.register_file.registers, [num_a, num_b, num_c])
+
+        # Test kommutativity
+        and_inst = AND(rs1=1, rs2=0, rd=2)
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[num_a, num_b, num_a])
+        )
+        state = and_inst.behavior(state)
+        self.assertEqual(state.register_file.registers, [num_a, num_b, num_c])
 
 
 class TestParser(unittest.TestCase):
