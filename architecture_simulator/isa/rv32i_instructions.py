@@ -12,13 +12,15 @@ class ADD(RTypeInstruction):
         super().__init__(rs1, rs2, rd, mnemonic="add")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
-        """rd = rs1 + rs2
+        """
+        Addition:
+            rd = rs1 + rs2
 
         Args:
-            architectural_state (ArchitecturalState): _description_
+            architectural_state
 
         Returns:
-            ArchitecturalState: _description_
+            architectural_state
         """
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
@@ -31,13 +33,15 @@ class SUB(RTypeInstruction):
         super().__init__(rs1, rs2, rd, mnemonic="sub")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
-        """rd = rs1 - rs2
+        """
+        Subtraction:
+            rd = rs1 - rs2
 
         Args:
-            architectural_state (ArchitecturalState): _description_
+            architectural_state
 
         Returns:
-            ArchitecturalState: _description_
+            architectural_state
         """
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
@@ -52,13 +56,17 @@ class SLL(RTypeInstruction):
         super().__init__(rs1, rs2, rd, mnemonic="sll")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
-        """rd = rs1 << rs2
+        """
+        Shift left logical:
+            rd = rs1 << rs2
+
+        (shift amount determined by lower 5 bits of rs2)
 
         Args:
-            architectural_state (ArchitecturalState): _description_
+            architectural_state
 
         Returns:
-            ArchitecturalState: _description_
+            architectural_state
         """
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[
@@ -73,13 +81,17 @@ class SLT(RTypeInstruction):
         super().__init__(rs1, rs2, rd, mnemonic="slt")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
-        """rd = 1 if [signed(rs1) < signed(rs2)] else 0
+        """
+        Set lower than:
+            rd = 1 if (rs1 < rs2) else 0
+
+        (register values are interpreted as signed integers)
 
         Args:
-            architectural_state (ArchitecturalState): _description_
+            architectural_state
 
         Returns:
-            ArchitecturalState: _description_
+            architectural_state
         """
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         rs2 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs2]))
@@ -94,13 +106,17 @@ class SLTU(RTypeInstruction):
         super().__init__(rs1, rs2, rd, mnemonic="sltu")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
-        """rd = 1 if [unsigned(rs1) < unsigend(rs2)] else 0
+        """
+        Set lower than unsigned:
+            rd = 1 if (rs1 < rs2) else 0
+
+        (register values are interpreted as unsigned integers)
 
         Args:
-            architectural_state (ArchitecturalState): _description_
+            architectural_state
 
         Returns:
-            ArchitecturalState: _description_
+            architectural_state
         """
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
@@ -115,13 +131,17 @@ class XOR(RTypeInstruction):
         super().__init__(rs1, rs2, rd, mnemonic="xor")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
-        """rd = rs1 ^ rs2
+        """
+        XOR:
+            rd = rs1 ^ rs2
+
+        (executed bitwise)
 
         Args:
-            architectural_state (ArchitecturalState): _description_
+            architectural_state
 
         Returns:
-            ArchitecturalState: _description_
+            architectural_state
         """
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
@@ -134,13 +154,17 @@ class SRL(RTypeInstruction):
         super().__init__(rs1, rs2, rd, mnemonic="srl")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
-        """rd = rs1 >> rs2
+        """
+        Shift right logical:
+            rd = rs1 >> rs2
+
+        (shift amount determined by lower 5 bits of rs2)
 
         Args:
-            architectural_state (ArchitecturalState): _description_
+            architectural_state
 
         Returns:
-            ArchitecturalState: _description_
+            architectural_state
         """
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[
@@ -155,13 +179,17 @@ class SRA(RTypeInstruction):
         super().__init__(rs1, rs2, rd, mnemonic="sra")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
-        """rd = rs1 >> rs2 (logical shift with rs1 and rs2 treated as signed numbers)
+        """
+        Shift right arithmetic:
+            rd = rs1 >>s rs2
+
+        (shift amount determined by lower 5 bits of rs2)
 
         Args:
-            architectural_state (ArchitecturalState): _description_
+            architectural_state
 
         Returns:
-            ArchitecturalState: _description_
+            architectural_state
         """
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         rs2 = fixedint.Int32(
@@ -181,13 +209,17 @@ class OR(RTypeInstruction):
         super().__init__(rs1, rs2, rd, mnemonic="or")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
-        """rd = rs1 | rs2
+        """
+        OR:
+            rd = rs1 | rs2
+
+        (executed bitwise)
 
         Args:
-            architectural_state (ArchitecturalState): _description_
+            architectural_state
 
         Returns:
-            ArchitecturalState: _description_
+            architectural_state
         """
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
@@ -200,13 +232,17 @@ class AND(RTypeInstruction):
         super().__init__(rs1, rs2, rd, mnemonic="and")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
-        """rd = rs1 | rs2
+        """
+        AND:
+            rd = rs1 & rs2
+
+        (executed bitwise)
 
         Args:
-            architectural_state (ArchitecturalState): _description_
+            architectural_state
 
         Returns:
-            ArchitecturalState: _description_
+            architectural_state
         """
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
@@ -222,6 +258,7 @@ instruction_map = {
     "sltu": SLTU,
     "xor": XOR,
     "srl": SRL,
+    "sra": SRA,
     "or": OR,
     "and": AND,
 }
