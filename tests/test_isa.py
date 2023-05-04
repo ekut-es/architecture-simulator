@@ -2,7 +2,7 @@ import unittest
 import fixedint
 
 from architecture_simulator.uarch.architectural_state import RegisterFile
-from architecture_simulator.isa.rv32i_instructions import ADD, SUB, SLL
+from architecture_simulator.isa.rv32i_instructions import ADD, SUB, SLL, SLT, SLTU, XOR
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 
 from architecture_simulator.isa.parser import riscv_bnf, riscv_parser
@@ -220,13 +220,108 @@ class TestInstructions(unittest.TestCase):
         )
 
     def test_slt(self):
-        pass
+        # Number definitions
+        num_min = fixedint.MutableUInt32(2147483648)
+        num_max = fixedint.MutableUInt32(2147483647)
+        num_0 = fixedint.MutableUInt32(0)
+        num_1 = fixedint.MutableUInt32(1)
+        num_77 = fixedint.MutableUInt32(77)
+
+        # equivalenz leads to 0
+        slt = SLT(rs1=1, rs2=0, rd=2)
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[num_77, num_77, num_77])
+        )
+        state = slt.behavior(state)
+        self.assertEqual(state.register_file.registers, [num_77, num_77, num_0])
+        # numbers are treated as signed
+        slt = SLT(rs1=0, rs2=1, rd=2)
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[num_min, num_max, num_77])
+        )
+        state = slt.behavior(state)
+        self.assertEqual(state.register_file.registers, [num_min, num_max, num_1])
+        # rs1 beeing smaller by one leads to 1
+        slt = SLT(rs1=1, rs2=2, rd=0)
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[num_min, num_0, num_1])
+        )
+        state = slt.behavior(state)
+        self.assertEqual(state.register_file.registers, [num_1, num_0, num_1])
+        # rs1 beeing greater by one leads to 0
+        slt = SLT(rs1=1, rs2=2, rd=0)
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[num_min, num_1, num_0])
+        )
+        state = slt.behavior(state)
+        self.assertEqual(state.register_file.registers, [num_0, num_1, num_0])
 
     def test_sltu(self):
-        pass
+        # Number definitions
+        num_0 = fixedint.MutableUInt32(0)
+        num_max = fixedint.MutableUInt32(4294967295)
+        num_1 = fixedint.MutableUInt32(1)
+        num_77 = fixedint.MutableUInt32(77)
+
+        # equivalenz leads to 0
+        sltu = SLTU(rs1=1, rs2=0, rd=2)
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[num_77, num_77, num_77])
+        )
+        state = sltu.behavior(state)
+        self.assertEqual(state.register_file.registers, [num_77, num_77, num_0])
+        # numbers are treated as unsigned
+        sltu = SLTU(rs1=0, rs2=1, rd=2)
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[num_max, num_0, num_77])
+        )
+        state = sltu.behavior(state)
+        self.assertEqual(state.register_file.registers, [num_max, num_0, num_0])
+        # rs1 beeing smaller by one leads to 1
+        sltu = SLTU(rs1=1, rs2=2, rd=0)
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[num_max, num_0, num_1])
+        )
+        state = sltu.behavior(state)
+        self.assertEqual(state.register_file.registers, [num_1, num_0, num_1])
+        # rs1 beeing greater by one leads to 0
+        sltu = SLTU(rs1=1, rs2=2, rd=0)
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[num_max, num_1, num_0])
+        )
+        state = sltu.behavior(state)
+        self.assertEqual(state.register_file.registers, [num_0, num_1, num_0])
 
     def test_xor(self):
-        pass
+        num_all_but_msb = fixedint.MutableUInt32(2147483647)
+        num_msb = fixedint.MutableUInt32(2147483648)
+        num_all_bits = fixedint.MutableUInt32(4294967295)
+        num_0 = fixedint.MutableUInt32(0)
+
+        num_a = fixedint.MutableUInt32(4294902015)  # FF FF 00 FF
+        num_b = fixedint.MutableUInt32(4294905615)  # FF FF 0F 0F
+        num_c = fixedint.MutableUInt32(4080)  # 00 00 0F F0
+
+        xor = XOR(rs1=0, rs2=1, rd=2)
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[num_all_but_msb, num_all_bits, num_0])
+        )
+        state = xor.behavior(state)
+        self.assertEqual(
+            state.register_file.registers, [num_all_but_msb, num_all_bits, num_msb]
+        )
+
+        xor = XOR(rs1=3, rs2=4, rd=2)
+        state = ArchitecturalState(
+            register_file=RegisterFile(
+                registers=[num_all_but_msb, num_all_bits, num_0, num_a, num_b]
+            )
+        )
+        state = xor.behavior(state)
+        self.assertEqual(
+            state.register_file.registers,
+            [num_all_but_msb, num_all_bits, num_c, num_a, num_b],
+        )
 
     def test_srl(self):
         pass

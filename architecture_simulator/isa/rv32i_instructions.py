@@ -30,7 +30,7 @@ class ADD(RTypeInstruction):
 
 class SUB(RTypeInstruction):
     def __init__(self, rs1: int, rs2: int, rd: int):
-        super().__init__(rs1, rs2, rd, mnemonic="add")
+        super().__init__(rs1, rs2, rd, mnemonic="sub")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """rd = rs1 - rs2
@@ -70,4 +70,72 @@ class SLL(RTypeInstruction):
         return architectural_state
 
 
-instruction_map = {"add": ADD, "sub": SUB, "sll": SLL}
+class SLT(RTypeInstruction):
+    def __init__(self, rs1: int, rs2: int, rd: int):
+        super().__init__(rs1, rs2, rd, mnemonic="slt")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """rd = 1 if [signed(rs1) < signed(rs2)] else 0
+
+        Args:
+            architectural_state (ArchitecturalState): _description_
+
+        Returns:
+            ArchitecturalState: _description_
+        """
+        rs1 = int(fixedint.Int32(architectural_state.register_file.registers[self.rs1]))
+        rs2 = int(fixedint.Int32(architectural_state.register_file.registers[self.rs2]))
+        architectural_state.register_file.registers[self.rd] = (
+            fixedint.MutableUInt32(1) if rs1 < rs2 else fixedint.MutableUInt32(0)
+        )
+        return architectural_state
+
+
+class SLTU(RTypeInstruction):
+    def __init__(self, rs1: int, rs2: int, rd: int):
+        super().__init__(rs1, rs2, rd, mnemonic="sltu")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """rd = 1 if [unsigned(rs1) < unsigend(rs2)] else 0
+
+        Args:
+            architectural_state (ArchitecturalState): _description_
+
+        Returns:
+            ArchitecturalState: _description_
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        architectural_state.register_file.registers[self.rd] = (
+            fixedint.MutableUInt32(1) if rs1 < rs2 else fixedint.MutableUInt32(0)
+        )
+        return architectural_state
+
+
+class XOR(RTypeInstruction):
+    def __init__(self, rs1: int, rs2: int, rd: int):
+        super().__init__(rs1, rs2, rd, mnemonic="xor")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """rd = rs1 ^ rs2
+
+        Args:
+            architectural_state (ArchitecturalState): _description_
+
+        Returns:
+            ArchitecturalState: _description_
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        architectural_state.register_file.registers[self.rd] = rs1 ^ rs2
+        return architectural_state
+
+
+instruction_map = {
+    "add": ADD,
+    "sub": SUB,
+    "sll": SLL,
+    "slt": SLT,
+    "sltu": SLTU,
+    "xor": XOR,
+}
