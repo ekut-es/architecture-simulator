@@ -28,7 +28,7 @@ class BTypeInstruction(Instruction):
             rs2 (int): source register 2
             imm (int): offset to be added to the pc. Needs to be a 12 bit signed integer. Interpreted as multiple of 2 bytes.
         """
-        if -2048 < imm or 2047 < imm:
+        if imm < -2048 or 2047 < imm:
             raise ValueError(
                 "B-Type Instruction immediate values have to be in range(-2048, 2048). Given immediate was "
                 + str(imm)
