@@ -37,7 +37,7 @@ class SUB(RTypeInstruction):
 
 
 class BEQ(BTypeInstruction):
-    def __init__(self, rs1: int, rs2: int, imm: c_int32):
+    def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1, rs2, imm, mnemonic="beq")
 
     def behavior(self, architectural_state: ArchitecturalState):
@@ -45,12 +45,12 @@ class BEQ(BTypeInstruction):
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
         if rs1 == rs2:
-            architectural_state.program_counter += self.imm - 4
+            architectural_state.program_counter += self.imm * 2 - 4
         return architectural_state
 
 
 class BNE(BTypeInstruction):
-    def __init__(self, rs1: int, rs2: int, imm: c_int32):
+    def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1, rs2, imm, mnemonic="bne")
 
     def behavior(self, architectural_state: ArchitecturalState):
@@ -58,33 +58,33 @@ class BNE(BTypeInstruction):
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
         if rs1 != rs2:
-            architectural_state.program_counter += self.imm - 4
+            architectural_state.program_counter += self.imm * 2 - 4
         return architectural_state
 
 
 class BLT(BTypeInstruction):
-    def __init__(self, rs1: int, rs2: int, imm: c_int32):
+    def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1, rs2, imm, mnemonic="blt")
 
     def behavior(self, architectural_state: ArchitecturalState):
         """if (x[rs1] <s x[rs2]) pc += sext(imm)"""
-        rs1 = architectural_state.register_file.registers[self.rs1]
-        rs2 = architectural_state.register_file.registers[self.rs2]
+        rs1 = fixedint.Int32(architectural_state.register_file.registers[self.rs1])
+        rs2 = fixedint.Int32(architectural_state.register_file.registers[self.rs2])
         if rs1 < rs2:
-            architectural_state.program_counter += self.imm - 4
+            architectural_state.program_counter += self.imm * 2 - 4
         return architectural_state
 
 
-class BEQ(BTypeInstruction):
-    def __init__(self, rs1: int, rs2: int, imm: c_int32):
-        super().__init__(rs1, rs2, imm, mnemonic="beq")
+class BGE(BTypeInstruction):
+    def __init__(self, rs1: int, rs2: int, imm: int):
+        super().__init__(rs1, rs2, imm, mnemonic="bge")
 
     def behavior(self, architectural_state: ArchitecturalState):
-        """if (x[rs1] == x[rs2]) pc += sext(imm)"""
-        rs1 = architectural_state.register_file.registers[self.rs1]
-        rs2 = architectural_state.register_file.registers[self.rs2]
-        if rs1 == rs2:
-            architectural_state.program_counter += self.imm - 4
+        """if (x[rs1] >= x[rs2]) pc += sext(imm)"""
+        rs1 = fixedint.Int32(architectural_state.register_file.registers[self.rs1])
+        rs2 = fixedint.Int32(architectural_state.register_file.registers[self.rs2])
+        if rs1 >= rs2:
+            architectural_state.program_counter += self.imm * 2 - 4
         return architectural_state
 
 
