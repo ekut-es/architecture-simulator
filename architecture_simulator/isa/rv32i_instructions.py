@@ -46,10 +46,18 @@ class LB(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = sext(M[x[rs1] + sext(imm)][7:0])"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
-        architectural_state.register_file.registers[self.rd] = fixedint.Int32(
+        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             int(
-                fixedint.Int8(
-                    int(architectural_state.memory.load_byte(int(rs1 + self.imm)))
+                fixedint.Int32(
+                    int(
+                        fixedint.Int8(
+                            int(
+                                architectural_state.memory.load_byte(
+                                    int(rs1 + self.imm)
+                                )
+                            )
+                        )
+                    )
                 )
             )
         )
@@ -63,10 +71,18 @@ class LH(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = sext(M[x[rs1] + sext(imm)][15:0])"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
-        architectural_state.register_file.registers[self.rd] = fixedint.Int32(
+        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             int(
-                fixedint.Int16(
-                    int(architectural_state.memory.load_halfword(int(rs1 + self.imm)))
+                fixedint.Int32(
+                    int(
+                        fixedint.Int16(
+                            int(
+                                architectural_state.memory.load_halfword(
+                                    int(rs1 + self.imm)
+                                )
+                            )
+                        )
+                    )
                 )
             )
         )
@@ -80,8 +96,12 @@ class LW(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = sext(M[x[rs1] + sext(imm)][31:0])"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
-        architectural_state.register_file.registers[self.rd] = fixedint.Int32(
-            int(architectural_state.memory.load_word(int(rs1 + self.imm)))
+        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
+            int(
+                fixedint.Int32(
+                    int(architectural_state.memory.load_word(int(rs1 + self.imm)))
+                )
+            )
         )
         return architectural_state
 
@@ -93,9 +113,9 @@ class LBU(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = M[x[rs1] + sext(imm)][7:0]"""
         rs1 = architectural_state.register_file.registers[self.rs1]
-        architectural_state.register_file.registers[
-            self.rd
-        ] = architectural_state.memory.load_byte(rs1 + self.imm)
+        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
+            int(architectural_state.memory.load_byte(rs1 + self.imm))
+        )
         return architectural_state
 
 
@@ -106,18 +126,13 @@ class LHU(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = M[x[rs1] + sext(imm)][15:0]"""
         rs1 = architectural_state.register_file.registers[self.rs1]
-        architectural_state.register_file.registers[
-            self.rd
-        ] = architectural_state.memory.load_halfword(rs1 + self.imm)
+        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
+            int(architectural_state.memory.load_halfword(rs1 + self.imm))
+        )
         return architectural_state
 
 
 instruction_map = {
     "add": ADD,
     "sub": SUB,
-    "lb": LB,
-    "lh": LH,
-    "lw": LW,
-    "lbu": LBU,
-    "lhu": LHU,
 }
