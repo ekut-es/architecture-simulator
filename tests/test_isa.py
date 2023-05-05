@@ -27,6 +27,35 @@ class TestInstructions(unittest.TestCase):
         state = sub_1.behavior(state)
         self.assertEqual(state.register_file.registers, [-4, 5, 9, 0])
 
+    def test_mem(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=()),
+            memory=Memory(memory_file=dict()),
+        )
+        # store_byte test
+        state.memory.store_byte(0, fixedint.MutableUInt8(1))
+        self.assertEqual(state.memory.load_byte(0), fixedint.MutableUInt8(1))
+
+        # store_halfword test
+        state.memory.store_halfword(0, fixedint.MutableUInt16(1))
+        self.assertEqual(state.memory.load_halfword(0), fixedint.MutableUInt16(1))
+
+        # store_word test
+        state.memory.store_word(0, fixedint.MutableUInt32(1))
+        self.assertEqual(state.memory.load_word(0), fixedint.MutableUInt32(1))
+
+        # store_byte negative value test
+        state.memory.store_byte(0, fixedint.MutableUInt8(-1))
+        self.assertEqual(state.memory.load_byte(0), fixedint.MutableUInt8(-1))
+
+        # store_halfword negative value test
+        state.memory.store_halfword(0, fixedint.MutableUInt16(-1))
+        self.assertEqual(state.memory.load_halfword(0), fixedint.MutableUInt16(-1))
+
+        # store_word test
+        state.memory.store_word(0, fixedint.MutableUInt32(-1))
+        self.assertEqual(state.memory.load_word(0), fixedint.MutableUInt32(-1))
+
 
 class TestParser(unittest.TestCase):
     program = """
