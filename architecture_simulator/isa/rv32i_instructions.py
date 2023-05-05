@@ -114,7 +114,7 @@ class LBU(ITypeInstruction):
         """x[rd] = M[x[rs1] + sext(imm)][7:0]"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            int(architectural_state.memory.load_byte(rs1 + self.imm))
+            int(architectural_state.memory.load_byte(int(rs1 + self.imm)))
         )
         return architectural_state
 
@@ -127,7 +127,7 @@ class LHU(ITypeInstruction):
         """x[rd] = M[x[rs1] + sext(imm)][15:0]"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            int(architectural_state.memory.load_halfword(rs1 + self.imm))
+            int(architectural_state.memory.load_halfword(int(rs1 + self.imm)))
         )
         return architectural_state
 
