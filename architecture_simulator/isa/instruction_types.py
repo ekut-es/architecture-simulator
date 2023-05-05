@@ -17,3 +17,33 @@ class RTypeInstruction(Instruction):
         self.rs1 = rs1
         self.rs2 = rs2
         self.rd = rd
+        
+        
+class CSRTypeInstruction(Instruction):
+    """Create an I-Type instruction
+
+    Args:
+        rd (int): register destination
+        csr (int): the control/status register's index
+        rs1 (int): source register 1
+    """    
+    def __init__(self, rd: int, csr: int, rs1: int, **args):
+        super().__init__(**args)
+        self.rd = rd
+        self.csr = csr
+        self.rs1 = rs1
+
+class CSRITypeInstruction(Instruction):
+    """Create an I-Type instruction
+
+    Args:
+        rd (int): register destination
+        csr (int): the control/status register's index
+        imm (int): immediate
+    """    
+    def __init__(self, rd: int, csr: int, uimm: int, **args):
+        super().__init__(**args)
+        self.rd = rd
+        self.csr = csr
+        self.uimm = uimm      
+        
