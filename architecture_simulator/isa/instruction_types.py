@@ -22,6 +22,7 @@ class RTypeInstruction(Instruction):
 class BTypeInstruction(Instruction):
     def __init__(self, rs1: int, rs2: int, imm: int, **args):
         """Create a B-Type instruction
+        Note: These B-Type-Instructions will actually set the pc to 2*imm-4, because the simulator will always add 4 to the pc.
 
         Args:
             rs1 (int): source register 1
