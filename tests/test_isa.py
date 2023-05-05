@@ -11,6 +11,7 @@ from architecture_simulator.isa.rv32i_instructions import (
     SUB,
     BGE,
     BLTU,
+    BGEU,
 )
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 
@@ -222,6 +223,47 @@ class TestInstructions(unittest.TestCase):
         instruction = BLTU(4, 3, 6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
+
+    def test_bgeu(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[0, 0, 1, pow(2, 32) - 1, pow(2, 31)])
+        )
+
+        # 0, 0
+        state.program_counter = 0
+        instruction = BGEU(0, 1, 6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # 0, 1
+        state.program_counter = 0
+        instruction = BGEU(0, 2, 6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 1, 0
+        state.program_counter = 0
+        instruction = BGEU(2, 0, 6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # 1, 0 - negative immediate
+        state.program_counter = 32
+        instruction = BGEU(2, 0, -6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 16)
+
+        # 0, (2^32 - 1)
+        state.program_counter = 0
+        instruction = BGEU(0, 3, 6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 2^31, (2^32 - 1)
+        state.program_counter = 0
+        instruction = BGEU(4, 3, 6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
 
 
 class TestParser(unittest.TestCase):
