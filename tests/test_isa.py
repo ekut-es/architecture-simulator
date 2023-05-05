@@ -61,7 +61,7 @@ class TestInstructions(unittest.TestCase):
         # store_word test
         state.memory.store_word(0, fixedint.MutableUInt32(-1))
         self.assertEqual(state.memory.load_word(0), fixedint.MutableUInt32(-1))
-        
+
     def test_lb(self):
         state = ArchitecturalState(
             register_file=RegisterFile(registers=[0, 1, -1, pow(2, 32) - 1]),
