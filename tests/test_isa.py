@@ -1,4 +1,5 @@
 import unittest
+import fixedint
 
 from architecture_simulator.uarch.architectural_state import RegisterFile
 from architecture_simulator.isa.rv32i_instructions import ADD, SUB
