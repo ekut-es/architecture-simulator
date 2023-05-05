@@ -8,8 +8,8 @@ import fixedint
 
 
 class ADD(RTypeInstruction):
-    def __init__(self, rs1: int, rs2: int, rd: int):
-        super().__init__(rs1, rs2, rd, mnemonic="add")
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="add")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """
@@ -29,8 +29,8 @@ class ADD(RTypeInstruction):
 
 
 class SUB(RTypeInstruction):
-    def __init__(self, rs1: int, rs2: int, rd: int):
-        super().__init__(rs1, rs2, rd, mnemonic="sub")
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="sub")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """
@@ -52,8 +52,8 @@ class SUB(RTypeInstruction):
 
 
 class SLL(RTypeInstruction):
-    def __init__(self, rs1: int, rs2: int, rd: int):
-        super().__init__(rs1, rs2, rd, mnemonic="sll")
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="sll")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """
@@ -77,8 +77,8 @@ class SLL(RTypeInstruction):
 
 
 class SLT(RTypeInstruction):
-    def __init__(self, rs1: int, rs2: int, rd: int):
-        super().__init__(rs1, rs2, rd, mnemonic="slt")
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="slt")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """
@@ -102,8 +102,8 @@ class SLT(RTypeInstruction):
 
 
 class SLTU(RTypeInstruction):
-    def __init__(self, rs1: int, rs2: int, rd: int):
-        super().__init__(rs1, rs2, rd, mnemonic="sltu")
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="sltu")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """
@@ -127,8 +127,8 @@ class SLTU(RTypeInstruction):
 
 
 class XOR(RTypeInstruction):
-    def __init__(self, rs1: int, rs2: int, rd: int):
-        super().__init__(rs1, rs2, rd, mnemonic="xor")
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="xor")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """
@@ -150,8 +150,8 @@ class XOR(RTypeInstruction):
 
 
 class SRL(RTypeInstruction):
-    def __init__(self, rs1: int, rs2: int, rd: int):
-        super().__init__(rs1, rs2, rd, mnemonic="srl")
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="srl")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """
@@ -175,8 +175,8 @@ class SRL(RTypeInstruction):
 
 
 class SRA(RTypeInstruction):
-    def __init__(self, rs1: int, rs2: int, rd: int):
-        super().__init__(rs1, rs2, rd, mnemonic="sra")
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="sra")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """
@@ -205,8 +205,8 @@ class SRA(RTypeInstruction):
 
 
 class OR(RTypeInstruction):
-    def __init__(self, rs1: int, rs2: int, rd: int):
-        super().__init__(rs1, rs2, rd, mnemonic="or")
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="or")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """
@@ -228,8 +228,8 @@ class OR(RTypeInstruction):
 
 
 class AND(RTypeInstruction):
-    def __init__(self, rs1: int, rs2: int, rd: int):
-        super().__init__(rs1, rs2, rd, mnemonic="and")
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="and")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """
