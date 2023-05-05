@@ -6,6 +6,12 @@ from ..uarch.architectural_state import ArchitecturalState
 import fixedint
 
 # todo: use ctypes
+class ECALLException(Exception):
+    "Raises when an ECALL is executed"
+
+
+class EBREAKException(Exception):
+    "Raises when an EBREAK is executed"
 
 
 class ADD(RTypeInstruction):
@@ -112,6 +118,55 @@ class LHU(ITypeInstruction):
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             int(architectural_state.memory.load_halfword(int(rs1 + self.imm)))
+        )
+        return architectural_state
+
+
+class JALR(ITypeInstruction):
+    def __init__(self, imm: int, rs1: int, rd: int):
+        super().__init__(imm, rs1, rd, mnemonic="jalr")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """t=pc+4; pc=(x[rs1]+sext(imm))&∼1; x[rd]=t"""
+        rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
+        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
+            architectural_state.program_counter + 4
+        )
+        architectural_state.program_counter = (
+            int((rs1 + self.imm)) & (pow(2, 32) - 2) - 4
+        )
+        return architectural_state
+
+
+class ECALL(ITypeInstruction):
+    def __init__(self, imm: int, rs1: int, rd: int):
+        super().__init__(imm, rs1, rd, mnemonic="ecall")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """RaiseException(EnvironmentCall)"""
+        raise ECALLException
+        return architectural_state
+
+
+class EBREAK(ITypeInstruction):
+    def __init__(self, imm: int, rs1: int, rd: int):
+        super().__init__(imm, rs1, rd, mnemonic="ecall")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """RaiseException(EnvironmentCall)"""
+        raise EBREAKException
+        return architectural_state
+
+
+class SRAI(ITypeInstruction):
+    def __init__(self, imm: int, rs1: int, rd: int):
+        super().__init__(imm, rs1, rd, mnemonic="srai")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """x[rd] = x[rs1] >>s shamt"""
+        rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
+        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
+            rs1 >> self.imm
         )
         return architectural_state
 
