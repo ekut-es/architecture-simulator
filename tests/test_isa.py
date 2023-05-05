@@ -3,7 +3,21 @@ import fixedint
 
 from architecture_simulator.uarch.architectural_state import RegisterFile
 from architecture_simulator.uarch.architectural_state import Memory
-from architecture_simulator.isa.rv32i_instructions import ADD, SUB, LB, LH, LW, LBU, LHU
+from architecture_simulator.isa.rv32i_instructions import (
+    ADD,
+    SUB,
+    LB,
+    LH,
+    LW,
+    LBU,
+    LHU,
+    SRAI,
+    JALR,
+    ECALL,
+    EBREAK,
+    EBREAKException,
+    ECALLException,
+)
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 
 from architecture_simulator.isa.parser import riscv_bnf, riscv_parser
@@ -465,6 +479,100 @@ class TestInstructions(unittest.TestCase):
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
         with self.assertRaises(KeyError):
             instr = LHU(imm=8, rs1=0, rd=0)
+            state = instr.behavior(state)
+
+    def test_srai(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[0, 1, -128]),
+            memory=Memory(memory_file=dict()),
+        )
+        # imm=0, rs1=0
+        state.register_file.registers = [0, 1, -128]
+        instr = SRAI(imm=0, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [0, 1, -128])
+
+        # imm=1, rs1=0
+        state.register_file.registers = [0, 1, -128]
+        instr = SRAI(imm=1, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [0, 1, -128])
+
+        # imm=0, rs1=1
+        state.register_file.registers = [0, 1, -128]
+        instr = SRAI(imm=0, rs1=1, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [1, 1, -128])
+
+        # imm=1, rs1=1
+        state.register_file.registers = [0, 1, -128]
+        instr = SRAI(imm=1, rs1=1, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [0, 1, -128])
+
+        # imm=1, rs1=-128
+        state.register_file.registers = [0, 1, -128]
+        instr = SRAI(imm=1, rs1=2, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(
+            state.register_file.registers, [fixedint.MutableUInt32(-64), 1, -128]
+        )
+
+    def test_jalr(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[0, 1]),
+            memory=Memory(memory_file=dict()),
+        )
+        # imm=8, rs1=0
+        state.register_file.registers = [0, 8]
+        state.program_counter = 0
+        instr = JALR(imm=8, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [4, 8])
+        self.assertEqual(state.program_counter, 4)
+
+        # imm=0, rs1=8
+        state.register_file.registers = [0, 8]
+        state.program_counter = 0
+        instr = JALR(imm=0, rs1=1, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [4, 8])
+        self.assertEqual(state.program_counter, 4)
+
+        # imm=8, rs1=8
+        state.register_file.registers = [0, 8]
+        state.program_counter = 0
+        instr = JALR(imm=8, rs1=1, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [4, 8])
+        self.assertEqual(state.program_counter, 12)
+
+        # imm=7, rs1=8 seein if least significant bit is set to 0
+        state.register_file.registers = [0, 8]
+        state.program_counter = 0
+        instr = JALR(imm=7, rs1=1, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [4, 8])
+        self.assertEqual(state.program_counter, 10)
+
+    def test_ecall(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=()),
+            memory=Memory(memory_file=dict()),
+        )
+        # Raise ECALL Exception
+        with self.assertRaises(ECALLException):
+            instr = ECALL(imm=0, rs1=0, rd=0)
+            state = instr.behavior(state)
+
+    def test_ebreak(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=()),
+            memory=Memory(memory_file=dict()),
+        )
+        # Raise ECALL Exception
+        with self.assertRaises(EBREAKException):
+            instr = EBREAK(imm=0, rs1=0, rd=0)
             state = instr.behavior(state)
 
 
