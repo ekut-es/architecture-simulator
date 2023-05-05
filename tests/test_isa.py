@@ -115,7 +115,10 @@ class TestInstructions(unittest.TestCase):
         state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
         instr = LB(imm=3, rs1=0, rd=0)
         state = instr.behavior(state)
-        self.assertEqual(state.register_file.registers, [-1, 1, -1, pow(2, 32) - 1])
+        self.assertEqual(
+            state.register_file.registers,
+            [fixedint.MutableUInt32(-1), 1, -1, pow(2, 32) - 1],
+        )
 
         # try memory acces to non existant address
         state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
@@ -195,7 +198,10 @@ class TestInstructions(unittest.TestCase):
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
         instr = LH(imm=6, rs1=0, rd=0)
         state = instr.behavior(state)
-        self.assertEqual(state.register_file.registers, [-1, 2, -2, pow(2, 32) - 1])
+        self.assertEqual(
+            state.register_file.registers,
+            [fixedint.MutableUInt32(-1), 2, -2, pow(2, 32) - 1],
+        )
 
         # try memory acces to non existant address
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
@@ -301,7 +307,10 @@ class TestInstructions(unittest.TestCase):
         state.register_file.registers = [0, 4, -4, pow(2, 32) - 1]
         instr = LW(imm=12, rs1=0, rd=0)
         state = instr.behavior(state)
-        self.assertEqual(state.register_file.registers, [-1, 4, -4, pow(2, 32) - 1])
+        self.assertEqual(
+            state.register_file.registers,
+            [fixedint.MutableUInt32(-1), 4, -4, pow(2, 32) - 1],
+        )
 
         # try memory acces to non existant address
         state.register_file.registers = [0, 4, -4, pow(2, 32) - 1]
