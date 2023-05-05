@@ -48,16 +48,8 @@ class LB(ITypeInstruction):
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             int(
-                fixedint.Int32(
-                    int(
-                        fixedint.Int8(
-                            int(
-                                architectural_state.memory.load_byte(
-                                    int(rs1 + self.imm)
-                                )
-                            )
-                        )
-                    )
+                fixedint.Int8(
+                    int(architectural_state.memory.load_byte(int(rs1 + self.imm)))
                 )
             )
         )
@@ -73,16 +65,8 @@ class LH(ITypeInstruction):
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             int(
-                fixedint.Int32(
-                    int(
-                        fixedint.Int16(
-                            int(
-                                architectural_state.memory.load_halfword(
-                                    int(rs1 + self.imm)
-                                )
-                            )
-                        )
-                    )
+                fixedint.Int16(
+                    int(architectural_state.memory.load_halfword(int(rs1 + self.imm)))
                 )
             )
         )
