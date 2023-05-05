@@ -48,7 +48,15 @@ class TestInstructions(unittest.TestCase):
             BTypeInstruction(0, 0, 2048, mnemonic="x")
 
     def test_beq(self):
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 0, 1]))
+        state = ArchitecturalState(
+            register_file=RegisterFile(
+                registers=[
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(1),
+                ]
+            )
+        )
 
         # 0, 0
         state.program_counter = 0
@@ -69,7 +77,15 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.program_counter, 16)
 
     def test_bne(self):
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 0, 1]))
+        state = ArchitecturalState(
+            register_file=RegisterFile(
+                registers=[
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(1),
+                ]
+            )
+        )
 
         # 0, 0
         state.program_counter = 0
@@ -91,7 +107,15 @@ class TestInstructions(unittest.TestCase):
 
     def test_blt(self):
         state = ArchitecturalState(
-            register_file=RegisterFile(registers=[0, 0, 1, pow(2, 32) - 1, pow(2, 31)])
+            register_file=RegisterFile(
+                registers=[
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(1),
+                    fixedint.MutableUInt32(pow(2, 32) - 1),
+                    fixedint.MutableUInt32(pow(2, 31)),
+                ]
+            )
         )
 
         # 0, 0
@@ -138,7 +162,15 @@ class TestInstructions(unittest.TestCase):
 
     def test_bge(self):
         state = ArchitecturalState(
-            register_file=RegisterFile(registers=[0, 0, 1, pow(2, 32) - 1, pow(2, 31)])
+            register_file=RegisterFile(
+                registers=[
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(1),
+                    fixedint.MutableUInt32(pow(2, 32) - 1),
+                    fixedint.MutableUInt32(pow(2, 31)),
+                ]
+            )
         )
 
         # 0, 0
@@ -179,7 +211,15 @@ class TestInstructions(unittest.TestCase):
 
     def test_bltu(self):
         state = ArchitecturalState(
-            register_file=RegisterFile(registers=[0, 0, 1, pow(2, 32) - 1, pow(2, 31)])
+            register_file=RegisterFile(
+                registers=[
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(1),
+                    fixedint.MutableUInt32(pow(2, 32) - 1),
+                    fixedint.MutableUInt32(pow(2, 31)),
+                ]
+            )
         )
 
         # 0, 0
@@ -226,7 +266,15 @@ class TestInstructions(unittest.TestCase):
 
     def test_bgeu(self):
         state = ArchitecturalState(
-            register_file=RegisterFile(registers=[0, 0, 1, pow(2, 32) - 1, pow(2, 31)])
+            register_file=RegisterFile(
+                registers=[
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(1),
+                    fixedint.MutableUInt32(pow(2, 32) - 1),
+                    fixedint.MutableUInt32(pow(2, 31)),
+                ]
+            )
         )
 
         # 0, 0
