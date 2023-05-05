@@ -28,10 +28,7 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.register_file.registers, [-4, 5, 9, 0])
 
     def test_mem(self):
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=()),
-            memory=Memory(memory_file=dict()),
-        )
+        state = ArchitecturalState(register_file=RegisterFile(registers=()))
         # store_byte test
         state.memory.store_byte(0, fixedint.MutableUInt8(1))
         self.assertEqual(state.memory.load_byte(0), fixedint.MutableUInt8(1))

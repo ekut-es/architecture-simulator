@@ -61,5 +61,5 @@ class Memory:
 @dataclass
 class ArchitecturalState:
     register_file: RegisterFile
-    memory: Memory
+    memory: Memory = Memory(memory_file=dict())
     program_counter: int = 0
