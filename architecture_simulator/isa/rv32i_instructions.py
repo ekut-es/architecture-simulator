@@ -133,8 +133,8 @@ class JALR(ITypeInstruction):
             architectural_state.program_counter + 4
         )
         architectural_state.program_counter = (
-            int((rs1 + self.imm)) & (pow(2, 32) - 2) - 4
-        )
+            int((rs1 + self.imm)) & (pow(2, 32) - 2)
+        ) - 4
         return architectural_state
 
 
