@@ -25,19 +25,13 @@ from architecture_simulator.isa.parser import riscv_bnf, riscv_parser
 
 class TestInstructions(unittest.TestCase):
     def test_add(self):
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[0, 5, 9, 0]),
-            memory=Memory(memory_file=()),
-        )
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 5, 9, 0]))
         add_1 = ADD(rs1=1, rs2=2, rd=0)
         state = add_1.behavior(state)
         self.assertEqual(state.register_file.registers, [14, 5, 9, 0])
 
     def test_sub(self):
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[0, 5, 9, 0]),
-            memory=Memory(memory_file=()),
-        )
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 5, 9, 0]))
         sub_1 = SUB(rs1=1, rs2=2, rd=0)
         state = sub_1.behavior(state)
         self.assertEqual(state.register_file.registers, [-4, 5, 9, 0])
@@ -482,10 +476,7 @@ class TestInstructions(unittest.TestCase):
             state = instr.behavior(state)
 
     def test_srai(self):
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[0, 1, -128]),
-            memory=Memory(memory_file=dict()),
-        )
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 1, -128]))
         # imm=0, rs1=0
         state.register_file.registers = [0, 1, -128]
         instr = SRAI(imm=0, rs1=0, rd=0)
@@ -519,10 +510,7 @@ class TestInstructions(unittest.TestCase):
         )
 
     def test_jalr(self):
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[0, 1]),
-            memory=Memory(memory_file=dict()),
-        )
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 1]))
         # imm=8, rs1=0
         state.register_file.registers = [0, 8]
         state.program_counter = 0
@@ -556,20 +544,14 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.program_counter, 10)
 
     def test_ecall(self):
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=()),
-            memory=Memory(memory_file=dict()),
-        )
+        state = ArchitecturalState(register_file=RegisterFile(registers=()))
         # Raise ECALL Exception
         with self.assertRaises(ECALLException):
             instr = ECALL(imm=0, rs1=0, rd=0)
             state = instr.behavior(state)
 
     def test_ebreak(self):
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=()),
-            memory=Memory(memory_file=dict()),
-        )
+        state = ArchitecturalState(register_file=RegisterFile(registers=()))
         # Raise ECALL Exception
         with self.assertRaises(EBREAKException):
             instr = EBREAK(imm=0, rs1=0, rd=0)
