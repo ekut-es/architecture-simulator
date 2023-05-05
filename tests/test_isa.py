@@ -34,18 +34,18 @@ class TestInstructions(unittest.TestCase):
     def test_btype(self):
         # valid immediates
         try:
-            BTypeInstruction(0, 0, 0, mnemonic="x")
-            BTypeInstruction(0, 0, 2047, mnemonic="x")
-            BTypeInstruction(0, 0, -2048, mnemonic="x")
+            BTypeInstruction(rs1=0, rs2=0, imm=0, mnemonic="x")
+            BTypeInstruction(rs1=0, rs2=0, imm=2047, mnemonic="x")
+            BTypeInstruction(rs1=0, rs2=0, imm=-2048, mnemonic="x")
         except Exception:
             print(Exception)
             self.fail("BTypeInstruction raised an exception upon instantiation")
 
         # invalid immediates
         with self.assertRaises(ValueError):
-            BTypeInstruction(0, 0, -2049, mnemonic="x")
+            BTypeInstruction(rs1=0, rs2=0, imm=-2049, mnemonic="x")
         with self.assertRaises(ValueError):
-            BTypeInstruction(0, 0, 2048, mnemonic="x")
+            BTypeInstruction(rs1=0, rs2=0, imm=2048, mnemonic="x")
 
     def test_beq(self):
         state = ArchitecturalState(
@@ -60,19 +60,19 @@ class TestInstructions(unittest.TestCase):
 
         # 0, 0
         state.program_counter = 0
-        instruction = BEQ(0, 1, 6)
+        instruction = BEQ(rs1=0, rs2=1, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
         # 0, 1
         state.program_counter = 0
-        instruction = BEQ(0, 2, 6)
+        instruction = BEQ(rs1=0, rs2=2, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
         # 0, 0 - negative immediate
         state.program_counter = 32
-        instruction = BEQ(0, 1, -6)
+        instruction = BEQ(rs1=0, rs2=1, imm=-6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 16)
 
@@ -89,19 +89,19 @@ class TestInstructions(unittest.TestCase):
 
         # 0, 0
         state.program_counter = 0
-        instruction = BNE(0, 1, 6)
+        instruction = BNE(rs1=0, rs2=1, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
         # 0, 1
         state.program_counter = 0
-        instruction = BNE(0, 2, 6)
+        instruction = BNE(rs1=0, rs2=2, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
         # 0, 1 - negative immediate
         state.program_counter = 32
-        instruction = BNE(0, 2, -6)
+        instruction = BNE(rs1=0, rs2=2, imm=-6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 16)
 
@@ -120,43 +120,43 @@ class TestInstructions(unittest.TestCase):
 
         # 0, 0
         state.program_counter = 0
-        instruction = BLT(0, 1, 6)
+        instruction = BLT(rs1=0, rs2=1, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
         # 1, 0
         state.program_counter = 0
-        instruction = BLT(2, 0, 6)
+        instruction = BLT(rs1=2, rs2=0, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
         # 0, 1
         state.program_counter = 0
-        instruction = BLT(0, 2, 6)
+        instruction = BLT(rs1=0, rs2=2, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
         # 0, 1 - negative immediate
         state.program_counter = 32
-        instruction = BLT(0, 2, -6)
+        instruction = BLT(rs1=0, rs2=2, imm=-6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 16)
 
         # 0, -1
         state.program_counter = 0
-        instruction = BLT(0, 3, 6)
+        instruction = BLT(rs1=0, rs2=3, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
         # -1, 0
         state.program_counter = 0
-        instruction = BLT(3, 0, 6)
+        instruction = BLT(rs1=3, rs2=0, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
         # -2^31, -1
         state.program_counter = 0
-        instruction = BLT(4, 3, 6)
+        instruction = BLT(rs1=4, rs2=3, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
@@ -175,37 +175,37 @@ class TestInstructions(unittest.TestCase):
 
         # 0, 0
         state.program_counter = 0
-        instruction = BGE(0, 1, 6)
+        instruction = BGE(rs1=0, rs2=1, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
         # 0, 1
         state.program_counter = 0
-        instruction = BGE(0, 2, 6)
+        instruction = BGE(rs1=0, rs2=2, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
         # 1, 0
         state.program_counter = 0
-        instruction = BGE(2, 0, 6)
+        instruction = BGE(rs1=2, rs2=0, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
         # 1, 0 - negative immediate
         state.program_counter = 32
-        instruction = BGE(2, 0, -6)
+        instruction = BGE(rs1=2, rs2=0, imm=-6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 16)
 
         # 0, -1
         state.program_counter = 0
-        instruction = BGE(0, 3, 6)
+        instruction = BGE(rs1=0, rs2=3, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
         # -2^31, -1
         state.program_counter = 0
-        instruction = BGE(4, 3, 6)
+        instruction = BGE(rs1=4, rs2=3, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
@@ -224,43 +224,43 @@ class TestInstructions(unittest.TestCase):
 
         # 0, 0
         state.program_counter = 0
-        instruction = BLTU(0, 1, 6)
+        instruction = BLTU(rs1=0, rs2=1, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
         # 1, 0
         state.program_counter = 0
-        instruction = BLTU(2, 0, 6)
+        instruction = BLTU(rs1=2, rs2=0, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
         # 0, 1
         state.program_counter = 0
-        instruction = BLTU(0, 2, 6)
+        instruction = BLTU(rs1=0, rs2=2, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
         # 0, 1 - negative immediate
         state.program_counter = 32
-        instruction = BLTU(0, 2, -6)
+        instruction = BLTU(rs1=0, rs2=2, imm=-6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 16)
 
         # 0, (2^32 - 1)
         state.program_counter = 0
-        instruction = BLTU(0, 3, 6)
+        instruction = BLTU(rs1=0, rs2=3, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
         # (2^32 - 1), 0
         state.program_counter = 0
-        instruction = BLTU(3, 0, 6)
+        instruction = BLTU(rs1=3, rs2=0, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
         # 2^31, (2^32 - 1)
         state.program_counter = 0
-        instruction = BLTU(4, 3, 6)
+        instruction = BLTU(rs1=4, rs2=3, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
@@ -279,37 +279,37 @@ class TestInstructions(unittest.TestCase):
 
         # 0, 0
         state.program_counter = 0
-        instruction = BGEU(0, 1, 6)
+        instruction = BGEU(rs1=0, rs2=1, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
         # 0, 1
         state.program_counter = 0
-        instruction = BGEU(0, 2, 6)
+        instruction = BGEU(rs1=0, rs2=2, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
         # 1, 0
         state.program_counter = 0
-        instruction = BGEU(2, 0, 6)
+        instruction = BGEU(rs1=2, rs2=0, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
         # 1, 0 - negative immediate
         state.program_counter = 32
-        instruction = BGEU(2, 0, -6)
+        instruction = BGEU(rs1=2, rs2=0, imm=-6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 16)
 
         # 0, (2^32 - 1)
         state.program_counter = 0
-        instruction = BGEU(0, 3, 6)
+        instruction = BGEU(rs1=0, rs2=3, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
         # 2^31, (2^32 - 1)
         state.program_counter = 0
-        instruction = BGEU(4, 3, 6)
+        instruction = BGEU(rs1=4, rs2=3, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 

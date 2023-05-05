@@ -19,7 +19,7 @@ class ADD(RTypeInstruction):
 
 class SUB(RTypeInstruction):
     def __init__(self, rs1: int, rs2: int, rd: int):
-        super().__init__(rs1, rs2, rd, mnemonic="add")
+        super().__init__(rs1=rs1, rs2=rs2, rd=rd, mnemonic="add")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """rd = rs1 - rs2
@@ -38,7 +38,7 @@ class SUB(RTypeInstruction):
 
 class BEQ(BTypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
-        super().__init__(rs1, rs2, imm, mnemonic="beq")
+        super().__init__(rs1=rs1, rs2=rs2, imm=imm, mnemonic="beq")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """if (x[rs1] == x[rs2]) pc += sext(imm)"""
@@ -51,7 +51,7 @@ class BEQ(BTypeInstruction):
 
 class BNE(BTypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
-        super().__init__(rs1, rs2, imm, mnemonic="bne")
+        super().__init__(rs1=rs1, rs2=rs2, imm=imm, mnemonic="bne")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """if (x[rs1] != x[rs2]) pc += sext(imm)"""
@@ -64,7 +64,7 @@ class BNE(BTypeInstruction):
 
 class BLT(BTypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
-        super().__init__(rs1, rs2, imm, mnemonic="blt")
+        super().__init__(rs1=rs1, rs2=rs2, imm=imm, mnemonic="blt")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """if (x[rs1] <s x[rs2]) pc += sext(imm)"""
@@ -77,7 +77,7 @@ class BLT(BTypeInstruction):
 
 class BGE(BTypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
-        super().__init__(rs1, rs2, imm, mnemonic="bge")
+        super().__init__(rs1=rs1, rs2=rs2, imm=imm, mnemonic="bge")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """if (x[rs1] >= x[rs2]) pc += sext(imm)"""
@@ -90,7 +90,7 @@ class BGE(BTypeInstruction):
 
 class BLTU(BTypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
-        super().__init__(rs1, rs2, imm, mnemonic="bltu")
+        super().__init__(rs1=rs1, rs2=rs2, imm=imm, mnemonic="bltu")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """if (x[rs1] <u x[rs2]) pc += sext(imm)"""
@@ -103,7 +103,7 @@ class BLTU(BTypeInstruction):
 
 class BGEU(BTypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
-        super().__init__(rs1, rs2, imm, mnemonic="bgeu")
+        super().__init__(rs1=rs1, rs2=rs2, imm=imm, mnemonic="bgeu")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """if (x[rs1] >=u x[rs2]) pc += sext(imm)"""
