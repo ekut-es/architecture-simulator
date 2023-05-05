@@ -150,7 +150,7 @@ class ECALL(ITypeInstruction):
 
 class EBREAK(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
-        super().__init__(rd, rs1, imm, mnemonic="ecall")
+        super().__init__(rd, rs1, imm, mnemonic="ebreak")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """RaiseException(EnvironmentCall)"""
