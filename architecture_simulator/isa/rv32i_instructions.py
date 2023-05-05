@@ -46,8 +46,8 @@ class SUB(RTypeInstruction):
 
 
 class LB(ITypeInstruction):
-    def __init__(self, imm: int, rs1: int, rd: int):
-        super().__init__(imm, rs1, rd, mnemonic="lb")
+    def __init__(self, rd: int, rs1: int, imm: int):
+        super().__init__(rd, rs1, imm, mnemonic="lb")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = sext(M[x[rs1] + sext(imm)][7:0])"""
@@ -63,8 +63,8 @@ class LB(ITypeInstruction):
 
 
 class LH(ITypeInstruction):
-    def __init__(self, imm: int, rs1: int, rd: int):
-        super().__init__(imm, rs1, rd, mnemonic="lh")
+    def __init__(self, rd: int, rs1: int, imm: int):
+        super().__init__(rd, rs1, imm, mnemonic="lh")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = sext(M[x[rs1] + sext(imm)][15:0])"""
@@ -80,8 +80,8 @@ class LH(ITypeInstruction):
 
 
 class LW(ITypeInstruction):
-    def __init__(self, imm: int, rs1: int, rd: int):
-        super().__init__(imm, rs1, rd, mnemonic="lw")
+    def __init__(self, rd: int, rs1: int, imm: int):
+        super().__init__(rd, rs1, imm, mnemonic="lw")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = sext(M[x[rs1] + sext(imm)][31:0])"""
@@ -97,8 +97,8 @@ class LW(ITypeInstruction):
 
 
 class LBU(ITypeInstruction):
-    def __init__(self, imm: int, rs1: int, rd: int):
-        super().__init__(imm, rs1, rd, mnemonic="lbu")
+    def __init__(self, rd: int, rs1: int, imm: int):
+        super().__init__(rd, rs1, imm, mnemonic="lbu")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = M[x[rs1] + sext(imm)][7:0]"""
@@ -110,8 +110,8 @@ class LBU(ITypeInstruction):
 
 
 class LHU(ITypeInstruction):
-    def __init__(self, imm: int, rs1: int, rd: int):
-        super().__init__(imm, rs1, rd, mnemonic="lhu")
+    def __init__(self, rd: int, rs1: int, imm: int):
+        super().__init__(rd, rs1, imm, mnemonic="lhu")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = M[x[rs1] + sext(imm)][15:0]"""
@@ -123,8 +123,8 @@ class LHU(ITypeInstruction):
 
 
 class JALR(ITypeInstruction):
-    def __init__(self, imm: int, rs1: int, rd: int):
-        super().__init__(imm, rs1, rd, mnemonic="jalr")
+    def __init__(self, rd: int, rs1: int, imm: int):
+        super().__init__(rd, rs1, imm, mnemonic="jalr")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """t=pc+4; pc=(x[rs1]+sext(imm))&∼1; x[rd]=t"""
@@ -139,8 +139,8 @@ class JALR(ITypeInstruction):
 
 
 class ECALL(ITypeInstruction):
-    def __init__(self, imm: int, rs1: int, rd: int):
-        super().__init__(imm, rs1, rd, mnemonic="ecall")
+    def __init__(self, rd: int, rs1: int, imm: int):
+        super().__init__(rd, rs1, imm, mnemonic="ecall")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """RaiseException(EnvironmentCall)"""
@@ -149,8 +149,8 @@ class ECALL(ITypeInstruction):
 
 
 class EBREAK(ITypeInstruction):
-    def __init__(self, imm: int, rs1: int, rd: int):
-        super().__init__(imm, rs1, rd, mnemonic="ecall")
+    def __init__(self, rd: int, rs1: int, imm: int):
+        super().__init__(rd, rs1, imm, mnemonic="ecall")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """RaiseException(EnvironmentCall)"""
@@ -159,8 +159,8 @@ class EBREAK(ITypeInstruction):
 
 
 class SRAI(ITypeInstruction):
-    def __init__(self, imm: int, rs1: int, rd: int):
-        super().__init__(imm, rs1, rd, mnemonic="srai")
+    def __init__(self, rd: int, rs1: int, imm: int):
+        super().__init__(rd, rs1, imm, mnemonic="srai")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = x[rs1] >>s shamt"""

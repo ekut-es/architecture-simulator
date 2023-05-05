@@ -20,7 +20,7 @@ class RTypeInstruction(Instruction):
 
 
 class ITypeInstruction(Instruction):
-    def __init__(self, imm: int, rs1: int, rd: int, **args):
+    def __init__(self, rd: int, rs1: int, imm: int, **args):
         """Create a I-Type instruction
 
         Args:
