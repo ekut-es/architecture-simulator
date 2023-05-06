@@ -17,3 +17,17 @@ class RTypeInstruction(Instruction):
         self.rs1 = rs1
         self.rs2 = rs2
         self.rd = rd
+
+class ITypeInstruction(Instruction):
+    def __init__(self, rd: int, rs1: int, imm: int, **args):
+        """Create a I-Type instruction
+
+        Args:
+            rd (int): destination register
+            rs1 (int): source register 1
+            imm (int): offset to be further progressed by the instruction
+        """
+        super().__init__(**args)
+        self.rd = rd
+        self.rs1 = rs1
+        self.imm = imm

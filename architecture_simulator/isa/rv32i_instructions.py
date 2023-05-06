@@ -38,4 +38,107 @@ class SUB(RTypeInstruction):
         return architectural_state
 
 
+class ADDI(ITypeInstruction):
+    def __init__(self, rd: int, rs1: int, imm: int):
+        super().__init__(imm, rs1, rd, mnemonic="addi")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """x[rd] = x[rs1] + sext(imm)"""
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        architectural_state.register_file.registers[self.rd] = rs1 + self.imm
+        return architectural_state
+
+
+class ANDI(ITypeInstruction):
+    def __init__(self, rd: int, rs1: int, imm: int):
+        super().__init__(imm, rs1, rd, mnemonic="andi")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """x[rd] = x[rs1] & sext(imm)"""
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        architectural_state.register_file.registers[self.rd] = rs1 & self.imm
+        return architectural_state
+
+
+class ORI(ITypeInstruction):
+    def __init__(self, rd: int, rs1: int, imm: int):
+        super().__init__(imm, rs1, rd, mnemonic="ori")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """x[rd] = x[rs1] | sext(imm)"""
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        architectural_state.register_file.registers[self.rd] = rs1 | self.imm
+        return architectural_state
+
+
+class XORI(ITypeInstruction):
+    def __init__(self, rd: int, rs1: int, imm: int):
+        super().__init__(imm, rs1, rd, mnemonic="xori")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """x[rd] = x[rs1] ^ sext(imm)"""
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        architectural_state.register_file.registers[self.rd] = rs1 ^ self.imm
+        return architectural_state
+
+
+class SLLI(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, imm: int):
+        super().__init__(imm, rs1, rd, mnemonic="slli")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """x[rd] = x[rs1] << shamt  (imm)"""
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        architectural_state.register_file.registers[self.rd] = rs1 << self.imm
+        return architectural_state
+
+
+class SRLI(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, imm: int):
+        super().__init__(imm, rs1, rd, mnemonic="srli")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """x[rd] = x[rs1] >>u shamt  (imm)"""
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        architectural_state.register_file.registers[self.rd] = rs1 >> self.imm
+        return architectural_state
+
+
+class SRAI(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, imm: int):
+        super().__init__(imm, rs1, rd, mnemonic="srai")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """x[rd] = x[rs1] >>s shamt  (imm)"""
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        architectural_state.register_file.registers[self.rd] = rs1 >> self.imm
+        return architectural_state
+
+
+class SLTI(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, imm: int):
+        super().__init__(imm, rs1, rd, mnemonic="slti")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """x[rd] = x[rs1] <s sext(imm)"""
+        rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
+        architectural_state.register_file.registers[self.rd] = (
+            fixedint.MutableUInt32(1) if rs1 < self.imm else fixedint.MutableUInt32(0)
+        )
+        return architectural_state
+
+
+class SLTIU(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, imm: int):
+        super().__init__(imm, rs1, rd, mnemonic="sltiu")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """x[rd] = x[rs1] <u sext(imm)"""
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        architectural_state.register_file.registers[self.rd] = (
+            fixedint.MutableUInt32(1) if rs1 < fixedint.UInt32(self.imm) else fixedint.MutableUInt32(0)
+        )
+        return architectural_state
+
+
 instruction_map = {"add": ADD, "sub": SUB}
