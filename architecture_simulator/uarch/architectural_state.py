@@ -12,12 +12,24 @@ class Memory:
     memory_file: dict[int, fixedint.MutableUInt8]
 
     def load_byte(self, address: int) -> fixedint.MutableUInt8:
-        return self.memory_file[address % pow(2, 32)]
+        try:
+            addr1 = self.memory_file[address % pow(2, 32)]
+        except KeyError:
+            addr1 = fixedint.MutableUInt8(0)
+        return addr1
 
     def store_byte(self, address: int, value: fixedint.MutableUInt8):
         self.memory_file[address % pow(2, 32)] = value
 
     def load_halfword(self, address: int) -> fixedint.MutableUInt16:
+        try:
+            self.memory_file[address % pow(2, 32)]
+        except KeyError:
+            fixedint.MutableUInt8(0)
+        try:
+            self.memory_file[address % pow(2, 32)]
+        except KeyError:
+            fixedint.MutableUInt8(0)
         return (
             fixedint.MutableUInt16(
                 int(self.memory_file[(address + 1) % pow(2, 32)]) << 8
