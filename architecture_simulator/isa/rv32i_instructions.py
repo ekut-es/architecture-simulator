@@ -82,18 +82,18 @@ class XORI(ITypeInstruction):
         return architectural_state
 
 
-class SLLI(RTypeInstruction):
+class SLLI(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="slli")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = x[rs1] << shamt  (imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
-        architectural_state.register_file.registers[self.rd] = rs1 << self.imm
+        architectural_state.register_file.registers[self.rd] = rs1 ^ self.imm
         return architectural_state
 
 
-class SRLI(RTypeInstruction):
+class SRLI(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="srli")
 
@@ -104,7 +104,7 @@ class SRLI(RTypeInstruction):
         return architectural_state
 
 
-class SRAI(RTypeInstruction):
+class SRAI(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="srai")
 
@@ -115,7 +115,7 @@ class SRAI(RTypeInstruction):
         return architectural_state
 
 
-class SLTI(RTypeInstruction):
+class SLTI(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="slti")
 
@@ -128,7 +128,7 @@ class SLTI(RTypeInstruction):
         return architectural_state
 
 
-class SLTIU(RTypeInstruction):
+class SLTIU(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="sltiu")
 
@@ -136,7 +136,9 @@ class SLTIU(RTypeInstruction):
         """x[rd] = x[rs1] <u sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         architectural_state.register_file.registers[self.rd] = (
-            fixedint.MutableUInt32(1) if rs1 < fixedint.UInt32(self.imm) else fixedint.MutableUInt32(0)
+            fixedint.MutableUInt32(1)
+            if rs1 < fixedint.UInt32(self.imm)
+            else fixedint.MutableUInt32(0)
         )
         return architectural_state
 

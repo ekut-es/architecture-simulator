@@ -2,7 +2,19 @@ import unittest
 import fixedint
 
 from architecture_simulator.uarch.architectural_state import RegisterFile
-from architecture_simulator.isa.rv32i_instructions import ADD, SUB, ADDI, SLTI, SLTIU, XORI, ORI, ANDI, SLLI, SRLI, SRAI
+from architecture_simulator.isa.rv32i_instructions import (
+    ADD,
+    SUB,
+    ADDI,
+    SLTI,
+    SLTIU,
+    XORI,
+    ORI,
+    ANDI,
+    SLLI,
+    SRLI,
+    SRAI,
+)
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 
 from architecture_simulator.isa.parser import riscv_bnf, riscv_parser
@@ -20,28 +32,91 @@ class TestInstructions(unittest.TestCase):
         sub_1 = SUB(rs1=1, rs2=2, rd=0)
         state = sub_1.behavior(state)
         self.assertEqual(state.register_file.registers, [-4, 5, 9, 0])
-    
-    def test_addi(self):
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 5, 9, 0]))
 
+    def test_addi(self):
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 0, 0, 0]))
         addi_1 = ADDI(rd=0, rs1=0, imm=0)
         state = addi_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [0, 5, 9, 0])
-    
-    def test_andi(self):
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 5, 9, 0]))
+        addi_1 = ADDI(rd=1, rs1=3, imm=0)
+        state = addi_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [0, 0, 0, 0])
 
-        andi_1 = ANDI(rd=0, rs1=0, imm=0)
+        addi_1 = ADDI(rd=0, rs1=0, imm=1)
+        state = addi_1.behavior(state)
+        addi_1 = ADDI(rd=1, rs1=1, imm=2)
+        state = addi_1.behavior(state)
+        addi_1 = ADDI(rd=2, rs1=2, imm=3)
+        state = addi_1.behavior(state)
+        addi_1 = ADDI(rd=3, rs1=3, imm=4)
+        state = addi_1.behavior(state)
+        addi_1 = ADDI(rd=0, rs1=0, imm=9)
+        state = addi_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [10, 2, 3, 4])
+
+        addi_1 = ADDI(rd=0, rs1=2, imm=-4)
+        state = addi_1.behavior(state)
+        addi_1 = ADDI(rd=2, rs1=0, imm=-2)
+        state = addi_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [-1, 2, -3, 4])
+
+        maxint32 = fixedint.MutableInt32(pow(2, 32) / 2 - 1)
+        minint32 = fixedint.MutableInt32(-(pow(2, 32) / 2))
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[maxint32, 0, 0, 0])
+        )
+        addi_1 = ADDI(rd=1, rs1=0, imm=1)
+        state = addi_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [maxint32, minint32, 0, 0])
+        addi_1 = ADDI(rd=2, rs1=1, imm=-1)
+        state = addi_1.behavior(state)
+        self.assertEqual(
+            state.register_file.registers, [maxint32, minint32, maxint32, 0]
+        )
+        addi_1 = ADDI(rd=3, rs1=2, imm=3)
+        state = addi_1.behavior(state)
+        addi_1 = ADDI(rd=1, rs1=1, imm=-3)
+        state = addi_1.behavior(state)
+        self.assertEqual(
+            state.register_file.registers,
+            [maxint32, maxint32 - 2, maxint32, minint32 + 2],
+        )
+
+    def test_andi(self):
+        b0 = fixedint.MutableUInt32(0)
+        b1 = fixedint.MutableUInt32(pow(2, 32) - 1)
+        b2 = fixedint.MutableUInt32(3000000001)
+        b3 = fixedint.MutableUInt32(2000000001)
+        b4 = fixedint.MutableUInt32(839914497)
+
+        state = ArchitecturalState(register_file=RegisterFile(registers=[b0, b1, 0, 0]))
+        andi_1 = ANDI(rd=2, rs1=0, imm=0)
         state = andi_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [0, 5, 9, 0])
-    
+        andi_1 = ANDI(rd=3, rs1=1, imm=0)
+        state = andi_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [b0, b1, 0, 0])
+
+        andi_1 = ANDI(rd=2, rs1=0, imm=1234556)
+        state = andi_1.behavior(state)
+        andi_1 = ANDI(rd=3, rs1=1, imm=1)
+        state = andi_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [b0, b1, 0, 1])
+
+        state = ArchitecturalState(register_file=RegisterFile(registers=[b2, b3, 0, 0]))
+        andi_1 = ANDI(rd=0, rs1=0, imm=b2)
+        state = andi_1.behavior(state)
+        andi_1 = ANDI(rd=1, rs1=0, imm=b3)
+        state = andi_1.behavior(state)
+        andi_1 = ANDI(rd=2, rs1=0, imm=1)
+        state = andi_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [b2, b4, 1, 0])
+
     def test_ori(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=[0, 5, 9, 0]))
 
         ori_1 = ORI(rd=0, rs1=0, imm=0)
         state = ori_1.behavior(state)
         self.assertEqual(state.register_file.registers, [0, 5, 9, 0])
-    
+
     def test_xori(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=[0, 5, 9, 0]))
 
