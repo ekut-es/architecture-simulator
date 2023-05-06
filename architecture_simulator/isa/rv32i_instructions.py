@@ -40,7 +40,7 @@ class SUB(RTypeInstruction):
 
 class ADDI(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
-        super().__init__(imm, rs1, rd, mnemonic="addi")
+        super().__init__(rd, rs1, imm, mnemonic="addi")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = x[rs1] + sext(imm)"""
@@ -51,7 +51,7 @@ class ADDI(ITypeInstruction):
 
 class ANDI(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
-        super().__init__(imm, rs1, rd, mnemonic="andi")
+        super().__init__(rd, rs1, imm, mnemonic="andi")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = x[rs1] & sext(imm)"""
@@ -62,7 +62,7 @@ class ANDI(ITypeInstruction):
 
 class ORI(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
-        super().__init__(imm, rs1, rd, mnemonic="ori")
+        super().__init__(rd, rs1, imm, mnemonic="ori")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = x[rs1] | sext(imm)"""
@@ -73,7 +73,7 @@ class ORI(ITypeInstruction):
 
 class XORI(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
-        super().__init__(imm, rs1, rd, mnemonic="xori")
+        super().__init__(rd, rs1, imm, mnemonic="xori")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = x[rs1] ^ sext(imm)"""
@@ -84,7 +84,7 @@ class XORI(ITypeInstruction):
 
 class SLLI(RTypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
-        super().__init__(imm, rs1, rd, mnemonic="slli")
+        super().__init__(rd, rs1, imm, mnemonic="slli")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = x[rs1] << shamt  (imm)"""
@@ -95,7 +95,7 @@ class SLLI(RTypeInstruction):
 
 class SRLI(RTypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
-        super().__init__(imm, rs1, rd, mnemonic="srli")
+        super().__init__(rd, rs1, imm, mnemonic="srli")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = x[rs1] >>u shamt  (imm)"""
@@ -106,7 +106,7 @@ class SRLI(RTypeInstruction):
 
 class SRAI(RTypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
-        super().__init__(imm, rs1, rd, mnemonic="srai")
+        super().__init__(rd, rs1, imm, mnemonic="srai")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = x[rs1] >>s shamt  (imm)"""
@@ -117,7 +117,7 @@ class SRAI(RTypeInstruction):
 
 class SLTI(RTypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
-        super().__init__(imm, rs1, rd, mnemonic="slti")
+        super().__init__(rd, rs1, imm, mnemonic="slti")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = x[rs1] <s sext(imm)"""
@@ -130,7 +130,7 @@ class SLTI(RTypeInstruction):
 
 class SLTIU(RTypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
-        super().__init__(imm, rs1, rd, mnemonic="sltiu")
+        super().__init__(rd, rs1, imm, mnemonic="sltiu")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = x[rs1] <u sext(imm)"""
