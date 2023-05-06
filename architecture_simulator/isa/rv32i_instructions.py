@@ -55,7 +55,11 @@ class LB(ITypeInstruction):
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             int(
                 fixedint.Int8(
-                    int(architectural_state.memory.load_byte(int(rs1 + self.imm)))
+                    int(
+                        architectural_state.memory.load_byte(
+                            int(rs1 + fixedint.Int16(self.imm)[0:12])
+                        )
+                    )
                 )
             )
         )
@@ -72,7 +76,11 @@ class LH(ITypeInstruction):
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             int(
                 fixedint.Int16(
-                    int(architectural_state.memory.load_halfword(int(rs1 + self.imm)))
+                    int(
+                        architectural_state.memory.load_halfword(
+                            int(rs1 + fixedint.Int16(self.imm)[0:12])
+                        )
+                    )
                 )
             )
         )
@@ -89,7 +97,11 @@ class LW(ITypeInstruction):
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             int(
                 fixedint.Int32(
-                    int(architectural_state.memory.load_word(int(rs1 + self.imm)))
+                    int(
+                        architectural_state.memory.load_word(
+                            int(rs1 + fixedint.Int16(self.imm)[0:12])
+                        )
+                    )
                 )
             )
         )
@@ -104,7 +116,11 @@ class LBU(ITypeInstruction):
         """x[rd] = M[x[rs1] + sext(imm)][7:0]"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            int(architectural_state.memory.load_byte(int(rs1 + self.imm)))
+            int(
+                architectural_state.memory.load_byte(
+                    int(rs1 + fixedint.Int16(self.imm)[0:12])
+                )
+            )
         )
         return architectural_state
 
@@ -117,7 +133,11 @@ class LHU(ITypeInstruction):
         """x[rd] = M[x[rs1] + sext(imm)][15:0]"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            int(architectural_state.memory.load_halfword(int(rs1 + self.imm)))
+            int(
+                architectural_state.memory.load_halfword(
+                    int(rs1 + fixedint.Int16(self.imm)[0:12])
+                )
+            )
         )
         return architectural_state
 
@@ -133,7 +153,7 @@ class JALR(ITypeInstruction):
             architectural_state.program_counter + 4
         )
         architectural_state.program_counter = (
-            int((rs1 + self.imm)) & (pow(2, 32) - 2)
+            int((rs1 + fixedint.Int16(self.imm)[0:12])) & (pow(2, 32) - 2)
         ) - 4
         return architectural_state
 
@@ -166,7 +186,7 @@ class SRAI(ITypeInstruction):
         """x[rd] = x[rs1] >>s shamt"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            rs1 >> self.imm
+            rs1 >> int(fixedint.Int16(self.imm)[0:12])
         )
         return architectural_state
 
