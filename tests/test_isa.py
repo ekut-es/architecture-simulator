@@ -85,41 +85,42 @@ class TestInstructions(unittest.TestCase):
                         (2, fixedint.MutableUInt8(3)),
                         (3, fixedint.MutableUInt8(-1)),
                         (pow(2, 32) - 1, fixedint.MutableUInt8(4)),
+                        (2047, fixedint.MutableUInt8(5)),
                     ]
                 )
             ),
         )
-        # imm=0, rs1=0
+        # imm=0, rs1=0 try with both values at 0
         state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
         instr = LB(imm=0, rs1=0, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [1, 1, -1, pow(2, 32) - 1])
 
-        # imm=1, rs1=0
+        # imm=1, rs1=0 try with imm = 1
         state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
         instr = LB(imm=1, rs1=0, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [2, 1, -1, pow(2, 32) - 1])
 
-        # imm=0, rs1=1
+        # imm=0, rs1=1 try with rs1 value = 1
         state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
         instr = LB(imm=0, rs1=1, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [2, 1, -1, pow(2, 32) - 1])
 
-        # imm=1, rs1=1
+        # imm=1, rs1=1 try with both values = 1
         state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
         instr = LB(imm=1, rs1=1, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [3, 1, -1, pow(2, 32) - 1])
 
-        # imm=1, rs1=-1
+        # imm=1, rs1=-1 try with negative value in rs1, equates to acces to memory 0
         state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
         instr = LB(imm=1, rs1=2, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [1, 1, -1, pow(2, 32) - 1])
 
-        # imm=1, rs1=2^32-1
+        # imm=1, rs1=2^32-1 try with really high value in rs1, equates to 0 because memory is circular
         state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
         instr = LB(imm=1, rs1=3, rd=0)
         state = instr.behavior(state)
@@ -130,6 +131,12 @@ class TestInstructions(unittest.TestCase):
         instr = LB(imm=0, rs1=2, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [4, 1, -1, pow(2, 32) - 1])
+
+        # imm=10239, rs1=0 too high value in imm gets convertet to 12 bit i e 2047
+        state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
+        instr = LB(imm=10239, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [5, 1, -1, pow(2, 32) - 1])
 
         # imm=3, rs1=0 load negative value
         state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
@@ -162,41 +169,42 @@ class TestInstructions(unittest.TestCase):
                         (7, fixedint.MutableUInt8(-1)),
                         (pow(2, 32) - 2, fixedint.MutableUInt8(7)),
                         (pow(2, 32) - 1, fixedint.MutableUInt8(8)),
+                        (2047, fixedint.MutableUInt8(5)),
                     ]
                 )
             ),
         )
-        # imm=0, rs1=0
+        # imm=0, rs1=0 try with both values at 0
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
         instr = LH(imm=0, rs1=0, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [513, 2, -2, pow(2, 32) - 1])
 
-        # imm=2, rs1=0
+        # imm=2, rs1=0 try with imm = 2
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
         instr = LH(imm=2, rs1=0, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [1027, 2, -2, pow(2, 32) - 1])
 
-        # imm=0, rs1=2
+        # imm=0, rs1=2 try with rs1 value = 2
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
         instr = LH(imm=0, rs1=1, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [1027, 2, -2, pow(2, 32) - 1])
 
-        # imm=2, rs1=2
+        # imm=2, rs1=2 try with both values = 2
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
         instr = LH(imm=2, rs1=1, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [1541, 2, -2, pow(2, 32) - 1])
 
-        # imm=2, rs1=-2
+        # imm=2, rs1=-2 try with negative value in rs1, equates to acces to memory 0
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
         instr = LH(imm=2, rs1=2, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [513, 2, -2, pow(2, 32) - 1])
 
-        # imm=1, rs1=2^32-1 equates to 0
+        # imm=1, rs1=2^32-1 try with really high value in rs1, equates to 0 because memory is circular
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
         instr = LH(imm=1, rs1=3, rd=0)
         state = instr.behavior(state)
@@ -213,6 +221,12 @@ class TestInstructions(unittest.TestCase):
         instr = LH(imm=0, rs1=2, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [2055, 2, -2, pow(2, 32) - 1])
+
+        # imm=10239, rs1=0 too high value in imm gets convertet to 12 bit i e 2047
+        state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
+        instr = LH(imm=10239, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [5, 1, -1, pow(2, 32) - 1])
 
         # imm=6, rs1=0 load negative value
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
@@ -255,11 +269,12 @@ class TestInstructions(unittest.TestCase):
                         (pow(2, 32) - 3, fixedint.MutableUInt8(4)),
                         (pow(2, 32) - 2, fixedint.MutableUInt8(4)),
                         (pow(2, 32) - 1, fixedint.MutableUInt8(4)),
+                        (2047, fixedint.MutableUInt8(5)),
                     ]
                 )
             ),
         )
-        # imm=0, rs1=0
+        # imm=0, rs1=0 try with both values at 0
         state.register_file.registers = [0, 4, -4, pow(2, 32) - 1]
         instr = LW(imm=0, rs1=0, rd=0)
         state = instr.behavior(state)
@@ -267,7 +282,7 @@ class TestInstructions(unittest.TestCase):
             state.register_file.registers, [16843009, 4, -4, pow(2, 32) - 1]
         )
 
-        # imm=4, rs1=0
+        # imm=4, rs1=0 try with imm = 4
         state.register_file.registers = [0, 4, -4, pow(2, 32) - 1]
         instr = LW(imm=4, rs1=0, rd=0)
         state = instr.behavior(state)
@@ -275,7 +290,7 @@ class TestInstructions(unittest.TestCase):
             state.register_file.registers, [33686018, 4, -4, pow(2, 32) - 1]
         )
 
-        # imm=0, rs1=4
+        # imm=0, rs1=4 try with rs1 value = 4
         state.register_file.registers = [0, 4, -4, pow(2, 32) - 1]
         instr = LW(imm=0, rs1=1, rd=0)
         state = instr.behavior(state)
@@ -283,7 +298,7 @@ class TestInstructions(unittest.TestCase):
             state.register_file.registers, [33686018, 4, -4, pow(2, 32) - 1]
         )
 
-        # imm=4, rs1=4
+        # imm=4, rs1=4 try with both values = 4
         state.register_file.registers = [0, 4, -4, pow(2, 32) - 1]
         instr = LW(imm=4, rs1=1, rd=0)
         state = instr.behavior(state)
@@ -291,7 +306,7 @@ class TestInstructions(unittest.TestCase):
             state.register_file.registers, [50529027, 4, -4, pow(2, 32) - 1]
         )
 
-        # imm=4, rs1=-4
+        # imm=4, rs1=-4 try with negative value in rs1, equates to acces to memory 0
         state.register_file.registers = [0, 4, -4, pow(2, 32) - 1]
         instr = LW(imm=4, rs1=2, rd=0)
         state = instr.behavior(state)
@@ -299,7 +314,7 @@ class TestInstructions(unittest.TestCase):
             state.register_file.registers, [16843009, 4, -4, pow(2, 32) - 1]
         )
 
-        # imm=1, rs1=2^32-1 equates to 0
+        # imm=1, rs1=2^32-1 try with really high value in rs1, equates to 0 because memory is circular
         state.register_file.registers = [0, 4, -4, pow(2, 32) - 1]
         instr = LW(imm=1, rs1=3, rd=0)
         state = instr.behavior(state)
@@ -322,6 +337,12 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(
             state.register_file.registers, [67372036, 4, -4, pow(2, 32) - 1]
         )
+
+        # imm=10239, rs1=0 too high value in imm gets convertet to 12 bit i e 2047
+        state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
+        instr = LW(imm=10239, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [5, 1, -1, pow(2, 32) - 1])
 
         # imm=12, rs1=0 load negative value
         state.register_file.registers = [0, 4, -4, pow(2, 32) - 1]
@@ -349,41 +370,42 @@ class TestInstructions(unittest.TestCase):
                         (2, fixedint.MutableUInt8(3)),
                         (3, fixedint.MutableUInt8(-1)),
                         (pow(2, 32) - 1, fixedint.MutableUInt8(4)),
+                        (2047, fixedint.MutableUInt8(5)),
                     ]
                 )
             ),
         )
-        # imm=0, rs1=0
+        # imm=0, rs1=0 try with both values at 0
         state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
         instr = LBU(imm=0, rs1=0, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [1, 1, -1, pow(2, 32) - 1])
 
-        # imm=1, rs1=0
+        # imm=1, rs1=0 try with imm = 1
         state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
         instr = LBU(imm=1, rs1=0, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [2, 1, -1, pow(2, 32) - 1])
 
-        # imm=0, rs1=1
+        # imm=0, rs1=1 try with rs1 value = 1
         state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
         instr = LBU(imm=0, rs1=1, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [2, 1, -1, pow(2, 32) - 1])
 
-        # imm=1, rs1=1
+        # imm=1, rs1=1 try with both values = 1
         state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
         instr = LBU(imm=1, rs1=1, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [3, 1, -1, pow(2, 32) - 1])
 
-        # imm=1, rs1=-1
+        # imm=1, rs1=-1 try with negative value in rs1, equates to acces to memory 0
         state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
         instr = LBU(imm=1, rs1=2, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [1, 1, -1, pow(2, 32) - 1])
 
-        # imm=1, rs1=2^32-1
+        # imm=1, rs1=2^32-1 try with really high value in rs1, equates to 0 because memory is circular
         state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
         instr = LBU(imm=1, rs1=3, rd=0)
         state = instr.behavior(state)
@@ -394,6 +416,12 @@ class TestInstructions(unittest.TestCase):
         instr = LBU(imm=0, rs1=2, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [4, 1, -1, pow(2, 32) - 1])
+
+        # imm=10239, rs1=0 too high value in imm gets convertet to 12 bit i e 2047
+        state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
+        instr = LBU(imm=10239, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [5, 1, -1, pow(2, 32) - 1])
 
         # imm=3, rs1=0 load negative value
         state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
@@ -423,41 +451,42 @@ class TestInstructions(unittest.TestCase):
                         (7, fixedint.MutableUInt8(-1)),
                         (pow(2, 32) - 2, fixedint.MutableUInt8(7)),
                         (pow(2, 32) - 1, fixedint.MutableUInt8(8)),
+                        (2047, fixedint.MutableUInt8(5)),
                     ]
                 )
             ),
         )
-        # imm=0, rs1=0
+        # imm=0, rs1=0 try with both values at 0
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
         instr = LHU(imm=0, rs1=0, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [513, 2, -2, pow(2, 32) - 1])
 
-        # imm=2, rs1=0
+        # imm=2, rs1=0 try with imm = 2
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
         instr = LHU(imm=2, rs1=0, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [1027, 2, -2, pow(2, 32) - 1])
 
-        # imm=0, rs1=2
+        # imm=0, rs1=2 try with rs1 value = 2
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
         instr = LHU(imm=0, rs1=1, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [1027, 2, -2, pow(2, 32) - 1])
 
-        # imm=2, rs1=2
+        # imm=2, rs1=2 try with both values = 2
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
         instr = LHU(imm=2, rs1=1, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [1541, 2, -2, pow(2, 32) - 1])
 
-        # imm=2, rs1=-2
+        # imm=2, rs1=-2 try with negative value in rs1, equates to acces to memory 0
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
         instr = LHU(imm=2, rs1=2, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [513, 2, -2, pow(2, 32) - 1])
 
-        # imm=1, rs1=2^32-1 equates to 0
+        # imm=1, rs1=2^32-1 try with really high value in rs1, equates to 0 because memory is circular
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
         instr = LHU(imm=1, rs1=3, rd=0)
         state = instr.behavior(state)
@@ -474,6 +503,12 @@ class TestInstructions(unittest.TestCase):
         instr = LHU(imm=0, rs1=2, rd=0)
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [2055, 2, -2, pow(2, 32) - 1])
+
+        # imm=10239, rs1=0 too high value in imm gets convertet to 12 bit i e 2047
+        state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
+        instr = LHU(imm=10239, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [5, 1, -1, pow(2, 32) - 1])
 
         # imm=6, rs1=0 load negative value
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
