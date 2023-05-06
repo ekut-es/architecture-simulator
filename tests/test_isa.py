@@ -42,13 +42,25 @@ class TestInstructions(unittest.TestCase):
         state.memory.store_byte(0, fixedint.MutableUInt8(1))
         self.assertEqual(state.memory.load_byte(0), fixedint.MutableUInt8(1))
 
+        # store_byte type test
+        state.memory.store_byte(0, fixedint.MutableUInt8(1))
+        self.assertIsInstance(state.memory.load_byte(0), fixedint.MutableUInt8)
+
         # store_halfword test
         state.memory.store_halfword(0, fixedint.MutableUInt16(1))
         self.assertEqual(state.memory.load_halfword(0), fixedint.MutableUInt16(1))
 
+        # store_halfword type test
+        state.memory.store_halfword(0, fixedint.MutableUInt16(1))
+        self.assertIsInstance(state.memory.load_halfword(0), fixedint.MutableUInt16)
+
         # store_word test
         state.memory.store_word(0, fixedint.MutableUInt32(1))
         self.assertEqual(state.memory.load_word(0), fixedint.MutableUInt32(1))
+
+        # store_word type test
+        state.memory.store_word(0, fixedint.MutableUInt32(1))
+        self.assertIsInstance(state.memory.load_word(0), fixedint.MutableUInt32)
 
         # store_byte negative value test
         state.memory.store_byte(0, fixedint.MutableUInt8(-1))
@@ -130,9 +142,9 @@ class TestInstructions(unittest.TestCase):
 
         # try memory acces to non existant address
         state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
-        with self.assertRaises(KeyError):
-            instr = LB(imm=4, rs1=0, rd=0)
-            state = instr.behavior(state)
+        instr = LB(imm=4, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [0, 1, -1, pow(2, 32) - 1])
 
     def test_lh(self):
         state = ArchitecturalState(
@@ -212,10 +224,10 @@ class TestInstructions(unittest.TestCase):
         )
 
         # try memory acces to non existant address
-        state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
-        with self.assertRaises(KeyError):
-            instr = LH(imm=8, rs1=0, rd=0)
-            state = instr.behavior(state)
+        state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
+        instr = LB(imm=8, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [0, 1, -1, pow(2, 32) - 1])
 
     def test_lw(self):
         state = ArchitecturalState(
@@ -321,10 +333,10 @@ class TestInstructions(unittest.TestCase):
         )
 
         # try memory acces to non existant address
-        state.register_file.registers = [0, 4, -4, pow(2, 32) - 1]
-        with self.assertRaises(KeyError):
-            instr = LW(imm=16, rs1=0, rd=0)
-            state = instr.behavior(state)
+        state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
+        instr = LB(imm=16, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [0, 1, -1, pow(2, 32) - 1])
 
     def test_lbu(self):
         state = ArchitecturalState(
@@ -391,9 +403,9 @@ class TestInstructions(unittest.TestCase):
 
         # try memory acces to non existant address
         state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
-        with self.assertRaises(KeyError):
-            instr = LBU(imm=4, rs1=0, rd=0)
-            state = instr.behavior(state)
+        instr = LB(imm=4, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [0, 1, -1, pow(2, 32) - 1])
 
     def test_lhu(self):
         state = ArchitecturalState(
@@ -470,10 +482,10 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.register_file.registers, [65535, 2, -2, pow(2, 32) - 1])
 
         # try memory acces to non existant address
-        state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
-        with self.assertRaises(KeyError):
-            instr = LHU(imm=8, rs1=0, rd=0)
-            state = instr.behavior(state)
+        state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
+        instr = LB(imm=8, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [0, 1, -1, pow(2, 32) - 1])
 
     def test_srai(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=[0, 1, -128]))

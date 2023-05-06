@@ -13,60 +13,76 @@ class Memory:
 
     def load_byte(self, address: int) -> fixedint.MutableUInt8:
         try:
-            addr1 = self.memory_file[address % pow(2, 32)]
+            addr1 = fixedint.MutableUInt8(int(self.memory_file[address % pow(2, 32)]))
         except KeyError:
             addr1 = fixedint.MutableUInt8(0)
         return addr1
 
     def store_byte(self, address: int, value: fixedint.MutableUInt8):
-        self.memory_file[address % pow(2, 32)] = value
+        safe_value = fixedint.MutableUInt8(int(value))
+        self.memory_file[address % pow(2, 32)] = safe_value
 
     def load_halfword(self, address: int) -> fixedint.MutableUInt16:
         try:
-            self.memory_file[address % pow(2, 32)]
+            addr1 = fixedint.MutableUInt16(int(self.memory_file[address % pow(2, 32)]))
         except KeyError:
-            fixedint.MutableUInt8(0)
+            addr1 = fixedint.MutableUInt16(0)
         try:
-            self.memory_file[address % pow(2, 32)]
-        except KeyError:
-            fixedint.MutableUInt8(0)
-        return (
-            fixedint.MutableUInt16(
+            addr2 = fixedint.MutableUInt16(
                 int(self.memory_file[(address + 1) % pow(2, 32)]) << 8
             )
-            | self.memory_file[address % pow(2, 32)]
-        )
+        except KeyError:
+            addr2 = fixedint.MutableUInt16(0)
+
+        return addr2 | addr1
 
     def store_halfword(self, address: int, value: fixedint.MutableUInt16):
-        self.memory_file[address % pow(2, 32)] = fixedint.MutableUInt8(int(value[0:8]))
+        safe_value = fixedint.MutableUInt16(int(value))
+        self.memory_file[address % pow(2, 32)] = fixedint.MutableUInt8(
+            int(safe_value[0:8])
+        )
         self.memory_file[(address + 1) % pow(2, 32)] = fixedint.MutableUInt8(
-            int(value[8:16])
+            int(safe_value[8:16])
         )
 
     def load_word(self, address: int) -> fixedint.MutableUInt32:
-        return (
-            fixedint.MutableUInt32(
-                int(self.memory_file[(address + 3) % pow(2, 32)]) << 24
-            )
-            | fixedint.MutableUInt32(
-                int(self.memory_file[(address + 2) % pow(2, 32)]) << 16
-            )
-            | fixedint.MutableUInt32(
+        try:
+            addr1 = fixedint.MutableUInt32(int(self.memory_file[address % pow(2, 32)]))
+        except KeyError:
+            addr1 = fixedint.MutableUInt32(0)
+        try:
+            addr2 = fixedint.MutableUInt32(
                 int(self.memory_file[(address + 1) % pow(2, 32)]) << 8
             )
-            | fixedint.MutableUInt32(int(self.memory_file[address % pow(2, 32)]))
-        )
+        except KeyError:
+            addr2 = fixedint.MutableUInt32(0)
+        try:
+            addr3 = fixedint.MutableUInt32(
+                int(self.memory_file[(address + 2) % pow(2, 32)]) << 16
+            )
+        except KeyError:
+            addr3 = fixedint.MutableUInt32(0)
+        try:
+            addr4 = fixedint.MutableUInt32(
+                int(self.memory_file[(address + 3) % pow(2, 32)]) << 24
+            )
+        except KeyError:
+            addr4 = fixedint.MutableUInt32(0)
+        return addr4 | addr3 | addr2 | addr1
 
     def store_word(self, address: int, value: fixedint.MutableUInt32):
-        self.memory_file[address % pow(2, 32)] = fixedint.MutableUInt8(int(value[0:8]))
+        safe_value = fixedint.MutableUInt32(int(value))
+        self.memory_file[address % pow(2, 32)] = fixedint.MutableUInt8(
+            int(safe_value[0:8])
+        )
         self.memory_file[(address + 1) % pow(2, 32)] = fixedint.MutableUInt8(
-            int(value[8:16])
+            int(safe_value[8:16])
         )
         self.memory_file[(address + 2) % pow(2, 32)] = fixedint.MutableUInt8(
-            int(value[16:24])
+            int(safe_value[16:24])
         )
         self.memory_file[(address + 3) % pow(2, 32)] = fixedint.MutableUInt8(
-            int(value[24:32])
+            int(safe_value[24:32])
         )
 
 
