@@ -1,6 +1,6 @@
 # from ctypes import c_int32, c_uint32, c_int8, c_int16, c_uint8, c_uint16
 
-from .instruction_types import RTypeInstruction
+from .instruction_types import RTypeInstruction, ITypeInstruction
 from ..uarch.architectural_state import ArchitecturalState
 import fixedint
 
