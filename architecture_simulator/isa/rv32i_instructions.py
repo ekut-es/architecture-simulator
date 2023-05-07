@@ -154,4 +154,4 @@ class CSRRCI(CSRITypeInstruction):
         return architectural_state
 
 
-instruction_map = {"add": ADD, "sub": SUB, "csrrw": CSRRW, "csrrs": CSRRS, "csrrc": CSRRC, "csrrwi": CSRRWI, "csrrsi": CSRRSI, "csrrci": CSRRSI}
+instruction_map = {"add": ADD, "sub": SUB}
