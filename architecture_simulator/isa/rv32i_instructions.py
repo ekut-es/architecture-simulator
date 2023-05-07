@@ -135,8 +135,8 @@ class CSRRSI(CSRITypeInstruction):
         return architectural_state
     
 class CSRRCI(CSRITypeInstruction):
-    def __init__(self, rd: int, csr: int, imm: int):
-        super().__init__(rd, csr, imm, mnemonic="csrrci")
+    def __init__(self, rd: int, csr: int, uimm: int):
+        super().__init__(rd, csr, uimm, mnemonic="csrrci")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = zext(csr_register[csr]); csr_register[csr] = csr_register[csr] and not(zext(uimm))
