@@ -35,10 +35,14 @@ class TestInstructions(unittest.TestCase):
     def test_addi(self):
         b0 = fixedint.MutableUInt32(0)
         b1 = fixedint.MutableUInt32(1)
-        fixedint.MutableUInt32(2)
-        fixedint.MutableUInt32(20)
-        fixedint.MutableUInt32(31)
-        bn1 = fixedint.MutableInt32(-1)
+        b5 = fixedint.MutableUInt32(5)
+        bmaxint = fixedint.MutableUInt32(pow(2, 31) - 1)
+        bminint = fixedint.MutableUInt32(-pow(2, 31))
+        bmaximm = fixedint.MutableUInt32(2047)
+        bminimm = fixedint.MutableUInt32(-2048)
+        bn1 = fixedint.MutableUInt32(-1)
+        brandom = fixedint.MutableUInt32(3320171255)
+        brandomx = fixedint.MutableUInt32(3320171260)
 
         # 0 + 0    == 0
         # 0 + 1    == 1
@@ -60,109 +64,159 @@ class TestInstructions(unittest.TestCase):
         state = addi_1.behavior(state)
         self.assertEqual(state.register_file.registers, [b0, b1, b1, bn1, b0])
 
-        addi_1 = ADDI(rd=0, rs1=0, imm=1)
-        state = addi_1.behavior(state)
-        addi_1 = ADDI(rd=1, rs1=1, imm=2)
-        state = addi_1.behavior(state)
-        addi_1 = ADDI(rd=2, rs1=2, imm=3)
-        state = addi_1.behavior(state)
-        addi_1 = ADDI(rd=3, rs1=3, imm=4)
-        state = addi_1.behavior(state)
-        addi_1 = ADDI(rd=0, rs1=0, imm=9)
-        state = addi_1.behavior(state)
-        # self.assertEqual(state.register_file.registers, [10, 2, 3, 4])
-
-        addi_1 = ADDI(rd=0, rs1=2, imm=-4)
-        state = addi_1.behavior(state)
-        addi_1 = ADDI(rd=2, rs1=0, imm=-2)
-        state = addi_1.behavior(state)
-        # self.assertEqual(state.register_file.registers, [-1, 2, -3, 4])
-
-        maxint32 = fixedint.MutableInt32(pow(2, 32) / 2 - 1)
-        fixedint.MutableInt32(-(pow(2, 32) / 2))
+        # bmaxint + 1    == bminint
+        # bminint + -1   == bmaxint
+        # 0 + bmaximm    == 2048
+        # 0 + bminimm    == -2047
+        # brandom + 5
         state = ArchitecturalState(
-            register_file=RegisterFile(registers=[maxint32, 0, 0, 0])
+            register_file=RegisterFile(registers=[bmaxint, bminint, b0, b0, brandom])
         )
-        addi_1 = ADDI(rd=1, rs1=0, imm=1)
+        addi_1 = ADDI(rd=0, rs1=0, imm=b1)
         state = addi_1.behavior(state)
-        # self.assertEqual(state.register_file.registers, [maxint32, minint32, 0, 0])
-        addi_1 = ADDI(rd=2, rs1=1, imm=-1)
+        addi_1 = ADDI(rd=1, rs1=1, imm=bn1)
         state = addi_1.behavior(state)
-
-        addi_1 = ADDI(rd=3, rs1=2, imm=3)
+        addi_1 = ADDI(rd=2, rs1=2, imm=bmaximm)
         state = addi_1.behavior(state)
-        addi_1 = ADDI(rd=1, rs1=1, imm=-3)
+        addi_1 = ADDI(rd=3, rs1=3, imm=bminimm)
         state = addi_1.behavior(state)
+        addi_1 = ADDI(rd=4, rs1=4, imm=b5)
+        state = addi_1.behavior(state)
+        self.assertEqual(
+            state.register_file.registers,
+            [bminint, bmaxint, bmaximm, bminimm, brandomx],
+        )
 
     def test_andi(self):
         b0 = fixedint.MutableUInt32(0)
-        b1 = fixedint.MutableUInt32(pow(2, 11) - 1)
-        b2 = fixedint.MutableUInt32(3000000001)
-        b3 = fixedint.MutableUInt32(2000000001)
-        b4 = fixedint.MutableUInt32(839914497)
+        b1 = fixedint.MutableUInt32(1)
+        b5 = fixedint.MutableUInt32(5)
+        bmaxint = fixedint.MutableUInt32(pow(2, 31) - 1)
+        bmaximm = fixedint.MutableUInt32(2047)
+        bn1 = fixedint.MutableUInt32(-1)
+        brandom = fixedint.MutableUInt32(3320171255)
 
-        state = ArchitecturalState(register_file=RegisterFile(registers=[b0, b1, 0, 0]))
-        andi_1 = ANDI(rd=2, rs1=0, imm=0)
+        # 0 & 0    == 0
+        # 0 & 1    == 0
+        # 1 & 0    == 0
+        # 1 & 1    == 1
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[b0, b0, b1, b1])
+        )
+        andi_1 = ANDI(rd=0, rs1=0, imm=b0)
         state = andi_1.behavior(state)
-        andi_1 = ANDI(rd=3, rs1=1, imm=0)
+        andi_1 = ANDI(rd=1, rs1=1, imm=b1)
         state = andi_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b0, b1, 0, 0])
+        andi_1 = ANDI(rd=2, rs1=2, imm=b0)
+        state = andi_1.behavior(state)
+        andi_1 = ANDI(rd=3, rs1=3, imm=b1)
+        state = andi_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [b0, b0, b0, b1])
 
-        andi_1 = ANDI(rd=2, rs1=0, imm=1234556)
+        # -1 & 0             == 0
+        # -1 & 1             == 1
+        # bmaxint & bmaximm  == bmaximm
+        # bmaxint & -1       == bmaxint
+        # brandom & b5
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[bn1, bn1, bmaxint, bmaxint, brandom])
+        )
+        andi_1 = ANDI(rd=0, rs1=0, imm=b0)
         state = andi_1.behavior(state)
-        andi_1 = ANDI(rd=3, rs1=1, imm=1)
+        andi_1 = ANDI(rd=1, rs1=1, imm=b1)
         state = andi_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b0, b1, 0, 1])
-
-        state = ArchitecturalState(register_file=RegisterFile(registers=[b2, b3, 0, 0]))
-        andi_1 = ANDI(rd=0, rs1=0, imm=b2)
+        andi_1 = ANDI(rd=2, rs1=2, imm=bmaximm)
         state = andi_1.behavior(state)
-        andi_1 = ANDI(rd=1, rs1=0, imm=b3)
+        andi_1 = ANDI(rd=3, rs1=3, imm=bn1)
         state = andi_1.behavior(state)
-        andi_1 = ANDI(rd=2, rs1=0, imm=1)
+        andi_1 = ANDI(rd=4, rs1=4, imm=b5)
         state = andi_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b2, b4, 1, 0])
+        self.assertEqual(state.register_file.registers, [b0, b1, bmaximm, bmaxint, b5])
 
     def test_ori(self):
         b0 = fixedint.MutableUInt32(0)
-        b1 = fixedint.MutableUInt32(pow(2, 11) - 1)
-        b2 = fixedint.MutableUInt32(3000000001)
-        b3 = fixedint.MutableUInt32(2000000001)
-        b4 = fixedint.MutableUInt32(4160085505)
+        b1 = fixedint.MutableUInt32(1)
+        b5 = fixedint.MutableUInt32(5)
+        bminimm = fixedint.MutableUInt32(-2048)
+        bn1 = fixedint.MutableUInt32(-1)
+        brandom = fixedint.MutableUInt32(3320171255)
 
-        state = ArchitecturalState(register_file=RegisterFile(registers=[b0, b1, 0, 0]))
+        # 0 | 0  == 0
+        # 0 | 1  == 1
+        # 1 | 0  == 1
+        # 1 | 1  == 1
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[b0, b0, b1, b1])
+        )
         ori_1 = ORI(rd=0, rs1=0, imm=b0)
         state = ori_1.behavior(state)
-        ori_1 = ORI(rd=1, rs1=1, imm=b0)
+        ori_1 = ORI(rd=1, rs1=1, imm=b1)
         state = ori_1.behavior(state)
-        ori_1 = ORI(rd=2, rs1=0, imm=b2)
+        ori_1 = ORI(rd=2, rs1=2, imm=b0)
         state = ori_1.behavior(state)
-        ori_1 = ORI(rd=3, rs1=2, imm=b3)
+        ori_1 = ORI(rd=3, rs1=3, imm=b1)
         state = ori_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b0, b1, b2, b4])
+        self.assertEqual(state.register_file.registers, [b0, b1, b1, b1])
+
+        # -1 | 0       == -1
+        # -1 | -1      == -1
+        # 0 | bminimm  == bminimm
+        # brandom | 5  == brandom
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[bn1, bn1, b0, brandom])
+        )
+        ori_1 = ORI(rd=0, rs1=0, imm=b0)
+        state = ori_1.behavior(state)
+        ori_1 = ORI(rd=1, rs1=1, imm=bn1)
+        state = ori_1.behavior(state)
+        ori_1 = ORI(rd=2, rs1=2, imm=bminimm)
+        state = ori_1.behavior(state)
+        ori_1 = ORI(rd=3, rs1=3, imm=b5)
+        state = ori_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [bn1, bn1, bminimm, brandom])
 
     def test_xori(self):
         b0 = fixedint.MutableUInt32(0)
-        b1 = fixedint.MutableUInt32(pow(2, 11) - 1)
-        b2 = fixedint.MutableUInt32(3000001)
-        b3 = fixedint.MutableUInt32(2000000001)
-        b4 = fixedint.MutableUInt32(3320171008)
+        b1 = fixedint.MutableUInt32(1)
+        bmaxint = fixedint.MutableUInt32(pow(2, 31) - 1)
+        bminint = fixedint.MutableUInt32(-pow(2, 31))
+        bn1 = fixedint.MutableUInt32(-1)
+        brandom = fixedint.MutableUInt32(3320171255)
+        brandomx = fixedint.MutableUInt32(974796040)
 
-        state = ArchitecturalState(register_file=RegisterFile(registers=[b0, b1, 1, 0]))
+        # 0 ^ 0  == 0
+        # 0 ^ 1  == 1
+        # 1 ^ 0  == 1
+        # 1 ^ 1  == 0
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[b0, b0, b1, b1])
+        )
         xori_1 = XORI(rd=0, rs1=0, imm=b0)
         state = xori_1.behavior(state)
-        xori_1 = XORI(rd=1, rs1=1, imm=b0)
+        xori_1 = XORI(rd=1, rs1=1, imm=b1)
         state = xori_1.behavior(state)
-        xori_1 = XORI(rd=2, rs1=1, imm=b1)
+        xori_1 = XORI(rd=2, rs1=2, imm=b0)
         state = xori_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b0, b1, b0, 0])
+        xori_1 = XORI(rd=3, rs1=3, imm=b1)
+        state = xori_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [b0, b1, b1, b0])
 
-        state = ArchitecturalState(register_file=RegisterFile(registers=[b2, b3, 0, 0]))
-        xori_1 = XORI(rd=2, rs1=0, imm=b3)
+        # -1 ^ 0        == -1
+        # -1 ^ -1       == 0
+        # bmaxint ^ -1  == bminint
+        # brandom ^ -1  == brandomx
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[bn1, bn1, bmaxint, brandom])
+        )
+        xori_1 = XORI(rd=0, rs1=0, imm=b0)
         state = xori_1.behavior(state)
-        xori_1 = XORI(rd=3, rs1=1, imm=b2)
+        xori_1 = XORI(rd=1, rs1=1, imm=bn1)
         state = xori_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b2, b3, b4, b4])
+        xori_1 = XORI(rd=2, rs1=2, imm=bn1)
+        state = xori_1.behavior(state)
+        xori_1 = XORI(rd=3, rs1=3, imm=bn1)
+        state = xori_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [bn1, b0, bminint, brandomx])
 
     def test_slli(self):
         b0 = fixedint.MutableUInt32(0)
@@ -170,14 +224,13 @@ class TestInstructions(unittest.TestCase):
         b2 = fixedint.MutableUInt32(2)
         b20 = fixedint.MutableUInt32(20)
         b31 = fixedint.MutableUInt32(31)
+        b127 = fixedint.MutableUInt32(127)
         b2_20 = fixedint.MutableUInt32(pow(2, 20))
         b111 = fixedint.MutableUInt32(pow(2, 32) - 1)  # 11111....
         b110 = fixedint.MutableUInt32(pow(2, 32) - 2)  # 111...110
         b100 = fixedint.MutableUInt32(pow(2, 31))  # 10000....
         brandom = fixedint.MutableUInt32(3320171255)
         brandomx = fixedint.MutableUInt32(395783132)
-        bn1 = fixedint.MutableInt32(-1)
-        bn16 = fixedint.MutableInt32(-16)
 
         # 0 << 0   == 0
         # 0 << 20  == 0
@@ -201,34 +254,23 @@ class TestInstructions(unittest.TestCase):
 
         # 111...1 << 1     == 111...10
         # 111...1 << 31    == 1000....
+        # 111...1 << 127    == 0
         # 1000... << 1     == 0
         # 3320171255 << 2  == 395783132
         state = ArchitecturalState(
-            register_file=RegisterFile(registers=[b111, b111, b100, brandom])
+            register_file=RegisterFile(registers=[b111, b111, b111, b100, brandom])
         )
         slli_1 = SLLI(rd=0, rs1=0, imm=b1)
         state = slli_1.behavior(state)
         slli_1 = SLLI(rd=1, rs1=1, imm=b31)
         state = slli_1.behavior(state)
-        slli_1 = SLLI(rd=2, rs1=2, imm=b1)
+        slli_1 = SLLI(rd=2, rs1=2, imm=b127)
         state = slli_1.behavior(state)
-        slli_1 = SLLI(rd=3, rs1=3, imm=b2)
+        slli_1 = SLLI(rd=3, rs1=3, imm=b1)
         state = slli_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b110, b100, b0, brandomx])
-
-        # negative shifts shouldn't do anything
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[b0, b1, b111, b111])
-        )
+        slli_1 = SLLI(rd=4, rs1=4, imm=b2)
         state = slli_1.behavior(state)
-        slli_1 = SLLI(rd=0, rs1=0, imm=bn1)
-        state = slli_1.behavior(state)
-        slli_1 = SLLI(rd=1, rs1=1, imm=bn1)
-        state = slli_1.behavior(state)
-        slli_1 = SLLI(rd=2, rs1=2, imm=bn1)
-        state = slli_1.behavior(state)
-        slli_1 = SLLI(rd=3, rs1=3, imm=bn16)
-        # self.assertEqual(state.register_file.registers, [b0, b1, b111, b111])
+        self.assertEqual(state.register_file.registers, [b110, b100, b0, b0, brandomx])
 
     def test_srli(self):
         b0 = fixedint.MutableUInt32(0)
@@ -236,6 +278,7 @@ class TestInstructions(unittest.TestCase):
         b2 = fixedint.MutableUInt32(2)
         b20 = fixedint.MutableUInt32(20)
         b31 = fixedint.MutableUInt32(31)
+        b127 = fixedint.MutableUInt32(127)
         b111 = fixedint.MutableUInt32(pow(2, 32) - 1)  # 11111....
         b011 = fixedint.MutableUInt32(pow(2, 31) - 1)  # 01111....
         brandom = fixedint.MutableUInt32(3320171255)
@@ -263,17 +306,20 @@ class TestInstructions(unittest.TestCase):
 
         # 111...1 >> 1     == 0111....
         # 111...1 >> 31    == 1
+        # 111...1 >> 127   == 0
         # 3320171255 >> 2  == 395783132
         state = ArchitecturalState(
-            register_file=RegisterFile(registers=[b111, b111, brandom])
+            register_file=RegisterFile(registers=[b111, b111, b111, brandom])
         )
         srli_1 = SRLI(rd=0, rs1=0, imm=b1)
         state = srli_1.behavior(state)
         srli_1 = SRLI(rd=1, rs1=1, imm=b31)
         state = srli_1.behavior(state)
-        srli_1 = SRLI(rd=2, rs1=2, imm=b2)
+        srli_1 = SRLI(rd=2, rs1=2, imm=b127)
         state = srli_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b011, b1, brandomx])
+        srli_1 = SRLI(rd=3, rs1=3, imm=b2)
+        state = srli_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [b011, b1, b0, brandomx])
 
     def test_slti(self):
         b0 = fixedint.MutableInt32(0)

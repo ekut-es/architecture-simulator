@@ -1,0 +1,11 @@
+bugfixes, addi&andi tests
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# On branch devel/i_type_instructions_14-21
+# Your branch is up to date with 'origin/devel/i_type_instructions_14-21'.
+#
+# Changes to be committed:
+#	modified:   architecture_simulator/isa/rv32i_instructions.py
+#	modified:   tests/test_isa.py
+#
