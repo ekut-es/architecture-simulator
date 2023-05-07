@@ -130,7 +130,6 @@ class CsrRegisterFile(Memory):
         if adress < 0 or adress > 4095:
             raise Exception("illegal action: csr register does not exist")
 
-
     def checkReadOnly(self, adress: int):
         if adress & 0b100000000000 and adress & 0b010000000000:
             raise Exception("illegal action: attempting to write into read-only csr register")

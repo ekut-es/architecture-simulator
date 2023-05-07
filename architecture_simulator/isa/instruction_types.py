@@ -109,3 +109,18 @@ class JTypeInstruction(Instruction):
 class fence(Instruction):
     def __init__(self, **args):
         super().__init__(**args)
+
+
+class ITypeInstruction(Instruction):
+    def __init__(self, rd: int, rs1: int, imm: int, **args):
+        """Create a I-Type instruction
+
+        Args:
+            imm (int): offset to be further progressed by the instruction
+            rs1 (int): source register 1
+            rd (int): destination register
+        """
+        super().__init__(**args)
+        self.imm = imm
+        self.rs1 = rs1
+        self.rd = rd

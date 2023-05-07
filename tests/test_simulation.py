@@ -1,6 +1,7 @@
 import unittest
 
-from architecture_simulator.uarch.architectural_state import RegisterFile, Memory
+from architecture_simulator.uarch.architectural_state import RegisterFile
+from architecture_simulator.uarch.architectural_state import Memory
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 from architecture_simulator.simulation.simulation import Simulation
 
