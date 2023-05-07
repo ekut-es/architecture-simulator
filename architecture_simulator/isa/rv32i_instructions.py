@@ -11,11 +11,20 @@ import fixedint
 
 
 class ADD(RTypeInstruction):
-    def __init__(self, rs1: int, rs2: int, rd: int):
-        super().__init__(rs1, rs2, rd, mnemonic="add")
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="add")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
-        # rd = rs1 + rs2
+        """
+        Addition:
+            rd = rs1 + rs2
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
         architectural_state.register_file.registers[self.rd] = rs1 + rs2
@@ -23,21 +32,201 @@ class ADD(RTypeInstruction):
 
 
 class SUB(RTypeInstruction):
-    def __init__(self, rs1: int, rs2: int, rd: int):
-        super().__init__(rs1=rs1, rs2=rs2, rd=rd, mnemonic="add")
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="sub")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
-        """rd = rs1 - rs2
+        """
+        Subtraction:
+            rd = rs1 - rs2
 
         Args:
-            architectural_state (ArchitecturalState): _description_
+            architectural_state
 
         Returns:
-            ArchitecturalState: _description_
+            architectural_state
         """
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
-        architectural_state.register_file.registers[self.rd] = rs1 - rs2
+        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
+            int(fixedint.Int32(int(rs1)) - fixedint.Int32(int(rs2)))
+        )
+        return architectural_state
+
+
+class SLL(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="sll")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """
+        Shift left logical:
+            rd = rs1 << rs2
+
+        (shift amount determined by lower 5 bits of rs2)
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[
+            self.rs2
+        ] % fixedint.MutableUInt32(32)
+        architectural_state.register_file.registers[self.rd] = rs1 << rs2
+        return architectural_state
+
+
+class SLT(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="slt")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """
+        Set lower than:
+            rd = 1 if (rs1 < rs2) else 0
+
+        (register values are interpreted as signed integers)
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
+        rs2 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs2]))
+        architectural_state.register_file.registers[self.rd] = (
+            fixedint.MutableUInt32(1) if rs1 < rs2 else fixedint.MutableUInt32(0)
+        )
+        return architectural_state
+
+
+class SLTU(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="sltu")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """
+        Set lower than unsigned:
+            rd = 1 if (rs1 < rs2) else 0
+
+        (register values are interpreted as unsigned integers)
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        architectural_state.register_file.registers[self.rd] = (
+            fixedint.MutableUInt32(1) if rs1 < rs2 else fixedint.MutableUInt32(0)
+        )
+        return architectural_state
+
+
+class XOR(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="xor")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """
+        XOR:
+            rd = rs1 ^ rs2
+
+        (executed bitwise)
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        architectural_state.register_file.registers[self.rd] = rs1 ^ rs2
+        return architectural_state
+
+
+class SRL(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="srl")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """
+        Shift right logical:
+            rd = rs1 >> rs2
+
+        (shift amount determined by lower 5 bits of rs2)
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[
+            self.rs2
+        ] % fixedint.MutableUInt32(32)
+        architectural_state.register_file.registers[self.rd] = rs1 >> rs2
+        return architectural_state
+
+
+class SRA(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="sra")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """
+        Shift right arithmetic:
+            rd = rs1 >>s rs2
+
+        (shift amount determined by lower 5 bits of rs2)
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
+        rs2 = fixedint.Int32(
+            int(
+                architectural_state.register_file.registers[self.rs2]
+                % fixedint.MutableUInt32(32)
+            )
+        )
+        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
+            int(rs1 >> rs2)
+        )
+        return architectural_state
+
+
+class OR(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="or")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """
+        OR:
+            rd = rs1 | rs2
+
+        (executed bitwise)
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        architectural_state.register_file.registers[self.rd] = rs1 | rs2
         return architectural_state
 
 
@@ -234,6 +423,27 @@ class CSRRCI(CSRITypeInstruction):
         return architectural_state
 
 
+class AND(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="and")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """
+        AND:
+            rd = rs1 & rs2
+
+        (executed bitwise)
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        architectural_state.register_file.registers[self.rd] = rs1 & rs2
+        return architectural_state
 class SB(STypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1, rs2, imm, mnemonic="sb")
