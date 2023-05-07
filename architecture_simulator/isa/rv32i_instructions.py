@@ -1,11 +1,11 @@
 # from ctypes import c_int32, c_uint32, c_int8, c_int16, c_uint8, c_uint16
 
 from .instruction_types import RTypeInstruction, CSRTypeInstruction, CSRITypeInstruction
+from architecture_simulator.uarch.architectural_state import ArchitecturalState
+from .instruction_types import RTypeInstruction
+from .instruction_types import BTypeInstruction
 from ..uarch.architectural_state import ArchitecturalState
-
 import fixedint
-
-# todo: use ctypes
 
 
 class ADD(RTypeInstruction):
@@ -22,7 +22,7 @@ class ADD(RTypeInstruction):
 
 class SUB(RTypeInstruction):
     def __init__(self, rs1: int, rs2: int, rd: int):
-        super().__init__(rs1, rs2, rd, mnemonic="add")
+        super().__init__(rs1=rs1, rs2=rs2, rd=rd, mnemonic="add")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """rd = rs1 - rs2
@@ -37,7 +37,85 @@ class SUB(RTypeInstruction):
         rs2 = architectural_state.register_file.registers[self.rs2]
         architectural_state.register_file.registers[self.rd] = rs1 - rs2
         return architectural_state
-    
+
+
+class BEQ(BTypeInstruction):
+    def __init__(self, rs1: int, rs2: int, imm: int):
+        super().__init__(rs1=rs1, rs2=rs2, imm=imm, mnemonic="beq")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """if (x[rs1] == x[rs2]) pc += sext(imm)"""
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        if rs1 == rs2:
+            architectural_state.program_counter += self.imm * 2 - 4
+        return architectural_state
+
+
+class BNE(BTypeInstruction):
+    def __init__(self, rs1: int, rs2: int, imm: int):
+        super().__init__(rs1=rs1, rs2=rs2, imm=imm, mnemonic="bne")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """if (x[rs1] != x[rs2]) pc += sext(imm)"""
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        if rs1 != rs2:
+            architectural_state.program_counter += self.imm * 2 - 4
+        return architectural_state
+
+
+class BLT(BTypeInstruction):
+    def __init__(self, rs1: int, rs2: int, imm: int):
+        super().__init__(rs1=rs1, rs2=rs2, imm=imm, mnemonic="blt")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """if (x[rs1] <s x[rs2]) pc += sext(imm)"""
+        rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
+        rs2 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs2]))
+        if rs1 < rs2:
+            architectural_state.program_counter += self.imm * 2 - 4
+        return architectural_state
+
+
+class BGE(BTypeInstruction):
+    def __init__(self, rs1: int, rs2: int, imm: int):
+        super().__init__(rs1=rs1, rs2=rs2, imm=imm, mnemonic="bge")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """if (x[rs1] >= x[rs2]) pc += sext(imm)"""
+        rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
+        rs2 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs2]))
+        if rs1 >= rs2:
+            architectural_state.program_counter += self.imm * 2 - 4
+        return architectural_state
+
+
+class BLTU(BTypeInstruction):
+    def __init__(self, rs1: int, rs2: int, imm: int):
+        super().__init__(rs1=rs1, rs2=rs2, imm=imm, mnemonic="bltu")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """if (x[rs1] <u x[rs2]) pc += sext(imm)"""
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        if rs1 < rs2:
+            architectural_state.program_counter += self.imm * 2 - 4
+        return architectural_state
+
+
+class BGEU(BTypeInstruction):
+    def __init__(self, rs1: int, rs2: int, imm: int):
+        super().__init__(rs1=rs1, rs2=rs2, imm=imm, mnemonic="bgeu")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """if (x[rs1] >=u x[rs2]) pc += sext(imm)"""
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        if rs1 >= rs2:
+            architectural_state.program_counter += self.imm * 2 - 4
+        return architectural_state
+
 class CSRRW(CSRTypeInstruction):
     def __init__(self, rd: int, csr: int, rs1: int):
         super().__init__(rd, csr, rs1, mnemonic="csrrw")
@@ -53,7 +131,7 @@ class CSRRW(CSRTypeInstruction):
         """
         architectural_state.register_file.registers[self.rd] = architectural_state.csr_registers.load_word(self.csr)
         architectural_state.csr_registers.store_word(self.csr, architectural_state.register_file.registers[self.rs1])
-        
+
         return architectural_state
 
 class CSRRS(CSRTypeInstruction):
@@ -73,9 +151,9 @@ class CSRRS(CSRTypeInstruction):
         architectural_state.register_file.registers[self.rd] = architectural_state.csr_registers.load_word(self.csr)
         temp = architectural_state.csr_registers.load_word(self.csr) | rs1_value
         architectural_state.csr_registers.store_word(self.csr, temp)
-        
+
         return architectural_state
-    
+
 class CSRRC(CSRTypeInstruction):
     def __init__(self, rd: int, csr: int, rs1: int):
         super().__init__(rd, csr, rs1, mnemonic="csrrc")
@@ -93,10 +171,10 @@ class CSRRC(CSRTypeInstruction):
         architectural_state.register_file.registers[self.rd] = architectural_state.csr_registers.load_word(self.csr)
         temp = architectural_state.csr_registers.load_word(self.csr) & (~(rs1_value))
         architectural_state.csr_registers.store_word(self.csr, temp)
-        
+
         return architectural_state
-    
-    
+
+
 class CSRRWI(CSRITypeInstruction):
     def __init__(self, rd: int, csr: int, uimm: int):
         super().__init__(rd, csr, uimm, mnemonic="csrrwi")
@@ -112,7 +190,7 @@ class CSRRWI(CSRITypeInstruction):
         """
         architectural_state.register_file.registers[self.rd] = architectural_state.csr_registers.load_word(self.csr)
         architectural_state.csr_registers.store_word(self.csr, fixedint.MutableUInt32(self.uimm))
-        
+
         return architectural_state
 
 class CSRRSI(CSRITypeInstruction):
@@ -131,9 +209,9 @@ class CSRRSI(CSRITypeInstruction):
         architectural_state.register_file.registers[self.rd] = architectural_state.csr_registers.load_word(self.csr)
         temp = architectural_state.csr_registers.load_word(self.csr) | fixedint.MutableUInt32(self.uimm)
         architectural_state.csr_registers.store_word(self.csr, temp)
-        
+
         return architectural_state
-    
+
 class CSRRCI(CSRITypeInstruction):
     def __init__(self, rd: int, csr: int, uimm: int):
         super().__init__(rd, csr, uimm, mnemonic="csrrci")
@@ -150,7 +228,7 @@ class CSRRCI(CSRITypeInstruction):
         architectural_state.register_file.registers[self.rd] = architectural_state.csr_registers.load_word(self.csr)
         temp = architectural_state.csr_registers.load_word(self.csr) & (~(fixedint.MutableUInt32(self.uimm)))
         architectural_state.csr_registers.store_word(self.csr, temp)
-        
+
         return architectural_state
 
 
