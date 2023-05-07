@@ -1,6 +1,6 @@
 import unittest
 
-from architecture_simulator.uarch.architectural_state import RegisterFile
+from architecture_simulator.uarch.architectural_state import RegisterFile, Memory
 from architecture_simulator.isa.rv32i_instructions import (
     ADD,
     BEQ,
