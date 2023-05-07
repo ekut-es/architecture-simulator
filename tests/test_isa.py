@@ -2,7 +2,17 @@ import unittest
 import fixedint
 
 from architecture_simulator.uarch.architectural_state import RegisterFile, Memory
-from architecture_simulator.isa.rv32i_instructions import ADD, SUB
+from architecture_simulator.isa.rv32i_instructions import (
+    ADD,
+    SUB,
+    SB,
+    SH,
+    SW,
+    LUI,
+    AUIPC,
+    JAL,
+    fence,
+)
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 
 from architecture_simulator.isa.parser import riscv_bnf, riscv_parser
@@ -52,6 +62,90 @@ class TestInstructions(unittest.TestCase):
         # store_word test
         state.memory.store_word(0, fixedint.MutableUInt32(-1))
         self.assertEqual(state.memory.load_word(0), fixedint.MutableUInt32(-1))
+
+    def test_sb(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(
+                registers=[
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(5),
+                    fixedint.MutableUInt32(256),
+                    fixedint.MutableUInt32(0),
+                ]
+            ),
+            # memory=Memory(memory_file=()),
+        )
+
+        sb_1 = SB(rs1=1, rs2=2, imm=1, mnemonic="sb")
+        # state = sb_1.behavior(state)
+        # self.assertEqual(state.memory[6], 1)
+
+    def test_sh(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[0, 5, 9, 0]),
+            memory=Memory(memory_file=()),
+        )
+
+        # sh_1 = SH(rs1=1, rs2=2, imm=1)
+        # state = sh_1.behavior(state)
+        # self.assertEqual(int(state.memory[6]), 0)
+
+    def test_sw(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[0, 5, 65536, 0]),
+            memory=Memory(memory_file=()),
+        )
+
+        sw_1 = SW(rs1=1, rs2=2, imm=1, mnemonic="sw")
+        # state = sw_1.behavior(state)
+        # self.assertEqual(int(state.memory[6]), 1)
+
+    def test_lui(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[0, 5, 9, 0]),
+            memory=Memory(memory_file=()),
+        )
+
+        lui_1 = LUI(rd=1, imm=2)
+        state = lui_1.behavior(state)
+        self.assertEqual(int(state.register_file.registers[1]), 8192)
+
+        lui_2 = LUI(rd=0, imm=20)
+        state = lui_2.behavior(state)
+        self.assertEqual(int(state.register_file.registers[0]), 81920)
+
+    def test_auipc(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[0, 5, 9, 0]),
+            memory=Memory(memory_file=()),
+        )
+
+        state.program_counter = 0
+        auipc_1 = AUIPC(rd=1, imm=2)
+        state = auipc_1.behavior(state)
+        self.assertEqual(int(state.register_file.registers[1]), 8192)
+
+        state.program_counter = 3
+        auipc_1 = AUIPC(rd=1, imm=2)
+        state = auipc_1.behavior(state)
+        self.assertEqual(int(state.register_file.registers[1]), 8195)
+
+    def test_jal(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[1, 1, 1]),
+            memory=Memory(memory_file=()),
+        )
+        state.program_counter = 0
+        jal_1 = JAL(rd=0, imm=2)
+        state = jal_1.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+        self.assertEqual(int(state.register_file.registers[0]), 4)
+
+        state.program_counter = 3
+        jal_2 = JAL(rd=1, imm=3)
+        state = jal_2.behavior(state)
+        self.assertEqual(state.program_counter, 5)
+        self.assertEqual(int(state.register_file.registers[1]), 7)
 
 
 class TestParser(unittest.TestCase):
