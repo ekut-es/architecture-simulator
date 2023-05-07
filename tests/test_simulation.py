@@ -1,6 +1,6 @@
 import unittest
 
-from architecture_simulator.uarch.architectural_state import RegisterFile
+from architecture_simulator.uarch.architectural_state import RegisterFile, Memory
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 from architecture_simulator.simulation.simulation import Simulation
 
@@ -9,7 +9,8 @@ class TestSimulation(unittest.TestCase):
     def test_simulation(self):
         simulation = Simulation(
             state=ArchitecturalState(
-                register_file=RegisterFile(registers=[0, 2, 0, 0])
+                register_file=RegisterFile(registers=[0, 2, 0, 0]),
+                memory=Memory(memory_file=()),
             ),
             instructions={},
         )

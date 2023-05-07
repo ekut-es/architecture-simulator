@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from ..uarch.architectural_state import ArchitecturalState
+from architecture_simulator.uarch.architectural_state import ArchitecturalState
 
 
 @dataclass
@@ -17,8 +17,8 @@ class RTypeInstruction(Instruction):
         self.rs1 = rs1
         self.rs2 = rs2
         self.rd = rd
-        
-        
+
+
 class CSRTypeInstruction(Instruction):
     """Create an I-Type instruction
 
@@ -26,7 +26,7 @@ class CSRTypeInstruction(Instruction):
         rd (int): register destination
         csr (int): the control/status register's index
         rs1 (int): source register 1
-    """    
+    """
     def __init__(self, rd: int, csr: int, rs1: int, **args):
         super().__init__(**args)
         self.rd = rd
@@ -40,12 +40,12 @@ class CSRITypeInstruction(Instruction):
         rd (int): register destination
         csr (int): the control/status register's index
         imm (int): immediate
-    """    
+    """
     def __init__(self, rd: int, csr: int, uimm: int, **args):
         super().__init__(**args)
         self.rd = rd
         self.csr = csr
-        self.uimm = uimm      
+        self.uimm = uimm
 
 
 class BTypeInstruction(Instruction):
@@ -67,3 +67,45 @@ class BTypeInstruction(Instruction):
         self.rs1 = rs1
         self.rs2 = rs2
         self.imm = imm
+
+
+class STypeInstruction(Instruction):
+    def __init__(self, rs1: int, rs2: int, imm: int, **args):
+        super().__init__(**args)
+        if imm < -2048 or 2047 < imm:
+            raise ValueError(
+                "STypeInstruction can only take 12 bit immediates. Given immediate was "
+                + str(imm)
+            )
+        self.rs1 = rs1
+        self.rs2 = rs2
+        self.imm = imm
+
+
+class UTypeInstruction(Instruction):
+    def __init__(self, rd: int, imm: int, **args):
+        super().__init__(**args)
+        if imm < -pow(2, 19) or pow(2, 19) - 1 < imm:
+            raise ValueError(
+                "UTypeInstruction can only take 20 bit immediates. Given immediate was "
+                + str(imm)
+            )
+        self.rd = rd
+        self.imm = imm
+
+
+class JTypeInstruction(Instruction):
+    def __init__(self, rd: int, imm: int, **args):
+        super().__init__(**args)
+        if imm < -pow(2, 19) or pow(2, 19) - 1 < imm:
+            raise ValueError(
+                "JTypeInstruction can only take 20 bit immediates. Given immediate was "
+                + str(imm)
+            )
+        self.rd = rd
+        self.imm = imm
+
+
+class fence(Instruction):
+    def __init__(self, **args):
+        super().__init__(**args)
