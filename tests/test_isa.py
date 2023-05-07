@@ -556,8 +556,14 @@ class TestInstructions(unittest.TestCase):
             state.register_file.registers, [fixedint.MutableUInt32(-64), 1, -128]
         )
 
+        # imm=95, rs1= 2^30 immediate is max 32
+        state.register_file.registers = [0, 1, -128, pow(2, 30)]
+        instr = SRAI(imm=95, rs1=3, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [0, 1, -128, pow(2, 30)])
+
     def test_jalr(self):
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 1]))
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 8]))
         # imm=8, rs1=0
         state.register_file.registers = [0, 8]
         state.program_counter = 0
@@ -582,7 +588,7 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.register_file.registers, [4, 8])
         self.assertEqual(state.program_counter, 12)
 
-        # imm=7, rs1=8 seein if least significant bit is set to 0
+        # imm=7, rs1=8 seeing if least significant bit is set to 0
         state.register_file.registers = [0, 8]
         state.program_counter = 0
         instr = JALR(imm=7, rs1=1, rd=0)

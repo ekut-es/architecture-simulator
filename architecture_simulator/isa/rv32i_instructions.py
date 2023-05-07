@@ -186,7 +186,7 @@ class SRAI(ITypeInstruction):
         """x[rd] = x[rs1] >>s shamt"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            rs1 >> int(fixedint.UInt16(self.imm)[0:12])
+            rs1 >> int(fixedint.UInt16(self.imm)[0:6])
         )
         return architectural_state
 
