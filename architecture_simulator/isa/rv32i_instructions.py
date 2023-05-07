@@ -43,7 +43,7 @@ class SUB(RTypeInstruction):
 
 
 class SB(STypeInstruction):
-    def __init(self, rs1: int, rs2: int, imm: int):
+    def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1, rs2, imm, mnemonic="sb")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
@@ -57,7 +57,7 @@ class SB(STypeInstruction):
 
 
 class SH(STypeInstruction):
-    def __init(self, rs1: int, rs2: int, imm: int):
+    def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1, rs2, imm, mnemonic="sh")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
@@ -72,7 +72,7 @@ class SH(STypeInstruction):
 
 
 class SW(STypeInstruction):
-    def __init(self, rs1: int, rs2: int, imm: int):
+    def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1, rs2, imm, mnemonic="sw")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:

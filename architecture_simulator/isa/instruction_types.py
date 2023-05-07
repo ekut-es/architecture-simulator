@@ -22,6 +22,11 @@ class RTypeInstruction(Instruction):
 class STypeInstruction(Instruction):
     def __init__(self, rs1: int, rs2: int, imm: int, **args):
         super().__init__(**args)
+        if imm < -2048 or 2047 < imm:
+            raise ValueError(
+                "STypeInstruction can only take 12 bit immediates. Given immediate was "
+                + str(imm)
+            )
         self.rs1 = rs1
         self.rs2 = rs2
         self.imm = imm
@@ -30,6 +35,11 @@ class STypeInstruction(Instruction):
 class UTypeInstruction(Instruction):
     def __init__(self, rd: int, imm: int, **args):
         super().__init__(**args)
+        if imm < -pow(2, 19) or pow(2, 19) - 1 < imm:
+            raise ValueError(
+                "UTypeInstruction can only take 20 bit immediates. Given immediate was "
+                + str(imm)
+            )
         self.rd = rd
         self.imm = imm
 
@@ -37,6 +47,11 @@ class UTypeInstruction(Instruction):
 class JTypeInstruction(Instruction):
     def __init__(self, rd: int, imm: int, **args):
         super().__init__(**args)
+        if imm < -pow(2, 19) or pow(2, 19) - 1 < imm:
+            raise ValueError(
+                "JTypeInstruction can only take 20 bit immediates. Given immediate was "
+                + str(imm)
+            )
         self.rd = rd
         self.imm = imm
 
