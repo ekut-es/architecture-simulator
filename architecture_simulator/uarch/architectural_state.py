@@ -85,9 +85,66 @@ class Memory:
             int(safe_value[24:32])
         )
 
+@dataclass
+class CsrRegisterFile(Memory):
+    privilege_level: int = 0
+
+    def load_byte(self, adress: int) -> fixedint.MutableUInt8:
+        self.checkForLegalAdress(adress)
+        self.checkPrivilegeLevel(adress)
+        return super().load_byte(adress)
+
+    def store_byte(self, adress: int, value: fixedint.MutableUInt8):
+        self.checkForLegalAdress(adress)
+        self.checkPrivilegeLevel(adress)
+        self.checkReadOnly(adress)
+        return super().store_byte(adress, value)
+
+    def load_halfword(self, adress: int) -> fixedint.MutableUInt16:
+        self.checkForLegalAdress(adress)
+        self.checkPrivilegeLevel(adress)
+        return super().load_halfword(adress)
+
+    def store_halfword(self, adress: int, value: fixedint.MutableUInt16):
+        self.checkForLegalAdress(adress)
+        self.checkPrivilegeLevel(adress)
+        self.checkReadOnly(adress)
+        return super().store_halfword(adress, value)
+
+    def load_word(self, adress: int) -> fixedint.MutableUInt32:
+        self.checkForLegalAdress(adress)
+        self.checkPrivilegeLevel(adress)
+        return super().load_word(adress)
+
+    def store_word(self, adress: int, value: fixedint.MutableUInt32):
+        self.checkForLegalAdress(adress)
+        self.checkPrivilegeLevel(adress)
+        self.checkReadOnly(adress)
+        return super().store_word(adress, value)
+
+    def checkPrivilegeLevel(self, adress: int):
+        if (adress & 0b001100000000) > self.privilege_level:
+            raise Exception("illegal action: privilege level too low to access this csr register")
+
+    def checkForLegalAdress(self, adress: int):
+        if adress < 0 or adress > 4095:
+            raise Exception("illegal action: csr register does not exist")
+
+    def checkReadOnly(self, adress: int):
+        if adress & 0b100000000000 and adress & 0b010000000000:
+            raise Exception("illegal action: attempting to write into read-only csr register")
 
 @dataclass
 class ArchitecturalState:
     register_file: RegisterFile
-    memory: Memory = Memory(memory_file=dict())
+    memory: Memory = Memory(memory_file={})
+    csr_registers: CsrRegisterFile = CsrRegisterFile(memory_file={})
     program_counter: int = 0
+
+    def changePrivilegeLevel(self, level: int):
+        if not level < 0 and not level > 3:
+            self.csr_registers.privilege_level = level
+
+    def getPrivilegeLevel(self):
+        return self.csr_registers.privilege_level
+
