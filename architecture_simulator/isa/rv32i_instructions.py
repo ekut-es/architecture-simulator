@@ -49,7 +49,7 @@ class SB(STypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """M[x[rs1] + sext(imm)] = x[rs2][7:0]"""
         rs1 = architectural_state.register_file.registers[self.rs1]
-        rs2 = architectural_state.register_file.registers[self.rs2][-8:]
+        rs2 = architectural_state.register_file.registers[self.rs2][:8]
         architectural_state.memory.store_byte(
             int(rs1 + fixedint.MutableUInt32(self.imm)), fixedint.MutableUInt8(int(rs2))
         )
@@ -62,7 +62,7 @@ class SH(STypeInstruction):
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """M[x[rs1] + sext(imm)] = x[rs2][15:0]"""
-        rs2 = architectural_state.register_file.registers[self.rs2][-16:]
+        rs2 = architectural_state.register_file.registers[self.rs2][:16]
         rs1 = architectural_state.register_file.registers[self.rs1]
         architectural_state.memory.store_halfword(
             int(rs1 + fixedint.MutableUInt32(self.imm)),

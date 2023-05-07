@@ -69,7 +69,7 @@ class TestInstructions(unittest.TestCase):
                 registers=[
                     fixedint.MutableUInt32(0),
                     fixedint.MutableUInt32(5),
-                    fixedint.MutableUInt32(256),
+                    fixedint.MutableUInt32(257),
                     fixedint.MutableUInt32(0),
                 ]
             ),
@@ -77,33 +77,47 @@ class TestInstructions(unittest.TestCase):
         )
 
         sb_1 = SB(rs1=1, rs2=2, imm=1, mnemonic="sb")
-        # state = sb_1.behavior(state)
-        # self.assertEqual(state.memory[6], 1)
+        state = sb_1.behavior(state)
+        self.assertEqual(state.memory.memory_file[6], 1)
 
     def test_sh(self):
         state = ArchitecturalState(
-            register_file=RegisterFile(registers=[0, 5, 9, 0]),
-            memory=Memory(memory_file=()),
+            register_file=RegisterFile(
+                registers=[
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(5),
+                    fixedint.MutableUInt32(9),
+                    fixedint.MutableUInt32(0),
+                ]
+            ),
+            # memory=Memory(memory_file=()),
         )
 
-        # sh_1 = SH(rs1=1, rs2=2, imm=1)
-        # state = sh_1.behavior(state)
-        # self.assertEqual(int(state.memory[6]), 0)
+        sh_1 = SH(rs1=1, rs2=2, imm=1, mnemonic="sh")
+        state = sh_1.behavior(state)
+        self.assertEqual(int(state.memory.memory_file[6]), 9)
 
     def test_sw(self):
         state = ArchitecturalState(
-            register_file=RegisterFile(registers=[0, 5, 65536, 0]),
-            memory=Memory(memory_file=()),
+            register_file=RegisterFile(
+                registers=[
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(5),
+                    fixedint.MutableUInt32(65536),
+                    fixedint.MutableUInt32(0),
+                ]
+            ),
+            # memory=Memory(memory_file=()),
         )
 
         sw_1 = SW(rs1=1, rs2=2, imm=1, mnemonic="sw")
-        # state = sw_1.behavior(state)
-        # self.assertEqual(int(state.memory[6]), 1)
+        state = sw_1.behavior(state)
+        self.assertEqual(int(state.memory.memory_file[6]), 0)
 
     def test_lui(self):
         state = ArchitecturalState(
             register_file=RegisterFile(registers=[0, 5, 9, 0]),
-            memory=Memory(memory_file=()),
+            # memory=Memory(memory_file=()),
         )
 
         lui_1 = LUI(rd=1, imm=2)
@@ -117,7 +131,7 @@ class TestInstructions(unittest.TestCase):
     def test_auipc(self):
         state = ArchitecturalState(
             register_file=RegisterFile(registers=[0, 5, 9, 0]),
-            memory=Memory(memory_file=()),
+            # memory=Memory(memory_file=()),
         )
 
         state.program_counter = 0
@@ -133,7 +147,7 @@ class TestInstructions(unittest.TestCase):
     def test_jal(self):
         state = ArchitecturalState(
             register_file=RegisterFile(registers=[1, 1, 1]),
-            memory=Memory(memory_file=()),
+            # memory=Memory(memory_file=()),
         )
         state.program_counter = 0
         jal_1 = JAL(rd=0, imm=2)
