@@ -71,6 +71,8 @@ class TestInstructions(unittest.TestCase):
                     fixedint.MutableUInt32(261),
                     fixedint.MutableUInt32(257),
                     fixedint.MutableUInt32(256),
+                    fixedint.MutableUInt32(128),
+                    fixedint.MutableUInt32(1024),
                 ]
             ),
             # memory=Memory(memory_file=()),
@@ -96,24 +98,13 @@ class TestInstructions(unittest.TestCase):
         state = sb_4.behavior(state)
         self.assertEqual(state.memory.memory_file[1], 0)
 
-        state = ArchitecturalState(
-            register_file=RegisterFile(
-                registers=[
-                    fixedint.MutableUInt32(1),
-                    fixedint.MutableUInt32(2),
-                    fixedint.MutableUInt32(3),
-                    fixedint.MutableUInt32(4),
-                ]
-            ),
-        )
-
-        sb_5 = SB(rs1=0, rs2=1, imm=1, mnemonic="sb")
+        sb_5 = SB(rs1=0, rs2=4, imm=2, mnemonic="sb")
         state = sb_5.behavior(state)
-        self.assertEqual(state.memory.memory_file[2], 2)
+        self.assertEqual(state.memory.memory_file[2], 128)
 
-        sb_6 = SB(rs1=1, rs2=3, imm=1, mnemonic="sb")
+        sb_6 = SB(rs1=0, rs2=5, imm=2, mnemonic="sb")
         state = sb_6.behavior(state)
-        self.assertEqual(state.memory.memory_file[3], 4)
+        self.assertEqual(state.memory.memory_file[2], 0)
 
     def test_sh(self):
         state = ArchitecturalState(
@@ -123,10 +114,10 @@ class TestInstructions(unittest.TestCase):
                     fixedint.MutableUInt32(65536),
                     fixedint.MutableUInt32(65537),
                     fixedint.MutableUInt32(65538),
-                    fixedint.MutableUInt32(1),
-                    fixedint.MutableUInt32(2),
                     fixedint.MutableUInt32(3),
-                    fixedint.MutableUInt32(4),
+                    fixedint.MutableUInt32(2),
+                    fixedint.MutableUInt32(255),
+                    fixedint.MutableUInt32(128),
                 ]
             ),
             # memory=Memory(memory_file=()),
@@ -148,17 +139,17 @@ class TestInstructions(unittest.TestCase):
         state = sh_3.behavior(state)
         self.assertEqual(int(state.memory.memory_file[2]), 2)
 
-        sh_4 = SH(rs1=4, rs2=5, imm=2, mnemonic="sh")
+        sh_4 = SH(rs1=0, rs2=4, imm=3, mnemonic="sh")
         state = sh_4.behavior(state)
-        self.assertEqual(int(state.memory.memory_file[3]), 2)
-
-        sh_5 = SH(rs1=4, rs2=6, imm=2, mnemonic="sh")
-        state = sh_5.behavior(state)
         self.assertEqual(int(state.memory.memory_file[3]), 3)
 
-        sh_6 = SH(rs1=4, rs2=7, imm=2, mnemonic="sh")
+        sh_5 = SH(rs1=0, rs2=6, imm=3, mnemonic="sh")
+        state = sh_5.behavior(state)
+        self.assertEqual(int(state.memory.memory_file[3]), 255)
+
+        sh_6 = SH(rs1=0, rs2=7, imm=3, mnemonic="sh")
         state = sh_6.behavior(state)
-        self.assertEqual(int(state.memory.memory_file[3]), 4)
+        self.assertEqual(int(state.memory.memory_file[3]), 128)
 
     def test_sw(self):
         state = ArchitecturalState(
@@ -167,7 +158,7 @@ class TestInstructions(unittest.TestCase):
                     fixedint.MutableUInt32(0),
                     fixedint.MutableUInt32(1),
                     fixedint.MutableUInt32(2),
-                    fixedint.MutableUInt32(3),
+                    fixedint.MutableUInt32(100),
                     fixedint.MutableUInt32(10),
                     fixedint.MutableUInt32(255),
                     fixedint.MutableUInt32(256),
@@ -190,7 +181,7 @@ class TestInstructions(unittest.TestCase):
 
         sw_3 = SW(rs1=0, rs2=3, imm=3, mnemonic="sw")
         state = sw_3.behavior(state)
-        self.assertEqual(int(state.memory.memory_file[3]), 3)
+        self.assertEqual(int(state.memory.memory_file[3]), 100)
 
         sw_4 = SW(rs1=0, rs2=4, imm=0, mnemonic="sw")
         state = sw_4.behavior(state)
@@ -279,6 +270,10 @@ class TestInstructions(unittest.TestCase):
         state = jal_4.behavior(state)
         self.assertEqual(state.program_counter, 7)
         self.assertEqual(int(state.register_file.registers[1]), 7)
+
+        jal_5 = JAL(rd=1, imm=5)
+        state = jal_5.behavior(state)
+        self.assertEqual(state.program_counter, 13)
 
 
 class TestParser(unittest.TestCase):
