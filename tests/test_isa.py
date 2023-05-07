@@ -1,10 +1,22 @@
 import unittest
-import fixedint
 
 from architecture_simulator.uarch.architectural_state import RegisterFile
 from architecture_simulator.isa.rv32i_instructions import (
     ADD,
+    BEQ,
+    BLT,
+    BNE,
+    BTypeInstruction,
     SUB,
+    BGE,
+    BLTU,
+    BGEU,
+    CSRRW,
+    CSRRS,
+    CSRRC,
+    CSRRWI,
+    CSRRSI,
+    CSRRCI,
     SLL,
     SLT,
     SLTU,
@@ -12,11 +24,13 @@ from architecture_simulator.isa.rv32i_instructions import (
     SRL,
     SRA,
     OR,
-    AND,
+    AND
 )
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 
 from architecture_simulator.isa.parser import riscv_bnf, riscv_parser
+
+import fixedint
 
 
 class TestInstructions(unittest.TestCase):
@@ -454,6 +468,411 @@ class TestInstructions(unittest.TestCase):
         )
         state = and_inst.behavior(state)
         self.assertEqual(state.register_file.registers, [num_a, num_b, num_c])
+
+    def test_csrrw_privilege_level_too_low(self):
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
+        state.csr_registers.privilege_level = 0
+        with self.assertRaises(Exception) as context:
+            state.csr_registers.store_word(3000, fixedint.MutableUInt32(3))
+        self.assertTrue("illegal action: privilege level too low to access this csr register" in str(context.exception))
+
+    def test_csrrw_attempting_to_write_to_read_only(self):
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
+        with self.assertRaises(Exception) as context:
+            state.csr_registers.store_word(3072, fixedint.MutableUInt32(3))
+        self.assertTrue("illegal action: attempting to write into read-only csr register" in str(context.exception))
+
+    def test_csrrw_invalid_adress(self):
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
+        state.csr_registers.privilege_level = 4
+        with self.assertRaises(Exception) as context:
+            state.csr_registers.store_word(7000, fixedint.MutableUInt32(3))
+        self.assertTrue("illegal action: csr register does not exist" in str(context.exception))
+
+    def test_csrrw(self):
+        register_value_1 = fixedint.MutableUInt32(0)
+        register_value_2 = fixedint.MutableUInt32(1)
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
+        cssrw_1 = CSRRW(csr = 0, rs1 = 1, rd = 0)
+        state.csr_registers.store_word(0, fixedint.MutableUInt32(3))
+        state.csr_registers.privilege_level = 4
+        state = cssrw_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [3, 2])
+        self.assertEqual(state.csr_registers.load_word(cssrw_1.csr), 2)
+
+    def test_csrrs(self):
+        max_number = fixedint.MutableUInt32(4294967295) #FF FF FF FF
+        test_number_1 = fixedint.MutableUInt32(4294967294) #FF FF FF FE
+        test_mask_1 = fixedint.MutableUInt32(1) # 00 00 00 01
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0, test_mask_1]))
+        state.csr_registers.store_word(0, test_number_1)
+        cssrs_1 = CSRRS(csr = 0, rs1 = 1, rd = 0)
+        state = cssrs_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [test_number_1, test_mask_1])
+        self.assertEqual(state.csr_registers.load_word(cssrs_1.csr), max_number)
+
+    def test_csrrc(self):
+        max_number = fixedint.MutableUInt32(4294967295) #FF FF FF FF
+        test_result_1 = fixedint.MutableUInt32(1) # 00 00 00 01
+        test_mask_1 = fixedint.MutableUInt32(4294967294) #FF FF FF FE
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0, test_mask_1]))
+        state.csr_registers.store_word(0, max_number)
+        cssrc_1 = CSRRC(csr = 0, rs1 = 1, rd = 0)
+        state = cssrc_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [max_number, test_mask_1])
+        self.assertEqual(state.csr_registers.load_word(cssrc_1.csr), test_result_1)
+
+    def test_csrrwi(self):
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0]))
+        state.csr_registers.store_word(0, 3)
+        cssrwi_1 = CSRRWI(csr = 0, uimm = 4, rd = 0)
+        state = cssrwi_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [3])
+        self.assertEqual(state.csr_registers.load_word(cssrwi_1.csr), 4)
+
+    def test_csrrsi(self):
+        max_number = fixedint.MutableUInt32(4294967295) #FF FF FF FF
+        test_number_1 = fixedint.MutableUInt32(4294967294) #FF FF FF FE
+        test_mask_1 = fixedint.MutableUInt32(1) # 00 00 00 01
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0]))
+        cssrsi_1 = CSRRSI(csr = 0, uimm = test_mask_1, rd = 0)
+        state.csr_registers.store_word(0, test_number_1)
+        state = cssrsi_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [test_number_1])
+        self.assertEqual(state.csr_registers.load_word(cssrsi_1.csr), max_number)
+
+    def test_csrrci(self):
+        max_number = fixedint.MutableUInt32(4294967295) #FF FF FF FF
+        test_result_1 = fixedint.MutableUInt32(1) # 00 00 00 01
+        test_mask_1 = fixedint.MutableUInt32(4294967294) #FF FF FF FE
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0]))
+        state.csr_registers.store_word(0, max_number)
+        cssrci_1 = CSRRCI(csr = 0, uimm = test_mask_1, rd = 0)
+        state = cssrci_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [max_number])
+        self.assertEqual(state.csr_registers.load_word(cssrci_1.csr), test_result_1)
+
+    def test_mem(self):
+        state = ArchitecturalState(register_file=RegisterFile(registers=()))
+        # store_byte test
+        state.memory.store_byte(0, fixedint.MutableUInt8(1))
+        self.assertEqual(state.memory.load_byte(0), fixedint.MutableUInt8(1))
+
+        # store_byte type test
+        state.memory.store_byte(0, fixedint.MutableUInt8(1))
+        self.assertIsInstance(state.memory.load_byte(0), fixedint.MutableUInt8)
+
+        # store_halfword test
+        state.memory.store_halfword(0, fixedint.MutableUInt16(1))
+        self.assertEqual(state.memory.load_halfword(0), fixedint.MutableUInt16(1))
+
+        # store_halfword type test
+        state.memory.store_halfword(0, fixedint.MutableUInt16(1))
+        self.assertIsInstance(state.memory.load_halfword(0), fixedint.MutableUInt16)
+
+        # store_word test
+        state.memory.store_word(0, fixedint.MutableUInt32(1))
+        self.assertEqual(state.memory.load_word(0), fixedint.MutableUInt32(1))
+
+        # store_word type test
+        state.memory.store_word(0, fixedint.MutableUInt32(1))
+        self.assertIsInstance(state.memory.load_word(0), fixedint.MutableUInt32)
+
+        # store_byte negative value test
+        state.memory.store_byte(0, fixedint.MutableUInt8(-1))
+        self.assertEqual(state.memory.load_byte(0), fixedint.MutableUInt8(-1))
+
+        # store_halfword negative value test
+        state.memory.store_halfword(0, fixedint.MutableUInt16(-1))
+        self.assertEqual(state.memory.load_halfword(0), fixedint.MutableUInt16(-1))
+
+        # store_word test
+        state.memory.store_word(0, fixedint.MutableUInt32(-1))
+        self.assertEqual(state.memory.load_word(0), fixedint.MutableUInt32(-1))
+
+
+
+    def test_btype(self):
+        # valid immediates
+        try:
+            BTypeInstruction(rs1=0, rs2=0, imm=0, mnemonic="x")
+            BTypeInstruction(rs1=0, rs2=0, imm=2047, mnemonic="x")
+            BTypeInstruction(rs1=0, rs2=0, imm=-2048, mnemonic="x")
+        except Exception:
+            print(Exception)
+            self.fail("BTypeInstruction raised an exception upon instantiation")
+
+        # invalid immediates
+        with self.assertRaises(ValueError):
+            BTypeInstruction(rs1=0, rs2=0, imm=-2049, mnemonic="x")
+        with self.assertRaises(ValueError):
+            BTypeInstruction(rs1=0, rs2=0, imm=2048, mnemonic="x")
+
+    def test_beq(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(
+                registers=[
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(1),
+                ]
+            )
+        )
+
+        # 0, 0
+        state.program_counter = 0
+        instruction = BEQ(rs1=0, rs2=1, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # 0, 1
+        state.program_counter = 0
+        instruction = BEQ(rs1=0, rs2=2, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 0, 0 - negative immediate
+        state.program_counter = 32
+        instruction = BEQ(rs1=0, rs2=1, imm=-6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 16)
+
+    def test_bne(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(
+                registers=[
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(1),
+                ]
+            )
+        )
+
+        # 0, 0
+        state.program_counter = 0
+        instruction = BNE(rs1=0, rs2=1, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 0, 1
+        state.program_counter = 0
+        instruction = BNE(rs1=0, rs2=2, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # 0, 1 - negative immediate
+        state.program_counter = 32
+        instruction = BNE(rs1=0, rs2=2, imm=-6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 16)
+
+    def test_blt(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(
+                registers=[
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(1),
+                    fixedint.MutableUInt32(pow(2, 32) - 1),
+                    fixedint.MutableUInt32(pow(2, 31)),
+                ]
+            )
+        )
+
+        # 0, 0
+        state.program_counter = 0
+        instruction = BLT(rs1=0, rs2=1, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 1, 0
+        state.program_counter = 0
+        instruction = BLT(rs1=2, rs2=0, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 0, 1
+        state.program_counter = 0
+        instruction = BLT(rs1=0, rs2=2, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # 0, 1 - negative immediate
+        state.program_counter = 32
+        instruction = BLT(rs1=0, rs2=2, imm=-6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 16)
+
+        # 0, -1
+        state.program_counter = 0
+        instruction = BLT(rs1=0, rs2=3, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # -1, 0
+        state.program_counter = 0
+        instruction = BLT(rs1=3, rs2=0, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # -2^31, -1
+        state.program_counter = 0
+        instruction = BLT(rs1=4, rs2=3, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+    def test_bge(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(
+                registers=[
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(1),
+                    fixedint.MutableUInt32(pow(2, 32) - 1),
+                    fixedint.MutableUInt32(pow(2, 31)),
+                ]
+            )
+        )
+
+        # 0, 0
+        state.program_counter = 0
+        instruction = BGE(rs1=0, rs2=1, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # 0, 1
+        state.program_counter = 0
+        instruction = BGE(rs1=0, rs2=2, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 1, 0
+        state.program_counter = 0
+        instruction = BGE(rs1=2, rs2=0, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # 1, 0 - negative immediate
+        state.program_counter = 32
+        instruction = BGE(rs1=2, rs2=0, imm=-6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 16)
+
+        # 0, -1
+        state.program_counter = 0
+        instruction = BGE(rs1=0, rs2=3, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # -2^31, -1
+        state.program_counter = 0
+        instruction = BGE(rs1=4, rs2=3, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+    def test_bltu(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(
+                registers=[
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(1),
+                    fixedint.MutableUInt32(pow(2, 32) - 1),
+                    fixedint.MutableUInt32(pow(2, 31)),
+                ]
+            )
+        )
+
+        # 0, 0
+        state.program_counter = 0
+        instruction = BLTU(rs1=0, rs2=1, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 1, 0
+        state.program_counter = 0
+        instruction = BLTU(rs1=2, rs2=0, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 0, 1
+        state.program_counter = 0
+        instruction = BLTU(rs1=0, rs2=2, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # 0, 1 - negative immediate
+        state.program_counter = 32
+        instruction = BLTU(rs1=0, rs2=2, imm=-6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 16)
+
+        # 0, (2^32 - 1)
+        state.program_counter = 0
+        instruction = BLTU(rs1=0, rs2=3, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # (2^32 - 1), 0
+        state.program_counter = 0
+        instruction = BLTU(rs1=3, rs2=0, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 2^31, (2^32 - 1)
+        state.program_counter = 0
+        instruction = BLTU(rs1=4, rs2=3, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+    def test_bgeu(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(
+                registers=[
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(1),
+                    fixedint.MutableUInt32(pow(2, 32) - 1),
+                    fixedint.MutableUInt32(pow(2, 31)),
+                ]
+            )
+        )
+
+        # 0, 0
+        state.program_counter = 0
+        instruction = BGEU(rs1=0, rs2=1, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # 0, 1
+        state.program_counter = 0
+        instruction = BGEU(rs1=0, rs2=2, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 1, 0
+        state.program_counter = 0
+        instruction = BGEU(rs1=2, rs2=0, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # 1, 0 - negative immediate
+        state.program_counter = 32
+        instruction = BGEU(rs1=2, rs2=0, imm=-6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 16)
+
+        # 0, (2^32 - 1)
+        state.program_counter = 0
+        instruction = BGEU(rs1=0, rs2=3, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 2^31, (2^32 - 1)
+        state.program_counter = 0
+        instruction = BGEU(rs1=4, rs2=3, imm=6)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
 
 
 class TestParser(unittest.TestCase):
