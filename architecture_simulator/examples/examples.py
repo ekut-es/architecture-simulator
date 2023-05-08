@@ -3,7 +3,7 @@ from architecture_simulator.isa.rv32i_instructions import (
     ADDI,
     AND,
     BEQ,
-    BGEU,
+    BGE,
     JAL,
     JALR,
     LUI,
@@ -30,7 +30,7 @@ def fibonacci_recursive(n: int) -> MutableUInt32:
             12: JAL(rd=1, imm=4),  # call fib(n)
             16: BEQ(rs1=0, rs2=0, imm=44),  # jump to end
             # Start of fib(n) procedure
-            20: BGEU(rs1=0, rs2=10, imm=34),  # branch if n <= 0
+            20: BGE(rs1=0, rs2=10, imm=34),  # branch if n <= 0
             24: ADDI(rd=5, rs1=0, imm=1),
             28: BEQ(rs1=5, rs2=10, imm=34),  # branch if n == 1
             32: ADDI(rd=2, rs1=2, imm=-8),  # adjust sp for 2 items
@@ -56,7 +56,7 @@ def fibonacci_recursive(n: int) -> MutableUInt32:
     )
 
     while simulation.state.program_counter < 104:
-        simulation.step_simulation
+        simulation.step_simulation()
     return simulation.state.register_file.registers[10]
 
 
@@ -69,7 +69,7 @@ addi x10, x10, 10
 addi x2, x0, 1024
 jal x1, 8 # fib(n)
 beq x0, x0, 88 # go to end
-bgeu x0, x10, 68 # n <= 0
+bge x0, x10, 68 # n <= 0
 addi x5, x0, 1
 beq x5, x10, 68 # n == 1
 addi x2, x2, -8 # adjust sp for ra and x10
@@ -92,3 +92,6 @@ addi x10, x0, 1 # <- n == 1
 jalr x7, x1, 0
 and x0, x0, x0 # end
 """
+
+if __name__ == "__main__":
+    print(fibonacci_recursive(16))
