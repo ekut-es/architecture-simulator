@@ -15,11 +15,8 @@ all: add.s fibonacci.s
 %.a: %.c
 	$(CC) $(CFLAGS) $< -o $@
 
-add.s: add.a
+%.s: %.a
 	$(OBJDUMP) $(OBJDUMP_FLAGS) $<  | $(SED_FILTER) > $@
-
-fibonacci.s: fibonacci.a
-	$(OBJDUMP) $(OBJDUMP_FLAGS) $< | $(SED_FILTER) > $@
 
 .PHONY: clean
 clean:
