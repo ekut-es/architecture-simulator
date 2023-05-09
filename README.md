@@ -45,7 +45,20 @@ python -m build
 
 ## Generating Assembly Code
 
-* Install `xpack` RISC-V GCC binaries: [install instructions](https://xpack.github.io/dev-tools/riscv-none-elf-gcc/install/) (Manual install, [download link](https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/))
-*
+* Download and install `xpack` RISC-V GCC binaries: [download link](https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/)
 
-(Alternatively use [Compiler Explorer](https://godbolt.org/), RISC-V rv32gc gcc 12.2.0)
+```
+wget https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v12.2.0-3/xpack-riscv-none-elf-gcc-12.2.0-3-linux-x64.tar.gz
+tar -xvf xpack-riscv-none-elf-gcc-12.2.0-3-linux-x64.tar.gz
+mkdir -p /opt/riscv
+mv xpack-riscv-none-elf-gcc-12.2.0-3 /opt/riscv/
+echo 'export PATH="/opt/riscv/xpack-riscv-none-elf-gcc-12.2.0-3/bin:${PATH}"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+* Use GCC compiler to generate assembly from C programs in `tests/c_programs`
+```
+make -C tests/c_programs all
+```
+
+* (Alternatively use [Compiler Explorer](https://godbolt.org/), RISC-V rv32gc gcc 12.2.0)
