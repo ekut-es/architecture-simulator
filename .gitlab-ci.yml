@@ -23,7 +23,9 @@ before_script:
   - tar -xvf xpack-riscv-none-elf-gcc-12.2.0-3-linux-x64.tar.gz
   - mkdir -p /opt/riscv
   - mv xpack-riscv-none-elf-gcc-12.2.0-3 /opt/riscv/
-  - python --version  # For debugging
+  - export PATH="/opt/riscv/xpack-riscv-none-elf-gcc-12.2.0-3/bin:${PATH}"
+  - which riscv-none-elf-gcc # check that RISC-V GCC can be found
+  - python --version # check that Python version is correct
   - pip install virtualenv
   - virtualenv .venv
   - source .venv/bin/activate
