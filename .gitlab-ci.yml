@@ -17,7 +17,6 @@ cache:
   paths:
     - .cache/pip
     - .venv/
-    - /opt/riscv
 
 before_script:
   - wget https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v12.2.0-3/xpack-riscv-none-elf-gcc-12.2.0-3-linux-x64.tar.gz
