@@ -50,8 +50,8 @@ python -m build
 ```
 wget https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v12.2.0-3/xpack-riscv-none-elf-gcc-12.2.0-3-linux-x64.tar.gz
 tar -xvf xpack-riscv-none-elf-gcc-12.2.0-3-linux-x64.tar.gz
-mkdir -p /opt/riscv
-mv xpack-riscv-none-elf-gcc-12.2.0-3 /opt/riscv/
+sudo mkdir -p /opt/riscv
+sudo mv xpack-riscv-none-elf-gcc-12.2.0-3 /opt/riscv/
 echo 'export PATH="/opt/riscv/xpack-riscv-none-elf-gcc-12.2.0-3/bin:${PATH}"' >> ~/.bashrc
 source ~/.bashrc
 ```
