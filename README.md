@@ -42,3 +42,10 @@ python -m build
 * `main` current MVP
 * `devel/*` all branches for feature development
 * `fix/*` all branches that fix bugs
+
+## Generating Assembly Code
+
+* Install `xpack` RISC-V GCC binaries: [install instructions](https://xpack.github.io/dev-tools/riscv-none-elf-gcc/install/) (Manual install, [download link](https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/))
+*
+
+(Alternatively use [Compiler Explorer](https://godbolt.org/), RISC-V rv32gc gcc 12.2.0)
