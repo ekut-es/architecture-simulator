@@ -13,7 +13,7 @@ SED_FILTER=sed '/^\(<\|\t\)/!d' | sed 's/<\(.*\)>/\1/'
 all: add.s fibonacci.s
 
 %.a: %.c
-	$(CC) $(CFLAGS) $< -o $@
+	$(CC) $(CFLAGS) $< -o $@ --entry main
 
 %.s: %.a
 	$(OBJDUMP) $(OBJDUMP_FLAGS) $<  | $(SED_FILTER) > $@
