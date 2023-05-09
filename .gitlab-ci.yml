@@ -20,6 +20,9 @@ cache:
 
 before_script:
   - wget https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v12.2.0-3/xpack-riscv-none-elf-gcc-12.2.0-3-linux-x64.tar.gz
+  - tar -xvf xpack-riscv-none-elf-gcc-12.2.0-3-linux-x64.tar.gz
+  - mkdir -p /opt/riscv
+  - mv xpack-riscv-none-elf-gcc-12.2.0-3 /opt/riscv/
   - python --version  # For debugging
   - pip install virtualenv
   - virtualenv .venv
