@@ -8,17 +8,19 @@ CFLAGS=-O0 -march=rv32i
 # --no-addresses does output instruction addresses
 OBJDUMP_FLAGS=-d -Mno-aliases -Mnumeric --no-show-raw-insn --no-addresses
 
+SED_FILTER=sed '/^\(<\|\t\)/!d'
+
 all: add.s fibonacci.s
 
 %.a: %.c
 	$(CC) $(CFLAGS) $< -o $@
 
 add.s: add.a
-	$(OBJDUMP) $(OBJDUMP_FLAGS) --disassemble=main $< >> $@
+	$(OBJDUMP) $(OBJDUMP_FLAGS) --disassemble=main $<  | $(SED_FILTER) >> $@
 
 fibonacci.s: fibonacci.a
-	$(OBJDUMP) $(OBJDUMP_FLAGS) --disassemble=main $< >> $@
-	$(OBJDUMP) $(OBJDUMP_FLAGS) --disassemble=fibonacci $< >> $@
+	$(OBJDUMP) $(OBJDUMP_FLAGS) --disassemble=main $< | $(SED_FILTER) >> $@
+	$(OBJDUMP) $(OBJDUMP_FLAGS) --disassemble=fibonacci $<  | $(SED_FILTER) >> $@
 
 .PHONY: clean
 clean:
