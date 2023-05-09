@@ -1,6 +1,6 @@
 CC=riscv-none-elf-gcc
 OBJDUMP=riscv-none-elf-objdump
-CFLAGS=-O0 -march=rv32i -nostdlib
+CFLAGS=-O0 -march=rv32i -nostdlib --entry main
 
 # -Mno-aliases removed pseudo instructions
 # -Mnumeric uses x0-x31 registers instead of ABI names
@@ -13,7 +13,7 @@ SED_FILTER=sed '/^\(<\|\t\)/!d' | sed 's/<\(.*\)>/\1/'
 all: add.s fibonacci.s
 
 %.a: %.c
-	$(CC) $(CFLAGS) $< -o $@ --entry main
+	$(CC) $(CFLAGS) $< -o $@
 
 %.s: %.a
 	$(OBJDUMP) $(OBJDUMP_FLAGS) $<  | $(SED_FILTER) > $@
