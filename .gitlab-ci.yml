@@ -45,3 +45,4 @@ run:
   artifacts:
     paths:
       - dist/*.whl
+      - tests/c_programs/*.s
