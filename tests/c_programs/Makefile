@@ -1,6 +1,6 @@
 CC=riscv-none-elf-gcc
 OBJDUMP=riscv-none-elf-objdump
-CFLAGS=-O0 -march=rv32i
+CFLAGS=-O0 -march=rv32i -nostdlib
 
 # -Mno-aliases removed pseudo instructions
 # -Mnumeric uses x0-x31 registers instead of ABI names
@@ -8,7 +8,7 @@ CFLAGS=-O0 -march=rv32i
 # --no-addresses does output instruction addresses
 OBJDUMP_FLAGS=-d -Mno-aliases -Mnumeric --no-show-raw-insn --no-addresses
 
-SED_FILTER=sed '/^\(<\|\t\)/!d'
+SED_FILTER=sed '/^\(<\|\t\)/!d' | sed 's/<\(.*\)>/\1/'
 
 all: add.s fibonacci.s
 
@@ -16,11 +16,10 @@ all: add.s fibonacci.s
 	$(CC) $(CFLAGS) $< -o $@
 
 add.s: add.a
-	$(OBJDUMP) $(OBJDUMP_FLAGS) --disassemble=main $<  | $(SED_FILTER) >> $@
+	$(OBJDUMP) $(OBJDUMP_FLAGS) $<  | $(SED_FILTER) > $@
 
 fibonacci.s: fibonacci.a
-	$(OBJDUMP) $(OBJDUMP_FLAGS) --disassemble=main $< | $(SED_FILTER) >> $@
-	$(OBJDUMP) $(OBJDUMP_FLAGS) --disassemble=fibonacci $<  | $(SED_FILTER) >> $@
+	$(OBJDUMP) $(OBJDUMP_FLAGS) $< | $(SED_FILTER) > $@
 
 .PHONY: clean
 clean:
