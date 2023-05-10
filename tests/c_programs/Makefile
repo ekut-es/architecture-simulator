@@ -12,13 +12,13 @@ SED_FILTER=sed '/^\(<\|\t\)/!d' | sed 's/<\(.*\)>/\1/'
 
 all: add.s fibonacci.s
 
-%.a: %.c
+%.elf: %.c
 	$(CC) $(CFLAGS) $< -o $@
 
-%.s: %.a
+%.s: %.elf
 	$(OBJDUMP) $(OBJDUMP_FLAGS) $<  | $(SED_FILTER) > $@
 
 .PHONY: clean
 clean:
 	-rm *.s
-	-rm *.a
+	-rm *.elf

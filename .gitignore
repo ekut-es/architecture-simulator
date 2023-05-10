@@ -169,3 +169,4 @@ cython_debug/
 # Assembly files
 tests/c_programs/*.s
 tests/c_programs/*.a
+tests/c_programs/*.elf
