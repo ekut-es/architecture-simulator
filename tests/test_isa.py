@@ -50,7 +50,7 @@ from architecture_simulator.isa.rv32i_instructions import (
     ORI,
     ANDI,
     SLLI,
-    SRLI
+    SRLI,
 )
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 
@@ -331,9 +331,9 @@ class TestInstructions(unittest.TestCase):
         num_all_bits = fixedint.MutableUInt32(4294967295)
         num_0 = fixedint.MutableUInt32(0)
 
-        num_a = fixedint.MutableUInt32(4294902015)  # FF FF 00 FF
-        num_b = fixedint.MutableUInt32(4294905615)  # FF FF 0F 0F
-        num_c = fixedint.MutableUInt32(4080)  # 00 00 0F F0
+        num_a = fixedint.MutableUInt32(0x_FF_FF_00_FF)
+        num_b = fixedint.MutableUInt32(0x_FF_FF_0F_0F)
+        num_c = fixedint.MutableUInt32(0x_00_00_0F_F0)
 
         # general test case
         xor = XOR(rs1=0, rs2=1, rd=2)
@@ -453,9 +453,9 @@ class TestInstructions(unittest.TestCase):
 
     def test_or(self):
         # Number definitions
-        num_a = fixedint.MutableUInt32(16711698)  # 00 FF 00 12
-        num_b = fixedint.MutableUInt32(252641280)  # 0F 0F 00 00
-        num_c = fixedint.MutableUInt32(268369938)  # 0F FF 00 12
+        num_a = fixedint.MutableUInt32(0x00_FF_00_12)
+        num_b = fixedint.MutableUInt32(0x0F_0F_00_00)
+        num_c = fixedint.MutableUInt32(0x0F_FF_00_12)
 
         # Test bit wise behavior
         or_inst = OR(rs1=0, rs2=1, rd=2)
@@ -475,9 +475,9 @@ class TestInstructions(unittest.TestCase):
 
     def test_and(self):
         # Number defintions
-        num_a = fixedint.MutableUInt32(16711698)  # 00 FF 00 12
-        num_b = fixedint.MutableUInt32(252641280)  # 0F 0F 00 00
-        num_c = fixedint.MutableUInt32(983040)  # 00 0F 00 00
+        num_a = fixedint.MutableUInt32(0x00_FF_00_12)
+        num_b = fixedint.MutableUInt32(0x0F_0F_00_00)
+        num_c = fixedint.MutableUInt32(0x00_0F_00_00)
 
         # Test bit wise behavior
         and_inst = AND(rs1=0, rs2=1, rd=2)
@@ -500,26 +500,34 @@ class TestInstructions(unittest.TestCase):
         state.csr_registers.privilege_level = 0
         with self.assertRaises(Exception) as context:
             state.csr_registers.store_word(3000, fixedint.MutableUInt32(3))
-        self.assertTrue("illegal action: privilege level too low to access this csr register" in str(context.exception))
+        self.assertTrue(
+            "illegal action: privilege level too low to access this csr register"
+            in str(context.exception)
+        )
 
     def test_csrrw_attempting_to_write_to_read_only(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
         with self.assertRaises(Exception) as context:
             state.csr_registers.store_word(3072, fixedint.MutableUInt32(3))
-        self.assertTrue("illegal action: attempting to write into read-only csr register" in str(context.exception))
+        self.assertTrue(
+            "illegal action: attempting to write into read-only csr register"
+            in str(context.exception)
+        )
 
     def test_csrrw_invalid_adress(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
         state.csr_registers.privilege_level = 4
         with self.assertRaises(Exception) as context:
             state.csr_registers.store_word(7000, fixedint.MutableUInt32(3))
-        self.assertTrue("illegal action: csr register does not exist" in str(context.exception))
+        self.assertTrue(
+            "illegal action: csr register does not exist" in str(context.exception)
+        )
 
     def test_csrrw(self):
-        register_value_1 = fixedint.MutableUInt32(0)
-        register_value_2 = fixedint.MutableUInt32(1)
+        fixedint.MutableUInt32(0)
+        fixedint.MutableUInt32(1)
         state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
-        cssrw_1 = CSRRW(csr = 0, rs1 = 1, rd = 0)
+        cssrw_1 = CSRRW(csr=0, rs1=1, rd=0)
         state.csr_registers.store_word(0, fixedint.MutableUInt32(3))
         state.csr_registers.privilege_level = 4
         state = cssrw_1.behavior(state)
@@ -527,23 +535,27 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.csr_registers.load_word(cssrw_1.csr), 2)
 
     def test_csrrs(self):
-        max_number = fixedint.MutableUInt32(4294967295) #FF FF FF FF
-        test_number_1 = fixedint.MutableUInt32(4294967294) #FF FF FF FE
-        test_mask_1 = fixedint.MutableUInt32(1) # 00 00 00 01
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0, test_mask_1]))
+        max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
+        test_number_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
+        test_mask_1 = fixedint.MutableUInt32(0x00_00_00_01)
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[0, test_mask_1])
+        )
         state.csr_registers.store_word(0, test_number_1)
-        cssrs_1 = CSRRS(csr = 0, rs1 = 1, rd = 0)
+        cssrs_1 = CSRRS(csr=0, rs1=1, rd=0)
         state = cssrs_1.behavior(state)
         self.assertEqual(state.register_file.registers, [test_number_1, test_mask_1])
         self.assertEqual(state.csr_registers.load_word(cssrs_1.csr), max_number)
 
     def test_csrrc(self):
-        max_number = fixedint.MutableUInt32(4294967295) #FF FF FF FF
-        test_result_1 = fixedint.MutableUInt32(1) # 00 00 00 01
-        test_mask_1 = fixedint.MutableUInt32(4294967294) #FF FF FF FE
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0, test_mask_1]))
+        max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
+        test_result_1 = fixedint.MutableUInt32(0x00_00_00_01)
+        test_mask_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[0, test_mask_1])
+        )
         state.csr_registers.store_word(0, max_number)
-        cssrc_1 = CSRRC(csr = 0, rs1 = 1, rd = 0)
+        cssrc_1 = CSRRC(csr=0, rs1=1, rd=0)
         state = cssrc_1.behavior(state)
         self.assertEqual(state.register_file.registers, [max_number, test_mask_1])
         self.assertEqual(state.csr_registers.load_word(cssrc_1.csr), test_result_1)
@@ -551,29 +563,29 @@ class TestInstructions(unittest.TestCase):
     def test_csrrwi(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=[0]))
         state.csr_registers.store_word(0, 3)
-        cssrwi_1 = CSRRWI(csr = 0, uimm = 4, rd = 0)
+        cssrwi_1 = CSRRWI(csr=0, uimm=4, rd=0)
         state = cssrwi_1.behavior(state)
         self.assertEqual(state.register_file.registers, [3])
         self.assertEqual(state.csr_registers.load_word(cssrwi_1.csr), 4)
 
     def test_csrrsi(self):
-        max_number = fixedint.MutableUInt32(4294967295) #FF FF FF FF
-        test_number_1 = fixedint.MutableUInt32(4294967294) #FF FF FF FE
-        test_mask_1 = fixedint.MutableUInt32(1) # 00 00 00 01
+        max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
+        test_number_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
+        test_mask_1 = fixedint.MutableUInt32(0x00_00_00_01)
         state = ArchitecturalState(register_file=RegisterFile(registers=[0]))
-        cssrsi_1 = CSRRSI(csr = 0, uimm = test_mask_1, rd = 0)
+        cssrsi_1 = CSRRSI(csr=0, uimm=test_mask_1, rd=0)
         state.csr_registers.store_word(0, test_number_1)
         state = cssrsi_1.behavior(state)
         self.assertEqual(state.register_file.registers, [test_number_1])
         self.assertEqual(state.csr_registers.load_word(cssrsi_1.csr), max_number)
 
     def test_csrrci(self):
-        max_number = fixedint.MutableUInt32(4294967295) #FF FF FF FF
-        test_result_1 = fixedint.MutableUInt32(1) # 00 00 00 01
-        test_mask_1 = fixedint.MutableUInt32(4294967294) #FF FF FF FE
+        max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
+        test_result_1 = fixedint.MutableUInt32(0x00_00_00_01)
+        test_mask_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
         state = ArchitecturalState(register_file=RegisterFile(registers=[0]))
         state.csr_registers.store_word(0, max_number)
-        cssrci_1 = CSRRCI(csr = 0, uimm = test_mask_1, rd = 0)
+        cssrci_1 = CSRRCI(csr=0, uimm=test_mask_1, rd=0)
         state = cssrci_1.behavior(state)
         self.assertEqual(state.register_file.registers, [max_number])
         self.assertEqual(state.csr_registers.load_word(cssrci_1.csr), test_result_1)
