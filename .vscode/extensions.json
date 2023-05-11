@@ -1,3 +1,3 @@
 {
-    "recommendations": ["ms-python.python", "ms-vscode.live-server"]
+    "recommendations": ["ms-python.python", "ms-vscode.live-server", "firefox-devtools.vscode-firefox-debug"]
 }
