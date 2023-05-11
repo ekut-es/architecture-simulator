@@ -19,7 +19,14 @@ cache:
     - .venv/
 
 before_script:
-  - python --version  # For debugging
+  - wget https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v12.2.0-3/xpack-riscv-none-elf-gcc-12.2.0-3-linux-x64.tar.gz
+  - tar -xvf xpack-riscv-none-elf-gcc-12.2.0-3-linux-x64.tar.gz
+  - mkdir -p /opt/riscv
+  - mv xpack-riscv-none-elf-gcc-12.2.0-3 /opt/riscv/
+  - export PATH="/opt/riscv/xpack-riscv-none-elf-gcc-12.2.0-3/bin:${PATH}"
+  - make -C tests/c_programs all
+  - which riscv-none-elf-gcc # check that RISC-V GCC can be found
+  - python --version # check that Python version is correct
   - pip install virtualenv
   - virtualenv .venv
   - source .venv/bin/activate
@@ -38,3 +45,4 @@ run:
   artifacts:
     paths:
       - dist/*.whl
+      - tests/c_programs/*.s
