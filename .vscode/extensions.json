@@ -1,3 +1,9 @@
 {
-    "recommendations": ["ms-python.python", "ms-vscode.live-server", "firefox-devtools.vscode-firefox-debug"]
+    "recommendations": [
+        "ms-python.python",
+        "ms-vscode.live-server",
+        "firefox-devtools.vscode-firefox-debug",
+        "ms-python.black-formatter",
+        "matangover.mypy"
+    ]
 }
