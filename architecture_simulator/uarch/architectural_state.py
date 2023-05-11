@@ -85,6 +85,7 @@ class Memory:
             int(safe_value[24:32])
         )
 
+
 @dataclass
 class CsrRegisterFile(Memory):
     privilege_level: int = 0
@@ -124,7 +125,9 @@ class CsrRegisterFile(Memory):
 
     def checkPrivilegeLevel(self, adress: int):
         if (adress & 0b001100000000) > self.privilege_level:
-            raise Exception("illegal action: privilege level too low to access this csr register")
+            raise Exception(
+                "illegal action: privilege level too low to access this csr register"
+            )
 
     def checkForLegalAdress(self, adress: int):
         if adress < 0 or adress > 4095:
@@ -132,7 +135,10 @@ class CsrRegisterFile(Memory):
 
     def checkReadOnly(self, adress: int):
         if adress & 0b100000000000 and adress & 0b010000000000:
-            raise Exception("illegal action: attempting to write into read-only csr register")
+            raise Exception(
+                "illegal action: attempting to write into read-only csr register"
+            )
+
 
 @dataclass
 class ArchitecturalState:
@@ -147,4 +153,3 @@ class ArchitecturalState:
 
     def getPrivilegeLevel(self):
         return self.csr_registers.privilege_level
-
