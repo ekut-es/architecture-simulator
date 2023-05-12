@@ -19,3 +19,11 @@ class Simulation:
     def step_simulation(self):
         self.state = self.instructions[self.state.program_counter].behavior(self.state)
         self.state.program_counter += 4
+
+    def run_simulation(self):
+        last_address = max(self.instructions.keys)
+        while self.state.program_counter <= last_address:
+            self.state = self.instructions[self.state.program_counter].behavior(
+                self.state
+            )
+            self.state.program_counter += 4
