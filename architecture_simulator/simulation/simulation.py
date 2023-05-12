@@ -23,6 +23,8 @@ class Simulation:
 
     def run_simulation(self) -> PerformanceMetrics:
         """run the current simulation until no more instructions are left (pc stepped over last instruction)
+        NOTE: The branch counter simply counts the amount of times that the instruction counter does not increase by 4 ->
+        will make trouble with 16-bit instructions (and also doesn't count useless branch instructions that only increase the pc by 4 anyway)
 
         Returns:
             PerformanceMetrics: Some performance metrics about the simulation.
@@ -46,5 +48,7 @@ class Simulation:
             execution_time_s=execution_time,
             instruction_count=instruction_count,
             branch_count=branch_count,
-            instructions_per_second=instruction_count / execution_time,
+            instructions_per_second=(instruction_count / execution_time)
+            if execution_time != 0
+            else 0,
         )
