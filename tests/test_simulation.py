@@ -54,7 +54,6 @@ class TestSimulation(unittest.TestCase):
             instructions={},
         )
         metrics = simulation.run_simulation()
-        # basically just checking if it terminated
         self.assertEquals(int(simulation.state.register_file.registers[0]), 0)
         self.assertEquals(metrics.branch_count, 0)
         self.assertEquals(metrics.instruction_count, 0)
@@ -75,9 +74,27 @@ class TestSimulation(unittest.TestCase):
             },
         )
         metrics = simulation.run_simulation()
-        # basically just checking if it terminated
         self.assertEquals(simulation.state.register_file.registers, [0, 5, 5, 64])
         self.assertEquals(metrics.branch_count, 5)
         self.assertEquals(metrics.instruction_count, 13)
+        self.assertGreater(metrics.instructions_per_second, 0)
+        self.assertGreater(metrics.execution_time_s, 0)
+
+        simulation = Simulation(
+            state=ArchitecturalState(
+                register_file=RegisterFile(registers=[0, 0, 0, 0])
+            ),
+            instructions={
+                0: ADDI(rd=2, rs1=0, imm=33),
+                4: ADDI(rd=1, rs1=1, imm=1),
+                8: ADDI(rd=1, rs1=1, imm=1),
+                12: ADDI(rd=1, rs1=1, imm=1),
+                16: BNE(rs1=1, rs2=2, imm=-6),
+            },
+        )
+        metrics = simulation.run_simulation()
+        self.assertEquals(simulation.state.register_file.registers, [0, 33, 33, 0])
+        self.assertEquals(metrics.branch_count, 10)
+        self.assertEquals(metrics.instruction_count, 45)
         self.assertGreater(metrics.instructions_per_second, 0)
         self.assertGreater(metrics.execution_time_s, 0)
