@@ -7,3 +7,4 @@ class PerformanceMetrics:
     instruction_count: int
     instructions_per_second: float
     branch_count: int
+    procedure_count: int

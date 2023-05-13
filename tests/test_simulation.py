@@ -44,6 +44,7 @@ class TestSimulation(unittest.TestCase):
         self.assertEquals(int(simulation.state.register_file.registers[1]), 7)
         self.assertEquals(metrics.branch_count, 0)
         self.assertEquals(metrics.instruction_count, 7)
+        self.assertEquals(metrics.procedure_count, 0)
         self.assertGreater(metrics.instructions_per_second, 0)
         self.assertGreater(metrics.execution_time_s, 0)
 
@@ -57,6 +58,7 @@ class TestSimulation(unittest.TestCase):
         self.assertEquals(int(simulation.state.register_file.registers[0]), 0)
         self.assertEquals(metrics.branch_count, 0)
         self.assertEquals(metrics.instruction_count, 0)
+        self.assertEquals(metrics.procedure_count, 0)
         self.assertEquals(metrics.instructions_per_second, 0)
         self.assertGreaterEqual(metrics.execution_time_s, 0)
 
@@ -77,6 +79,7 @@ class TestSimulation(unittest.TestCase):
         self.assertEquals(simulation.state.register_file.registers, [0, 5, 5, 64])
         self.assertEquals(metrics.branch_count, 5)
         self.assertEquals(metrics.instruction_count, 13)
+        self.assertEquals(metrics.procedure_count, 0)
         self.assertGreater(metrics.instructions_per_second, 0)
         self.assertGreater(metrics.execution_time_s, 0)
 
@@ -96,5 +99,6 @@ class TestSimulation(unittest.TestCase):
         self.assertEquals(simulation.state.register_file.registers, [0, 33, 33, 0])
         self.assertEquals(metrics.branch_count, 10)
         self.assertEquals(metrics.instruction_count, 45)
+        self.assertEquals(metrics.procedure_count, 0)
         self.assertGreater(metrics.instructions_per_second, 0)
         self.assertGreater(metrics.execution_time_s, 0)
