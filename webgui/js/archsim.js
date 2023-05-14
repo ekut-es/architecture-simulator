@@ -1,7 +1,7 @@
 const output = document.getElementById("output");
 const code = document.getElementById("code");
 const registers = document.getElementById("registers");
-
+const memory = document.getElementById("memory");
 
 function addToOutput(s) {
     output.value += ">>>" + code.value + "\n" + s + "\n";
@@ -23,6 +23,20 @@ const archsim_js = {
     },
     update_register: function(reg, val) {
         document.getElementById("val_x"+reg).innerText = val
+    },
+    append_memory: function(address, val) {
+        tr = document.createElement("tr")
+        td1 = document.createElement("td")
+        td1.innerText = address
+        td2 = document.createElement("td")
+        td2.innerText = val
+        td2.id = "memory"+address
+        tr.appendChild(td1)
+        tr.appendChild(td2)
+        memory.appendChild(tr)
+    },
+    update_memory: function(address, val) {
+        document.getElementById("memory"+address).innerText = val
     }
 };
 
