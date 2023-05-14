@@ -1,5 +1,6 @@
 import unittest
 
+from architecture_simulator.simulation.simulation import Simulation
 from architecture_simulator.uarch.architectural_state import RegisterFile, Memory
 from architecture_simulator.isa.rv32i_instructions import (
     ADD,
@@ -2088,10 +2089,12 @@ class TestInstructions(unittest.TestCase):
 
 class TestParser(unittest.TestCase):
     program = """
-Ananas:
+Ananas:#dfsdfsdf
 add x0,x1,x2
-addi x0, x1, 20
+addi x0, x1, -20
+#aaaaa
 Banane:
+##asdsadad
 Banune:
 lb x0, 7(x1)
 sb x1, 666(x2)
@@ -2105,7 +2108,7 @@ jal x10, Ananas
     expected = [
         "Ananas",
         ["add", ["x", "0"], ["x", "1"], ["x", "2"]],
-        ["addi", ["x", "0"], ["x", "1"], "20"],
+        ["addi", ["x", "0"], ["x", "1"], "-20"],
         "Banane",
         "Banune",
         ["lb", ["x", "0"], "7", ["x", "1"]],
@@ -2128,7 +2131,7 @@ jal x10, Ananas
         expected_labels = {"Ananas": 0, "Banane": 8, "Banune": 8, "Chinakohl": 24}
         expected_instructions = [
             ["add", ["x", "0"], ["x", "1"], ["x", "2"]],
-            ["addi", ["x", "0"], ["x", "1"], "20"],
+            ["addi", ["x", "0"], ["x", "1"], "-20"],
             ["lb", ["x", "0"], "7", ["x", "1"]],
             ["sb", ["x", "1"], "666", ["x", "2"]],
             ["BEQ", ["x", "4"], ["x", "5"], "42"],
@@ -2150,11 +2153,11 @@ jal x10, Ananas
         self.assertEqual(instr[0].rd, 0)
         self.assertEqual(instr[0].rs1, 1)
         self.assertEqual(instr[0].rs2, 2)
-        # addi x0, x1, 20
+        # addi x0, x1, -20
         self.assertIsInstance(instr[1], ADDI)
         self.assertEqual(instr[1].rd, 0)
         self.assertEqual(instr[1].rs1, 1)
-        self.assertEqual(instr[1].imm, 20)
+        self.assertEqual(instr[1].imm, -20)
         # lb x0, 7(x1)
         self.assertIsInstance(instr[2], LB)
         self.assertEqual(instr[2].rd, 0)
@@ -2187,9 +2190,56 @@ jal x10, Ananas
         self.assertIsInstance(instr[7], BNE)
         self.assertEqual(instr[7].rs1, 3)
         self.assertEqual(instr[7].rs2, 10)
-        self.assertEqual(instr[7].imm, -20)
+        self.assertEqual(instr[7].imm, -10)
 
         # jal x10, Ananas
         self.assertIsInstance(instr[8], JAL)
         self.assertEqual(instr[8].rd, 10)
         self.assertEqual(instr[8].imm, -16)
+
+    fibonacci = """lui x10, 0
+    addi x10, x10, 10
+    addi x2, x0, 1024
+    jal x1, Fib
+    beq x0, x0, End
+    Fib:
+    bge x0, x10, BaseA
+    addi x5, x0, 1
+    beq x5, x10, BaseB
+    addi x2, x2, -8
+    sw x1, 4(x2)
+    sw x10, 0(x2) # store n
+    addi x10, x10, -1 # x10 = n - 1
+    jal x1, Fib # goto 5 (beginning)
+    lw x5, 0(x2) # restore argument
+    sw x10, 0(x2) # store return value (fib(n-1))
+    addi x10, x5, -2 # x10 = n - 2
+    jal x1, Fib # goto 5 (beginning)
+    lw x5, 0(x2) # x5 = fib(n-1)
+    lw x1, 4(x2) # restore ra
+    addi x2, x2, 8 # return sp to original size
+    add x10, x10, x5 # x10 = fib(n-2) + fib(n-1)
+    jalr x7, x1, 0
+    BaseA:
+    and x10, x10, x0 # <- n <= 0
+    jalr x7, x1, 0
+    BaseB:
+    addi x10, x0, 1 # <- n == 1
+    jalr x7, x1, 0
+    End:
+    and x0, x0, x0 # end
+    """
+
+    def test_fibonacci_parser(self):
+        simulation = Simulation(
+            state=ArchitecturalState(
+                register_file=RegisterFile(registers=[0] * 32),
+                memory=Memory(memory_file={}),
+            ),
+            instructions={},
+        )
+        simulation.append_instructions(self.fibonacci)
+        # print(simulation.instructions)
+        while simulation.state.program_counter < 104:
+            simulation.step_simulation()
+        self.assertEqual(int(simulation.state.register_file.registers[10]), 55)

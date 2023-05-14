@@ -16,6 +16,8 @@ def riscv_bnf():
 
     pattern_label = pp.Word(pp.alphas)("label") + D_COL
 
+    pattern_imm = pp.Combine(pp.Optional("-") + pp.Word(pp.nums))("imm")
+
     # R-Types
     pattern_reg_reg_reg_instruction = pp.Group(
         pp.Word(pp.alphas)("mnemonic")
@@ -33,7 +35,7 @@ def riscv_bnf():
         + COMMA
         + pattern_register("reg2")
         + COMMA
-        + (pp.Word(pp.nums)("imm") | pp.Word(pp.alphas)("label"))
+        + (pattern_imm | pp.Word(pp.alphas)("label"))
     )
 
     # I-Types, B-Types, S-Types
@@ -41,7 +43,7 @@ def riscv_bnf():
         pp.Word(pp.alphas)("mnemonic")
         + pattern_register("reg1")
         + COMMA
-        + (pp.Word(pp.nums)("imm") | pp.Word(pp.alphas)("label"))
+        + (pattern_imm | pp.Word(pp.alphas)("label"))
         + Paren_L
         + pattern_register("reg2")
         + Paren_R
@@ -52,7 +54,7 @@ def riscv_bnf():
         pp.Word(pp.alphas)("mnemonic")
         + pattern_register("rd")
         + COMMA
-        + (pp.Word(pp.nums)("imm") | pp.Word(pp.alphas)("label"))
+        + (pattern_imm | pp.Word(pp.alphas)("label"))
     )
 
     riscv_bnf = (
@@ -117,7 +119,7 @@ def riscv_parser(program: str):
                     imm_val = int(int(instruction_parsed.imm) / 2)
                 else:
                     imm_val = int(
-                        labels[instruction_parsed.label] - instruction_number * 4
+                        (labels[instruction_parsed.label] - instruction_number * 4) / 2
                     )
 
                 instructions.append(
