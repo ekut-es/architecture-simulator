@@ -97,7 +97,7 @@ and x0, x0, x0 # end
 """
 
 if __name__ == "__main__":
-    simulation = fibonacci_recursive_simulation(25)
-    performance = simulation.run_simulation()
+    simulation = fibonacci_recursive_simulation(22)
+    simulation.run_simulation()
     print(simulation.state.register_file.registers[10])
-    print(performance)
+    print(simulation.state.performance_metrics)

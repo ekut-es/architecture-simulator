@@ -3,6 +3,7 @@ import unittest
 from architecture_simulator.uarch.architectural_state import RegisterFile
 from architecture_simulator.uarch.architectural_state import Memory
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
+from architecture_simulator.uarch.architectural_state import PerformanceMetrics
 from architecture_simulator.simulation.simulation import Simulation
 from architecture_simulator.isa.rv32i_instructions import ADDI, BNE, BEQ
 
@@ -40,13 +41,15 @@ class TestSimulation(unittest.TestCase):
                 24: ADDI(rd=1, rs1=1, imm=1),
             },
         )
-        metrics = simulation.run_simulation()
+        simulation.run_simulation()
         self.assertEquals(int(simulation.state.register_file.registers[1]), 7)
-        self.assertEquals(metrics.branch_count, 0)
-        self.assertEquals(metrics.instruction_count, 7)
-        self.assertEquals(metrics.procedure_count, 0)
-        self.assertGreater(metrics.instructions_per_second, 0)
-        self.assertGreater(metrics.execution_time_s, 0)
+        self.assertEquals(simulation.state.performance_metrics.branch_count, 0)
+        self.assertEquals(simulation.state.performance_metrics.instruction_count, 7)
+        self.assertEquals(simulation.state.performance_metrics.procedure_count, 0)
+        self.assertGreater(
+            simulation.state.performance_metrics.instructions_per_second, 0
+        )
+        self.assertGreater(simulation.state.performance_metrics.execution_time_s, 0)
 
         simulation = Simulation(
             state=ArchitecturalState(
@@ -54,13 +57,20 @@ class TestSimulation(unittest.TestCase):
             ),
             instructions={},
         )
-        metrics = simulation.run_simulation()
+
+        # FIXME: performance_metrics is a class variable - all architectural states use the same object :(
+        simulation.state.performance_metrics = PerformanceMetrics()
+        simulation.run_simulation()
         self.assertEquals(int(simulation.state.register_file.registers[0]), 0)
-        self.assertEquals(metrics.branch_count, 0)
-        self.assertEquals(metrics.instruction_count, 0)
-        self.assertEquals(metrics.procedure_count, 0)
-        self.assertEquals(metrics.instructions_per_second, 0)
-        self.assertGreaterEqual(metrics.execution_time_s, 0)
+        self.assertEquals(simulation.state.performance_metrics.branch_count, 0)
+        self.assertEquals(simulation.state.performance_metrics.instruction_count, 0)
+        self.assertEquals(simulation.state.performance_metrics.procedure_count, 0)
+        self.assertEquals(
+            simulation.state.performance_metrics.instructions_per_second, 0
+        )
+        self.assertGreaterEqual(
+            simulation.state.performance_metrics.execution_time_s, 0
+        )
 
         simulation = Simulation(
             state=ArchitecturalState(
@@ -75,13 +85,16 @@ class TestSimulation(unittest.TestCase):
                 20: ADDI(rd=3, rs1=0, imm=64),
             },
         )
-        metrics = simulation.run_simulation()
+        simulation.state.performance_metrics = PerformanceMetrics()
+        simulation.run_simulation()
         self.assertEquals(simulation.state.register_file.registers, [0, 5, 5, 64])
-        self.assertEquals(metrics.branch_count, 5)
-        self.assertEquals(metrics.instruction_count, 13)
-        self.assertEquals(metrics.procedure_count, 0)
-        self.assertGreater(metrics.instructions_per_second, 0)
-        self.assertGreater(metrics.execution_time_s, 0)
+        self.assertEquals(simulation.state.performance_metrics.branch_count, 5)
+        self.assertEquals(simulation.state.performance_metrics.instruction_count, 13)
+        self.assertEquals(simulation.state.performance_metrics.procedure_count, 0)
+        self.assertGreater(
+            simulation.state.performance_metrics.instructions_per_second, 0
+        )
+        self.assertGreater(simulation.state.performance_metrics.execution_time_s, 0)
 
         simulation = Simulation(
             state=ArchitecturalState(
@@ -95,10 +108,13 @@ class TestSimulation(unittest.TestCase):
                 16: BNE(rs1=1, rs2=2, imm=-6),
             },
         )
-        metrics = simulation.run_simulation()
+        simulation.state.performance_metrics = PerformanceMetrics()
+        simulation.run_simulation()
         self.assertEquals(simulation.state.register_file.registers, [0, 33, 33, 0])
-        self.assertEquals(metrics.branch_count, 10)
-        self.assertEquals(metrics.instruction_count, 45)
-        self.assertEquals(metrics.procedure_count, 0)
-        self.assertGreater(metrics.instructions_per_second, 0)
-        self.assertGreater(metrics.execution_time_s, 0)
+        self.assertEquals(simulation.state.performance_metrics.branch_count, 10)
+        self.assertEquals(simulation.state.performance_metrics.instruction_count, 45)
+        self.assertEquals(simulation.state.performance_metrics.procedure_count, 0)
+        self.assertGreater(
+            simulation.state.performance_metrics.instructions_per_second, 0
+        )
+        self.assertGreater(simulation.state.performance_metrics.execution_time_s, 0)
