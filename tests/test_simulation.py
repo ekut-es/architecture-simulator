@@ -41,11 +41,12 @@ class TestSimulation(unittest.TestCase):
                 24: ADDI(rd=1, rs1=1, imm=1),
             },
         )
+        simulation.state.performance_metrics = PerformanceMetrics()
         simulation.run_simulation()
-        self.assertEquals(int(simulation.state.register_file.registers[1]), 7)
-        self.assertEquals(simulation.state.performance_metrics.branch_count, 0)
-        self.assertEquals(simulation.state.performance_metrics.instruction_count, 7)
-        self.assertEquals(simulation.state.performance_metrics.procedure_count, 0)
+        self.assertEqual(int(simulation.state.register_file.registers[1]), 7)
+        self.assertEqual(simulation.state.performance_metrics.branch_count, 0)
+        self.assertEqual(simulation.state.performance_metrics.instruction_count, 7)
+        self.assertEqual(simulation.state.performance_metrics.procedure_count, 0)
         self.assertGreater(
             simulation.state.performance_metrics.instructions_per_second, 0
         )
@@ -61,11 +62,11 @@ class TestSimulation(unittest.TestCase):
         # FIXME: performance_metrics is a class variable - all architectural states use the same object :(
         simulation.state.performance_metrics = PerformanceMetrics()
         simulation.run_simulation()
-        self.assertEquals(int(simulation.state.register_file.registers[0]), 0)
-        self.assertEquals(simulation.state.performance_metrics.branch_count, 0)
-        self.assertEquals(simulation.state.performance_metrics.instruction_count, 0)
-        self.assertEquals(simulation.state.performance_metrics.procedure_count, 0)
-        self.assertEquals(
+        self.assertEqual(int(simulation.state.register_file.registers[0]), 0)
+        self.assertEqual(simulation.state.performance_metrics.branch_count, 0)
+        self.assertEqual(simulation.state.performance_metrics.instruction_count, 0)
+        self.assertEqual(simulation.state.performance_metrics.procedure_count, 0)
+        self.assertEqual(
             simulation.state.performance_metrics.instructions_per_second, 0
         )
         self.assertGreaterEqual(
@@ -87,10 +88,10 @@ class TestSimulation(unittest.TestCase):
         )
         simulation.state.performance_metrics = PerformanceMetrics()
         simulation.run_simulation()
-        self.assertEquals(simulation.state.register_file.registers, [0, 5, 5, 64])
-        self.assertEquals(simulation.state.performance_metrics.branch_count, 5)
-        self.assertEquals(simulation.state.performance_metrics.instruction_count, 13)
-        self.assertEquals(simulation.state.performance_metrics.procedure_count, 0)
+        self.assertEqual(simulation.state.register_file.registers, [0, 5, 5, 64])
+        self.assertEqual(simulation.state.performance_metrics.branch_count, 5)
+        self.assertEqual(simulation.state.performance_metrics.instruction_count, 13)
+        self.assertEqual(simulation.state.performance_metrics.procedure_count, 0)
         self.assertGreater(
             simulation.state.performance_metrics.instructions_per_second, 0
         )
