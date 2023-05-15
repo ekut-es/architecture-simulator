@@ -5,7 +5,7 @@ from architecture_simulator.uarch.architectural_state import Memory
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 from architecture_simulator.uarch.architectural_state import PerformanceMetrics
 from architecture_simulator.simulation.simulation import Simulation
-from architecture_simulator.isa.rv32i_instructions import ADDI, BNE, BEQ
+from architecture_simulator.isa.rv32i_instructions import ADDI, BNE, BEQ, JAL
 
 
 class TestSimulation(unittest.TestCase):
@@ -110,10 +110,36 @@ class TestSimulation(unittest.TestCase):
         )
         simulation.state.performance_metrics = PerformanceMetrics()
         simulation.run_simulation()
-        self.assertEquals(simulation.state.register_file.registers, [0, 33, 33, 0])
-        self.assertEquals(simulation.state.performance_metrics.branch_count, 10)
-        self.assertEquals(simulation.state.performance_metrics.instruction_count, 45)
-        self.assertEquals(simulation.state.performance_metrics.procedure_count, 0)
+        self.assertEqual(simulation.state.register_file.registers, [0, 33, 33, 0])
+        self.assertEqual(simulation.state.performance_metrics.branch_count, 10)
+        self.assertEqual(simulation.state.performance_metrics.instruction_count, 45)
+        self.assertEqual(simulation.state.performance_metrics.procedure_count, 0)
+        self.assertGreater(
+            simulation.state.performance_metrics.instructions_per_second, 0
+        )
+        self.assertGreater(simulation.state.performance_metrics.execution_time_s, 0)
+
+        simulation = Simulation(
+            state=ArchitecturalState(
+                register_file=RegisterFile(registers=[0, 0, 0, 0])
+            ),
+            instructions={
+                0: ADDI(rd=3, rs1=0, imm=8),
+                4: JAL(rd=2, imm=4),
+                8: ADDI(rd=1, rs1=1, imm=1),
+                12: BEQ(rs1=0, rs2=0, imm=2),
+                16: JAL(rd=2, imm=2),
+                20: ADDI(rd=1, rs1=1, imm=-10),
+            },
+        )
+        simulation.state.performance_metrics = PerformanceMetrics()
+        simulation.run_simulation()
+        self.assertEqual(
+            simulation.state.register_file.registers, [0, pow(2, 32) - 10, 20, 8]
+        )
+        self.assertEqual(simulation.state.performance_metrics.branch_count, 1)
+        self.assertEqual(simulation.state.performance_metrics.instruction_count, 5)
+        self.assertEqual(simulation.state.performance_metrics.procedure_count, 2)
         self.assertGreater(
             simulation.state.performance_metrics.instructions_per_second, 0
         )
