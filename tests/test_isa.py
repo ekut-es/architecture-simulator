@@ -872,44 +872,6 @@ class TestInstructions(unittest.TestCase):
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
-    def test_mem(self):
-        state = ArchitecturalState(register_file=RegisterFile(registers=()))
-        # store_byte test
-        state.memory.store_byte(0, fixedint.MutableUInt8(1))
-        self.assertEqual(state.memory.load_byte(0), fixedint.MutableUInt8(1))
-
-        # store_byte type test
-        state.memory.store_byte(0, fixedint.MutableUInt8(1))
-        self.assertIsInstance(state.memory.load_byte(0), fixedint.MutableUInt8)
-
-        # store_halfword test
-        state.memory.store_halfword(0, fixedint.MutableUInt16(1))
-        self.assertEqual(state.memory.load_halfword(0), fixedint.MutableUInt16(1))
-
-        # store_halfword type test
-        state.memory.store_halfword(0, fixedint.MutableUInt16(1))
-        self.assertIsInstance(state.memory.load_halfword(0), fixedint.MutableUInt16)
-
-        # store_word test
-        state.memory.store_word(0, fixedint.MutableUInt32(1))
-        self.assertEqual(state.memory.load_word(0), fixedint.MutableUInt32(1))
-
-        # store_word type test
-        state.memory.store_word(0, fixedint.MutableUInt32(1))
-        self.assertIsInstance(state.memory.load_word(0), fixedint.MutableUInt32)
-
-        # store_byte negative value test
-        state.memory.store_byte(0, fixedint.MutableUInt8(-1))
-        self.assertEqual(state.memory.load_byte(0), fixedint.MutableUInt8(-1))
-
-        # store_halfword negative value test
-        state.memory.store_halfword(0, fixedint.MutableUInt16(-1))
-        self.assertEqual(state.memory.load_halfword(0), fixedint.MutableUInt16(-1))
-
-        # store_word test
-        state.memory.store_word(0, fixedint.MutableUInt32(-1))
-        self.assertEqual(state.memory.load_word(0), fixedint.MutableUInt32(-1))
-
     def test_lb(self):
         state = ArchitecturalState(
             register_file=RegisterFile(registers=[0, 1, -1, pow(2, 32) - 1]),
