@@ -3,8 +3,46 @@ import fixedint
 
 
 @dataclass
+class Registers(list):
+    """
+    Custom list, that overwrites [], so that register x0 gets hardwired to zero.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def __getitem__(self, index):
+        # access of x0 will alway return zero, since x0 get´s initialized as zero and can not be changed
+        # index out of bounds error will be thrown if trying to acces a register outside of x0 to x31
+        return super().__getitem__(index)
+
+    def __setitem__(self, index, value):
+        # ensures, that register x0 stays 0 and that there are only 32 registers
+        if index > 0 and index < 32:
+            super().__setitem__(index, value)
+
+
+@dataclass
 class RegisterFile:
+    """
+    This class implements the register file.
+
+    Args:
+        registers:
+            list[int / fixedint.MutableUInt32] => provided list will be used to init registers, x0 can have any value (test mode)
+
+            no_arg => 32 registers with x0 is hard wired to zero
+    """
+
     registers: list[fixedint.MutableUInt32]
+
+    def __init__(self, registers=[]):
+        if registers == []:
+            # initializes 32 registers with x0 hard wired to zero
+            self.registers = Registers([fixedint.MutableUInt32(0) for i in range(32)])
+        else:
+            # use provided test register layout
+            self.registers = registers
 
 
 @dataclass
