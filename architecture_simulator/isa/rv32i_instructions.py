@@ -10,6 +10,7 @@ from architecture_simulator.isa.instruction_types import JTypeInstruction
 from architecture_simulator.isa.instruction_types import fence
 import fixedint
 
+
 # todo: use ctypes
 class ECALLException(Exception):
     "Raises when an ECALL is executed"
@@ -727,18 +728,10 @@ class LW(ITypeInstruction):
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = sext(M[x[rs1] + sext(imm)][31:0])"""
-        rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
-        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            int(
-                fixedint.Int32(
-                    int(
-                        architectural_state.memory.load_word(
-                            int(rs1 + fixedint.Int16(self.imm)[0:12])
-                        )
-                    )
-                )
-            )
-        )
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        architectural_state.register_file.registers[
+            self.rd
+        ] = architectural_state.memory.load_word(int(rs1) + self.imm)
         return architectural_state
 
 

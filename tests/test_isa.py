@@ -2103,7 +2103,7 @@ lui x12, 8000
 Chinakohl:
 jal x20, 220
 bne x3, x10, Banane
-jal x10, Ananas
+jal x10, Ananas+0x24
 """
 
     program_2 = "8asfsdfs:"
@@ -2123,7 +2123,7 @@ jal x10, Ananas
         "Chinakohl",
         ["jal", ["x", "20"], "220"],
         ["bne", ["x", "3"], ["x", "10"], "Banane"],
-        ["jal", ["x", "10"], "Ananas"],
+        ["jal", ["x", "10"], "Ananas", "0x24"],
     ]
 
     def test_bnf(self):
@@ -2202,7 +2202,7 @@ jal x10, Ananas
         # jal x10, Ananas
         self.assertIsInstance(instr[8], JAL)
         self.assertEqual(instr[8].rd, 10)
-        self.assertEqual(instr[8].imm, -16)
+        self.assertEqual(instr[8].imm, 2)
 
         with self.assertRaises(KeyError):
             parser.parse_res_to_instructions(
@@ -2255,3 +2255,97 @@ jal x10, Ananas
         while simulation.state.program_counter < 104:
             simulation.step_simulation()
         self.assertEqual(int(simulation.state.register_file.registers[10]), 55)
+
+    fibonacci_c = """main:
+	addi	x2,x2,-16
+	sw	x1,12(x2)
+	sw	x8,8(x2)
+	addi	x8,x2,16
+	addi	x10,x0,10
+	jal	x1,fibonacci
+	addi	x15,x0,0
+	addi	x10,x15,0
+	lw	x1,12(x2)
+	lw	x8,8(x2)
+	addi	x2,x2,16
+	jalr	x0,0(x1)
+fibonacci:
+	addi	x2,x2,-32
+	sw	x1,28(x2)
+	sw	x8,24(x2)
+	sw	x9,20(x2)
+	addi	x8,x2,32
+	sw	x10,-20(x8)
+	lw	x14,-20(x8)
+	addi	x15,x0,1
+	blt	x15,x14,fibonacci+0x2c
+	lw	x15,-20(x8)
+	jal	x0,fibonacci+0x58
+	lw	x15,-20(x8)
+	addi	x15,x15,-1
+	addi	x10,x15,0
+	jal	x1,fibonacci
+	addi	x9,x10,0
+	lw	x15,-20(x8)
+	addi	x15,x15,-2
+	addi	x10,x15,0
+	jal	x1,fibonacci
+	addi	x15,x10,0
+	add	x15,x9,x15
+	addi	x10,x15,0
+	lw	x1,28(x2)
+	lw	x8,24(x2)
+	lw	x9,20(x2)
+	addi	x2,x2,32
+	jalr	x0,0(x1)
+
+"""
+
+    def test_compiled_c_programm(self):
+        simulation = Simulation(
+            state=ArchitecturalState(
+                register_file=RegisterFile(registers=[0] * 32),
+                memory=Memory(memory_file={}),
+            ),
+            instructions={},
+        )
+        simulation.append_instructions(self.fibonacci_c)
+        # print(simulation.instructions)
+        while simulation.state.program_counter != 24:
+            simulation.step_simulation()
+            simulation.state.register_file.registers[0] = 0
+        self.assertEqual(int(simulation.state.register_file.registers[15]), 55)
+
+    add_c = """main:
+	addi	x2,x2,-32
+	sw	x8,28(x2)
+	addi	x8,x2,32
+	addi	x15,x0,42
+	sw	x15,-20(x8)
+	addi	x15,x0,23
+	sw	x15,-24(x8)
+	lw	x14,-20(x8)
+	lw	x15,-24(x8)
+	add	x15,x14,x15
+	sw	x15,-28(x8)
+	addi	x15,x0,0
+	addi	x10,x15,0
+	lw	x8,28(x2)
+	addi	x2,x2,32
+	jalr	x0,0(x1)
+    """
+
+    def test_c_add(self):
+        simulation = Simulation(
+            state=ArchitecturalState(
+                register_file=RegisterFile(registers=[0] * 32),
+                memory=Memory(memory_file={}),
+            ),
+            instructions={},
+        )
+        simulation.append_instructions(self.add_c)
+        # print(simulation.instructions)
+        while simulation.state.program_counter < 60:
+            simulation.step_simulation()
+            simulation.state.register_file.registers[0] = 0
+        self.assertEqual(int(simulation.state.memory.load_word(4294967268)), 65)

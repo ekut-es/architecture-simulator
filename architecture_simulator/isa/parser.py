@@ -1,5 +1,5 @@
 import pyparsing as pp
-
+import fixedint
 from architecture_simulator.isa.instruction_types import Instruction
 from architecture_simulator.isa.rv32i_instructions import instruction_map
 from architecture_simulator.isa import instruction_types as instruction_types
@@ -10,12 +10,17 @@ class RiscvParser:
     Paren_R = pp.Literal(")").suppress()
     Paren_L = pp.Literal("(").suppress()
     D_COL = pp.Literal(":").suppress()
+    PLUS = pp.Literal("+").suppress()
 
     pattern_register = pp.Group(pp.one_of("r x") + pp.Word(pp.nums))
 
-    pattern_label = pp.Word(pp.alphas + "_", pp.alphanums + "_")("label") + D_COL
+    pattern_label = pp.Word(pp.alphas + "_", pp.alphanums + "_")("label")
 
     pattern_imm = pp.Combine(pp.Optional("-") + pp.Word(pp.nums))("imm")
+
+    pattern_offset = pp.Optional(
+        PLUS + pp.Combine("0x" + pp.Word(pp.hexnums))("offset")
+    )
 
     # R-Types
     pattern_reg_reg_reg_instruction = pp.Group(
@@ -34,7 +39,7 @@ class RiscvParser:
         + COMMA
         + pattern_register("reg2")
         + COMMA
-        + (pattern_imm | pp.Word(pp.alphas)("label"))
+        + (pattern_imm | (pattern_label + pattern_offset))
     )
 
     # I-Types, B-Types, S-Types
@@ -42,7 +47,7 @@ class RiscvParser:
         pp.Word(pp.alphas)("mnemonic")
         + pattern_register("reg1")
         + COMMA
-        + (pattern_imm | pp.Word(pp.alphas)("label"))
+        + pattern_imm
         + Paren_L
         + pattern_register("reg2")
         + Paren_R
@@ -53,7 +58,7 @@ class RiscvParser:
         pp.Word(pp.alphas)("mnemonic")
         + pattern_register("rd")
         + COMMA
-        + (pattern_imm | pp.Word(pp.alphas)("label"))
+        + (pattern_imm | (pattern_label + pattern_offset))
     )
 
     riscv_bnf = (
@@ -62,7 +67,7 @@ class RiscvParser:
             | pattern_reg_imm_reg_instruction
             | pattern_reg_reg_imm_instruction
             | pattern_reg_imm_instruction
-            | pattern_label
+            | (pattern_label + D_COL)
         )
         + pp.StringEnd()
     ).ignore(pp.Char("#") + pp.rest_of_line())
@@ -147,7 +152,12 @@ class RiscvParser:
                 if instruction_parsed.imm.isdigit():
                     imm_val = int(instruction_parsed.imm) // 2
                 else:
-                    imm_val = (labels[instruction_parsed.label] - address_count) // 2
+                    offset = 0
+                    if instruction_parsed.offset != "":
+                        offset = int(instruction_parsed.offset, 0)
+                    imm_val = (
+                        labels[instruction_parsed.label] + offset - address_count
+                    ) // 2
 
                 instructions.append(
                     instruction_class(
@@ -169,7 +179,12 @@ class RiscvParser:
                 if instruction_parsed.imm.isdigit():
                     imm_val = int(instruction_parsed.imm) // 2
                 else:
-                    imm_val = (labels[instruction_parsed.label] - address_count) // 2
+                    offset = 0
+                    if instruction_parsed.offset != "":
+                        offset = int(instruction_parsed.offset, 0)
+                    imm_val = (
+                        labels[instruction_parsed.label] + offset - address_count
+                    ) // 2
 
                 instructions.append(
                     instruction_class(
