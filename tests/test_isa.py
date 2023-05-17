@@ -1,5 +1,5 @@
 import unittest
-
+import pyparsing as pp
 from architecture_simulator.simulation.simulation import Simulation
 from architecture_simulator.uarch.architectural_state import RegisterFile, Memory
 from architecture_simulator.isa.rv32i_instructions import (
@@ -2095,7 +2095,7 @@ addi x0, x1, -20
 #aaaaa
 Banane:
 ##asdsadad
-Banune:
+_Banune24_de:
 lb x0, 7(x1)
 sb x1, 666(x2)
 BEQ x4, x5, 42
@@ -2105,12 +2105,17 @@ jal x20, 220
 bne x3, x10, Banane
 jal x10, Ananas
 """
+
+    program_2 = "8asfsdfs:"
+    program_3 = "add x5, x6, x6, x8"
+    program_4 = "addidas x5, x6, 666"
+
     expected = [
         "Ananas",
         ["add", ["x", "0"], ["x", "1"], ["x", "2"]],
         ["addi", ["x", "0"], ["x", "1"], "-20"],
         "Banane",
-        "Banune",
+        "_Banune24_de",
         ["lb", ["x", "0"], "7", ["x", "1"]],
         ["sb", ["x", "1"], "666", ["x", "2"]],
         ["BEQ", ["x", "4"], ["x", "5"], "42"],
@@ -2128,9 +2133,18 @@ jal x10, Ananas
         self.assertNotEqual(instr[1].mnemonic, "")
         # self.assertEqual(instr[1].mnemonic, "")
 
+        with self.assertRaises(pp.exceptions.ParseException):
+            parser.parse_assembly(self.program_2)
+
+        with self.assertRaises(pp.exceptions.ParseException):
+            parser.parse_assembly(self.program_3)
+
+        # just check that there is no parser exception
+        parser.parse_assembly(self.program_4)
+
     def test_process_labels(self):
         parser = RiscvParser()
-        expected_labels = {"Ananas": 0, "Banane": 8, "Banune": 8, "Chinakohl": 24}
+        expected_labels = {"Ananas": 0, "Banane": 8, "_Banune24_de": 8, "Chinakohl": 24}
         bnf_result = parser.parse_assembly(self.program)
         proc_labels = parser.compute_labels(bnf_result, 0)
         self.assertEqual(proc_labels, expected_labels)
@@ -2189,6 +2203,11 @@ jal x10, Ananas
         self.assertIsInstance(instr[8], JAL)
         self.assertEqual(instr[8].rd, 10)
         self.assertEqual(instr[8].imm, -16)
+
+        with self.assertRaises(KeyError):
+            parser.parse_res_to_instructions(
+                parser.parse_assembly(self.program_4), start_address=0
+            )
 
     fibonacci = """lui x10, 0
     addi x10, x10, 10

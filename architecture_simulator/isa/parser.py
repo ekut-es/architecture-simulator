@@ -1,8 +1,8 @@
 import pyparsing as pp
 
-from .instruction_types import Instruction
-from .rv32i_instructions import instruction_map
-from . import instruction_types as instruction_types
+from architecture_simulator.isa.instruction_types import Instruction
+from architecture_simulator.isa.rv32i_instructions import instruction_map
+from architecture_simulator.isa import instruction_types as instruction_types
 
 
 class RiscvParser:
@@ -13,7 +13,7 @@ class RiscvParser:
 
     pattern_register = pp.Group(pp.one_of("r x") + pp.Word(pp.nums))
 
-    pattern_label = pp.Word(pp.alphas)("label") + D_COL
+    pattern_label = pp.Word(pp.alphas + "_", pp.alphanums + "_")("label") + D_COL
 
     pattern_imm = pp.Combine(pp.Optional("-") + pp.Word(pp.nums))("imm")
 
