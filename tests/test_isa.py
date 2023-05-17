@@ -55,7 +55,7 @@ from architecture_simulator.isa.rv32i_instructions import (
 )
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 
-from architecture_simulator.isa.parser import riscv_bnf, riscv_parser, process_labels
+from architecture_simulator.isa.parser import RiscvParser
 
 import fixedint
 
@@ -2122,33 +2122,26 @@ jal x10, Ananas
     ]
 
     def test_bnf(self):
-        instr = riscv_bnf().parse_string(self.program)
+        parser = RiscvParser()
+        instr = parser.parse_assembly(self.program)
         self.assertEqual(instr.as_list(), self.expected)
         self.assertNotEqual(instr[1].mnemonic, "")
         # self.assertEqual(instr[1].mnemonic, "")
 
     def test_process_labels(self):
+        parser = RiscvParser()
         expected_labels = {"Ananas": 0, "Banane": 8, "Banune": 8, "Chinakohl": 24}
-        expected_instructions = [
-            ["add", ["x", "0"], ["x", "1"], ["x", "2"]],
-            ["addi", ["x", "0"], ["x", "1"], "-20"],
-            ["lb", ["x", "0"], "7", ["x", "1"]],
-            ["sb", ["x", "1"], "666", ["x", "2"]],
-            ["BEQ", ["x", "4"], ["x", "5"], "42"],
-            ["lui", ["x", "12"], "8000"],
-            ["jal", ["x", "20"], "220"],
-            ["bne", ["x", "3"], ["x", "10"], "Banane"],
-            ["jal", ["x", "10"], "Ananas"],
-        ]
-        bnf_result = riscv_bnf().parse_string(self.program)
-        proc_labels, proc_instructions = process_labels(bnf_result, 0)
+        bnf_result = parser.parse_assembly(self.program)
+        proc_labels = parser.compute_labels(bnf_result, 0)
         self.assertEqual(proc_labels, expected_labels)
-        for i, el in enumerate(proc_instructions):
-            self.assertEqual(el.as_list(), expected_instructions[i])
 
     def test_parser(self):
+        parser = RiscvParser()
+        instr = parser.parse_res_to_instructions(
+            parser.parse_assembly(self.program), start_address=0
+        )
+
         # add x0,x1,x2
-        instr = riscv_parser(self.program)
         self.assertIsInstance(instr[0], ADD)
         self.assertEqual(instr[0].rd, 0)
         self.assertEqual(instr[0].rs1, 1)

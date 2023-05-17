@@ -5,8 +5,7 @@ from .rv32i_instructions import instruction_map
 from . import instruction_types as instruction_types
 
 
-# TODO to be replaced by students with a class
-def riscv_bnf():
+class RiscvParser:
     COMMA = pp.Literal(",").suppress()
     Paren_R = pp.Literal(")").suppress()
     Paren_L = pp.Literal("(").suppress()
@@ -66,26 +65,56 @@ def riscv_bnf():
             | pattern_label
         )
         + pp.StringEnd()
-    )
-    riscv_bnf.ignore(pp.Char("#") + pp.rest_of_line())
+    ).ignore(pp.Char("#") + pp.rest_of_line())
 
-    return riscv_bnf
+    def parse_assembly(self, assembly: str) -> pp.ParseResults:
+        """Turn assembly code into parse results.
 
+        Args:
+            assembly (str): Text assembly which may contain labels and comments.
 
-def riscv_parser(program: str):
-    instructions: list[Instruction] = []
-    labels, instructions_parsed = process_labels(riscv_bnf().parse_string(program), 0)
+        Returns:
+            pp.ParseResults: Parse results.
+        """
+        return self.riscv_bnf.parse_string(assembly)
 
-    for instruction_number, instruction_parsed in enumerate(instructions_parsed):
-        if instruction_parsed.mnemonic != "":
+    def compute_labels(self, parse_result: pp.ParseResults, start_address: int) -> dict:
+        """Compute the addresses for the labels.
+        Args:
+            parse_result (pp.ParseResults): Parsed assembly which may contain labels
+            start_address (int): address of the first instruction.
+
+        Returns:
+            dict: addresses for the labels.
+        """
+        labels = {}
+        instruction_address = start_address
+        for i_parsed in parse_result:
+            if isinstance(i_parsed, str):
+                labels.update({i_parsed: instruction_address})
+            else:
+                instruction_address += 4
+        return labels
+
+    def parse_res_to_instructions(
+        self, parse_result: pp.ParseResults, start_address: int
+    ) -> list[Instruction]:
+        """Turn parse results into instructions.
+
+        Args:
+            parse_result (pp.ParseResults): parsed assembly which may contain labels.
+
+        Returns:
+            list[Instruction]: executable list of instructions
+        """
+        instructions: list[Instruction] = []
+        labels = self.compute_labels(parse_result, start_address)
+        address_count: int = start_address
+
+        for instruction_parsed in parse_result:
+            if isinstance(instruction_parsed, str):
+                continue
             instruction_class = instruction_map[instruction_parsed.mnemonic.lower()]
-            # if (
-            #     instruction_parsed.rd[0] == "r"
-            #     or instruction_parsed.rs1[0] == "r"
-            #     or instruction_parsed.rs2[0] == "r"
-            # ):
-            #     # TODO: translate r notation to register number
-            #     raise NotImplementedError()
             if instruction_class.__base__ is instruction_types.RTypeInstruction:
                 instructions.append(
                     instruction_class(
@@ -116,11 +145,9 @@ def riscv_parser(program: str):
                 # TODO: Throws exception if imm is uneven
                 imm_val = -1
                 if instruction_parsed.imm.isdigit():
-                    imm_val = int(int(instruction_parsed.imm) / 2)
+                    imm_val = int(instruction_parsed.imm) // 2
                 else:
-                    imm_val = int(
-                        (labels[instruction_parsed.label] - instruction_number * 4) / 2
-                    )
+                    imm_val = (labels[instruction_parsed.label] - address_count) // 2
 
                 instructions.append(
                     instruction_class(
@@ -140,11 +167,9 @@ def riscv_parser(program: str):
                 # TODO: Throws exception if imm is uneven
                 imm_val = -1
                 if instruction_parsed.imm.isdigit():
-                    imm_val = int(int(instruction_parsed.imm) / 2)
+                    imm_val = int(instruction_parsed.imm) // 2
                 else:
-                    imm_val = int(
-                        (labels[instruction_parsed.label] - instruction_number * 4) / 2
-                    )
+                    imm_val = (labels[instruction_parsed.label] - address_count) // 2
 
                 instructions.append(
                     instruction_class(
@@ -169,29 +194,6 @@ def riscv_parser(program: str):
                         uimm=int(instruction_parsed.uimm),
                     )
                 )
-
-    return instructions
-
-
-def process_labels(
-    input: pp.ParseResults, start_address: int
-) -> tuple[dict[str, int], list[pp.ParseResults]]:
-    """Takes results from parser and calculates all label addresses and returns a list containing only instructions
-
-    Args:
-        input (pp.ParseResults): Result from pyparser
-        start_address (int): address of first instruction
-
-    Returns:
-        tuple[dict[str, int], list[pp.ParseResults]]: dict containing the addresses for the labels and a list of the instructions
-    """
-    labels = {}
-    instruction_address = start_address
-    instructions: list[pp.ParseResults] = []
-    for i_parsed in input:
-        if isinstance(i_parsed, str):
-            labels.update({i_parsed: instruction_address})
-        else:
-            instructions.append(i_parsed)
-            instruction_address += 4
-    return (labels, instructions)
+            # TODO: If instructions with length != 4 Bytes are supported the Instruction Type needs to be checked
+            address_count += 4
+        return instructions
