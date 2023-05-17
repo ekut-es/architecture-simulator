@@ -35,3 +35,4 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(int(fibonacci_recursive(5)), 5)
         self.assertEqual(int(fibonacci_recursive(6)), 8)
         self.assertEqual(int(fibonacci_recursive(7)), 13)
+        self.assertEqual(int(fibonacci_recursive(20)), 6765)
