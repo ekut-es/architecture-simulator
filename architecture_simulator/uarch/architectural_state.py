@@ -191,3 +191,12 @@ class ArchitecturalState:
 
     def get_privilege_level(self):
         return self.csr_registers.privilege_level
+
+
+import json
+
+dic = dict()
+l = [{hex(1): "a"}, {2: "b"}]
+dic[0] = l
+print(dic)
+print(json.dumps(dic))
