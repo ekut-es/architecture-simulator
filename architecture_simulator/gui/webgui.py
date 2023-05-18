@@ -6,6 +6,7 @@ from architecture_simulator.isa.rv32i_instructions import ADD
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 from architecture_simulator.simulation.simulation import Simulation
 import fixedint
+import json
 
 simulation = None
 
@@ -36,20 +37,60 @@ def sim_init():
             reg_i, simulation.state.register_file.registers[reg_i]
         )
 
-    for mem_i in simulation.state.memory.memory_file.keys():
-        archsim_js.append_memory(mem_i, int(simulation.state.memory.memory_file[mem_i]))
+    for address, address_val in simulation.state.memory.memory_file.items():
+        archsim_js.append_memory(address, int(address_val))
 
     return simulation
 
 
-def exec_instr(instr: str):
+def step_sim(instr: str):
     global simulation
     if simulation is None:
         raise RuntimeError("state has not been initialized.")
-    simulation.append_instructions(instr)
+
+    # parse the instr json string into a python dict
+    instr_parsed = json.loads(instr)
+
+    # append all instructions
+    for cmd in instr_parsed.values():
+        simulation.append_instructions(cmd)
+
+    # step the simulation
     simulation.step_simulation()
+
+    # update the registers after exeution of the instruction/s
     for reg_i, reg_val in enumerate(simulation.state.register_file.registers):
         archsim_js.update_register(reg_i, reg_val)
-    for address, address_val in enumerate(simulation.state.memory.memory_file):
+
+    # update the memory after exeution of the instruction/s
+    for address, address_val in simulation.state.memory.memory_file.items():
         archsim_js.update_memory(address, address_val)
+
+    return simulation
+
+
+# runs the simulation, takes a json string as input and returns the whole simulation
+def run_sim(instr: str):
+    global simulation
+    if simulation is None:
+        raise RuntimeError("state has not been initialized.")
+
+    # parse the instr json string into a python dict
+    instr_parsed = json.loads(instr)
+
+    # append all instructions
+    for cmd in instr_parsed.values():
+        simulation.append_instructions(cmd)
+
+    # run the simulation
+    simulation.run_simulation()
+
+    # update the registers after exeution of the instruction/s
+    for reg_i, reg_val in enumerate(simulation.state.register_file.registers):
+        archsim_js.update_register(reg_i, reg_val)
+
+    # update the memory after exeution of the instruction/s
+    for address, address_val in simulation.state.memory.memory_file.items():
+        archsim_js.update_memory(address, address_val)
+
     return simulation
