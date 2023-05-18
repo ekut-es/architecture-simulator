@@ -3,6 +3,8 @@ const code = document.getElementById("code");
 const registers = document.getElementById("registers");
 const memory = document.getElementById("memory");
 
+setCommandString();
+
 function addToOutput(s) {
     output.value += ">>>" + code.value + "\n" + s + "\n";
     output.scrollTop = output.scrollHeight;
@@ -37,7 +39,10 @@ const archsim_js = {
     },
     update_memory: function(address, val) {
         document.getElementById("memory"+address).innerText = val
-    }
+    },
+    append_instructions: function(cmd_json_str) {
+        setCommandString(cmd_json_str)
+    },
 };
 
 output.value = "Initializing... ";
@@ -57,22 +62,22 @@ sim_init()
 }
 let pyodideReadyPromise = main();
 
-async function evaluatePython_step_sim() {
+async function evaluatePython_step_sim(cmd_json_str) {
     let pyodide = await pyodideReadyPromise;
     try {
         step_sim = pyodide.globals.get("step_sim");
-        let output = step_sim(code.value);
+        let output = step_sim(cmd_json_str);
         addToOutput(output);
     } catch (err) {
         addToOutput(err);
     }
 }
 
-async function evaluatePython_run_sim() {
+async function evaluatePython_run_sim(cmd_json_str) {
     let pyodide = await pyodideReadyPromise;
     try {
         run_sim = pyodide.globals.get("run_sim");
-        let output = run_sim(code.value);
+        let output = run_sim(cmd_json_str);
         addToOutput(output);
     } catch (err) {
         addToOutput(err);

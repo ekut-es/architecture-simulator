@@ -40,6 +40,11 @@ def sim_init():
     for address, address_val in simulation.state.memory.memory_file.items():
         archsim_js.append_memory(address, int(address_val))
 
+    json_array = []
+    for address, cmd in simulation.instructions.items:
+        json_array.append({hex(address): cmd})
+
+    archsim_js.append_instructions({"cmd_list": json_array})
     return simulation
 
 
