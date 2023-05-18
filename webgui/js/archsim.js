@@ -57,11 +57,22 @@ sim_init()
 }
 let pyodideReadyPromise = main();
 
-async function evaluatePython() {
+async function evaluatePython_step_sim() {
     let pyodide = await pyodideReadyPromise;
     try {
-        exec_instr = pyodide.globals.get("exec_instr");
-        let output = exec_instr(code.value);
+        step_sim = pyodide.globals.get("step_sim");
+        let output = step_sim(code.value);
+        addToOutput(output);
+    } catch (err) {
+        addToOutput(err);
+    }
+}
+
+async function evaluatePython_run_sim() {
+    let pyodide = await pyodideReadyPromise;
+    try {
+        run_sim = pyodide.globals.get("run_sim");
+        let output = run_sim(code.value);
         addToOutput(output);
     } catch (err) {
         addToOutput(err);
