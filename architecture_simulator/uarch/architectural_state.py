@@ -157,8 +157,8 @@ class ArchitecturalState:
 
 import json
 
-dic = dict()
-l = [{hex(1): "a"}, {2: "b"}]
-dic[0] = l
-print(dic)
-print(json.dumps(dic))
+str = '{"cmd_list":[{"add":"0x0000", "cmd":"SUB A0, T0, T2"}, {"add":"0x0004", "cmd":"ADD A0, T0, T2"}]}'
+str_parsed = json.loads(str)
+print(str_parsed["cmd_list"])
+for cmd in str_parsed["cmd_list"]:
+    print(cmd["cmd"])

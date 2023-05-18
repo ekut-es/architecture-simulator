@@ -2,7 +2,7 @@ import archsim_js
 
 from architecture_simulator.uarch.architectural_state import RegisterFile, Memory
 from architecture_simulator.isa.instruction_types import Instruction
-from architecture_simulator.isa.rv32i_instructions import ADD
+from architecture_simulator.isa.rv32i_instructions import ADDI
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 from architecture_simulator.simulation.simulation import Simulation
 import fixedint
@@ -29,7 +29,7 @@ def sim_init():
                 )
             ),
         ),
-        instructions={},
+        instructions={4: ADDI(rd=10, rs1=10, imm=2)},
     )
 
     for reg_i in range(len(simulation.state.register_file.registers)):
@@ -40,11 +40,12 @@ def sim_init():
     for address, address_val in simulation.state.memory.memory_file.items():
         archsim_js.append_memory(address, int(address_val))
 
+    # create a json string with all instructions in it
     json_array = []
-    for address, cmd in simulation.instructions.items:
+    for address, cmd in simulation.instructions.items():
         json_array.append({hex(address): cmd})
 
-    archsim_js.append_instructions({"cmd_list": json_array})
+    archsim_js.append_instructions(json.dumps({"cmd_list": json_array}))
     return simulation
 
 
@@ -55,10 +56,10 @@ def step_sim(instr: str):
 
     # parse the instr json string into a python dict
     instr_parsed = json.loads(instr)
-
+    instr_list = instr_parsed["cmd_list"]
     # append all instructions
-    for cmd in instr_parsed.values():
-        simulation.append_instructions(cmd)
+    for cmd in instr_list:
+        simulation.append_instructions(cmd["cmd"])
 
     # step the simulation
     simulation.step_simulation()
@@ -82,10 +83,10 @@ def run_sim(instr: str):
 
     # parse the instr json string into a python dict
     instr_parsed = json.loads(instr)
-
+    instr_list = instr_parsed["cmd_list"]
     # append all instructions
-    for cmd in instr_parsed.values():
-        simulation.append_instructions(cmd)
+    for cmd in instr_list:
+        simulation.append_instructions(cmd["cmd"])
 
     # run the simulation
     simulation.run_simulation()
