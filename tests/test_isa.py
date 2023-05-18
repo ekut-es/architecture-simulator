@@ -514,7 +514,7 @@ class TestInstructions(unittest.TestCase):
             in str(context.exception)
         )
 
-    def test_csrrw_invalid_adress(self):
+    def test_csrrw_invalid_address(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
         state.csr_registers.privilege_level = 4
         with self.assertRaises(Exception) as context:
