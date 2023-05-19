@@ -2,7 +2,7 @@ import archsim_js
 
 from architecture_simulator.uarch.architectural_state import RegisterFile, Memory
 from architecture_simulator.isa.instruction_types import Instruction
-from architecture_simulator.isa.rv32i_instructions import ADDI
+from architecture_simulator.isa.rv32i_instructions import ADD
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 from architecture_simulator.simulation.simulation import Simulation
 import fixedint
@@ -15,7 +15,7 @@ def sim_init():
     global simulation
     simulation = Simulation(
         state=ArchitecturalState(
-            register_file=RegisterFile(registers=[0, 2, 0, 0, 4]),
+            register_file=RegisterFile(registers=[0, 2, 0, 8, 6]),
             memory=Memory(
                 memory_file=dict(
                     [
@@ -29,7 +29,7 @@ def sim_init():
                 )
             ),
         ),
-        instructions={4: ADDI(rd=10, rs1=10, imm=2)},
+        instructions={0: ADD(rd=10, rs1=10, rs2=2)},
     )
 
     for reg_i in range(len(simulation.state.register_file.registers)):
@@ -38,14 +38,14 @@ def sim_init():
         )
 
     for address, address_val in simulation.state.memory.memory_file.items():
-        archsim_js.append_memory(address, int(address_val))
+        archsim_js.append_memory(hex(address), int(address_val))
 
     # create a json string with all instructions in it
-    json_array = []
+    """json_array = []
     for address, cmd in simulation.instructions.items():
         json_array.append({hex(address): cmd})
 
-    archsim_js.append_instructions(json.dumps({"cmd_list": json_array}))
+    archsim_js.append_instructions(json.dumps({"cmd_list": json_array}))"""
     return simulation
 
 

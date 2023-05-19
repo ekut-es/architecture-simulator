@@ -11,12 +11,10 @@
 	<link 	rel="stylesheet"	 	type="text/css" 		href="RISCV_DialogEditCommands.css">
 	<!--	****************************************************************************************************************************** -->
   <script type="text/javascript" 							src="js/RISCV_DialogEditCommands.js"></script>
-	<script type="text/javascript" 							src="https://cdn.jsdelivr.net/pyodide/v0.22.1/full/pyodide.js"></script>
-  <script type="text/javascript" 							src="js/archsim.js"></script>
 	<!--	****************************************************************************************************************************** -->
 	<script type="text/javascript">
 		let dialogEditCommands = null;
-		
+
 		let simulation_json = null;
 
 		window.addEventListener('DOMContentLoaded', function () {
@@ -26,7 +24,7 @@
 																"webapp_dialog_EditCommandsFooterBtnOkID",
 																"webapp_dialog_EditCommandsFooterBtnCnlID",
 								);
-			
+
 			document.getElementById("button_gui_cmd_edit_id").addEventListener("click", () => {
 				if(dialogEditCommands){
 					dialogEditCommands.setCommandString('{"cmd_list":[{"add":"0x0000", "cmd":"SUB A0, T0, T2"}, {"add":"0x0004", "cmd":"ADD A0, T0, T2"}]}'); //placeholder, load json from simulator
@@ -34,10 +32,12 @@
 				}
 			});
 
-			document.getElementById("button_simulation_start_id").addEventListener("click", () => {
-				//evaluatePython();
-			});
-			
+			document.getElementById("button_simulation_start_id").addEventListener("click", evaluatePython_step_sim);
+
+			/*document.getElementById("button_simulation_start_id").addEventListener("click", () => {
+				evaluatePython_step_sim
+			});*/
+
 		});
 		// ask if you really wanna leave the site
 		window.onbeforeunload = function() {
@@ -87,6 +87,17 @@
 			</div>
 		</div>
     </main>
+	<table>
+		<thead><td>Register</td><td>Value</td></thead>
+		<tbody id="registers" ></tbody>
+	  </table>
+	  <table>
+		<thead><td>Memory</td><td>Value</td></thead>
+		<tbody id="memory" ></tbody>
+	  </table>
+	  <div>Output:</div>
+    <textarea id="output" style="width: 100%;" rows="20" disabled></textarea>
+	<button onclick="test()">Run</button>
 	<footer id="webapp_footer_id">
 	</footer>
 	<!--  ****************** Modale Form ********************************************* -->
@@ -123,5 +134,7 @@
 	</dialog>
 	<dialog id="webapp_dialog_AppHelpID" >
 	</dialog>
+	<script type="text/javascript" 							src="https://cdn.jsdelivr.net/pyodide/v0.22.1/full/pyodide.js"></script>
+  <script type="text/javascript" 							src="js/archsim.js"></script>
 </body>
 </html>
