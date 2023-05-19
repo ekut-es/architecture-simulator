@@ -3,6 +3,7 @@ import fixedint
 from architecture_simulator.isa.instruction_types import Instruction
 from architecture_simulator.isa.rv32i_instructions import instruction_map
 from architecture_simulator.isa import instruction_types as instruction_types
+from architecture_simulator.isa.rv32i_instructions import ECALL, EBREAK, FENCE
 
 
 class RiscvParser:
@@ -18,9 +19,13 @@ class RiscvParser:
 
     pattern_imm = pp.Combine(pp.Optional("-") + pp.Word(pp.nums))("imm")
 
+    pattern_uimm = pp.Word(pp.nums)("uimm")
+
     pattern_offset = pp.Optional(
         PLUS + pp.Combine("0x" + pp.Word(pp.hexnums))("offset")
     )
+
+    pattern_hex = pp.Combine("0x" + pp.Word(pp.hexnums))
 
     # R-Types
     pattern_reg_reg_reg_instruction = pp.Group(
@@ -53,21 +58,44 @@ class RiscvParser:
         + Paren_R
     )
 
-    # U-Types, J-Types
-    pattern_reg_imm_instruction = pp.Group(
+    # U-Types, J-Types, Fence
+    pattern_reg_smth_instruction = pp.Group(
         pp.Word(pp.alphas)("mnemonic")
         + pattern_register("rd")
         + COMMA
-        + (pattern_imm | (pattern_label + pattern_offset))
+        + (pattern_imm | pattern_register("rs1") | (pattern_label + pattern_offset))
+    )
+
+    # CSR-Types
+    pattern_reg_csr_reg_instruction = pp.Group(
+        pp.Word(pp.alphas)("mnemonic")
+        + pattern_register("rd")
+        + COMMA
+        + pattern_hex("csr")
+        + COMMA
+        + pattern_register("rs1")
+    )
+
+    # CSRI-Types
+    pattern_reg_csr_imm_instruction = pp.Group(
+        pp.Word(pp.alphas)("mnemonic")
+        + pattern_register("rd")
+        + COMMA
+        + pattern_hex("csr")
+        + COMMA
+        + pattern_uimm("uimm")
     )
 
     riscv_bnf = (
         pp.OneOrMore(
             pattern_reg_reg_reg_instruction
             | pattern_reg_imm_reg_instruction
+            | pattern_reg_csr_reg_instruction
+            | pattern_reg_csr_imm_instruction
             | pattern_reg_reg_imm_instruction
-            | pattern_reg_imm_instruction
+            | pattern_reg_smth_instruction
             | (pattern_label + D_COL)
+            | pp.Word(pp.alphas)("mnemonic")  # for ecall, ebreak
         )
         + pp.StringEnd()
     ).ignore(pp.Char("#") + pp.rest_of_line())
@@ -95,7 +123,11 @@ class RiscvParser:
         labels = {}
         instruction_address = start_address
         for i_parsed in parse_result:
-            if isinstance(i_parsed, str):
+            if (
+                isinstance(i_parsed, str)
+                and i_parsed != "ecall"
+                and i_parsed != "ebreak"
+            ):
                 labels.update({i_parsed: instruction_address})
             else:
                 instruction_address += 4
@@ -118,6 +150,10 @@ class RiscvParser:
 
         for instruction_parsed in parse_result:
             if isinstance(instruction_parsed, str):
+                if instruction_parsed == "ecall":
+                    instructions.append(ECALL(imm=0, rs1=0, rd=0))
+                if instruction_parsed == "ebreak":
+                    instructions.append(EBREAK(imm=1, rs1=0, rd=0))
                 continue
             instruction_class = instruction_map[instruction_parsed.mnemonic.lower()]
             if instruction_class.__base__ is instruction_types.RTypeInstruction:
@@ -195,9 +231,9 @@ class RiscvParser:
             elif instruction_class.__base__ is instruction_types.CSRTypeInstruction:
                 instructions.append(
                     instruction_class(
-                        rd=int(instruction_parsed.reg1[1]),
-                        csr=int(instruction_parsed.imm),
-                        rs1=int(instruction_parsed.reg2[1]),
+                        rd=int(instruction_parsed.rd[1]),
+                        csr=int(instruction_parsed.csr, 0),
+                        rs1=int(instruction_parsed.rs1[1]),
                     )
                 )
             elif instruction_class.__base__ is instruction_types.CSRITypeInstruction:
@@ -205,10 +241,13 @@ class RiscvParser:
                 instructions.append(
                     instruction_class(
                         rd=int(instruction_parsed.rd[1]),
-                        csr=int(instruction_parsed.imm),
+                        csr=int(instruction_parsed.csr, 0),
                         uimm=int(instruction_parsed.uimm),
                     )
                 )
+            elif instruction_class.__base__ is instruction_types.fence:
+                # TODO: Change me, if Fence gets implemented
+                instructions.append(FENCE())
             # TODO: If instructions with length != 4 Bytes are supported the Instruction Type needs to be checked
             address_count += 4
         return instructions

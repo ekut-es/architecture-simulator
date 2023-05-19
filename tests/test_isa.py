@@ -52,6 +52,7 @@ from architecture_simulator.isa.rv32i_instructions import (
     ANDI,
     SLLI,
     SRLI,
+    FENCE,
 )
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 
@@ -2104,6 +2105,11 @@ Chinakohl:
 jal x20, 220
 bne x3, x10, Banane
 jal x10, Ananas+0x24
+ecall
+ebreak
+fence x10, x12
+csrrw x2, 0x448, x9
+csrrwi x2, 0x448, 20
 """
 
     program_2 = "8asfsdfs:"
@@ -2124,6 +2130,11 @@ jal x10, Ananas+0x24
         ["jal", ["x", "20"], "220"],
         ["bne", ["x", "3"], ["x", "10"], "Banane"],
         ["jal", ["x", "10"], "Ananas", "0x24"],
+        "ecall",
+        "ebreak",
+        ["fence", ["x", "10"], ["x", "12"]],
+        ["csrrw", ["x", "2"], "0x448", ["x", "9"]],
+        ["csrrwi", ["x", "2"], "0x448", "20"],
     ]
 
     def test_bnf(self):
@@ -2203,6 +2214,30 @@ jal x10, Ananas+0x24
         self.assertIsInstance(instr[8], JAL)
         self.assertEqual(instr[8].rd, 10)
         self.assertEqual(instr[8].imm, 2)
+
+        # ecall
+        self.assertIsInstance(instr[9], ECALL)
+
+        # ebreak
+        self.assertIsInstance(instr[10], EBREAK)
+
+        # fence
+        self.assertIsInstance(instr[11], FENCE)
+        # TODO: currently not implemented
+        # self.assertEqual(instr[11].rd, 10)
+        # self.assertEqual(instr[11].rs1, 12)
+
+        # csrrw x2, 0x448, x9
+        self.assertIsInstance(instr[12], CSRRW)
+        self.assertEqual(instr[12].rd, 2)
+        self.assertEqual(instr[12].csr, 0x448)
+        self.assertEqual(instr[12].rs1, 9)
+
+        # csrrwi x2, 0x448, 20
+        self.assertIsInstance(instr[13], CSRRWI)
+        self.assertEqual(instr[13].rd, 2)
+        self.assertEqual(instr[13].csr, 0x448)
+        self.assertEqual(instr[13].uimm, 20)
 
         with self.assertRaises(KeyError):
             parser.parse_res_to_instructions(
