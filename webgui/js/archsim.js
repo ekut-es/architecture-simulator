@@ -3,8 +3,6 @@ const code = document.getElementById("code");
 const registers = document.getElementById("registers");
 const memory = document.getElementById("memory");
 
-setCommandString();
-
 function addToOutput(s) {
     output.value += ">>>" + code.value + "\n" + s + "\n";
     output.scrollTop = output.scrollHeight;
@@ -41,8 +39,8 @@ const archsim_js = {
         document.getElementById("memory"+address).innerText = val
     },
     append_instructions: function(cmd_json_str) {
-        setCommandString(cmd_json_str)
-    },
+        //setCommandString(cmd_json_str)
+    }
 };
 
 output.value = "Initializing... ";
@@ -62,7 +60,11 @@ sim_init()
 }
 let pyodideReadyPromise = main();
 
-async function evaluatePython_step_sim(cmd_json_str) {
+function test(){
+    alert(Hello);
+}
+
+async function evaluatePython_step_sim() {
     let pyodide = await pyodideReadyPromise;
     try {
         step_sim = pyodide.globals.get("step_sim");
