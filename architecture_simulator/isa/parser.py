@@ -1,5 +1,4 @@
 import pyparsing as pp
-import fixedint
 from architecture_simulator.isa.instruction_types import Instruction
 from architecture_simulator.isa.rv32i_instructions import instruction_map
 from architecture_simulator.isa import instruction_types as instruction_types
