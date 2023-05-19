@@ -5,6 +5,42 @@ from architecture_simulator.isa.rv32i_instructions import instruction_map
 from architecture_simulator.isa import instruction_types as instruction_types
 from architecture_simulator.isa.rv32i_instructions import ECALL, EBREAK, FENCE
 
+reg_mapping = {
+    "zero": 0,
+    "ra": 1,
+    "sp": 2,
+    "gp": 3,
+    "tp": 4,
+    "t0": 5,
+    "t1": 6,
+    "t2": 7,
+    "fp": 8,  # this is intentional
+    "s0": 8,
+    "s1": 9,
+    "a0": 10,
+    "a1": 11,
+    "a2": 12,
+    "a3": 13,
+    "a4": 14,
+    "a5": 15,
+    "a6": 16,
+    "a7": 17,
+    "s2": 18,
+    "s3": 19,
+    "s4": 20,
+    "s5": 21,
+    "s6": 22,
+    "s7": 23,
+    "s8": 24,
+    "s9": 25,
+    "s10": 26,
+    "s11": 27,
+    "t3": 28,
+    "t4": 29,
+    "t5": 30,
+    "t6": 31,
+}
+
 
 class RiscvParser:
     COMMA = pp.Literal(",").suppress()
@@ -13,7 +49,9 @@ class RiscvParser:
     D_COL = pp.Literal(":").suppress()
     PLUS = pp.Literal("+").suppress()
 
-    pattern_register = pp.Group(pp.one_of("r x") + pp.Word(pp.nums))
+    pattern_register = pp.Group(
+        pp.one_of("x zero ra sp gp tp t s fp a") + pp.Optional(pp.Word(pp.nums))
+    )
 
     pattern_label = pp.Word(pp.alphas + "_", pp.alphanums + "_")("label")
 
@@ -100,6 +138,12 @@ class RiscvParser:
         + pp.StringEnd()
     ).ignore(pp.Char("#") + pp.rest_of_line())
 
+    def p_reg(self, parsed_register: pp.ParseResults) -> int:
+        if parsed_register[0] == "x":
+            return int(parsed_register[1])
+        else:
+            return reg_mapping["".join(parsed_register)]
+
     def parse_assembly(self, assembly: str) -> pp.ParseResults:
         """Turn assembly code into parse results.
 
@@ -159,9 +203,9 @@ class RiscvParser:
             if instruction_class.__base__ is instruction_types.RTypeInstruction:
                 instructions.append(
                     instruction_class(
-                        rs1=int(instruction_parsed.rs1[1]),
-                        rs2=int(instruction_parsed.rs2[1]),
-                        rd=int(instruction_parsed.rd[1]),
+                        rs1=self.p_reg(instruction_parsed.rs1),
+                        rs2=self.p_reg(instruction_parsed.rs2),
+                        rd=self.p_reg(instruction_parsed.rd),
                     )
                 )
             elif instruction_class.__base__ is instruction_types.ITypeInstruction:
@@ -170,15 +214,15 @@ class RiscvParser:
                         imm=int(instruction_parsed.imm),
                         # because an i type instruction may be written in two diffrent patterns the "reg" notation is used
                         # ex: lb x1, 33(x2) | addi x1, x2, 33
-                        rs1=int(instruction_parsed.reg2[1]),
-                        rd=int(instruction_parsed.reg1[1]),
+                        rs1=self.p_reg(instruction_parsed.reg2),
+                        rd=self.p_reg(instruction_parsed.reg1),
                     )
                 )
             elif instruction_class.__base__ is instruction_types.STypeInstruction:
                 instructions.append(
                     instruction_class(
-                        rs1=int(instruction_parsed.reg2[1]),
-                        rs2=int(instruction_parsed.reg1[1]),
+                        rs1=self.p_reg(instruction_parsed.reg2),
+                        rs2=self.p_reg(instruction_parsed.reg1),
                         imm=int(instruction_parsed.imm),
                     )
                 )
@@ -197,15 +241,15 @@ class RiscvParser:
 
                 instructions.append(
                     instruction_class(
-                        rs1=int(instruction_parsed.reg1[1]),
-                        rs2=int(instruction_parsed.reg2[1]),
+                        rs1=self.p_reg(instruction_parsed.reg1),
+                        rs2=self.p_reg(instruction_parsed.reg2),
                         imm=imm_val,
                     )
                 )
             elif instruction_class.__base__ is instruction_types.UTypeInstruction:
                 instructions.append(
                     instruction_class(
-                        rd=int(instruction_parsed.rd[1]),
+                        rd=self.p_reg(instruction_parsed.rd),
                         imm=int(instruction_parsed.imm),
                     )
                 )
@@ -224,23 +268,23 @@ class RiscvParser:
 
                 instructions.append(
                     instruction_class(
-                        rd=int(instruction_parsed.rd[1]),
+                        rd=self.p_reg(instruction_parsed.rd),
                         imm=imm_val,
                     )
                 )
             elif instruction_class.__base__ is instruction_types.CSRTypeInstruction:
                 instructions.append(
                     instruction_class(
-                        rd=int(instruction_parsed.rd[1]),
+                        rd=self.p_reg(instruction_parsed.rd),
                         csr=int(instruction_parsed.csr, 0),
-                        rs1=int(instruction_parsed.rs1[1]),
+                        rs1=self.p_reg(instruction_parsed.rs1),
                     )
                 )
             elif instruction_class.__base__ is instruction_types.CSRITypeInstruction:
                 # TODO: Add parser element for this type
                 instructions.append(
                     instruction_class(
-                        rd=int(instruction_parsed.rd[1]),
+                        rd=self.p_reg(instruction_parsed.rd),
                         csr=int(instruction_parsed.csr, 0),
                         uimm=int(instruction_parsed.uimm),
                     )

@@ -2116,6 +2116,29 @@ csrrwi x2, 0x448, 20
     program_3 = "add x5, x6, x6, x8"
     program_4 = "addidas x5, x6, 666"
 
+    program_5_abi = """
+Ananas:#dfsdfsdf
+add zero, ra, sp
+addi zero, ra, -20
+#aaaaa
+Banane:
+##asdsadad
+_Banune24_de:
+lb zero, 7(ra)
+sb ra, 666(sp)
+BEQ tp, t0, 42
+lui a2, 8000
+Chinakohl:
+jal s4, 220
+bne gp, a0, Banane
+jal a0, Ananas+0x24
+ecall
+ebreak
+fence a0, a2
+csrrw sp, 0x448, s1
+csrrwi sp, 0x448, 20
+"""
+
     expected = [
         "Ananas",
         ["add", ["x", "0"], ["x", "1"], ["x", "2"]],
@@ -2243,6 +2266,84 @@ csrrwi x2, 0x448, 20
             parser.parse_res_to_instructions(
                 parser.parse_assembly(self.program_4), start_address=0
             )
+
+        parser = RiscvParser()
+        instr = parser.parse_res_to_instructions(
+            parser.parse_assembly(self.program_5_abi), start_address=0
+        )
+
+        # add x0,x1,x2
+        self.assertIsInstance(instr[0], ADD)
+        self.assertEqual(instr[0].rd, 0)
+        self.assertEqual(instr[0].rs1, 1)
+        self.assertEqual(instr[0].rs2, 2)
+        # addi x0, x1, -20
+        self.assertIsInstance(instr[1], ADDI)
+        self.assertEqual(instr[1].rd, 0)
+        self.assertEqual(instr[1].rs1, 1)
+        self.assertEqual(instr[1].imm, -20)
+        # lb x0, 7(x1)
+        self.assertIsInstance(instr[2], LB)
+        self.assertEqual(instr[2].rd, 0)
+        self.assertEqual(instr[2].rs1, 1)
+        self.assertEqual(instr[2].imm, 7)
+
+        # sb x1, 666(x2)
+        self.assertIsInstance(instr[3], SB)
+        self.assertEqual(instr[3].rs1, 2)
+        self.assertEqual(instr[3].rs2, 1)
+        self.assertEqual(instr[3].imm, 666)
+
+        # BEQ x4, x5, 42
+        self.assertIsInstance(instr[4], BEQ)
+        self.assertEqual(instr[4].rs1, 4)
+        self.assertEqual(instr[4].rs2, 5)
+        self.assertEqual(instr[4].imm, 21)
+
+        # lui x12, 8000
+        self.assertIsInstance(instr[5], LUI)
+        self.assertEqual(instr[5].rd, 12)
+        self.assertEqual(instr[5].imm, 8000)
+
+        # jal x20, 220
+        self.assertIsInstance(instr[6], JAL)
+        self.assertEqual(instr[6].rd, 20)
+        self.assertEqual(instr[6].imm, 110)
+
+        # bne x3, x10, Banane
+        self.assertIsInstance(instr[7], BNE)
+        self.assertEqual(instr[7].rs1, 3)
+        self.assertEqual(instr[7].rs2, 10)
+        self.assertEqual(instr[7].imm, -10)
+
+        # jal x10, Ananas
+        self.assertIsInstance(instr[8], JAL)
+        self.assertEqual(instr[8].rd, 10)
+        self.assertEqual(instr[8].imm, 2)
+
+        # ecall
+        self.assertIsInstance(instr[9], ECALL)
+
+        # ebreak
+        self.assertIsInstance(instr[10], EBREAK)
+
+        # fence
+        self.assertIsInstance(instr[11], FENCE)
+        # TODO: currently not implemented
+        # self.assertEqual(instr[11].rd, 10)
+        # self.assertEqual(instr[11].rs1, 12)
+
+        # csrrw x2, 0x448, x9
+        self.assertIsInstance(instr[12], CSRRW)
+        self.assertEqual(instr[12].rd, 2)
+        self.assertEqual(instr[12].csr, 0x448)
+        self.assertEqual(instr[12].rs1, 9)
+
+        # csrrwi x2, 0x448, 20
+        self.assertIsInstance(instr[13], CSRRWI)
+        self.assertEqual(instr[13].rd, 2)
+        self.assertEqual(instr[13].csr, 0x448)
+        self.assertEqual(instr[13].uimm, 20)
 
     fibonacci = """lui x10, 0
     addi x10, x10, 10
