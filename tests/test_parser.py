@@ -302,7 +302,7 @@ fibonacci:
 
 """
 
-    def test_compiled_c_programm(self):
+    def test_c_fibonacci(self):
         simulation = Simulation(
             state=ArchitecturalState(
                 register_file=RegisterFile(registers=[0] * 32),
@@ -350,3 +350,62 @@ fibonacci:
             simulation.step_simulation()
             simulation.state.register_file.registers[0] = 0
         self.assertEqual(int(simulation.state.memory.load_word(4294967268)), 65)
+
+    fibonacci_c_abi = """main:
+	addi	sp,sp,-16
+	sw	ra,12(sp)
+	sw	s0,8(sp)
+	addi	s0,sp,16
+	addi	a0,zero,10
+	jal	ra,fibonacci
+	addi	a5,zero,0
+	addi	a0,a5,0
+	lw	ra,12(sp)
+	lw	s0,8(sp)
+	addi	sp,sp,16
+	jalr	zero,0(ra)
+fibonacci:
+	addi	sp,sp,-32
+	sw	ra,28(sp)
+	sw	s0,24(sp)
+	sw	s1,20(sp)
+	addi	s0,sp,32
+	sw	a0,-20(s0)
+	lw	a4,-20(s0)
+	addi	a5,zero,1
+	blt	a5,a4,fibonacci+0x2c
+	lw	a5,-20(s0)
+	jal	zero,fibonacci+0x58
+	lw	a5,-20(s0)
+	addi	a5,a5,-1
+	addi	a0,a5,0
+	jal	ra,fibonacci
+	addi	s1,a0,0
+	lw	a5,-20(s0)
+	addi	a5,a5,-2
+	addi	a0,a5,0
+	jal	ra,fibonacci
+	addi	a5,a0,0
+	add	a5,s1,a5
+	addi	a0,a5,0
+	lw	ra,28(sp)
+	lw	s0,24(sp)
+	lw	s1,20(sp)
+	addi	sp,sp,32
+	jalr	zero,0(ra)
+"""
+
+    def test_c_fibonacci_abi(self):
+        simulation = Simulation(
+            state=ArchitecturalState(
+                register_file=RegisterFile(registers=[0] * 32),
+                memory=Memory(memory_file={}),
+            ),
+            instructions={},
+        )
+        simulation.append_instructions(self.fibonacci_c_abi)
+        # print(simulation.instructions)
+        while simulation.state.program_counter != 24:
+            simulation.step_simulation()
+            simulation.state.register_file.registers[0] = 0
+        self.assertEqual(int(simulation.state.register_file.registers[15]), 55)

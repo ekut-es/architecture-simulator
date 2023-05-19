@@ -6,7 +6,7 @@ CFLAGS=-O0 -march=rv32i -nostdlib --entry main
 # -Mnumeric uses x0-x31 registers instead of ABI names
 # --no-show-raw-insn does not show hex code for instructions
 # --no-addresses does output instruction addresses
-OBJDUMP_FLAGS=-d -Mno-aliases -Mnumeric --no-show-raw-insn --no-addresses
+OBJDUMP_FLAGS=-d -Mno-aliases --no-show-raw-insn --no-addresses
 
 SED_FILTER=sed '/^\(<\|\t\)/!d' | sed 's/<\(.*\)>/\1/'
 
