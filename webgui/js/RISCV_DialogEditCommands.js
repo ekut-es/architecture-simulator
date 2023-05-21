@@ -105,7 +105,6 @@ class RISCV_DialogEditCommands {
 								this.#_command_execute_json.cmd_list.push(cmd_json);
 
 								this.#_input_cmd.value = "";
-								debugger;
 								this.#_initDialog();
 							}
 
