@@ -3,8 +3,6 @@ const registers = document.getElementById("registers");
 const memory = document.getElementById("memory");
 const input = document.getElementById("input");
 
-var arrayOfLines = input.value.split("\n");
-
 function addToOutput(s) {
     output.value += ">>>" + input.value + "\n" + s + "\n";
     output.scrollTop = output.scrollHeight;
@@ -27,7 +25,11 @@ const archsim_js = {
         document.getElementById("val_x"+reg).innerText = val
     },
     append_registers: function(reg_json_str) {
-
+        alert(simulation_json)
+        temp_simulation_json = JSON.parse(simulation_json)["reg_list"]
+        temp_simulation_json["reg_list"] = JSON.parse(reg_json_str)
+        simulation_json = JSON.stringify(temp_simulation_json)
+        alert(simulation_json)
     },
     append_memory: function(address, val) {
         tr = document.createElement("tr")
@@ -40,11 +42,15 @@ const archsim_js = {
         tr.appendChild(td2)
         memory.appendChild(tr)
     },
-    append_memories: function(mem_json_str) {
-
-    },
     update_memory: function(address, val) {
         document.getElementById("memory"+address).innerText = val
+    },
+    append_memories: function(mem_json_str) {
+        alert(simulation_json)
+        temp_simulation_json = JSON.parse(simulation_json)["reg_list"]
+        temp_simulation_json["reg_list"] = JSON.parse(mem_json_str)
+        simulation_json = JSON.stringify(temp_simulation_json)
+        alert(simulation_json)
     },
     append_instructions: function(cmd_json_str) {
         //setCommandString(cmd_json_str)
@@ -68,23 +74,27 @@ sim_init()
 }
 let pyodideReadyPromise = main();
 
-async function evaluatePython_step_sim(cmd_json_str) {
+async function evaluatePython_step_sim() {
     let pyodide = await pyodideReadyPromise;
-    alert("step");
-    alert(cmd_json_str);
+    alert("step")
+    alert(input.value.split("\n"))
+    cmd_json_str = JSON.stringify(input.value.split("\n"))
+    alert(cmd_json_str)
     try {
         step_sim = pyodide.globals.get("step_sim");
-        let output = step_sim('{"cmd_list":[{"add":"0x0000", "cmd":"add x4, x2, x3"} ]}');
+        let output = step_sim(cmd_json_str);
         addToOutput(output);
     } catch (err) {
         addToOutput(err);
     }
 }
 
-async function evaluatePython_run_sim(cmd_json_str) {
+async function evaluatePython_run_sim() {
     let pyodide = await pyodideReadyPromise;
-    alert("run");
-    alert(cmd_json_str);
+    alert("run")
+    alert(input.value.split("\n"))
+    cmd_json_str = JSON.stringify(input.value.split("\n"))
+    alert(cmd_json_str)
     try {
         run_sim = pyodide.globals.get("run_sim");
         let output = run_sim(cmd_json_str);

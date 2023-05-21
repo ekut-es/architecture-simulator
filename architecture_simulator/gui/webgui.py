@@ -29,7 +29,7 @@ def sim_init():
                 )
             ),
         ),
-        instructions={0: ADD(rd=1, rs1=2, rs2=3)},
+        instructions={},
     )
 
     # appends all the registers either one at a time, or all at once with a json string
@@ -37,16 +37,18 @@ def sim_init():
     for reg_i in range(len(simulation.state.register_file.registers)):
         json_array.append({reg_i: simulation.state.register_file.registers[reg_i]})
         archsim_js.append_register(
-            reg_i, int(simulation.state.register_file.registers[reg_i])
+            reg_i,
+            int(simulation.state.register_file.registers[reg_i]),
+            json.dumps({"reg_list": json_array}),
         )
-    archsim_js.append_registers(json.dumps({"reg_list": json_array}))
 
     # appends all the memory either one at a time or all at once with a json string
     json_array = []
     for address, address_val in simulation.state.memory.memory_file.items():
-        json_array.append({hex(address): bin(address_val)})
-        archsim_js.append_memory(hex(address), bin(address_val))
-    archsim_js.append_memories({"mem_list": json_array})
+        json_array.append({hex(address): int(address_val)})
+        archsim_js.append_memory(
+            hex(address), int(address_val), {"mem_list": json_array}
+        )
 
     # create a json string with all instructions in it
     """json_array = []
@@ -65,11 +67,10 @@ def step_sim(instr: str):
     # parse the instr json string into a python dict
     if simulation.instructions == {}:
         instr_parsed = json.loads(instr)
-        instr_list = instr_parsed["cmd_list"]
         instr_str = ""
         # append all instructions
-        for cmd in instr_list:
-            instr_str = instr_str + " " + cmd["cmd"]
+        for cmd in instr_parsed:
+            instr_str = instr_str + " " + cmd
         simulation.append_instructions(instr_str)
 
     # step the simulation
@@ -77,11 +78,11 @@ def step_sim(instr: str):
 
     # update the registers after exeution of the instruction/s
     for reg_i, reg_val in enumerate(simulation.state.register_file.registers):
-        archsim_js.update_register(reg_i, reg_val)
+        archsim_js.update_register(reg_i, reg_val, "")
 
     # update the memory after exeution of the instruction/s
     for address, address_val in simulation.state.memory.memory_file.items():
-        archsim_js.update_memory(hex(address), bin(address_val))
+        archsim_js.update_memory(hex(address), bin(address_val), "")
 
     return simulation
 
@@ -97,22 +98,21 @@ def run_sim(instr: str):
 
     # parse the instr json string into a python dict
     instr_parsed = json.loads(instr)
-    instr_list = instr_parsed["cmd_list"]
     instr_str = ""
     # append all instructions
-    for cmd in instr_list:
-        instr_str = instr_str + " " + cmd["cmd"]
+    for cmd in instr_parsed:
+        instr_str = instr_str + " " + cmd
     simulation.append_instructions(instr_str)
     # run the simulation
     simulation.run_simulation()
 
     # update the registers after exeution of the instruction/s
     for reg_i, reg_val in enumerate(simulation.state.register_file.registers):
-        archsim_js.update_register(reg_i, reg_val)
+        archsim_js.update_register(reg_i, reg_val, "")
 
     # update the memory after exeution of the instruction/s
     for address, address_val in simulation.state.memory.memory_file.items():
-        archsim_js.update_memory(hex(address), bin(address_val))
+        archsim_js.update_memory(hex(address), bin(address_val), "")
 
     return simulation
 
@@ -131,7 +131,7 @@ def reset_sim():
     for reg_i in range(len(simulation.state.register_file.registers)):
         # json_array.append({reg_i: int(simulation.state.register_file.registers[reg_i])})
         archsim_js.append_register(
-            reg_i, int(simulation.state.register_file.registers[reg_i])
+            reg_i, int(simulation.state.register_file.registers[reg_i], "")
         )
     # archsim_js.append_registers(json.dumps({"reg_list": json_array}))
 
@@ -139,7 +139,7 @@ def reset_sim():
     # json_array = []
     for address, address_val in simulation.state.memory.memory_file.items():
         # json_array.append({hex(address): bin(address_val)})
-        archsim_js.append_memory(hex(address), int(address_val))
+        archsim_js.append_memory(hex(address), int(address_val), "")
     # archsim_js.append_memories({"mem_list": json_array})
 
     return simulation
