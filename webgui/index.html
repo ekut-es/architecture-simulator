@@ -15,7 +15,7 @@
 	<script type="text/javascript">
 		let dialogEditCommands = null;
 
-		let simulation_json = '{"cmd_list":[], "reg_list":[], "memory_list":[]}';
+		let simulation_json = '{"cmd_list":[], "reg_list":[], "mem_list":[]}';
 
 		window.addEventListener('DOMContentLoaded', function () {
 			dialogEditCommands = new RISCV_DialogEditCommands( 	"webapp_dialog_EditCommandsID",
@@ -110,7 +110,6 @@
     <textarea id="input" style="width: 100%;" rows="20" ></textarea>
 	  <div>Output:</div>
     <textarea id="output" style="width: 100%;" rows="20" disabled></textarea>
-	<button onclick="evaluatePython_step_sim()">Run</button>
 	<footer id="webapp_footer_id">
 	</footer>
 	<!--  ****************** Modale Form ********************************************* -->

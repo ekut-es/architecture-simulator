@@ -25,11 +25,10 @@ const archsim_js = {
         document.getElementById("val_x"+reg).innerText = val
     },
     append_registers: function(reg_json_str) {
-        alert(simulation_json)
-        temp_simulation_json = JSON.parse(simulation_json)["reg_list"]
-        temp_simulation_json["reg_list"] = JSON.parse(reg_json_str)
+        temp_simulation_json = JSON.parse(simulation_json)
+        temp_reg_json_str = JSON.parse(reg_json_str)
+        temp_simulation_json.reg_list = temp_reg_json_str
         simulation_json = JSON.stringify(temp_simulation_json)
-        alert(simulation_json)
     },
     append_memory: function(address, val) {
         tr = document.createElement("tr")
@@ -43,14 +42,27 @@ const archsim_js = {
         memory.appendChild(tr)
     },
     update_memory: function(address, val) {
+        try{
         document.getElementById("memory"+address).innerText = val
+        }
+        catch
+        {
+        tr = document.createElement("tr")
+        td1 = document.createElement("td")
+        td1.innerText = address
+        td2 = document.createElement("td")
+        td2.innerText = val
+        td2.id = "memory"+address
+        tr.appendChild(td1)
+        tr.appendChild(td2)
+        memory.appendChild(tr)
+        }
     },
     append_memories: function(mem_json_str) {
-        alert(simulation_json)
-        temp_simulation_json = JSON.parse(simulation_json)["reg_list"]
-        temp_simulation_json["reg_list"] = JSON.parse(mem_json_str)
+        temp_simulation_json = JSON.parse(simulation_json)
+        temp_mem_json_str = JSON.parse(mem_json_str)
+        temp_simulation_json.mem_list = temp_mem_json_str
         simulation_json = JSON.stringify(temp_simulation_json)
-        alert(simulation_json)
     },
     append_instructions: function(cmd_json_str) {
         //setCommandString(cmd_json_str)
@@ -79,7 +91,6 @@ async function evaluatePython_step_sim() {
     alert("step")
     alert(input.value.split("\n"))
     cmd_json_str = JSON.stringify(input.value.split("\n"))
-    alert(cmd_json_str)
     try {
         step_sim = pyodide.globals.get("step_sim");
         let output = step_sim(cmd_json_str);
