@@ -23,6 +23,7 @@
 																"webapp_dialog_EditCommandsTextInputID",
 																"webapp_dialog_EditCommandsFooterBtnOkID",
 																"webapp_dialog_EditCommandsFooterBtnCnlID",
+                                "gui_cmd_table_body_id",
 								);
 
 			document.getElementById("button_gui_cmd_edit_id").addEventListener("click", () => {
@@ -83,8 +84,12 @@
 							<th title="Auszuführender Befehl">Command</th>
 						</tr>
 					</thead>
-					<tbody id="gui_cmd_table_body_id">
-					</tbody>
+          <tbody id="gui_cmd_table_body_id">
+            <tr>
+              <td></td>
+              <td>0X0000</td>
+              <td>SUB A0, T0, T1</td>
+            </tr>
 				</table>
 			</div>
 		</div>

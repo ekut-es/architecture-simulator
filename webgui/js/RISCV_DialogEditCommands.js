@@ -22,7 +22,9 @@ class RISCV_DialogEditCommands {
 
 	#_command_validate_json;
 
-	constructor(dialog_id, deploy_element_id, input_cmd_id, cmd_btn_ok_id, cmd_btn_cnl_id){
+	#_main_cmd_table;
+
+	constructor(dialog_id, deploy_element_id, input_cmd_id, cmd_btn_ok_id, cmd_btn_cnl_id, main_cmd_table_id){
 
 		this.#_dialog					= document.getElementById(dialog_id);
 
@@ -34,7 +36,7 @@ class RISCV_DialogEditCommands {
 
 		this.#_cmd_btn_cnl	 			= document.getElementById(cmd_btn_cnl_id); //Abbrechen in dialog
 
-		
+		this.#_main_cmd_table			= document.getElementById(main_cmd_table_id);
 
 		// create actual json and load it here
 
@@ -103,9 +105,8 @@ class RISCV_DialogEditCommands {
 								this.#_command_execute_json.cmd_list.push(cmd_json);
 
 								this.#_input_cmd.value = "";
-
+								debugger;
 								this.#_initDialog();
-
 							}
 
 						}
@@ -119,10 +120,12 @@ class RISCV_DialogEditCommands {
 			
 
 			this.#_cmd_btn_ok.addEventListener("click", () => {
-
+				
 				this.#_dialog.close();
 
 				simulation_json = JSON.parse(JSON.stringify(this.#_command_execute_json));
+
+				this.updateMainCommandTable();
 
 			});
 
@@ -219,6 +222,56 @@ class RISCV_DialogEditCommands {
 			if(this.#_deploy_element && this.#_command_execute_json){
 
 				this.#_initDialog();
+
+			}
+
+		}
+
+	}
+
+	updateMainCommandTable(){
+
+		if(this.#_main_cmd_table && this.#_command_execute_json){
+
+			while (this.#_main_cmd_table.firstChild) {
+
+				this.#_main_cmd_table.removeChild(this.#_main_cmd_table.firstChild);
+
+			}
+
+			for(let cmd_idx = 0; cmd_idx < this.#_command_execute_json.cmd_list.length; cmd_idx ++){
+
+				let html_el_table_td_row = document.createElement("tr");
+
+				if(html_el_table_td_row){
+
+					let html_el_table_td_empty = document.createElement("td");
+					let html_el_table_td_pc = document.createElement("td");
+
+					if(html_el_table_td_pc){
+
+						html_el_table_td_pc.innerHTML = this.#_command_execute_json.cmd_list[cmd_idx].add; 
+
+						html_el_table_td_row.appendChild(html_el_table_td_empty);
+						html_el_table_td_row.appendChild(html_el_table_td_pc);
+
+					}
+
+					let html_el_table_td_cmd = document.createElement("td");
+
+					if(html_el_table_td_cmd){
+
+					html_el_table_td_cmd.innerHTML = this.#_command_execute_json.cmd_list[cmd_idx].cmd;
+
+						html_el_table_td_row.appendChild(html_el_table_td_cmd);
+
+					}
+
+					this.#_main_cmd_table.appendChild(html_el_table_td_row);
+
+				}
+
+				document.getElementById("webapp_dialog_EditCommandsPcAddressID").value = cmd_idx;
 
 			}
 

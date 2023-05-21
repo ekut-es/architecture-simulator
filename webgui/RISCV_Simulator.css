@@ -1,46 +1,91 @@
-.tool_toolbox {
-    overflow: hidden;
-    color: black;
-    padding-top: 5px;
-	padding-left: 5px;
-	padding-right: 20px;
-	padding-bottom: 2px;
-	border-radius: 4px;
-	background-color: var(--tool_footer_color);
-    text-align: left;
-}
-.tool_toolbox select:hover{
-    background-color: #DDDDDD;
-    color: black;
-}
-.tool_toolbox label{
-	color: var(--app_nav_text_color);
-	text-align: right;
-	padding-top: 1px;
-	padding-left: 10px;
-	padding-right: 10px;
-	font-family: var(--tool_font_family);
-	font-size: 16px;
-	font-weight: bold;
-}
-.tool_toolbox input[type=text]{ 
-	border-radius: 3px;
-	border-top: none;
-	border-left: none;
-	padding-right: 10px;
-	color:var(--app_nav_text_color);
-	font-size: 14px;
-	height: 20px;
-	width: 90px;
-}
-.button_search_lot {
-	color:var(--app_nav_text_color);
-	font-size: 15px;
-	border-radius: 4px;
-	padding-left: 10px;
-    text-decoration: none;
-    margin: 1px;
-    cursor: pointer;
-	height: 25px;
-	width: 90px;
+.tool_toolbox {
+
+    overflow: hidden;
+
+    color: black;
+
+    padding-top: 5px;
+
+	padding-left: 5px;
+
+	padding-right: 20px;
+
+	padding-bottom: 2px;
+
+	border-radius: 4px;
+
+	background-color: var(--tool_footer_color);
+
+    text-align: left;
+
+}
+
+.tool_toolbox select:hover{
+
+    background-color: #DDDDDD;
+
+    color: black;
+
+}
+
+.tool_toolbox label{
+
+	color: var(--app_nav_text_color);
+
+	text-align: right;
+
+	padding-top: 1px;
+
+	padding-left: 10px;
+
+	padding-right: 10px;
+
+	font-family: var(--tool_font_family);
+
+	font-size: 16px;
+
+	font-weight: bold;
+
+}
+
+.tool_toolbox input[type=text]{ 
+
+	border-radius: 3px;
+
+	border-top: none;
+
+	border-left: none;
+
+	padding-right: 10px;
+
+	color:var(--app_nav_text_color);
+
+	font-size: 14px;
+
+	height: 20px;
+
+	width: 90px;
+
+}
+
+.button_search_lot {
+
+	color:var(--app_nav_text_color);
+
+	font-size: 15px;
+
+	border-radius: 4px;
+
+	padding-left: 10px;
+
+    text-decoration: none;
+
+    margin: 1px;
+
+    cursor: pointer;
+
+	height: 25px;
+
+	width: 90px;
+
 }
