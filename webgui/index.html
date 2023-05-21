@@ -42,6 +42,8 @@
 			});
 
 			document.getElementById("button_simulation_stop_id").addEventListener("click", () => {
+				dialogEditCommands.updateMainCommandTable();
+				evaluatePython_step_sim(simulation_json);
 				evaluatePython_reset_sim();
 			});
 
