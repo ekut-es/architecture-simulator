@@ -2,6 +2,9 @@ const output = document.getElementById("output");
 const code = document.getElementById("code");
 const registers = document.getElementById("registers");
 const memory = document.getElementById("memory");
+const input = document.getElementById("input");
+
+var arrayOfLines = input.value.split("\n");
 
 function addToOutput(s) {
     output.value += ">>>" + code.value + "\n" + s + "\n";
@@ -72,7 +75,7 @@ async function evaluatePython_step_sim(cmd_json_str) {
     alert(cmd_json_str);
     try {
         step_sim = pyodide.globals.get("step_sim");
-        let output = step_sim(cmd_json_str);
+        let output = step_sim('{"cmd_list":[{"add":"0x0000", "cmd":"add x4, x2, x3"} ]}');
         addToOutput(output);
     } catch (err) {
         addToOutput(err);

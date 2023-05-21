@@ -65,9 +65,11 @@ def step_sim(instr: str):
     # parse the instr json string into a python dict
     instr_parsed = json.loads(instr)
     instr_list = instr_parsed["cmd_list"]
+    instr_str = ""
     # append all instructions
     for cmd in instr_list:
-        simulation.append_instructions(cmd["cmd"])
+        instr_str = instr_str + " " + cmd["cmd"]
+    simulation.append_instructions(instr_str)
 
     # step the simulation
     simulation.step_simulation()
@@ -92,10 +94,11 @@ def run_sim(instr: str):
     # parse the instr json string into a python dict
     instr_parsed = json.loads(instr)
     instr_list = instr_parsed["cmd_list"]
+    instr_str = ""
     # append all instructions
     for cmd in instr_list:
-        simulation.append_instructions(cmd["cmd"])
-
+        instr_str = instr_str + " " + cmd["cmd"]
+    simulation.append_instructions(instr_str)
     # run the simulation
     simulation.run_simulation()
 
