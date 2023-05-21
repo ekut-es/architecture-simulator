@@ -90,6 +90,7 @@ async function evaluatePython_step_sim() {
     let pyodide = await pyodideReadyPromise;
     alert("step")
     alert(input.value.split("\n"))
+    alert(simulation_json)
     cmd_json_str = JSON.stringify(input.value.split("\n"))
     try {
         step_sim = pyodide.globals.get("step_sim");

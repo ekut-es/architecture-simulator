@@ -136,7 +136,7 @@ def reset_sim():
     # appends all the registers either one at a time, or all at once with a json string
     json_array = []
     for reg_i, reg_val in enumerate(simulation.state.register_file.registers):
-        json_array.append({"index": reg_i, "value": reg_val})
+        json_array.append({"index": int(reg_i), "value": int(reg_val)})
         archsim_js.append_register(reg_i, int(reg_val))
     archsim_js.append_registers(json.dumps(json_array))
 

@@ -15,7 +15,7 @@
 	<script type="text/javascript">
 		let dialogEditCommands = null;
 
-		let simulation_json = '{"cmd_list":[], "reg_list":[], "mem_list":[]}';
+		let simulation_json = '{"cmd_list":[{"add":"0x0000", "cmd":"SUB A0, T0, T2"}, {"add":"0x0004", "cmd":"ADD A0, T0, T2"}], "reg_list":[], "mem_list":[]}';
 
 		window.addEventListener('DOMContentLoaded', function () {
 			dialogEditCommands = new RISCV_DialogEditCommands( 	"webapp_dialog_EditCommandsID",
@@ -37,20 +37,29 @@
 
 			document.getElementById("button_simulation_start_id").addEventListener("click", () => {
 				evaluatePython_run_sim();
+				dialogEditCommands.updateMainCommandTable();
+				dialogEditCommands.updateMainMemoryTable();
+				dialogEditCommands.updateMainRegistersTable();
 			});
 
 			document.getElementById("button_simulation_next_id").addEventListener("click", () => {
 				evaluatePython_step_sim();
 				dialogEditCommands.updateMainCommandTable();
-				//dialogEditCommands.updateMainMemoryTable();
-				//dialogEditCommandsupdateMainRegisterTable();
+				dialogEditCommands.updateMainMemoryTable();
+				dialogEditCommands.updateMainRegistersTable();
 			});
 
 			document.getElementById("button_simulation_stop_id").addEventListener("click", () => {
 				evaluatePython_reset_sim();
+				dialogEditCommands.updateMainCommandTable();
+				dialogEditCommands.updateMainMemoryTable();
+				dialogEditCommands.updateMainRegistersTable();
 			});
 
 		});
+		dialogEditCommands.updateMainCommandTable();
+		dialogEditCommands.updateMainMemoryTable();
+		dialogEditCommands.updateMainRegistersTable();
 		// ask if you really wanna leave the site
 		window.onbeforeunload = function() {
 			return true;
