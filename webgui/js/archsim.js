@@ -1,5 +1,4 @@
 const output = document.getElementById("output");
-const code = document.getElementById("code");
 const registers = document.getElementById("registers");
 const memory = document.getElementById("memory");
 const input = document.getElementById("input");
@@ -7,7 +6,7 @@ const input = document.getElementById("input");
 var arrayOfLines = input.value.split("\n");
 
 function addToOutput(s) {
-    output.value += ">>>" + code.value + "\n" + s + "\n";
+    output.value += ">>>" + input.value + "\n" + s + "\n";
     output.scrollTop = output.scrollHeight;
 }
 
@@ -89,6 +88,19 @@ async function evaluatePython_run_sim(cmd_json_str) {
     try {
         run_sim = pyodide.globals.get("run_sim");
         let output = run_sim(cmd_json_str);
+        addToOutput(output);
+    } catch (err) {
+        addToOutput(err);
+    }
+}
+
+async function evaluatePython_reset_sim() {
+    let pyodide = await pyodideReadyPromise;
+    registers.innerHTML = ""
+    memory.innerHTML = ""
+    try {
+        reset_sim = pyodide.globals.get("reset_sim");
+        let output = reset_sim();
         addToOutput(output);
     } catch (err) {
         addToOutput(err);
