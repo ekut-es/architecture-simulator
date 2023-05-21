@@ -63,13 +63,14 @@ def step_sim(instr: str):
         raise RuntimeError("state has not been initialized.")
 
     # parse the instr json string into a python dict
-    instr_parsed = json.loads(instr)
-    instr_list = instr_parsed["cmd_list"]
-    instr_str = ""
-    # append all instructions
-    for cmd in instr_list:
-        instr_str = instr_str + " " + cmd["cmd"]
-    simulation.append_instructions(instr_str)
+    if simulation.instructions == {}:
+        instr_parsed = json.loads(instr)
+        instr_list = instr_parsed["cmd_list"]
+        instr_str = ""
+        # append all instructions
+        for cmd in instr_list:
+            instr_str = instr_str + " " + cmd["cmd"]
+        simulation.append_instructions(instr_str)
 
     # step the simulation
     simulation.step_simulation()
@@ -90,6 +91,9 @@ def run_sim(instr: str):
     global simulation
     if simulation is None:
         raise RuntimeError("state has not been initialized.")
+
+    # reset the instruction list
+    simulation.instructions = {}
 
     # parse the instr json string into a python dict
     instr_parsed = json.loads(instr)
