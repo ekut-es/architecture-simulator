@@ -88,7 +88,7 @@ input:valid {
 
 	 background:var(--input_valid_color);
 
- } 
+ }
 
 input:invalid {
 
@@ -96,7 +96,7 @@ input:invalid {
 
  }
 
- 
+
 
  input:in-range {
 
@@ -390,7 +390,7 @@ body footer {
 
 	width: 				29px;
 
-}	
+}
 
 .button_pause_simulation {
 
@@ -418,7 +418,7 @@ body footer {
 
 }
 
-	
+
 
 .button_next_step_simulation {
 
@@ -444,7 +444,7 @@ body footer {
 
 	width: 				29px;
 
-}	
+}
 
 
 
@@ -504,7 +504,7 @@ body main #gui_cmd_div_id .button_edit_cmd {
 
 	width: 				29px;
 
-}	
+}
 
 
 
@@ -555,7 +555,7 @@ body main #gui_cmd_table_id th 	{
 body main #gui_cmd_table_id th:nth-child(1) {
 
 	width: 				30px;
-	
+
 	border: 			0px solid #9a9393;
 
 	background-color: var(--app_main_bg_color);
@@ -568,7 +568,7 @@ body main #gui_cmd_table_id th:nth-child(2) {
 
 }
 
-body main #gui_cmd_table_id td 	{ 
+body main #gui_cmd_table_id td 	{
 
 	padding-top: 		1px;
 
@@ -606,7 +606,10 @@ body main #gui_cmd_table_id td:nth-child(2) {
 
 	width: 				60px;
 
-body main #gui_cmd_table_id select {
+}
+
+
+body main #gui_memory_table_id select {
 
 	padding: 			1px;
 
@@ -618,7 +621,310 @@ body main #gui_cmd_table_id select {
 
 }
 
-body main #gui_cmd_table_id option:disabled {
+body main #gui_memory_table_id option:disabled {
+
+	color: 				#F78181;
+
+}
+
+
+
+body main #gui_memory_div_id {
+
+	/*background-color: 	DodgerBlue;*/
+
+	margin-top: 		10px;
+
+	margin-bottom: 		30px;
+
+	margin-right: 		30px;
+
+	margin-left: 		30px;
+
+	width: 				230px;
+
+	overflow-x: 		hidden;
+
+	overflow-y: 		auto;
+
+}
+
+
+
+body main #gui_memory_table_id {
+
+	table-layout: 		fixed;
+
+	font-family: 		"Trebuchet MS", Arial, Helvetica, sans-serif;
+
+	font-size: 			11px;
+
+	border-collapse: 	collapse;
+
+	margin: 			1px auto;
+
+	padding-top: 		40px;
+
+	width: 				100%;
+
+}
+
+body main #gui_memory_table_id th 	{
+
+	padding-top: 		1px;
+
+	padding-bottom: 	1px;
+
+	padding-left: 		1px;
+
+	text-align: 		center;
+
+	font-weight: 		bold;
+
+	font-size: 			12px;
+
+	vertical-align: 	middle;
+
+	border: 			1px solid #848484;
+
+	background-color: 	#848484;
+
+	color: 				white;
+
+	height: 			25px;
+
+}
+
+body main #gui_memory_table_id th:nth-child(1) {
+
+	width: 				30px;
+
+	border: 			0px solid #9a9393;
+
+	background-color: var(--app_main_bg_color);
+
+}
+
+body main #gui_memory_table_id th:nth-child(2) {
+
+	width: 				60px;
+
+}
+
+body main #gui_memory_table_id td 	{
+
+	padding-top: 		1px;
+
+	padding-bottom: 	1px;
+
+	padding-left: 		5px;
+
+	text-align: 		center;
+
+	font-size: 			12px;
+
+	vertical-align: 	middle;
+
+	border: 			1px solid #9a9393;
+
+	color: 				#585858;
+
+	background-color: 	white;
+
+	height: 			25px;
+
+}
+
+body main #gui_memory_table_id td:nth-child(1) {
+
+	border: 			0px solid #9a9393;
+
+	background-color: var(--app_main_bg_color);
+
+	width: 				30px;
+
+}
+
+body main #gui_memory_table_id td:nth-child(2) {
+
+	width: 				60px;
+
+}
+
+body main #gui_memory_table_id select {
+
+	padding: 			1px;
+
+	width: 				80px;
+
+	height: 			25px;
+
+	margin-top: 		0px;
+
+}
+
+body main #gui_memory_table_id option:disabled {
+
+	color: 				#F78181;
+
+}
+
+
+body main #gui_memory_table_id select {
+
+	padding: 			1px;
+
+	width: 				80px;
+
+	height: 			25px;
+
+	margin-top: 		0px;
+
+}
+
+body main #gui_memory_table_id option:disabled {
+
+	color: 				#F78181;
+
+}
+
+
+
+body main #gui_registers_div_id {
+
+	/*background-color: 	DodgerBlue;*/
+
+	margin-top: 		10px;
+
+	margin-bottom: 		30px;
+
+	margin-right: 		30px;
+
+	margin-left: 		30px;
+
+	width: 				230px;
+
+	overflow-x: 		hidden;
+
+	overflow-y: 		auto;
+
+}
+
+
+
+body main #gui_registers_table_id {
+
+	table-layout: 		fixed;
+
+	font-family: 		"Trebuchet MS", Arial, Helvetica, sans-serif;
+
+	font-size: 			11px;
+
+	border-collapse: 	collapse;
+
+	margin: 			1px auto;
+
+	padding-top: 		40px;
+
+	width: 				100%;
+
+}
+
+body main #gui_registers_table_id th 	{
+
+	padding-top: 		1px;
+
+	padding-bottom: 	1px;
+
+	padding-left: 		1px;
+
+	text-align: 		center;
+
+	font-weight: 		bold;
+
+	font-size: 			12px;
+
+	vertical-align: 	middle;
+
+	border: 			1px solid #848484;
+
+	background-color: 	#848484;
+
+	color: 				white;
+
+	height: 			25px;
+
+}
+
+body main #gui_registers_table_id th:nth-child(1) {
+
+	width: 				30px;
+
+	border: 			0px solid #9a9393;
+
+	background-color: var(--app_main_bg_color);
+
+}
+
+body main #gui_registers_table_id th:nth-child(2) {
+
+	width: 				60px;
+
+}
+
+body main #gui_registers_table_id td 	{
+
+	padding-top: 		1px;
+
+	padding-bottom: 	1px;
+
+	padding-left: 		5px;
+
+	text-align: 		center;
+
+	font-size: 			12px;
+
+	vertical-align: 	middle;
+
+	border: 			1px solid #9a9393;
+
+	color: 				#585858;
+
+	background-color: 	white;
+
+	height: 			25px;
+
+}
+
+body main #gui_registers_table_id td:nth-child(1) {
+
+	border: 			0px solid #9a9393;
+
+	background-color: var(--app_main_bg_color);
+
+	width: 				30px;
+
+}
+
+body main #gui_registers_table_id td:nth-child(2) {
+
+	width: 				60px;
+
+}
+
+body main #gui_registers_table_id select {
+
+	padding: 			1px;
+
+	width: 				80px;
+
+	height: 			25px;
+
+	margin-top: 		0px;
+
+}
+
+body main #gui_registers_table_id option:disabled {
 
 	color: 				#F78181;
 

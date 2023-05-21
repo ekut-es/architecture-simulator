@@ -24,11 +24,13 @@
 																"webapp_dialog_EditCommandsFooterBtnOkID",
 																"webapp_dialog_EditCommandsFooterBtnCnlID",
                                 "gui_cmd_table_body_id",
+								"gui_memory_table_body_id",
+								"gui_registers_table_body_id"
 								);
 
 			document.getElementById("button_gui_cmd_edit_id").addEventListener("click", () => {
 				if(dialogEditCommands){
-					dialogEditCommands.setCommandString('{"cmd_list":[{"add":"0x0000", "cmd":"SUB A0, T0, T2"}, {"add":"0x0004", "cmd":"ADD A0, T0, T2"}]}'); //placeholder, load json from simulator
+					dialogEditCommands.setCommandString('{"cmd_list":[{"add":"0x0000", "cmd":"SUB A0, T0, T2"}, {"add":"0x0004", "cmd":"ADD A0, T0, T2"}],"memory_list":[{"index":"0x0000", "value":"0x0000"}, {"index":"0x0001", "value":"0xFFFF"}], "registers_list":[{"index":"0x0000", "value":"0x0000"}, {"index":"0x0001", "value":"0x0AAA"}]}'); //placeholder, load json from simulator
 					dialogEditCommands.openDialog();
 				}
 			});
@@ -56,16 +58,16 @@
 		<img 	id="webapp_header_icon_image_id" src="RISCV_HeaderIcon.svg"/>
 	</header>
 	<nav id="webapp_nav_id">
-		<button type="button" id="button_simulation_start_id" class="button_start_simulation" title="Simulation starten">
+		<button type="button" id="button_simulation_start_id" class="button_start_simulation" title="start simulation">
 			<img src="start.svg" width="25px" height="25px">
 		</button>
-		<button type="button" id="button_simulation_pause_id" class="button_pause_simulation" title="Simulation pause">
+		<button type="button" id="button_simulation_pause_id" class="button_pause_simulation" title="pause simulation">
 			<img src="pause.svg" width="25px" height="25px">
 		</button>
-		<button type="button" id="button_simulation_next_id" class="button_next_step_simulation" title="Simulation nächster Befehl">
+		<button type="button" id="button_simulation_next_id" class="button_next_step_simulation" title="next step">
 			<img src="next.svg" width="25px" height="25px">
 		</button>
-		<button type="button" id="button_simulation_stop_id" class="button_stop_simulation" title="Simulation beenden">
+		<button type="button" id="button_simulation_stop_id" class="button_stop_simulation" title="reset">
 			<img src="stop.svg" width="25px" height="25px">
 		</button>
 	</nav>
@@ -76,12 +78,12 @@
 					<thead>
 						<tr>
 							<th>
-								<button type="button" id="button_gui_cmd_edit_id" class="button_edit_cmd" title="Simulation beenden">
+								<button type="button" id="button_gui_cmd_edit_id" class="button_edit_cmd" title="edit input">
 									<img src="cmd_edit.svg" width="20px" height="20px">
 								</button>
 							</th>
 							<th title="Programm Counter">PC</th>
-							<th title="Auszuführender Befehl">Command</th>
+							<th title="Command">Command</th>
 						</tr>
 					</thead>
           <tbody id="gui_cmd_table_body_id">
@@ -92,7 +94,37 @@
             </tr>
 				</table>
 			</div>
+			<div id="gui_registers_div_id">
+					<table id="gui_registers_table_id">
+						<thead>
+							<tr>
+								<th>
+								</th>
+								<th title="register">Register</th>
+								<th title="register value">Hex Value</th>
+							</tr>
+						</thead>
+						<tbody id="gui_registers_table_body_id">
+					</tbody>
+				</table>
+			</div>
+			<div id="gui_memory_div_id">
+				<table id="gui_memory_table_id">
+					<thead>
+						<tr>
+							<th>
+							</th>
+							<th title="memory address">address</th>
+							<th title="memory value">Hex Value</th>
+						</tr>
+					</thead>
+					<tbody id="gui_memory_table_body_id">
+					</tbody>
+				</table>
+			</div>
+
 		</div>
+
     </main>
 	<table>
 		<thead><td>Register</td><td>Value</td></thead>

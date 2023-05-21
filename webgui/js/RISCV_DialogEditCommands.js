@@ -24,11 +24,15 @@ class RISCV_DialogEditCommands {
 
 	#_main_cmd_table;
 
-	constructor(dialog_id, deploy_element_id, input_cmd_id, cmd_btn_ok_id, cmd_btn_cnl_id, main_cmd_table_id){
+	#_main_memory_table;
+
+	#_main_registers_table
+
+	constructor(dialog_id, deploy_element_id, input_cmd_id, cmd_btn_ok_id, cmd_btn_cnl_id, main_cmd_table_id, main_memory_table_id, main_registers_table_id){
 
 		this.#_dialog					= document.getElementById(dialog_id);
 
-		this.#_deploy_element	 		= document.getElementById(deploy_element_id); // table body of dialog - add instructions dialog 
+		this.#_deploy_element	 		= document.getElementById(deploy_element_id); // table body of dialog - add instructions dialog
 
 		this.#_input_cmd				= document.getElementById(input_cmd_id);
 
@@ -38,27 +42,32 @@ class RISCV_DialogEditCommands {
 
 		this.#_main_cmd_table			= document.getElementById(main_cmd_table_id);
 
+		this.#_main_memory_table		= document.getElementById(main_memory_table_id);
+
+		this.#_main_registers_table		= document.getElementById(main_registers_table_id);
+
+
 		// create actual json and load it here
 
-		let temp_validation_json_str 	= 	'{"cmd":[' 																					+ 
+		let temp_validation_json_str 	= 	'{"cmd":[' 																					+
 
-											'	{"cmd":"SUB ", 	"reg_expr":"^SUB [AT]{1}[0-9]{1}, [T]{1}[0-9]{1}, [T]{1}[0-9]{1}"},' 		+ 
+											'	{"cmd":"SUB ", 	"reg_expr":"^SUB [AT]{1}[0-9]{1}, [T]{1}[0-9]{1}, [T]{1}[0-9]{1}"},' 		+
 
-											'	{"cmd":"SUBI", 	"reg_expr":"^SUBI[AT]{1}[0-9]{1}, [T]{1}[0-9]{1}, [T]{1}[0-9]{1}"} ' 		+ 
+											'	{"cmd":"SUBI", 	"reg_expr":"^SUBI[AT]{1}[0-9]{1}, [T]{1}[0-9]{1}, [T]{1}[0-9]{1}"} ' 		+
 
 											']}';
 
-		
+
 
 		if(typeof temp_validation_json_str == "string" && temp_validation_json_str.length){
 
-			
+
 
 			this.#_command_validate_json= JSON.parse(temp_validation_json_str);
 
 		}
 
-				
+
 
 		if(this.#_dialog && this.#_deploy_element && this.#_input_cmd && this.#_cmd_btn_ok && this.#_cmd_btn_cnl){
 
@@ -84,7 +93,7 @@ class RISCV_DialogEditCommands {
 
 			});
 
-			
+
 
 			this.#_input_cmd.addEventListener("change", () => {
 
@@ -116,19 +125,21 @@ class RISCV_DialogEditCommands {
 
 			});
 
-			
+
 
 			this.#_cmd_btn_ok.addEventListener("click", () => {
-				
+
 				this.#_dialog.close();
 
 				simulation_json = JSON.parse(JSON.stringify(this.#_command_execute_json));
 
 				this.updateMainCommandTable();
+				this.updateMainMemoryTable();
+				this.updateMainRegistersTable();
 
 			});
 
-			
+
 
 			this.#_cmd_btn_cnl.addEventListener("click", () => {
 
@@ -168,7 +179,7 @@ class RISCV_DialogEditCommands {
 
 					if(html_el_table_td_pc){
 
-						html_el_table_td_pc.innerHTML = this.#_command_execute_json.cmd_list[cmd_idx].add; 
+						html_el_table_td_pc.innerHTML = this.#_command_execute_json.cmd_list[cmd_idx].add;
 
 						html_el_table_td_row.appendChild(html_el_table_td_pc);
 
@@ -196,7 +207,7 @@ class RISCV_DialogEditCommands {
 
 	}
 
-	
+
 
 	// public Methoden
 
@@ -210,7 +221,7 @@ class RISCV_DialogEditCommands {
 
 	}
 
-	
+
 
 	setCommandString(cmd_json_str){
 
@@ -249,7 +260,7 @@ class RISCV_DialogEditCommands {
 
 					if(html_el_table_td_pc){
 
-						html_el_table_td_pc.innerHTML = this.#_command_execute_json.cmd_list[cmd_idx].add; 
+						html_el_table_td_pc.innerHTML = this.#_command_execute_json.cmd_list[cmd_idx].add;
 
 						html_el_table_td_row.appendChild(html_el_table_td_empty);
 						html_el_table_td_row.appendChild(html_el_table_td_pc);
@@ -278,6 +289,108 @@ class RISCV_DialogEditCommands {
 
 	}
 
-}
+	updateMainMemoryTable(){
 
+		if(this.#_main_memory_table && this.#_command_execute_json){
+
+			while (this.#_main_memory_table.firstChild) {
+
+				this.#_main_memory_table.removeChild(this.#_main_memory_table.firstChild);
+
+			}
+
+			for(let cmd_idx = 0; cmd_idx < this.#_command_execute_json.memory_list.length; cmd_idx ++){
+
+				let html_el_table_td_row = document.createElement("tr");
+
+				if(html_el_table_td_row){
+
+					let html_el_table_td_empty = document.createElement("td");
+					let html_el_table_td_pc = document.createElement("td");
+
+					if(html_el_table_td_pc){
+
+						html_el_table_td_pc.innerHTML = this.#_command_execute_json.memory_list[cmd_idx].index;
+
+						html_el_table_td_row.appendChild(html_el_table_td_empty);
+						html_el_table_td_row.appendChild(html_el_table_td_pc);
+
+					}
+
+					let html_el_table_td_cmd = document.createElement("td");
+
+					if(html_el_table_td_cmd){
+
+					html_el_table_td_cmd.innerHTML = this.#_command_execute_json.memory_list[cmd_idx].value;
+
+						html_el_table_td_row.appendChild(html_el_table_td_cmd);
+
+					}
+
+					this.#_main_memory_table.appendChild(html_el_table_td_row);
+
+				}
+
+				document.getElementById("webapp_dialog_EditCommandsPcAddressID").value = cmd_idx;
+
+			}
+
+		}
+
+	}
+
+
+
+
+	updateMainRegistersTable(){
+
+		if(this.#_main_registers_table && this.#_command_execute_json){
+
+			while (this.#_main_registers_table.firstChild) {
+
+				this.#_main_registers_table.removeChild(this.#_main_registers_table.firstChild);
+
+			}
+
+			for(let cmd_idx = 0; cmd_idx < this.#_command_execute_json.registers_list.length; cmd_idx ++){
+
+				let html_el_table_td_row = document.createElement("tr");
+
+				if(html_el_table_td_row){
+
+					let html_el_table_td_empty = document.createElement("td");
+					let html_el_table_td_pc = document.createElement("td");
+
+					if(html_el_table_td_pc){
+
+						html_el_table_td_pc.innerHTML = this.#_command_execute_json.registers_list[cmd_idx].index;
+
+						html_el_table_td_row.appendChild(html_el_table_td_empty);
+						html_el_table_td_row.appendChild(html_el_table_td_pc);
+
+					}
+
+					let html_el_table_td_cmd = document.createElement("td");
+
+					if(html_el_table_td_cmd){
+
+					html_el_table_td_cmd.innerHTML = this.#_command_execute_json.registers_list[cmd_idx].value;
+
+						html_el_table_td_row.appendChild(html_el_table_td_cmd);
+
+					}
+
+					this.#_main_registers_table.appendChild(html_el_table_td_row);
+
+				}
+
+				document.getElementById("webapp_dialog_EditCommandsPcAddressID").value = cmd_idx;
+
+			}
+
+		}
+
+	}
+
+}
 /* ------------------------------------------------------------------------------ */
