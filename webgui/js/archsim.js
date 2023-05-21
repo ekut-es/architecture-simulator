@@ -24,6 +24,9 @@ const archsim_js = {
     update_register: function(reg, val) {
         document.getElementById("val_x"+reg).innerText = val
     },
+    append_registers: function(reg_json_str) {
+
+    },
     append_memory: function(address, val) {
         tr = document.createElement("tr")
         td1 = document.createElement("td")
@@ -34,6 +37,9 @@ const archsim_js = {
         tr.appendChild(td1)
         tr.appendChild(td2)
         memory.appendChild(tr)
+    },
+    append_memories: function(mem_json_str) {
+
     },
     update_memory: function(address, val) {
         document.getElementById("memory"+address).innerText = val
@@ -60,12 +66,10 @@ sim_init()
 }
 let pyodideReadyPromise = main();
 
-function test(){
-    alert(Hello);
-}
-
-async function evaluatePython_step_sim() {
+async function evaluatePython_step_sim(cmd_json_str) {
     let pyodide = await pyodideReadyPromise;
+    alert("step");
+    alert(cmd_json_str);
     try {
         step_sim = pyodide.globals.get("step_sim");
         let output = step_sim(cmd_json_str);
@@ -77,6 +81,8 @@ async function evaluatePython_step_sim() {
 
 async function evaluatePython_run_sim(cmd_json_str) {
     let pyodide = await pyodideReadyPromise;
+    alert("run");
+    alert(cmd_json_str);
     try {
         run_sim = pyodide.globals.get("run_sim");
         let output = run_sim(cmd_json_str);

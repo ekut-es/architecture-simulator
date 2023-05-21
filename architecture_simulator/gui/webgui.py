@@ -29,16 +29,24 @@ def sim_init():
                 )
             ),
         ),
-        instructions={0: ADD(rd=10, rs1=10, rs2=2)},
+        instructions={0: ADD(rd=1, rs1=2, rs2=3)},
     )
 
+    # appends all the registers either one at a time, or all at once with a json string
+    json_array = []
     for reg_i in range(len(simulation.state.register_file.registers)):
+        json_array.append({reg_i: simulation.state.register_file.registers[reg_i]})
         archsim_js.append_register(
             reg_i, simulation.state.register_file.registers[reg_i]
         )
+    archsim_js.append_registers(json.dumps({"reg_list": json_array}))
 
+    # appends all the memory either one at a time or all at once with a json string
+    json_array = []
     for address, address_val in simulation.state.memory.memory_file.items():
-        archsim_js.append_memory(hex(address), int(address_val))
+        json_array.append({hex(address): bin(address_val)})
+        archsim_js.append_memory(hex(address), bin(address_val))
+    archsim_js.append_memories({"mem_list": json_array})
 
     # create a json string with all instructions in it
     """json_array = []
@@ -70,7 +78,7 @@ def step_sim(instr: str):
 
     # update the memory after exeution of the instruction/s
     for address, address_val in simulation.state.memory.memory_file.items():
-        archsim_js.update_memory(address, address_val)
+        archsim_js.update_memory(hex(address), bin(address_val))
 
     return simulation
 
@@ -97,6 +105,6 @@ def run_sim(instr: str):
 
     # update the memory after exeution of the instruction/s
     for address, address_val in simulation.state.memory.memory_file.items():
-        archsim_js.update_memory(address, address_val)
+        archsim_js.update_memory(hex(address), bin(address_val))
 
     return simulation

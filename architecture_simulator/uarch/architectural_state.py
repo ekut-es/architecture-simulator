@@ -153,12 +153,3 @@ class ArchitecturalState:
 
     def getPrivilegeLevel(self):
         return self.csr_registers.privilege_level
-
-
-import json
-
-str = '{"cmd_list":[{"add":"0x0000", "cmd":"SUB A0, T0, T2"}, {"add":"0x0004", "cmd":"ADD A0, T0, T2"}]}'
-str_parsed = json.loads(str)
-print(str_parsed["cmd_list"])
-for cmd in str_parsed["cmd_list"]:
-    print(cmd["cmd"])
