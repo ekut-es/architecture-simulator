@@ -32,11 +32,13 @@
 				}
 			});
 
-			document.getElementById("button_simulation_start_id").addEventListener("click", evaluatePython_step_sim);
+			document.getElementById("button_simulation_start_id").addEventListener("click", () => {
+				evaluatePython_run_sim(simulation_json);
+			});
 
-			/*document.getElementById("button_simulation_start_id").addEventListener("click", () => {
-				evaluatePython_step_sim
-			});*/
+			document.getElementById("button_simulation_next_id").addEventListener("click", () => {
+				evaluatePython_step_sim(simulation_json);
+			});
 
 		});
 		// ask if you really wanna leave the site
@@ -95,9 +97,11 @@
 		<thead><td>Memory</td><td>Value</td></thead>
 		<tbody id="memory" ></tbody>
 	  </table>
+	  <div>Input:</div>
+    <textarea id="input" style="width: 100%;" rows="20" ></textarea>
 	  <div>Output:</div>
     <textarea id="output" style="width: 100%;" rows="20" disabled></textarea>
-	<button onclick="test()">Run</button>
+	<button onclick="evaluatePython_step_sim()">Run</button>
 	<footer id="webapp_footer_id">
 	</footer>
 	<!--  ****************** Modale Form ********************************************* -->
