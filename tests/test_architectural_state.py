@@ -1,11 +1,9 @@
 import unittest
-
-from architecture_simulator.uarch.architectural_state import RegisterFile
-
-from architecture_simulator.uarch.architectural_state import ArchitecturalState
-
-from architecture_simulator.isa.rv32i_instructions import ADD, SLL
 import fixedint
+
+from architecture_simulator.uarch.architectural_state import RegisterFile, ArchitecturalState, Memory
+from architecture_simulator.isa.rv32i_instructions import ADD, SLL
+
 
 
 class TestArchitecture(unittest.TestCase):
@@ -82,3 +80,21 @@ class TestArchitecture(unittest.TestCase):
         # store_word test
         state.memory.store_word(0, fixedint.MutableUInt32(-1))
         self.assertEqual(state.memory.load_word(0), fixedint.MutableUInt32(-1))
+
+        # tests are now with 16 bit length of memory
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=()),
+            memory=Memory(memory_file={}, length=16),
+        )
+
+        # store_byte test
+        state.memory.store_byte(pow(2, 16), fixedint.MutableUInt8(2))
+        self.assertEqual(state.memory.load_word(0), fixedint.MutableUInt32(2))
+
+        # store_halfword test
+        state.memory.store_halfword(pow(2, 16), fixedint.MutableUInt16(3))
+        self.assertEqual(state.memory.load_halfword(0), fixedint.MutableUInt16(3))
+
+        # store_word test
+        state.memory.store_word(pow(2, 16), fixedint.MutableUInt32(4))
+        self.assertEqual(state.memory.load_word(0), fixedint.MutableUInt32(4))
