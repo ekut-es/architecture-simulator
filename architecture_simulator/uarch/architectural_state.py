@@ -1,5 +1,27 @@
 from dataclasses import dataclass
 import fixedint
+import time
+
+
+@dataclass
+class PerformanceMetrics:
+    execution_time_s: float = -1
+    instruction_count: int = 0
+    instructions_per_second: float = -1
+    branch_count: int = 0
+    procedure_count: int = 0
+    start: float = -1
+
+    def start_timer(self):
+        self.start = time.time()
+
+    def stop_timer(self):
+        self.execution_time_s = time.time() - self.start
+        self.instructions_per_second = (
+            (self.instruction_count / self.execution_time_s)
+            if self.execution_time_s
+            else 0
+        )
 
 
 @dataclass
@@ -184,6 +206,7 @@ class ArchitecturalState:
     memory: Memory = Memory(memory_file={})
     csr_registers: CsrRegisterFile = CsrRegisterFile(memory_file={})
     program_counter: int = 0
+    performance_metrics: PerformanceMetrics = PerformanceMetrics()
 
     def change_privilege_level(self, level: int):
         if not level < 0 and not level > 3:

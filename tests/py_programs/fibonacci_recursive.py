@@ -18,7 +18,7 @@ from architecture_simulator.uarch.architectural_state import (
 from fixedint import MutableUInt32
 
 
-def fibonacci_recursive(n: int) -> MutableUInt32:
+def fibonacci_recursive_simulation(n: int) -> Simulation:
     simulation = Simulation(
         state=ArchitecturalState(
             register_file=RegisterFile(registers=[MutableUInt32(0)] * 32)
@@ -54,9 +54,12 @@ def fibonacci_recursive(n: int) -> MutableUInt32:
             # end of fib(n) procedure
         },
     )
+    return simulation
 
-    while simulation.state.program_counter < 104:
-        simulation.step_simulation()
+
+def fibonacci_recursive(n: int) -> MutableUInt32:
+    simulation = fibonacci_recursive_simulation(n)
+    simulation.run_simulation()
     return simulation.state.register_file.registers[10]
 
 
@@ -94,4 +97,7 @@ and x0, x0, x0 # end
 """
 
 if __name__ == "__main__":
-    print(fibonacci_recursive(16))
+    simulation = fibonacci_recursive_simulation(22)
+    simulation.run_simulation()
+    print(simulation.state.register_file.registers[10])
+    print(simulation.state.performance_metrics)
