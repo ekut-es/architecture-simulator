@@ -1,26 +1,203 @@
-<!doctype html>
-<html>
-  <head>
-    <title>architecture-simulator</title>
-  </head>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+	<meta 	charset='utf-8'/>
+	<meta 	name="viewport" 								content="width=device-width, initial-scale=1.0">
+	<title	> RISC-V Simulator</title>
+	<!--	****************************************************************************************************************************** -->
+	<link 	rel="shortcut icon" 	type="image/x-icon" 	href="favicon.ico">
+	<!--	****************************************************************************************************************************** -->
+	<link 	rel="stylesheet"	 	type="text/css" 		href="WEB_APP_BASIC.css">
+	<link 	rel="stylesheet"	 	type="text/css" 		href="RISCV_DialogEditCommands.css">
+	<!--	****************************************************************************************************************************** -->
+  <script type="text/javascript" 							src="js/RISCV_DialogEditCommands.js"></script>
+	<!--	****************************************************************************************************************************** -->
+	<script type="text/javascript">
+		let dialogEditCommands = null;
 
-  <body>
-    <p>
-      You can execute instructions. Just enter something in the box below and
-      click the button.
-    </p>
-    <input id="code" value="add x0, x1, x0" />
-    <button onclick="evaluatePython()">Run</button>
-    <table>
-      <thead><td>Register</td><td>Value</td></thead>
-      <tbody id="registers" ></tbody>
-    </table>
-    <br />
-    <br />
-    <div>Output:</div>
+		let simulation_json = '{"cmd_list":[{"add":"0x0000", "cmd":"ADD A0, T0, T2"}, {"add":"0x0004", "cmd":"ADD A0, T0, T2"}], "registers_list":[], "memory_list":[]}';
+
+		let waiting_for_pyodide_flag = true
+		window.addEventListener('DOMContentLoaded', function () {
+			dialogEditCommands = new RISCV_DialogEditCommands( 	"webapp_dialog_EditCommandsID",
+																"webapp_dialog_EditCommandsTableBodyID",
+																"webapp_dialog_EditCommandsTextInputID",
+																"webapp_dialog_EditCommandsFooterBtnOkID",
+																"webapp_dialog_EditCommandsFooterBtnCnlID",
+                                "gui_cmd_table_body_id",
+								"gui_memory_table_body_id",
+								"gui_registers_table_body_id"
+								);
+				//alert(simulation_json)
+				dialogEditCommands.setCommandString(simulation_json);
+				dialogEditCommands.updateMainCommandTable();
+				dialogEditCommands.updateMainMemoryTable();
+				dialogEditCommands.updateMainRegistersTable();
+
+			document.getElementById("button_gui_cmd_edit_id").addEventListener("click", () => {
+				if(dialogEditCommands){
+					dialogEditCommands.setCommandString(simulation_json); //placeholder, load json from simulator
+					dialogEditCommands.openDialog();
+				}
+			});
+
+			document.getElementById("button_simulation_start_id").addEventListener("click", () => {
+				evaluatePython_run_sim();
+				dialogEditCommands.setCommandString(simulation_json);
+				dialogEditCommands.updateMainCommandTable();
+				dialogEditCommands.updateMainMemoryTable();
+				dialogEditCommands.updateMainRegistersTable();
+			});
+
+			document.getElementById("button_simulation_next_id").addEventListener("click", () => {
+				//alert(simulation_json)
+				evaluatePython_step_sim();
+				dialogEditCommands.setCommandString(simulation_json);
+				dialogEditCommands.updateMainCommandTable();
+				dialogEditCommands.updateMainMemoryTable();
+				dialogEditCommands.updateMainRegistersTable();
+			});
+
+			document.getElementById("button_simulation_stop_id").addEventListener("click", () => {
+				evaluatePython_reset_sim();
+				dialogEditCommands.setCommandString(simulation_json);
+				dialogEditCommands.updateMainCommandTable();
+				dialogEditCommands.updateMainMemoryTable();
+				dialogEditCommands.updateMainRegistersTable();
+			});
+
+		});
+		// ask if you really wanna leave the site
+		window.onbeforeunload = function() {
+			return true;
+		};
+    </script>
+</head>
+<body id="webapp_body_id">
+	<!-- ************  Tool Title  ****************************************************-->
+	<header id="webapp_header_id">
+		<div 	id="webapp_header_app_name_id" > RISC-V Simulator </div>
+		<img 	id="webapp_header_help_image_id" src="WEB_APP_BASIC_Help.svg"/>
+		<img 	id="webapp_header_icon_image_id" src="RISCV_HeaderIcon.svg"/>
+	</header>
+	<nav id="webapp_nav_id">
+		<button type="button" id="button_simulation_start_id" class="button_start_simulation" title="start simulation">
+			<img src="start.svg" width="25px" height="25px">
+		</button>
+		<button type="button" id="button_simulation_pause_id" class="button_pause_simulation" title="pause simulation">
+			<img src="pause.svg" width="25px" height="25px">
+		</button>
+		<button type="button" id="button_simulation_next_id" class="button_next_step_simulation" title="next step">
+			<img src="next.svg" width="25px" height="25px">
+		</button>
+		<button type="button" id="button_simulation_stop_id" class="button_stop_simulation" title="reset">
+			<img src="stop.svg" width="25px" height="25px">
+		</button>
+	</nav>
+	<main id="webapp_main_id">
+		<div id="gui_base_div_id">
+			<div id="gui_cmd_div_id">
+				<table id="gui_cmd_table_id">
+					<thead>
+						<tr>
+							<th>
+								<button type="button" id="button_gui_cmd_edit_id" class="button_edit_cmd" title="edit input">
+									<img src="cmd_edit.svg" width="20px" height="20px">
+								</button>
+							</th>
+							<th title="Programm Counter">PC</th>
+							<th title="Command">Command</th>
+						</tr>
+					</thead>
+          <tbody id="gui_cmd_table_body_id">
+            <tr>
+              <td></td>
+              <td>0X0000</td>
+              <td>SUB A0, T0, T1</td>
+            </tr>
+				</table>
+			</div>
+			<div id="gui_registers_div_id">
+					<table id="gui_registers_table_id">
+						<thead>
+							<tr>
+								<th>
+								</th>
+								<th title="register">Register</th>
+								<th title="register value">Hex Value</th>
+							</tr>
+						</thead>
+						<tbody id="gui_registers_table_body_id">
+					</tbody>
+				</table>
+			</div>
+			<div id="gui_memory_div_id">
+				<table id="gui_memory_table_id">
+					<thead>
+						<tr>
+							<th>
+							</th>
+							<th title="memory address">address</th>
+							<th title="memory value">Hex Value</th>
+						</tr>
+					</thead>
+					<tbody id="gui_memory_table_body_id">
+					</tbody>
+				</table>
+			</div>
+
+		</div>
+
+    </main>
+	<table>
+		<thead><td>Register</td><td>Value</td></thead>
+		<tbody id="registers" ></tbody>
+	  </table>
+	  <table>
+		<thead><td>Memory</td><td>Value</td></thead>
+		<tbody id="memory" ></tbody>
+	  </table>
+	  <div>Input:</div>
+    <textarea id="input" style="width: 100%;" rows="20" ></textarea>
+	  <div>Output:</div>
     <textarea id="output" style="width: 100%;" rows="20" disabled></textarea>
-
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.22.1/full/pyodide.js"></script>
-    <script src="js/archsim.js"></script>
-  </body>
+	<footer id="webapp_footer_id">
+	</footer>
+	<!--  ****************** Modale Form ********************************************* -->
+	<!--  ****************** Modale Form CMD Edit ************************************ -->
+	<dialog id="webapp_dialog_EditCommandsID" >
+		<div id="webapp_dialog_EditCommandsHeaderDivID">
+			<label id="webapp_dialog_EditCommandsHeaderLabelID"> Command Editor </label>
+		</div>
+		<div>
+			<!--missing number input check (only multiples of 4) & display as hex, also get max from python (max number of registers) -->
+			<input type="number" id="webapp_dialog_EditCommandsPcAddressID" min="0" max="127" step="4">
+			<input type="text"   id="webapp_dialog_EditCommandsTextInputID">
+		</div>
+		<div id="webapp_dialog_EditCommandsTextDivID">
+			<table id="webapp_dialog_EditCommandsTableID">
+				<thead>
+					<tr>
+						<th title="Programm Counter">PC</th>
+						<th title="Auszuführender Befehl">Command</th>
+					</tr>
+				</thead>
+				<tbody id="webapp_dialog_EditCommandsTableBodyID">
+					<tr>
+						<td>0X0000</td>
+						<td>SUB A0, T0, T1</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div id="webapp_dialog_EditCommandsFooterDivID">
+			<button type="button" id="webapp_dialog_EditCommandsFooterBtnOkID"  title="Eingaben werden übernommen">Übernehmen</button>
+			<button type="button" id="webapp_dialog_EditCommandsFooterBtnCnlID" title="Eingaben werden verworfen">Abbrechen</button>
+		</div>
+	</dialog>
+	<dialog id="webapp_dialog_AppHelpID" >
+	</dialog>
+	<script type="text/javascript" 							src="https://cdn.jsdelivr.net/pyodide/v0.22.1/full/pyodide.js"></script>
+  <script type="text/javascript" 							src="js/archsim.js"></script>
+</body>
 </html>

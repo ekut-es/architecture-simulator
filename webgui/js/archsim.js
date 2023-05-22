@@ -1,10 +1,10 @@
 const output = document.getElementById("output");
-const code = document.getElementById("code");
 const registers = document.getElementById("registers");
-
+const memory = document.getElementById("memory");
+const input = document.getElementById("input");
 
 function addToOutput(s) {
-    output.value += ">>>" + code.value + "\n" + s + "\n";
+    output.value += ">>>" + input.value + "\n" + s + "\n";
     output.scrollTop = output.scrollHeight;
 }
 
@@ -23,6 +23,49 @@ const archsim_js = {
     },
     update_register: function(reg, val) {
         document.getElementById("val_x"+reg).innerText = val
+    },
+    append_registers: function(reg_json_str) {
+        temp_simulation_json = JSON.parse(simulation_json)
+        temp_reg_json_str = JSON.parse(reg_json_str)
+        temp_simulation_json.registers_list = temp_reg_json_str
+        simulation_json = JSON.stringify(temp_simulation_json)
+    },
+    append_memory: function(address, val) {
+        tr = document.createElement("tr")
+        td1 = document.createElement("td")
+        td1.innerText = address
+        td2 = document.createElement("td")
+        td2.innerText = val
+        td2.id = "memory"+address
+        tr.appendChild(td1)
+        tr.appendChild(td2)
+        memory.appendChild(tr)
+    },
+    update_memory: function(address, val) {
+        try{
+        document.getElementById("memory"+address).innerText = val
+        }
+        catch
+        {
+        tr = document.createElement("tr")
+        td1 = document.createElement("td")
+        td1.innerText = address
+        td2 = document.createElement("td")
+        td2.innerText = val
+        td2.id = "memory"+address
+        tr.appendChild(td1)
+        tr.appendChild(td2)
+        memory.appendChild(tr)
+        }
+    },
+    append_memories: function(mem_json_str) {
+        temp_simulation_json = JSON.parse(simulation_json)
+        temp_mem_json_str = JSON.parse(mem_json_str)
+        temp_simulation_json.memory_list = temp_mem_json_str
+        simulation_json = JSON.stringify(temp_simulation_json)
+    },
+    append_instructions: function(cmd_json_str) {
+        //setCommandString(cmd_json_str)
     }
 };
 
@@ -43,11 +86,43 @@ sim_init()
 }
 let pyodideReadyPromise = main();
 
-async function evaluatePython() {
+async function evaluatePython_step_sim() {
     let pyodide = await pyodideReadyPromise;
+    //alert("step")
+    //alert(input.value.split("\n"))
+    //alert(simulation_json)
+    cmd_json_str = JSON.stringify(input.value.split("\n"))
     try {
-        exec_instr = pyodide.globals.get("exec_instr");
-        let output = exec_instr(code.value);
+        step_sim = pyodide.globals.get("step_sim");
+        let output = step_sim(cmd_json_str);
+        addToOutput(output);
+    } catch (err) {
+        addToOutput(err);
+    }
+    //alert(simulation_json)
+}
+
+async function evaluatePython_run_sim() {
+    let pyodide = await pyodideReadyPromise;
+    //alert("run")
+    //alert(input.value.split("\n"))
+    cmd_json_str = JSON.stringify(input.value.split("\n"))
+    try {
+        run_sim = pyodide.globals.get("run_sim");
+        let output = run_sim(cmd_json_str);
+        addToOutput(output);
+    } catch (err) {
+        addToOutput(err);
+    }
+}
+
+async function evaluatePython_reset_sim() {
+    let pyodide = await pyodideReadyPromise;
+    registers.innerHTML = ""
+    memory.innerHTML = ""
+    try {
+        reset_sim = pyodide.globals.get("reset_sim");
+        let output = reset_sim();
         addToOutput(output);
     } catch (err) {
         addToOutput(err);
