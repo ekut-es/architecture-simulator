@@ -129,7 +129,7 @@ class RISCV_DialogEditCommands {
 
 				this.#_dialog.close();
 
-				simulation_json = JSON.parse(JSON.stringify(this.#_command_execute_json));
+				//simulation_json = JSON.parse(JSON.stringify(this.#_command_execute_json));
 
 				this.updateMainCommandTable();
 				this.updateMainMemoryTable();

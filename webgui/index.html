@@ -15,8 +15,9 @@
 	<script type="text/javascript">
 		let dialogEditCommands = null;
 
-		let simulation_json = '{"cmd_list":[{"add":"0x0000", "cmd":"SUB A0, T0, T2"}, {"add":"0x0004", "cmd":"ADD A0, T0, T2"}], "reg_list":[], "mem_list":[]}';
+		let simulation_json = '{"cmd_list":[{"add":"0x0000", "cmd":"ADD A0, T0, T2"}, {"add":"0x0004", "cmd":"ADD A0, T0, T2"}], "registers_list":[], "memory_list":[]}';
 
+		let waiting_for_pyodide_flag = true
 		window.addEventListener('DOMContentLoaded', function () {
 			dialogEditCommands = new RISCV_DialogEditCommands( 	"webapp_dialog_EditCommandsID",
 																"webapp_dialog_EditCommandsTableBodyID",
@@ -27,23 +28,31 @@
 								"gui_memory_table_body_id",
 								"gui_registers_table_body_id"
 								);
+				//alert(simulation_json)
+				dialogEditCommands.setCommandString(simulation_json);
+				dialogEditCommands.updateMainCommandTable();
+				dialogEditCommands.updateMainMemoryTable();
+				dialogEditCommands.updateMainRegistersTable();
 
 			document.getElementById("button_gui_cmd_edit_id").addEventListener("click", () => {
 				if(dialogEditCommands){
-					dialogEditCommands.setCommandString('{"cmd_list":[{"add":"0x0000", "cmd":"SUB A0, T0, T2"}, {"add":"0x0004", "cmd":"ADD A0, T0, T2"}],"memory_list":[{"index":"0x0000", "value":"0x0000"}, {"index":"0x0001", "value":"0xFFFF"}], "registers_list":[{"index":"0x0000", "value":"0x0000"}, {"index":"0x0001", "value":"0x0AAA"}]}'); //placeholder, load json from simulator
+					dialogEditCommands.setCommandString(simulation_json); //placeholder, load json from simulator
 					dialogEditCommands.openDialog();
 				}
 			});
 
 			document.getElementById("button_simulation_start_id").addEventListener("click", () => {
 				evaluatePython_run_sim();
+				dialogEditCommands.setCommandString(simulation_json);
 				dialogEditCommands.updateMainCommandTable();
 				dialogEditCommands.updateMainMemoryTable();
 				dialogEditCommands.updateMainRegistersTable();
 			});
 
 			document.getElementById("button_simulation_next_id").addEventListener("click", () => {
+				//alert(simulation_json)
 				evaluatePython_step_sim();
+				dialogEditCommands.setCommandString(simulation_json);
 				dialogEditCommands.updateMainCommandTable();
 				dialogEditCommands.updateMainMemoryTable();
 				dialogEditCommands.updateMainRegistersTable();
@@ -51,15 +60,13 @@
 
 			document.getElementById("button_simulation_stop_id").addEventListener("click", () => {
 				evaluatePython_reset_sim();
+				dialogEditCommands.setCommandString(simulation_json);
 				dialogEditCommands.updateMainCommandTable();
 				dialogEditCommands.updateMainMemoryTable();
 				dialogEditCommands.updateMainRegistersTable();
 			});
 
 		});
-		dialogEditCommands.updateMainCommandTable();
-		dialogEditCommands.updateMainMemoryTable();
-		dialogEditCommands.updateMainRegistersTable();
 		// ask if you really wanna leave the site
 		window.onbeforeunload = function() {
 			return true;

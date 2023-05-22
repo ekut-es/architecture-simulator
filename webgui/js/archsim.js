@@ -27,7 +27,7 @@ const archsim_js = {
     append_registers: function(reg_json_str) {
         temp_simulation_json = JSON.parse(simulation_json)
         temp_reg_json_str = JSON.parse(reg_json_str)
-        temp_simulation_json.reg_list = temp_reg_json_str
+        temp_simulation_json.registers_list = temp_reg_json_str
         simulation_json = JSON.stringify(temp_simulation_json)
     },
     append_memory: function(address, val) {
@@ -61,7 +61,7 @@ const archsim_js = {
     append_memories: function(mem_json_str) {
         temp_simulation_json = JSON.parse(simulation_json)
         temp_mem_json_str = JSON.parse(mem_json_str)
-        temp_simulation_json.mem_list = temp_mem_json_str
+        temp_simulation_json.memory_list = temp_mem_json_str
         simulation_json = JSON.stringify(temp_simulation_json)
     },
     append_instructions: function(cmd_json_str) {
@@ -88,9 +88,9 @@ let pyodideReadyPromise = main();
 
 async function evaluatePython_step_sim() {
     let pyodide = await pyodideReadyPromise;
-    alert("step")
-    alert(input.value.split("\n"))
-    alert(simulation_json)
+    //alert("step")
+    //alert(input.value.split("\n"))
+    //alert(simulation_json)
     cmd_json_str = JSON.stringify(input.value.split("\n"))
     try {
         step_sim = pyodide.globals.get("step_sim");
@@ -99,14 +99,14 @@ async function evaluatePython_step_sim() {
     } catch (err) {
         addToOutput(err);
     }
+    //alert(simulation_json)
 }
 
 async function evaluatePython_run_sim() {
     let pyodide = await pyodideReadyPromise;
-    alert("run")
-    alert(input.value.split("\n"))
+    //alert("run")
+    //alert(input.value.split("\n"))
     cmd_json_str = JSON.stringify(input.value.split("\n"))
-    alert(cmd_json_str)
     try {
         run_sim = pyodide.globals.get("run_sim");
         let output = run_sim(cmd_json_str);
