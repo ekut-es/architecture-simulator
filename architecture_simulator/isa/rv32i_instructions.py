@@ -10,6 +10,7 @@ from architecture_simulator.isa.instruction_types import JTypeInstruction
 from architecture_simulator.isa.instruction_types import fence
 import fixedint
 
+
 # todo: use ctypes
 class ECALLException(Exception):
     "Raises when an ECALL is executed"
@@ -692,15 +693,12 @@ class LB(ITypeInstruction):
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = sext(M[x[rs1] + sext(imm)][7:0])"""
-        rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        # casting like this is necessary for sign extension
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             int(
                 fixedint.Int8(
-                    int(
-                        architectural_state.memory.load_byte(
-                            int(rs1 + fixedint.Int16(self.imm)[0:12])
-                        )
-                    )
+                    int(architectural_state.memory.load_byte(int(rs1) + self.imm))
                 )
             )
         )
@@ -713,15 +711,11 @@ class LH(ITypeInstruction):
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = sext(M[x[rs1] + sext(imm)][15:0])"""
-        rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
+        rs1 = architectural_state.register_file.registers[self.rs1]
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             int(
                 fixedint.Int16(
-                    int(
-                        architectural_state.memory.load_halfword(
-                            int(rs1 + fixedint.Int16(self.imm)[0:12])
-                        )
-                    )
+                    int(architectural_state.memory.load_halfword(int(rs1) + self.imm))
                 )
             )
         )
@@ -734,18 +728,10 @@ class LW(ITypeInstruction):
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = sext(M[x[rs1] + sext(imm)][31:0])"""
-        rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
-        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            int(
-                fixedint.Int32(
-                    int(
-                        architectural_state.memory.load_word(
-                            int(rs1 + fixedint.Int16(self.imm)[0:12])
-                        )
-                    )
-                )
-            )
-        )
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        architectural_state.register_file.registers[
+            self.rd
+        ] = architectural_state.memory.load_word(int(rs1) + self.imm)
         return architectural_state
 
 
@@ -757,11 +743,7 @@ class LBU(ITypeInstruction):
         """x[rd] = M[x[rs1] + sext(imm)][7:0]"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            int(
-                architectural_state.memory.load_byte(
-                    int(rs1 + fixedint.Int16(self.imm)[0:12])
-                )
-            )
+            int(architectural_state.memory.load_byte(int(rs1) + self.imm))
         )
         return architectural_state
 
@@ -774,11 +756,7 @@ class LHU(ITypeInstruction):
         """x[rd] = M[x[rs1] + sext(imm)][15:0]"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            int(
-                architectural_state.memory.load_halfword(
-                    int(rs1 + fixedint.Int16(self.imm)[0:12])
-                )
-            )
+            int(architectural_state.memory.load_halfword(int(rs1) + self.imm))
         )
         return architectural_state
 
@@ -834,5 +812,49 @@ class SRAI(ITypeInstruction):
 
 instruction_map = {
     "add": ADD,
+    "beq": BEQ,
+    "blt": BLT,
+    "bne": BNE,
     "sub": SUB,
+    "bge": BGE,
+    "bltu": BLTU,
+    "bgeu": BGEU,
+    "csrrw": CSRRW,
+    "csrrs": CSRRS,
+    "csrrc": CSRRC,
+    "csrrwi": CSRRWI,
+    "csrrsi": CSRRSI,
+    "csrrci": CSRRCI,
+    "sb": SB,
+    "sh": SH,
+    "sw": SW,
+    "lui": LUI,
+    "auipc": AUIPC,
+    "jal": JAL,
+    "fence": FENCE,
+    "sll": SLL,
+    "slt": SLT,
+    "sltu": SLTU,
+    "xor": XOR,
+    "srl": SRL,
+    "sra": SRA,
+    "or": OR,
+    "and": AND,
+    "lb": LB,
+    "lh": LH,
+    "lw": LW,
+    "lbu": LBU,
+    "lhu": LHU,
+    "srai": SRAI,
+    "jalr": JALR,
+    "ecall": ECALL,
+    "ebreak": EBREAK,
+    "addi": ADDI,
+    "slti": SLTI,
+    "sltiu": SLTIU,
+    "xori": XORI,
+    "ori": ORI,
+    "andi": ANDI,
+    "slli": SLLI,
+    "srli": SRLI,
 }

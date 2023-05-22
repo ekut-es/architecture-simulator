@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from ..isa.instruction_types import Instruction
-from ..isa.parser import riscv_parser
+from ..isa.parser import RiscvParser
 from ..uarch.architectural_state import ArchitecturalState
 
 
@@ -11,7 +11,10 @@ class Simulation:
 
     def append_instructions(self, program: str):
         next_address = len(self.instructions) * 4
-        for instr in riscv_parser(program):
+        parser: RiscvParser = RiscvParser()
+        for instr in parser.parse_res_to_instructions(
+            parser.parse_assembly(program), start_address=0
+        ):
             self.instructions[next_address] = instr
             next_address += 4
 

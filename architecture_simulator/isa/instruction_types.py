@@ -27,11 +27,13 @@ class CSRTypeInstruction(Instruction):
         csr (int): the control/status register's index
         rs1 (int): source register 1
     """
+
     def __init__(self, rd: int, csr: int, rs1: int, **args):
         super().__init__(**args)
         self.rd = rd
         self.csr = csr
         self.rs1 = rs1
+
 
 class CSRITypeInstruction(Instruction):
     """Create an I-Type instruction
@@ -41,6 +43,7 @@ class CSRITypeInstruction(Instruction):
         csr (int): the control/status register's index
         imm (int): immediate
     """
+
     def __init__(self, rd: int, csr: int, uimm: int, **args):
         super().__init__(**args)
         self.rd = rd
@@ -121,6 +124,11 @@ class ITypeInstruction(Instruction):
             rd (int): destination register
         """
         super().__init__(**args)
+        if imm < -2048 or 2047 < imm:
+            raise ValueError(
+                "ITypeInstruction can only take 12 bit immediates. Given immediate was "
+                + str(imm)
+            )
         self.imm = imm
         self.rs1 = rs1
         self.rd = rd
