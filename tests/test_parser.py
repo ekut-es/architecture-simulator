@@ -44,6 +44,9 @@ ebreak
 fence x10, x12
 csrrw x2, 0x448, x9
 csrrwi x2, 0x448, 20
+beq x0, x1, Ban0n3
+Ban0n3:
+beq x0, x1, Ban0n3
 """
 
     program_2 = "8asfsdfs:"
@@ -71,6 +74,9 @@ ebreak
 fence a0, a2
 csrrw sp, 0x448, s1
 csrrwi sp, 0x448, 20
+beq zero, ra, Ban0n3
+Ban0n3:
+beq zero, ra, Ban0n3
 """
 
     expected = [
@@ -92,6 +98,9 @@ csrrwi sp, 0x448, 20
         ["fence", ["x", "10"], ["x", "12"]],
         ["csrrw", ["x", "2"], "0x448", ["x", "9"]],
         ["csrrwi", ["x", "2"], "0x448", "20"],
+        ["beq", ["x", "0"], ["x", "1"], "Ban0n3"],
+        "Ban0n3",
+        ["beq", ["x", "0"], ["x", "1"], "Ban0n3"],
     ]
 
     def test_bnf(self):
@@ -112,7 +121,13 @@ csrrwi sp, 0x448, 20
 
     def test_process_labels(self):
         parser = RiscvParser()
-        expected_labels = {"Ananas": 0, "Banane": 8, "_Banune24_de": 8, "Chinakohl": 24}
+        expected_labels = {
+            "Ananas": 0,
+            "Banane": 8,
+            "_Banune24_de": 8,
+            "Chinakohl": 24,
+            "Ban0n3": 60,
+        }
         bnf_result = parser.parse_assembly(self.program)
         proc_labels = parser.compute_labels(bnf_result, 0)
         self.assertEqual(proc_labels, expected_labels)
@@ -190,6 +205,18 @@ csrrwi sp, 0x448, 20
         self.assertEqual(instr[13].rd, 2)
         self.assertEqual(instr[13].csr, 0x448)
         self.assertEqual(instr[13].uimm, 20)
+
+        # beq x0, x1, Ban0n3
+        self.assertIsInstance(instr[14], BEQ)
+        self.assertEqual(instr[14].rs1, 0)
+        self.assertEqual(instr[14].rs2, 1)
+        self.assertEqual(instr[14].imm, 2)
+
+        # beq x0, x1, Ban0n3
+        self.assertIsInstance(instr[15], BEQ)
+        self.assertEqual(instr[15].rs1, 0)
+        self.assertEqual(instr[15].rs2, 1)
+        self.assertEqual(instr[15].imm, 0)
 
     def test_parser(self):
         parser = RiscvParser()

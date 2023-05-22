@@ -195,8 +195,10 @@ class RiscvParser:
             if isinstance(instruction_parsed, str):
                 if instruction_parsed == "ecall":
                     instructions.append(ECALL(imm=0, rs1=0, rd=0))
+                    address_count += 4
                 if instruction_parsed == "ebreak":
                     instructions.append(EBREAK(imm=1, rs1=0, rd=0))
+                    address_count += 4
                 continue
             instruction_class = instruction_map[instruction_parsed.mnemonic.lower()]
             if instruction_class.__base__ is instruction_types.RTypeInstruction:
