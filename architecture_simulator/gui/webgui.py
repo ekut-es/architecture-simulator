@@ -91,6 +91,7 @@ def run_sim(instr: str):
 
     # reset the instruction list
     simulation.instructions = {}
+    simulation.state.program_counter = 0
 
     simulation.append_instructions(instr)
     # run the simulation
