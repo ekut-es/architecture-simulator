@@ -91,10 +91,10 @@ async function evaluatePython_step_sim() {
     //alert("step")
     //alert(input.value.split("\n"))
     //alert(simulation_json)
-    cmd_json_str = JSON.stringify(input.value.split("\n"))
+    input_str = input.value
     try {
         step_sim = pyodide.globals.get("step_sim");
-        let output = step_sim(cmd_json_str);
+        let output = step_sim(input_str);
         addToOutput(output);
     } catch (err) {
         addToOutput(err);
@@ -106,10 +106,10 @@ async function evaluatePython_run_sim() {
     let pyodide = await pyodideReadyPromise;
     //alert("run")
     //alert(input.value.split("\n"))
-    cmd_json_str = JSON.stringify(input.value.split("\n"))
+    input_str = input.value
     try {
         run_sim = pyodide.globals.get("run_sim");
-        let output = run_sim(cmd_json_str);
+        let output = run_sim(input_str);
         addToOutput(output);
     } catch (err) {
         addToOutput(err);

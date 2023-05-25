@@ -61,12 +61,7 @@ def step_sim(instr: str):
 
     # parse the instr json string into a python dict
     if simulation.instructions == {}:
-        instr_parsed = json.loads(instr)
-        instr_str = ""
-        # append all instructions
-        for cmd in instr_parsed:
-            instr_str = instr_str + " " + cmd
-        simulation.append_instructions(instr_str)
+        simulation.append_instructions(instr)
 
     # step the simulation
     simulation.step_simulation()
@@ -96,14 +91,9 @@ def run_sim(instr: str):
 
     # reset the instruction list
     simulation.instructions = {}
+    simulation.state.program_counter = 0
 
-    # parse the instr json string into a python dict
-    instr_parsed = json.loads(instr)
-    instr_str = ""
-    # append all instructions
-    for cmd in instr_parsed:
-        instr_str = instr_str + " " + cmd
-    simulation.append_instructions(instr_str)
+    simulation.append_instructions(instr)
     # run the simulation
     simulation.run_simulation()
 
