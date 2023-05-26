@@ -1,16 +1,15 @@
-from dataclasses import dataclass
 import fixedint
 import time
 
 
-@dataclass
 class PerformanceMetrics:
-    execution_time_s: float = -1
-    instruction_count: int = 0
-    instructions_per_second: float = -1
-    branch_count: int = 0
-    procedure_count: int = 0
-    start: float = -1
+    def __init__(self) -> None:
+        self.execution_time_s: float = -1
+        self.instruction_count: int = 0
+        self.instructions_per_second: float = -1
+        self.branch_count: int = 0
+        self.procedure_count: int = 0
+        self.start: float = -1
 
     def start_timer(self):
         self.start = time.time()
@@ -24,7 +23,6 @@ class PerformanceMetrics:
         )
 
 
-@dataclass
 class Registers(list):
     """
     Custom list, that overwrites [], so that register x0 gets hardwired to zero.
@@ -44,7 +42,6 @@ class Registers(list):
             super().__setitem__(index, value)
 
 
-@dataclass
 class RegisterFile:
     """
     This class implements the register file.
@@ -56,21 +53,21 @@ class RegisterFile:
             no_arg => 32 registers with x0 is hard wired to zero
     """
 
-    registers: list[fixedint.MutableUInt32]
-
-    def __init__(self, registers=[]):
-        if registers == []:
-            # initializes 32 registers with x0 hard wired to zero
-            self.registers = Registers([fixedint.MutableUInt32(0) for i in range(32)])
-        else:
-            # use provided test register layout
-            self.registers = registers
+    def __init__(self, registers=None) -> None:
+        # initializes 32 registers with x0 hard wired to zero or uses the given registers
+        self.registers: list[fixedint.MutableUInt32] = (
+            Registers([fixedint.MutableUInt32(0)] * 32)
+            if registers == None
+            else registers
+        )
 
 
-@dataclass
 class Memory:
-    memory_file: dict[int, fixedint.MutableUInt8]
-    length: int = 32
+    def __init__(self, length: int = 32, memory_file=None) -> None:
+        self.length: int = length
+        self.memory_file: dict[int, fixedint.MutableUInt8] = (
+            {} if memory_file == None else memory_file
+        )
 
     def load_byte(self, address: int) -> fixedint.MutableUInt8:
         try:
@@ -153,9 +150,12 @@ class Memory:
         )
 
 
-@dataclass
 class CsrRegisterFile(Memory):
-    privilege_level: int = 0
+    def __init__(
+        self, memory_file=None, privelege_level: int = 0, length: int = 32
+    ) -> None:
+        super().__init__(memory_file=memory_file, length=length)
+        self.privilege_level: int = privelege_level
 
     def load_byte(self, address: int) -> fixedint.MutableUInt8:
         self.check_for_legal_address(address)
@@ -207,13 +207,26 @@ class CsrRegisterFile(Memory):
             )
 
 
-@dataclass
 class ArchitecturalState:
-    register_file: RegisterFile
-    memory: Memory = Memory(memory_file={})
-    csr_registers: CsrRegisterFile = CsrRegisterFile(memory_file={}, length=32)
-    program_counter: int = 0
-    performance_metrics: PerformanceMetrics = PerformanceMetrics()
+    def __init__(
+        self,
+        register_file=None,
+        memory=None,
+        csr_registers=None,
+        program_counter: int = 0,
+        performance_metrics=None,
+    ) -> None:
+        self.register_file: RegisterFile = (
+            RegisterFile() if register_file == None else register_file
+        )
+        self.memory: Memory = Memory() if memory == None else memory
+        self.csr_registers: CsrRegisterFile = (
+            CsrRegisterFile() if csr_registers == None else csr_registers
+        )
+        self.program_counter: int = program_counter
+        self.performance_metrics: PerformanceMetrics = (
+            PerformanceMetrics() if performance_metrics == None else performance_metrics
+        )
 
     def change_privilege_level(self, level: int):
         if not level < 0 and not level > 3:

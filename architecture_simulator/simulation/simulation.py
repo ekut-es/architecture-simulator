@@ -1,13 +1,16 @@
-from dataclasses import dataclass
 from ..isa.instruction_types import Instruction
 from ..isa.parser import RiscvParser
 from ..uarch.architectural_state import ArchitecturalState
 
 
-@dataclass
 class Simulation:
-    state: ArchitecturalState
-    instructions: dict[int, Instruction]
+    def __init__(self, state=None, instructions=None) -> None:
+        self.state: ArchitecturalState = (
+            ArchitecturalState() if state == None else state
+        )
+        self.instructions: dict[int, Instruction] = (
+            {} if instructions == None else instructions
+        )
 
     def append_instructions(self, program: str):
         next_address = len(self.instructions) * 4
