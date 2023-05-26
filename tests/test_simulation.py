@@ -3,7 +3,6 @@ import unittest
 from architecture_simulator.uarch.architectural_state import RegisterFile
 from architecture_simulator.uarch.architectural_state import Memory
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
-from architecture_simulator.uarch.architectural_state import PerformanceMetrics
 from architecture_simulator.simulation.simulation import Simulation
 from architecture_simulator.isa.rv32i_instructions import ADDI, BNE, BEQ, JAL
 
@@ -41,7 +40,6 @@ class TestSimulation(unittest.TestCase):
                 24: ADDI(rd=1, rs1=1, imm=1),
             },
         )
-        simulation.state.performance_metrics = PerformanceMetrics()
         simulation.run_simulation()
         self.assertEqual(int(simulation.state.register_file.registers[1]), 7)
         self.assertEqual(simulation.state.performance_metrics.branch_count, 0)
@@ -59,8 +57,6 @@ class TestSimulation(unittest.TestCase):
             instructions={},
         )
 
-        # FIXME: performance_metrics is a class variable - all architectural states use the same object :(
-        simulation.state.performance_metrics = PerformanceMetrics()
         simulation.run_simulation()
         self.assertEqual(int(simulation.state.register_file.registers[0]), 0)
         self.assertEqual(simulation.state.performance_metrics.branch_count, 0)
@@ -86,7 +82,6 @@ class TestSimulation(unittest.TestCase):
                 20: ADDI(rd=3, rs1=0, imm=64),
             },
         )
-        simulation.state.performance_metrics = PerformanceMetrics()
         simulation.run_simulation()
         self.assertEqual(simulation.state.register_file.registers, [0, 5, 5, 64])
         self.assertEqual(simulation.state.performance_metrics.branch_count, 5)
@@ -109,7 +104,6 @@ class TestSimulation(unittest.TestCase):
                 16: BNE(rs1=1, rs2=2, imm=-6),
             },
         )
-        simulation.state.performance_metrics = PerformanceMetrics()
         simulation.run_simulation()
         self.assertEqual(simulation.state.register_file.registers, [0, 33, 33, 0])
         self.assertEqual(simulation.state.performance_metrics.branch_count, 10)
@@ -133,7 +127,6 @@ class TestSimulation(unittest.TestCase):
                 20: ADDI(rd=1, rs1=1, imm=-10),
             },
         )
-        simulation.state.performance_metrics = PerformanceMetrics()
         simulation.run_simulation()
         self.assertEqual(
             simulation.state.register_file.registers, [0, pow(2, 32) - 10, 20, 8]
