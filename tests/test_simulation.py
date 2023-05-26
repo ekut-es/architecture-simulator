@@ -1,4 +1,5 @@
 import unittest
+import fixedint
 
 from architecture_simulator.uarch.architectural_state import RegisterFile
 from architecture_simulator.uarch.architectural_state import Memory
@@ -138,3 +139,24 @@ class TestSimulation(unittest.TestCase):
             simulation.state.performance_metrics.instructions_per_second, 0
         )
         self.assertGreater(simulation.state.performance_metrics.execution_time_s, 0)
+
+    def test_against_class_variables(self):
+        """Some tests against class variables (some things used to be class variables and were thus shared between objects, which was undesired)"""
+        simulation1 = Simulation()
+        simulation2 = Simulation()
+
+        simulation1.state.register_file.registers[5] = fixedint.MutableUInt32(12)
+        self.assertEqual(int(simulation1.state.register_file.registers[5]), 12)
+        self.assertEqual(int(simulation2.state.register_file.registers[5]), 0)
+
+        simulation1.instructions = {0: ADDI(rd=5, rs1=12, imm=12)}
+        self.assertEqual(len(simulation1.instructions), 1)
+        self.assertEqual(len(simulation2.instructions), 0)
+
+        simulation1.state.performance_metrics.instruction_count = 12
+        self.assertEqual(simulation1.state.performance_metrics.instruction_count, 12)
+        self.assertEqual(simulation2.state.performance_metrics.instruction_count, 0)
+
+        simulation1.state.memory.store_byte(address=5, value=fixedint.MutableUInt8(12))
+        self.assertEqual(int(simulation1.state.memory.load_byte(address=5)), 12)
+        self.assertEqual(int(simulation2.state.memory.load_byte(address=5)), 0)
