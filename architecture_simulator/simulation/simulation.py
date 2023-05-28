@@ -1,16 +1,13 @@
 from ..isa.instruction_types import Instruction
 from ..isa.parser import RiscvParser
 from ..uarch.architectural_state import ArchitecturalState
+from dataclasses import dataclass, field
 
 
+@dataclass
 class Simulation:
-    def __init__(self, state=None, instructions=None) -> None:
-        self.state: ArchitecturalState = (
-            ArchitecturalState() if state == None else state
-        )
-        self.instructions: dict[int, Instruction] = (
-            {} if instructions == None else instructions
-        )
+    state: ArchitecturalState = field(default_factory=ArchitecturalState)
+    instructions: dict[int, Instruction] = field(default_factory=dict)
 
     def append_instructions(self, program: str):
         next_address = len(self.instructions) * 4
