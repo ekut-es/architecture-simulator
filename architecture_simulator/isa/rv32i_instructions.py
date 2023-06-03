@@ -8,6 +8,8 @@ from architecture_simulator.isa.instruction_types import STypeInstruction
 from architecture_simulator.isa.instruction_types import UTypeInstruction
 from architecture_simulator.isa.instruction_types import JTypeInstruction
 from architecture_simulator.isa.instruction_types import fence
+from architecture_simulator.isa.instruction_types import Instruction
+from typing import Type
 import fixedint
 
 
@@ -810,7 +812,7 @@ class SRAI(ITypeInstruction):
         return architectural_state
 
 
-instruction_map = {
+instruction_map: dict[str, Type[Instruction]] = {
     "add": ADD,
     "beq": BEQ,
     "blt": BLT,

@@ -10,6 +10,9 @@ class Instruction:
     # If this is not the case, this needs to be shadowed (I hope that that works in python, but we'll se that when we get to it).
     length: int = 4
 
+    def __init__(self, **kwargs):
+        self.mnemonic = kwargs["mnemonic"]
+
     def behavior(self, architectural_state: ArchitecturalState):
         pass
 

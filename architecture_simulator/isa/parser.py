@@ -173,7 +173,10 @@ class RiscvParser:
             ):
                 labels.update({i_parsed: instruction_address})
             else:
-                instruction_address += 4
+                mnemonic = (
+                    i_parsed if type(i_parsed) == str else i_parsed.mnemonic
+                ).lower()
+                instruction_address += instruction_map[mnemonic].length
         return labels
 
     def parse_res_to_instructions(
