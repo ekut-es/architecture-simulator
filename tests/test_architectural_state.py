@@ -1,9 +1,12 @@
 import unittest
 import fixedint
 
-from architecture_simulator.uarch.architectural_state import RegisterFile, ArchitecturalState, Memory
+from architecture_simulator.uarch.architectural_state import (
+    RegisterFile,
+    ArchitecturalState,
+    Memory,
+)
 from architecture_simulator.isa.rv32i_instructions import ADD, SLL
-
 
 
 class TestArchitecture(unittest.TestCase):
@@ -84,7 +87,7 @@ class TestArchitecture(unittest.TestCase):
         # tests are now with 16 bit length of memory
         state = ArchitecturalState(
             register_file=RegisterFile(registers=()),
-            memory=Memory(memory_file={}, length=16),
+            memory=Memory(memory_file={}, address_length=16),
         )
 
         # store_byte test
