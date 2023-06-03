@@ -198,10 +198,10 @@ class RiscvParser:
             if isinstance(instruction_parsed, str):
                 if instruction_parsed == "ecall":
                     instructions.append(ECALL(imm=0, rs1=0, rd=0))
-                    address_count += 4
+                    address_count += ECALL.length
                 if instruction_parsed == "ebreak":
                     instructions.append(EBREAK(imm=1, rs1=0, rd=0))
-                    address_count += 4
+                    address_count += EBREAK.length
                 continue
             instruction_class = instruction_map[instruction_parsed.mnemonic.lower()]
             if instruction_class.__base__ is instruction_types.RTypeInstruction:
@@ -296,6 +296,5 @@ class RiscvParser:
             elif instruction_class.__base__ is instruction_types.fence:
                 # TODO: Change me, if Fence gets implemented
                 instructions.append(FENCE())
-            # TODO: If instructions with length != 4 Bytes are supported the Instruction Type needs to be checked
-            address_count += 4
+            address_count += instruction_map[instruction_parsed.mnemonic.lower()].length
         return instructions
