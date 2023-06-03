@@ -6,6 +6,9 @@ from architecture_simulator.uarch.architectural_state import ArchitecturalState
 @dataclass
 class Instruction:
     mnemonic: str
+    # length of the instruction in bytes. Most instructions are 4 bytes long.
+    # If this is not the case, this needs to be shadowed (I hope that that works in python, but we'll se that when we get to it).
+    length: int = 4
 
     def behavior(self, architectural_state: ArchitecturalState):
         pass
