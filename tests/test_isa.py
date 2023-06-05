@@ -49,6 +49,7 @@ from architecture_simulator.isa.rv32i_instructions import (
     ANDI,
     SLLI,
     SRLI,
+    FENCE,
 )
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 
@@ -2080,3 +2081,32 @@ class TestInstructions(unittest.TestCase):
 
         b_type_ex_bltu = BLTU(rs1=30, rs2=31, imm=-12)
         self.assertEqual(b_type_ex_bltu.__repr__(), "bltu x30, x31, -12")
+
+        # Test U-Type
+        u_type_ex_lui = LUI(rd=16, imm=123)
+        self.assertEqual(u_type_ex_lui.__repr__(), "lui x16, 123")
+
+        u_type_ex_auipc = AUIPC(rd=31, imm=-4)
+        self.assertEqual(u_type_ex_auipc.__repr__(), "auipc x31, -4")
+
+        # Test J-Type
+        j_type_ex_jal = JAL(rd=23, imm=120)
+        self.assertEqual(j_type_ex_jal.__repr__(), "jal x23, 120")
+
+        # Test fence
+        fence_ex = FENCE()
+        self.assertEqual(fence_ex.__repr__(), "fence")
+
+        # Test CSR-Type
+        csr_type_ex_csrrw = CSRRW(rd=0, csr=0xF, rs1=12)
+        self.assertEqual(csr_type_ex_csrrw.__repr__(), "csrrw x0, 0xf, x12")
+
+        csr_type_ex_csrrs = CSRRS(rd=31, csr=0xAC, rs1=7)
+        self.assertEqual(csr_type_ex_csrrs.__repr__(), "csrrs x31, 0xac, x7")
+
+        # Test CSR-imm-Type
+        csri_type_ex_csrrwi = CSRRWI(rd=12, csr=0x448, uimm=20)
+        self.assertEqual(csri_type_ex_csrrwi.__repr__(), "csrrwi x12, 0x448, 20")
+
+        csri_type_ex_csrrci = CSRRCI(rd=0, csr=0x40F, uimm=16)
+        self.assertEqual(csri_type_ex_csrrci.__repr__(), "csrrci x0, 0x40f, 16")

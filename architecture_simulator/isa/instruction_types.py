@@ -37,6 +37,9 @@ class CSRTypeInstruction(Instruction):
         self.csr = csr
         self.rs1 = rs1
 
+    def __repr__(self) -> str:
+        return f"{self.mnemonic} x{self.rd}, {hex(self.csr)}, x{self.rs1}"
+
 
 class CSRITypeInstruction(Instruction):
     """Create an I-Type instruction
@@ -52,6 +55,9 @@ class CSRITypeInstruction(Instruction):
         self.rd = rd
         self.csr = csr
         self.uimm = uimm
+
+    def __repr__(self) -> str:
+        return f"{self.mnemonic} x{self.rd}, {hex(self.csr)}, {self.uimm}"
 
 
 class BTypeInstruction(Instruction):
@@ -105,6 +111,9 @@ class UTypeInstruction(Instruction):
         self.rd = rd
         self.imm = imm
 
+    def __repr__(self) -> str:
+        return f"{self.mnemonic} x{self.rd}, {self.imm}"
+
 
 class JTypeInstruction(Instruction):
     def __init__(self, rd: int, imm: int, **args):
@@ -117,10 +126,16 @@ class JTypeInstruction(Instruction):
         self.rd = rd
         self.imm = imm
 
+    def __repr__(self) -> str:
+        return f"{self.mnemonic} x{self.rd}, {self.imm}"
+
 
 class fence(Instruction):
     def __init__(self, **args):
         super().__init__(**args)
+
+    def __repr__(self) -> str:
+        return f"{self.mnemonic}"
 
 
 class ITypeInstruction(Instruction):
