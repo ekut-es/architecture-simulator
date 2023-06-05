@@ -2055,3 +2055,28 @@ class TestInstructions(unittest.TestCase):
         slti_1 = SLTIU(rd=3, rs1=3, imm=b1)
         state = slti_1.behavior(state)
         self.assertEqual(state.register_file.registers, [b1, b1, b1, b0])
+
+    def test_repr(self):
+        # Tests that the __repr__() method for the instructions works as intended
+        # Test R-Type
+        r_type_ex_add = ADD(rd=4, rs1=5, rs2=6)
+        self.assertEqual(r_type_ex_add.__repr__(), "add x4, x5, x6")
+
+        r_type_ex_or = OR(rd=0, rs1=31, rs2=30)
+        self.assertEqual(r_type_ex_or.__repr__(), "or x0, x31, x30")
+
+        # Test I-Type
+
+        # Test S-Type
+        s_type_ex_sb = SB(rs1=8, rs2=11, imm=16)
+        self.assertEqual(s_type_ex_sb.__repr__(), "sb x11, 16(x8)")
+
+        s_type_ex_sw = SW(rs1=5, rs2=31, imm=-4)
+        self.assertEqual(s_type_ex_sw.__repr__(), "sw x31, -4(x5)")
+
+        # Test B-Type
+        b_type_ex_beq = BEQ(rs1=4, rs2=5, imm=48)
+        self.assertEqual(b_type_ex_beq.__repr__(), "beq x4, x5, 48")
+
+        b_type_ex_bltu = BLTU(rs1=30, rs2=31, imm=-12)
+        self.assertEqual(b_type_ex_bltu.__repr__(), "bltu x30, x31, -12")

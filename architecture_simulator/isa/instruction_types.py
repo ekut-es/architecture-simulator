@@ -18,6 +18,9 @@ class RTypeInstruction(Instruction):
         self.rs2 = rs2
         self.rd = rd
 
+    def __repr__(self) -> str:
+        return f"{self.mnemonic} x{self.rd}, x{self.rs1}, x{self.rs2}"
+
 
 class CSRTypeInstruction(Instruction):
     """Create an I-Type instruction
@@ -71,6 +74,9 @@ class BTypeInstruction(Instruction):
         self.rs2 = rs2
         self.imm = imm
 
+    def __repr__(self) -> str:
+        return f"{self.mnemonic} x{self.rs1}, x{self.rs2}, {self.imm}"
+
 
 class STypeInstruction(Instruction):
     def __init__(self, rs1: int, rs2: int, imm: int, **args):
@@ -83,6 +89,9 @@ class STypeInstruction(Instruction):
         self.rs1 = rs1
         self.rs2 = rs2
         self.imm = imm
+
+    def __repr__(self) -> str:
+        return f"{self.mnemonic} x{self.rs2}, {self.imm}(x{self.rs1})"
 
 
 class UTypeInstruction(Instruction):
