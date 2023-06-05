@@ -81,7 +81,7 @@ class BTypeInstruction(Instruction):
         self.imm = imm
 
     def __repr__(self) -> str:
-        return f"{self.mnemonic} x{self.rs1}, x{self.rs2}, {self.imm}"
+        return f"{self.mnemonic} x{self.rs1}, x{self.rs2}, {self.imm*2}"
 
 
 class STypeInstruction(Instruction):
@@ -127,15 +127,16 @@ class JTypeInstruction(Instruction):
         self.imm = imm
 
     def __repr__(self) -> str:
-        return f"{self.mnemonic} x{self.rd}, {self.imm}"
+        return f"{self.mnemonic} x{self.rd}, {self.imm*2}"
 
 
 class fence(Instruction):
     def __init__(self, **args):
         super().__init__(**args)
 
-    def __repr__(self) -> str:
-        return f"{self.mnemonic}"
+    # TODO: Change me, if Fence gets implemented
+    # def __repr__(self) -> str:
+    #    return f"{self.mnemonic}"
 
 
 class ITypeInstruction(Instruction):

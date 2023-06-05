@@ -55,6 +55,8 @@ from architecture_simulator.uarch.architectural_state import ArchitecturalState
 
 import fixedint
 
+from architecture_simulator.isa.parser import RiscvParser
+
 
 class TestInstructions(unittest.TestCase):
     def test_add(self):
@@ -2057,7 +2059,7 @@ class TestInstructions(unittest.TestCase):
         state = slti_1.behavior(state)
         self.assertEqual(state.register_file.registers, [b1, b1, b1, b0])
 
-    def test_repr(self):
+    def test_repr_1(self):
         # Tests that the __repr__() method for the instructions works as intended
         # Test R-Type
         r_type_ex_add = ADD(rd=4, rs1=5, rs2=6)
@@ -2105,10 +2107,10 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(s_type_ex_sw.__repr__(), "sw x31, -4(x5)")
 
         # Test B-Type
-        b_type_ex_beq = BEQ(rs1=4, rs2=5, imm=48)
+        b_type_ex_beq = BEQ(rs1=4, rs2=5, imm=24)
         self.assertEqual(b_type_ex_beq.__repr__(), "beq x4, x5, 48")
 
-        b_type_ex_bltu = BLTU(rs1=30, rs2=31, imm=-12)
+        b_type_ex_bltu = BLTU(rs1=30, rs2=31, imm=-6)
         self.assertEqual(b_type_ex_bltu.__repr__(), "bltu x30, x31, -12")
 
         # Test U-Type
@@ -2119,12 +2121,12 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(u_type_ex_auipc.__repr__(), "auipc x31, -4")
 
         # Test J-Type
-        j_type_ex_jal = JAL(rd=23, imm=120)
+        j_type_ex_jal = JAL(rd=23, imm=60)
         self.assertEqual(j_type_ex_jal.__repr__(), "jal x23, 120")
 
-        # Test fence
-        fence_ex = FENCE()
-        self.assertEqual(fence_ex.__repr__(), "fence")
+        # TODO: Change me, if Fence gets implemented
+        # fence_ex = FENCE()
+        # self.assertEqual(fence_ex.__repr__(),"fence")
 
         # Test CSR-Type
         csr_type_ex_csrrw = CSRRW(rd=0, csr=0xF, rs1=12)
@@ -2139,3 +2141,34 @@ class TestInstructions(unittest.TestCase):
 
         csri_type_ex_csrrci = CSRRCI(rd=0, csr=0x40F, uimm=16)
         self.assertEqual(csri_type_ex_csrrci.__repr__(), "csrrci x0, 0x40f, 16")
+
+    def test_repr_2(self):
+        # Test using the parser
+        text = """add x4, x5, x6
+or x0, x31, x30
+addi x3, x4, 32
+ori x31, x30, 12
+ecall
+ebreak
+lb x0, 12(x8)
+lh x0, 12(x8)
+lw x0, 12(x8)
+lbu x0, 4(x8)
+lhu x0, 4(x8)
+sb x11, 16(x8)
+sw x31, 4(x5)
+beq x4, x5, 48
+bltu x30, x31, 12
+lui x16, 123
+auipc x31, 4
+jal x23, 120
+csrrw x0, 0xf, x12
+csrrs x31, 0xac, x7
+csrrwi x12, 0x448, 20
+csrrci x0, 0x40f, 16"""
+        parser = RiscvParser()
+        instructions = parser.parse_res_to_instructions(
+            parser.parse_assembly(text), start_address=0
+        )
+        for (instruction, line) in zip(instructions, text.splitlines()):
+            self.assertEqual(str(instruction), line)
