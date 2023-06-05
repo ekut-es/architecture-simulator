@@ -156,3 +156,23 @@ class ITypeInstruction(Instruction):
         self.imm = imm
         self.rs1 = rs1
         self.rd = rd
+
+    def __repr__(self) -> str:
+        from architecture_simulator.isa.rv32i_instructions import (
+            LB,
+            LH,
+            LW,
+            LBU,
+            LHU,
+            ECALL,
+            EBREAK,
+        )
+
+        memory_instructions = (LB, LH, LW, LBU, LHU)
+        e_instructions = (ECALL, EBREAK)
+        if isinstance(self, memory_instructions):
+            return f"{self.mnemonic} x{self.rd}, {self.imm}(x{self.rs1})"
+        elif isinstance(self, e_instructions):
+            return f"{self.mnemonic}"
+        else:
+            return f"{self.mnemonic} x{self.rd}, x{self.rs1}, {self.imm}"

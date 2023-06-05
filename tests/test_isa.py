@@ -2067,6 +2067,35 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(r_type_ex_or.__repr__(), "or x0, x31, x30")
 
         # Test I-Type
+        # Test instructions that use default repr
+        i_type_ex_addi = ADDI(rd=3, rs1=4, imm=32)
+        self.assertEqual(i_type_ex_addi.__repr__(), "addi x3, x4, 32")
+
+        i_type_ex_ori = ORI(rd=31, rs1=30, imm=-12)
+        self.assertEqual(i_type_ex_ori.__repr__(), "ori x31, x30, -12")
+
+        # Test e-instructions
+        i_type_ex_ecall = ECALL(rd=0, rs1=0, imm=0)
+        self.assertEqual(i_type_ex_ecall.__repr__(), "ecall")
+
+        i_type_ex_ebreak = EBREAK(rd=0, rs1=0, imm=0)
+        self.assertEqual(i_type_ex_ebreak.__repr__(), "ebreak")
+
+        # Test instructions that use memory layout
+        i_type_ex_lb = LB(rd=0, rs1=8, imm=-12)
+        self.assertEqual(i_type_ex_lb.__repr__(), "lb x0, -12(x8)")
+
+        i_type_ex_lh = LH(rd=0, rs1=8, imm=-12)
+        self.assertEqual(i_type_ex_lh.__repr__(), "lh x0, -12(x8)")
+
+        i_type_ex_lw = LW(rd=0, rs1=8, imm=-12)
+        self.assertEqual(i_type_ex_lw.__repr__(), "lw x0, -12(x8)")
+
+        i_type_ex_lbu = LBU(rd=0, rs1=8, imm=4)
+        self.assertEqual(i_type_ex_lbu.__repr__(), "lbu x0, 4(x8)")
+
+        i_type_ex_lhu = LHU(rd=0, rs1=8, imm=4)
+        self.assertEqual(i_type_ex_lhu.__repr__(), "lhu x0, 4(x8)")
 
         # Test S-Type
         s_type_ex_sb = SB(rs1=8, rs2=11, imm=16)
