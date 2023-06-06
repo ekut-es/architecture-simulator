@@ -97,6 +97,12 @@ def run_sim(instr: str):
     # run the simulation
     simulation.run_simulation()
 
+    # update the instructions after exeution of the instruction/s
+    json_instructions = []
+    for address, cmd in simulation.instructions.items():
+        json_instructions.append({"add": int(address), "cmd": cmd.__repr__()})
+    archsim_js.append_instructions(json.dumps(json_instructions))
+
     # update the registers after exeution of the instruction/s
     json_registers = []
     for reg_i, reg_val in enumerate(simulation.state.register_file.registers):

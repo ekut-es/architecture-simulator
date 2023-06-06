@@ -65,7 +65,10 @@ const archsim_js = {
         simulation_json = JSON.stringify(temp_simulation_json)
     },
     append_instructions: function(cmd_json_str) {
-        //setCommandString(cmd_json_str)
+        temp_simulation_json = JSON.parse(simulation_json)
+        temp_cmd_json_str = JSON.parse(cmd_json_str)
+        temp_simulation_json.cmd_list = temp_cmd_json_str
+        simulation_json = JSON.stringify(temp_simulation_json)
     }
 };
 
