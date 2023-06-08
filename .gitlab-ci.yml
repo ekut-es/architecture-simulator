@@ -1,3 +1,8 @@
+stages:
+  - build
+  - test
+  - deploy
+
 default:
   interruptible: false
   image: python:3.10
@@ -18,27 +23,24 @@ cache:
     - .cache/pip
     - .venv/
 
-before_script:
-  - wget https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v12.2.0-3/xpack-riscv-none-elf-gcc-12.2.0-3-linux-x64.tar.gz
-  - tar -xvf xpack-riscv-none-elf-gcc-12.2.0-3-linux-x64.tar.gz
-  - mkdir -p /opt/riscv
-  - mv xpack-riscv-none-elf-gcc-12.2.0-3 /opt/riscv/
-  - export PATH="/opt/riscv/xpack-riscv-none-elf-gcc-12.2.0-3/bin:${PATH}"
-  - make -C tests/c_programs all
-  - which riscv-none-elf-gcc # check that RISC-V GCC can be found
-  - python --version # check that Python version is correct
-  - pip install virtualenv
-  - virtualenv .venv
-  - source .venv/bin/activate
-  - pip install -e .
+.python-job:
+  before_script:
+    - wget https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v12.2.0-3/xpack-riscv-none-elf-gcc-12.2.0-3-linux-x64.tar.gz
+    - tar -xvf xpack-riscv-none-elf-gcc-12.2.0-3-linux-x64.tar.gz
+    - mkdir -p /opt/riscv
+    - mv xpack-riscv-none-elf-gcc-12.2.0-3 /opt/riscv/
+    - export PATH="/opt/riscv/xpack-riscv-none-elf-gcc-12.2.0-3/bin:${PATH}"
+    - make -C tests/c_programs all
+    - which riscv-none-elf-gcc # check that RISC-V GCC can be found
+    - python --version # check that Python version is correct
+    - pip install virtualenv
+    - virtualenv .venv
+    - source .venv/bin/activate
+    - pip install -e .
 
-test:
-  script:
-    - pip install pytest mypy
-    - pytest .
-    - mypy .
-
-run:
+build:
+  stage: build
+  extends: .python-job
   script:
     - pip install build
     - python -m build
@@ -46,3 +48,36 @@ run:
     paths:
       - dist/*.whl
       - tests/c_programs/*.s
+
+test:
+  stage: test
+  extends: .python-job
+  script:
+    - pip install pytest mypy
+    - pytest --junitxml=test-report.xml .
+    - mypy .
+  artifacts:
+    when: always
+    reports:
+      junit: test-report.xml
+
+deploy:
+  stage: deploy
+  only:
+    - main
+  variables:
+    TARGET: "archsim@atreus.cs.uni-tuebingen.de:/opt/landing_page/archsim/"
+  dependencies:
+    - "build"
+  before_script:
+    - apt-get update
+    - apt-get install -y rsync
+  script:
+    - eval $(ssh-agent -s)
+    - echo "$DEPLOY_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "$DEPLOY_HOST_KEY" >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - rsync -ah --no-o --no-g --delete webgui/ $TARGET
+    - rsync -ah --no-o --no-g --delete dist $TARGET
