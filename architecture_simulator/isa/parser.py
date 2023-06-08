@@ -138,8 +138,8 @@ class RiscvParser:
         + pattern_uimm("uimm")
     )
 
-    riscv_bnf = (
-        pp.OneOrMore(
+    line = (
+        (
             pattern_reg_reg_reg_instruction
             | pattern_reg_imm_reg_instruction
             | pattern_reg_csr_reg_instruction
@@ -147,10 +147,9 @@ class RiscvParser:
             | pattern_reg_reg_imm_instruction
             | pattern_reg_smth_instruction
             | (pattern_label + D_COL)
-            | pp.Word(pp.alphas)("mnemonic")  # for ecall, ebreak
-        )
-        + pp.StringEnd()
-    ).ignore(pp.Char("#") + pp.rest_of_line())
+            | pp.Word(pp.alphas)("mnemonic")
+        )  # for ecall, ebreak
+    ) + pp.StringEnd().suppress()
 
     def convert_label_or_imm(
         self,
@@ -175,7 +174,7 @@ class RiscvParser:
         else:
             return reg_mapping["".join(parsed_register)]
 
-    def parse_assembly(self, assembly: str) -> pp.ParseResults:
+    def parse_assembly(self, assembly: str) -> list[pp.ParseResults]:
         """Turn assembly code into parse results.
 
         Args:
@@ -184,18 +183,26 @@ class RiscvParser:
         Returns:
             pp.ParseResults: Parse results.
         """
-        return self.riscv_bnf.parse_string(assembly)
+        lines = [
+            (line.split("#", 1)[0].strip()).strip()
+            for line in assembly.splitlines()
+            if line and not line.strip().startswith("#")
+        ]
+        a = [self.line.parse_string(line)[0] for line in lines]
+        return a
 
-    def compute_labels(self, parse_result: pp.ParseResults, start_address: int) -> dict:
+    def compute_labels(
+        self, parse_result: list[pp.ParseResults], start_address: int
+    ) -> dict:
         """Compute the addresses for the labels.
         Args:
-            parse_result (pp.ParseResults): Parsed assembly which may contain labels
+            parse_result list[pp.ParseResults]: Parsed assembly which may contain labels
             start_address (int): address of the first instruction.
 
         Returns:
             dict: addresses for the labels.
         """
-        labels = {}
+        labels: dict[str, int] = {}
         instruction_address = start_address
         for i_parsed in parse_result:
             if (
@@ -212,12 +219,12 @@ class RiscvParser:
         return labels
 
     def parse_res_to_instructions(
-        self, parse_result: pp.ParseResults, start_address: int
+        self, parse_result: list[pp.ParseResults], start_address: int
     ) -> list[Instruction]:
         """Turn parse results into instructions.
 
         Args:
-            parse_result (pp.ParseResults): parsed assembly which may contain labels.
+            parse_result (list[pp.ParseResults]): parsed assembly which may contain labels.
 
         Returns:
             list[Instruction]: executable list of instructions
