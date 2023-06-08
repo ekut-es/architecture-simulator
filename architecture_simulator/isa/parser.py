@@ -54,7 +54,18 @@ class RiscvParser:
 
     pattern_label = pp.Word(pp.alphas + "_", pp.alphanums + "_")("label")
 
-    pattern_imm = pp.Combine(pp.Optional("-") + pp.Word(pp.nums))("imm")
+    pattern_imm = pp.Combine(
+        pp.Optional("-")
+        + (
+            (
+                pp.Word(pp.nums)
+                | pp.Combine("0x" + pp.Word(pp.hexnums))
+                | pp.Combine("0b" + pp.Word("01"))
+            )
+        )
+    )
+
+    pp.ParseResults().get_name()
 
     pattern_uimm = pp.Word(pp.nums)("uimm")
 
@@ -81,7 +92,7 @@ class RiscvParser:
         + COMMA
         + pattern_register("reg2")
         + COMMA
-        + (pattern_imm | (pattern_label + pattern_offset))
+        + (pattern_imm("imm") | (pattern_label + pattern_offset))
     )
 
     # I-Types, B-Types, S-Types
@@ -89,7 +100,7 @@ class RiscvParser:
         pp.Word(pp.alphas)("mnemonic")
         + pattern_register("reg1")
         + COMMA
-        + pattern_imm
+        + pattern_imm("imm")
         + Paren_L
         + pattern_register("reg2")
         + Paren_R
@@ -100,7 +111,11 @@ class RiscvParser:
         pp.Word(pp.alphas)("mnemonic")
         + pattern_register("rd")
         + COMMA
-        + (pattern_imm | pattern_register("rs1") | (pattern_label + pattern_offset))
+        + (
+            pattern_imm("imm")
+            | pattern_register("rs1")
+            | (pattern_label + pattern_offset)
+        )
     )
 
     # CSR-Types
@@ -136,6 +151,23 @@ class RiscvParser:
         )
         + pp.StringEnd()
     ).ignore(pp.Char("#") + pp.rest_of_line())
+
+    def convert_label_or_imm(
+        self,
+        instruction_parsed: pp.ParseResults,
+        labels: dict[str, int],
+        address_count: int,
+    ) -> int:
+        # Checks if a imm or label was given
+        # returns the integer value used in the construction of the instruction
+        # TODO: Throws exception if imm is uneven
+        if instruction_parsed.get("imm"):
+            return int(instruction_parsed.imm, base=0) // 2
+        else:
+            offset = 0
+            if instruction_parsed.offset:
+                offset = int(instruction_parsed.offset, base=0)
+            return (labels[instruction_parsed.label] + offset - address_count) // 2
 
     def p_reg(self, parsed_register: pp.ParseResults) -> int:
         if parsed_register[0] == "x":
@@ -215,7 +247,7 @@ class RiscvParser:
             elif instruction_class.__base__ is instruction_types.ITypeInstruction:
                 instructions.append(
                     instruction_class(
-                        imm=int(instruction_parsed.imm),
+                        imm=int(instruction_parsed.imm, base=0),
                         # because an i type instruction may be written in two diffrent patterns the "reg" notation is used
                         # ex: lb x1, 33(x2) | addi x1, x2, 33
                         rs1=self.p_reg(instruction_parsed.reg2),
@@ -227,21 +259,13 @@ class RiscvParser:
                     instruction_class(
                         rs1=self.p_reg(instruction_parsed.reg2),
                         rs2=self.p_reg(instruction_parsed.reg1),
-                        imm=int(instruction_parsed.imm),
+                        imm=int(instruction_parsed.imm, base=0),
                     )
                 )
             elif instruction_class.__base__ is instruction_types.BTypeInstruction:
-                # TODO: Throws exception if imm is uneven
-                imm_val = -1
-                if instruction_parsed.imm.isdigit():
-                    imm_val = int(instruction_parsed.imm) // 2
-                else:
-                    offset = 0
-                    if instruction_parsed.offset != "":
-                        offset = int(instruction_parsed.offset, 0)
-                    imm_val = (
-                        labels[instruction_parsed.label] + offset - address_count
-                    ) // 2
+                imm_val = self.convert_label_or_imm(
+                    instruction_parsed, labels, address_count
+                )
 
                 instructions.append(
                     instruction_class(
@@ -254,21 +278,13 @@ class RiscvParser:
                 instructions.append(
                     instruction_class(
                         rd=self.p_reg(instruction_parsed.rd),
-                        imm=int(instruction_parsed.imm),
+                        imm=int(instruction_parsed.imm, base=0),
                     )
                 )
             elif instruction_class.__base__ is instruction_types.JTypeInstruction:
-                # TODO: Throws exception if imm is uneven
-                imm_val = -1
-                if instruction_parsed.imm.isdigit():
-                    imm_val = int(instruction_parsed.imm) // 2
-                else:
-                    offset = 0
-                    if instruction_parsed.offset != "":
-                        offset = int(instruction_parsed.offset, 0)
-                    imm_val = (
-                        labels[instruction_parsed.label] + offset - address_count
-                    ) // 2
+                imm_val = self.convert_label_or_imm(
+                    instruction_parsed, labels, address_count
+                )
 
                 instructions.append(
                     instruction_class(
@@ -280,7 +296,7 @@ class RiscvParser:
                 instructions.append(
                     instruction_class(
                         rd=self.p_reg(instruction_parsed.rd),
-                        csr=int(instruction_parsed.csr, 0),
+                        csr=int(instruction_parsed.csr, base=0),
                         rs1=self.p_reg(instruction_parsed.rs1),
                     )
                 )
@@ -289,7 +305,7 @@ class RiscvParser:
                 instructions.append(
                     instruction_class(
                         rd=self.p_reg(instruction_parsed.rd),
-                        csr=int(instruction_parsed.csr, 0),
+                        csr=int(instruction_parsed.csr, base=0),
                         uimm=int(instruction_parsed.uimm),
                     )
                 )
