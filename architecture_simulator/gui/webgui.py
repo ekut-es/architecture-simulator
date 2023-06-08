@@ -73,7 +73,7 @@ def step_sim(instr: str):
     json_registers = []
     for reg_i, reg_val in enumerate(simulation.state.register_file.registers):
         json_registers.append({"index": int(reg_i), "value": int(reg_val)})
-        archsim_js.update_register(reg_i, int(reg_val))
+        archsim_js.update_single_register(reg_i, int(reg_val))
     archsim_js.append_registers(json.dumps(json_registers))
 
     # update the memory after exeution of the instruction/s
@@ -82,7 +82,7 @@ def step_sim(instr: str):
         simulation.state.memory.memory_file.items(), key=lambda item: item[0]
     ):
         json_memory.append({"index": hex(address), "value": int(address_val)})
-        archsim_js.update_memory(hex(address), bin(address_val))
+        archsim_js.update_single_memory_address(hex(address), bin(address_val))
     archsim_js.append_memories(json.dumps(json_memory))
 
     return simulation
@@ -112,7 +112,7 @@ def run_sim(instr: str):
     json_registers = []
     for reg_i, reg_val in enumerate(simulation.state.register_file.registers):
         json_registers.append({"index": int(reg_i), "value": int(reg_val)})
-        archsim_js.update_register(reg_i, int(reg_val))
+        archsim_js.update_single_register(reg_i, int(reg_val))
     archsim_js.append_registers(json.dumps(json_registers))
 
     # update the memory after exeution of the instruction/s
@@ -121,7 +121,7 @@ def run_sim(instr: str):
         simulation.state.memory.memory_file.items(), key=lambda item: item[0]
     ):
         json_memory.append({"index": hex(address), "value": int(address_val)})
-        archsim_js.update_memory(hex(address), bin(address_val))
+        archsim_js.update_single_memory_address(hex(address), bin(address_val))
     archsim_js.append_memories(json.dumps(json_memory))
 
     return simulation
