@@ -48,3 +48,6 @@ state.register_file.registers[1] = fixedint.MutableUInt32(0x_80_00_00_00)
 #print([fixedint.MutableUInt32(0) for i in range(32)])
 for reg_i in range(len(simulation.state.register_file.registers)):
     print(reg_i,int(simulation.state.register_file.registers[reg_i]))"""
+
+"""d = {1: "a", 2: "b", 4: "c", 3: "d"}
+print(sorted(d.items(), key=lambda item: item[0]))"""
