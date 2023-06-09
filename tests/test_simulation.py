@@ -26,6 +26,23 @@ class TestSimulation(unittest.TestCase):
         # simulation.step_simulation()
         # self.assertEqual(simulation.state.register_file.registers[0], 2)
 
+    # testing whether the addresses for the instructions get computed correctly
+    def test_append_multiple_instructions(self):
+        simulation = Simulation(
+            state=ArchitecturalState(register_file=RegisterFile()), instructions={}
+        )
+        simulation.append_instructions("addi x1, x0, 12")
+        simulation.append_instructions("bne x7, x7, 30")
+        simulation.append_instructions("jal x12, 30")
+        self.assertEqual(
+            simulation.instructions,
+            {
+                0: ADDI(rd=1, rs1=0, imm=12),
+                4: BNE(rs1=7, rs2=7, imm=30),
+                8: JAL(rd=12, imm=30),
+            },
+        )
+
     def test_run_simulation(self):
         simulation = Simulation(
             state=ArchitecturalState(

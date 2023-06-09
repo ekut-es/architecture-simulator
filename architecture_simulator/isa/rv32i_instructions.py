@@ -8,6 +8,8 @@ from architecture_simulator.isa.instruction_types import STypeInstruction
 from architecture_simulator.isa.instruction_types import UTypeInstruction
 from architecture_simulator.isa.instruction_types import JTypeInstruction
 from architecture_simulator.isa.instruction_types import fence
+from architecture_simulator.isa.instruction_types import Instruction
+from typing import Type
 import fixedint
 
 
@@ -249,7 +251,7 @@ class BEQ(BTypeInstruction):
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
         if rs1 == rs2:
-            architectural_state.program_counter += self.imm * 2 - 4
+            architectural_state.program_counter += self.imm * 2 - self.length
             architectural_state.performance_metrics.branch_count += 1
         return architectural_state
 
@@ -263,7 +265,7 @@ class BNE(BTypeInstruction):
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
         if rs1 != rs2:
-            architectural_state.program_counter += self.imm * 2 - 4
+            architectural_state.program_counter += self.imm * 2 - self.length
             architectural_state.performance_metrics.branch_count += 1
         return architectural_state
 
@@ -277,7 +279,7 @@ class BLT(BTypeInstruction):
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         rs2 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs2]))
         if rs1 < rs2:
-            architectural_state.program_counter += self.imm * 2 - 4
+            architectural_state.program_counter += self.imm * 2 - self.length
             architectural_state.performance_metrics.branch_count += 1
         return architectural_state
 
@@ -291,7 +293,7 @@ class BGE(BTypeInstruction):
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         rs2 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs2]))
         if rs1 >= rs2:
-            architectural_state.program_counter += self.imm * 2 - 4
+            architectural_state.program_counter += self.imm * 2 - self.length
             architectural_state.performance_metrics.branch_count += 1
         return architectural_state
 
@@ -305,7 +307,7 @@ class BLTU(BTypeInstruction):
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
         if rs1 < rs2:
-            architectural_state.program_counter += self.imm * 2 - 4
+            architectural_state.program_counter += self.imm * 2 - self.length
             architectural_state.performance_metrics.branch_count += 1
         return architectural_state
 
@@ -319,7 +321,7 @@ class BGEU(BTypeInstruction):
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
         if rs1 >= rs2:
-            architectural_state.program_counter += self.imm * 2 - 4
+            architectural_state.program_counter += self.imm * 2 - self.length
             architectural_state.performance_metrics.branch_count += 1
         return architectural_state
 
@@ -673,7 +675,7 @@ class JAL(JTypeInstruction):
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             architectural_state.program_counter + 4
         )
-        architectural_state.program_counter += self.imm * 2 - 4
+        architectural_state.program_counter += self.imm * 2 - self.length
         architectural_state.performance_metrics.procedure_count += 1
         return architectural_state
 
@@ -773,7 +775,7 @@ class JALR(ITypeInstruction):
         )
         architectural_state.program_counter = (
             int((rs1 + fixedint.Int16(self.imm)[0:12])) & (pow(2, 32) - 2)
-        ) - 4
+        ) - self.length
         return architectural_state
 
 
@@ -810,7 +812,7 @@ class SRAI(ITypeInstruction):
         return architectural_state
 
 
-instruction_map = {
+instruction_map: dict[str, Type[Instruction]] = {
     "add": ADD,
     "beq": BEQ,
     "blt": BLT,
