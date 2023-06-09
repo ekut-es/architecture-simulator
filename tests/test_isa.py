@@ -49,10 +49,13 @@ from architecture_simulator.isa.rv32i_instructions import (
     ANDI,
     SLLI,
     SRLI,
+    FENCE,
 )
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 
 import fixedint
+
+from architecture_simulator.isa.parser import RiscvParser
 
 
 class TestInstructions(unittest.TestCase):
@@ -2055,3 +2058,117 @@ class TestInstructions(unittest.TestCase):
         slti_1 = SLTIU(rd=3, rs1=3, imm=b1)
         state = slti_1.behavior(state)
         self.assertEqual(state.register_file.registers, [b1, b1, b1, b0])
+
+    def test_repr_1(self):
+        # Tests that the __repr__() method for the instructions works as intended
+        # Test R-Type
+        r_type_ex_add = ADD(rd=4, rs1=5, rs2=6)
+        self.assertEqual(r_type_ex_add.__repr__(), "add x4, x5, x6")
+
+        r_type_ex_or = OR(rd=0, rs1=31, rs2=30)
+        self.assertEqual(r_type_ex_or.__repr__(), "or x0, x31, x30")
+
+        # Test I-Type
+        # Test instructions that use default repr
+        i_type_ex_addi = ADDI(rd=3, rs1=4, imm=32)
+        self.assertEqual(i_type_ex_addi.__repr__(), "addi x3, x4, 32")
+
+        i_type_ex_ori = ORI(rd=31, rs1=30, imm=-12)
+        self.assertEqual(i_type_ex_ori.__repr__(), "ori x31, x30, -12")
+
+        # Test e-instructions
+        i_type_ex_ecall = ECALL(rd=0, rs1=0, imm=0)
+        self.assertEqual(i_type_ex_ecall.__repr__(), "ecall")
+
+        i_type_ex_ebreak = EBREAK(rd=0, rs1=0, imm=0)
+        self.assertEqual(i_type_ex_ebreak.__repr__(), "ebreak")
+
+        # Test instructions that use memory layout
+        i_type_ex_lb = LB(rd=0, rs1=8, imm=-12)
+        self.assertEqual(i_type_ex_lb.__repr__(), "lb x0, -12(x8)")
+
+        i_type_ex_lh = LH(rd=0, rs1=8, imm=-12)
+        self.assertEqual(i_type_ex_lh.__repr__(), "lh x0, -12(x8)")
+
+        i_type_ex_lw = LW(rd=0, rs1=8, imm=-12)
+        self.assertEqual(i_type_ex_lw.__repr__(), "lw x0, -12(x8)")
+
+        i_type_ex_lbu = LBU(rd=0, rs1=8, imm=4)
+        self.assertEqual(i_type_ex_lbu.__repr__(), "lbu x0, 4(x8)")
+
+        i_type_ex_lhu = LHU(rd=0, rs1=8, imm=4)
+        self.assertEqual(i_type_ex_lhu.__repr__(), "lhu x0, 4(x8)")
+
+        # Test S-Type
+        s_type_ex_sb = SB(rs1=8, rs2=11, imm=16)
+        self.assertEqual(s_type_ex_sb.__repr__(), "sb x11, 16(x8)")
+
+        s_type_ex_sw = SW(rs1=5, rs2=31, imm=-4)
+        self.assertEqual(s_type_ex_sw.__repr__(), "sw x31, -4(x5)")
+
+        # Test B-Type
+        b_type_ex_beq = BEQ(rs1=4, rs2=5, imm=24)
+        self.assertEqual(b_type_ex_beq.__repr__(), "beq x4, x5, 48")
+
+        b_type_ex_bltu = BLTU(rs1=30, rs2=31, imm=-6)
+        self.assertEqual(b_type_ex_bltu.__repr__(), "bltu x30, x31, -12")
+
+        # Test U-Type
+        u_type_ex_lui = LUI(rd=16, imm=123)
+        self.assertEqual(u_type_ex_lui.__repr__(), "lui x16, 123")
+
+        u_type_ex_auipc = AUIPC(rd=31, imm=-4)
+        self.assertEqual(u_type_ex_auipc.__repr__(), "auipc x31, -4")
+
+        # Test J-Type
+        j_type_ex_jal = JAL(rd=23, imm=60)
+        self.assertEqual(j_type_ex_jal.__repr__(), "jal x23, 120")
+
+        # TODO: Change me, if Fence gets implemented
+        # fence_ex = FENCE()
+        # self.assertEqual(fence_ex.__repr__(),"fence")
+
+        # Test CSR-Type
+        csr_type_ex_csrrw = CSRRW(rd=0, csr=0xF, rs1=12)
+        self.assertEqual(csr_type_ex_csrrw.__repr__(), "csrrw x0, 0xf, x12")
+
+        csr_type_ex_csrrs = CSRRS(rd=31, csr=0xAC, rs1=7)
+        self.assertEqual(csr_type_ex_csrrs.__repr__(), "csrrs x31, 0xac, x7")
+
+        # Test CSR-imm-Type
+        csri_type_ex_csrrwi = CSRRWI(rd=12, csr=0x448, uimm=20)
+        self.assertEqual(csri_type_ex_csrrwi.__repr__(), "csrrwi x12, 0x448, 20")
+
+        csri_type_ex_csrrci = CSRRCI(rd=0, csr=0x40F, uimm=16)
+        self.assertEqual(csri_type_ex_csrrci.__repr__(), "csrrci x0, 0x40f, 16")
+
+    def test_repr_2(self):
+        # Test using the parser
+        text = """add x4, x5, x6
+or x0, x31, x30
+addi x3, x4, 32
+ori x31, x30, 12
+ecall
+ebreak
+lb x0, 12(x8)
+lh x0, 12(x8)
+lw x0, 12(x8)
+lbu x0, 4(x8)
+lhu x0, 4(x8)
+sb x11, 16(x8)
+sw x31, 4(x5)
+beq x4, x5, 48
+bltu x30, x31, 12
+lui x16, 123
+auipc x31, 4
+jal x23, 120
+csrrw x0, 0xf, x12
+csrrs x31, 0xac, x7
+csrrwi x12, 0x448, 20
+csrrci x0, 0x40f, 16"""
+        parser = RiscvParser()
+        instructions = parser.parse_res_to_instructions(
+            parser.parse_assembly(text), start_address=0
+        )
+        for (instruction, line) in zip(instructions, text.splitlines()):
+            self.assertEqual(str(instruction), line)
