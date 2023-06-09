@@ -1,9 +1,9 @@
 import unittest
+import fixedint
 
 from architecture_simulator.uarch.architectural_state import RegisterFile
 from architecture_simulator.uarch.architectural_state import Memory
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
-from architecture_simulator.uarch.architectural_state import PerformanceMetrics
 from architecture_simulator.simulation.simulation import Simulation
 from architecture_simulator.isa.rv32i_instructions import ADDI, BNE, BEQ, JAL
 
@@ -41,7 +41,6 @@ class TestSimulation(unittest.TestCase):
                 24: ADDI(rd=1, rs1=1, imm=1),
             },
         )
-        simulation.state.performance_metrics = PerformanceMetrics()
         simulation.run_simulation()
         self.assertEqual(int(simulation.state.register_file.registers[1]), 7)
         self.assertEqual(simulation.state.performance_metrics.branch_count, 0)
@@ -59,8 +58,6 @@ class TestSimulation(unittest.TestCase):
             instructions={},
         )
 
-        # FIXME: performance_metrics is a class variable - all architectural states use the same object :(
-        simulation.state.performance_metrics = PerformanceMetrics()
         simulation.run_simulation()
         self.assertEqual(int(simulation.state.register_file.registers[0]), 0)
         self.assertEqual(simulation.state.performance_metrics.branch_count, 0)
@@ -86,7 +83,6 @@ class TestSimulation(unittest.TestCase):
                 20: ADDI(rd=3, rs1=0, imm=64),
             },
         )
-        simulation.state.performance_metrics = PerformanceMetrics()
         simulation.run_simulation()
         self.assertEqual(simulation.state.register_file.registers, [0, 5, 5, 64])
         self.assertEqual(simulation.state.performance_metrics.branch_count, 5)
@@ -109,7 +105,6 @@ class TestSimulation(unittest.TestCase):
                 16: BNE(rs1=1, rs2=2, imm=-6),
             },
         )
-        simulation.state.performance_metrics = PerformanceMetrics()
         simulation.run_simulation()
         self.assertEqual(simulation.state.register_file.registers, [0, 33, 33, 0])
         self.assertEqual(simulation.state.performance_metrics.branch_count, 10)
@@ -133,7 +128,6 @@ class TestSimulation(unittest.TestCase):
                 20: ADDI(rd=1, rs1=1, imm=-10),
             },
         )
-        simulation.state.performance_metrics = PerformanceMetrics()
         simulation.run_simulation()
         self.assertEqual(
             simulation.state.register_file.registers, [0, pow(2, 32) - 10, 20, 8]
@@ -145,3 +139,32 @@ class TestSimulation(unittest.TestCase):
             simulation.state.performance_metrics.instructions_per_second, 0
         )
         self.assertGreater(simulation.state.performance_metrics.execution_time_s, 0)
+
+    def test_against_class_variables(self):
+        """Some tests against class variables (some things used to be class variables and were thus shared between objects, which was undesired)"""
+        simulation1 = Simulation()
+        simulation2 = Simulation()
+
+        simulation1.state.register_file.registers[5] = fixedint.MutableUInt32(12)
+        self.assertEqual(int(simulation1.state.register_file.registers[5]), 12)
+        self.assertEqual(int(simulation2.state.register_file.registers[5]), 0)
+
+        simulation1.instructions = {0: ADDI(rd=5, rs1=12, imm=12)}
+        self.assertEqual(len(simulation1.instructions), 1)
+        self.assertEqual(len(simulation2.instructions), 0)
+
+        simulation1.state.csr_registers.store_byte(
+            address=5, value=fixedint.MutableUInt8(12)
+        )
+        self.assertEqual(
+            (int(simulation1.state.csr_registers.load_byte(address=5))), 12
+        )
+        self.assertEqual((int(simulation2.state.csr_registers.load_byte(address=5))), 0)
+
+        simulation1.state.performance_metrics.instruction_count = 12
+        self.assertEqual(simulation1.state.performance_metrics.instruction_count, 12)
+        self.assertEqual(simulation2.state.performance_metrics.instruction_count, 0)
+
+        simulation1.state.memory.store_byte(address=5, value=fixedint.MutableUInt8(12))
+        self.assertEqual(int(simulation1.state.memory.load_byte(address=5)), 12)
+        self.assertEqual(int(simulation2.state.memory.load_byte(address=5)), 0)
