@@ -1,14 +1,14 @@
 :root{
-  --dialog_command_edit_width:	300px;
-  --dialog_command_edit_height:	500px;
+  --dialog_command_edit_width:	18.75em;
+  --dialog_command_edit_height:	31.25em;
 }
 
 #webapp_dialog_EditCommandsID {
 	position:			absolute;
 	width:				var(--dialog_command_edit_width);
 	height:				var(--dialog_command_edit_height);
-	border-radius: 		4px;
-	padding-top: 		10px;
+	border-radius: 		0.25em;
+	padding-top: 		0.625;
 	background-color: 	var(--app_footer_bg_color);
 	border-color: 		#A4A4A4;
 }
@@ -16,9 +16,9 @@
 
 #webapp_dialog_EditCommandsHeaderDivID {
 	width:				100%;
-	height:				33px;
+	height:				2.0625em;
 	text-align: 		center;
-	padding-top: 		5px;
+	padding-top: 		0.3125em;
 	background-color: 	var(--app_header_bg_color);
 }
 
@@ -27,31 +27,31 @@
 	font-family:		var(--app_header_font_family);
 	font-style:			normal;
 	font-weight:		bold;
-	font-size: 			20px;
-	padding-top: 		1px;
+	font-size: 			1.25em;
+	padding-top: 		0.0625em;
 }
 
 #webapp_dialog_EditCommandsTextDivID {
 	width:				100%;
-	height:				370px;
+	height:				23.125em;
 	overflow-x: 		hidden;
 	overflow-y: 		auto;
 	background-color: 	var(--app_main_bg_color);
 }
 
 #webapp_dialog_EditCommandsPcAddressID {
-	width: 				77px;
-	height: 			20px;
-	margin: 			1px;
-	margin-right: 		1px;
+	width: 				4.8125em;
+	height: 			1.25em;
+	margin: 			0.0625em;
+	margin-right: 		0.0625em;
 	font-family:		var(--app_header_font_family);
 }
 
 #webapp_dialog_EditCommandsTextInputID {
-	width: 				calc(var(--dialog_command_edit_width) - 102px);
-	height: 			20px;
-	margin: 			1px;
-	margin-left: 		1px;
+	width: 				15.9em;
+	height: 			1.25em;
+	margin: 			0.0625em;
+	margin-left: 		0.0625em;
 	font-family:		var(--app_header_font_family);
 }
 
@@ -60,47 +60,47 @@
 	font-family: 		"Trebuchet MS", Arial, Helvetica, sans-serif;
 	font-size: 			11px;
 	border-collapse: 	collapse;
-	margin: 			1px auto;
-	padding-top: 		40px;
+	margin: 			0.0625em auto;
+	padding-top: 		2.5em;
 	width: 				100%;
 }
 #webapp_dialog_EditCommandsTableID tr {
 	width: 				100%;
 }
 #webapp_dialog_EditCommandsTableID th {
-	padding-top: 		1px;
-	padding-bottom: 	1px;
-	padding-left: 		5px;
+	padding-top: 		0.0625em;
+	padding-bottom: 	0.0625em;
+	padding-left: 		0.3125em;
 	text-align: 		left;
 	font-weight: 		bold;
 	font-size: 			12px;
 	vertical-align: 	middle;
-	border: 			1px solid #ddd;
+	border: 			0.0625em solid #ddd;
 	background-color: 	#848484;
 	color: 				var(--app_header_title_color);
-	height: 			25px;
+	height: 			1.5625em;
 }
 #webapp_dialog_EditCommandsTableID th:nth-child(1) {
-	width: 				80px;
+	width: 				5em;
 }
 
 #webapp_dialog_EditCommandsTableID td {
-	padding-top: 		1px;
-	padding-bottom: 	1px;
-	padding-left: 		5px;
+	padding-top: 		0.0625em;
+	padding-bottom: 	0.0625em;
+	padding-left: 		0.3125em;
 	text-align: 		left;
 	vertical-align: 	middle;
-	border: 			1px solid #ddd;
+	border: 			0.0625em solid #ddd;
 	color: 				#585858;
 	background-color: 	var(--app_footer_bg_color);
-	height: 			20px;
+	height: 			1.25em;
 }
 
 #webapp_dialog_EditCommandsFooterDivID {
 	width:				100%;
-	height:				30px;
-	padding-top: 		15px;
-	padding-bottom: 	5px;
+	height:				1.875em;
+	padding-top: 		0.9375em;
+	padding-bottom: 	0.3125em;
 	display:			flex;
 	justify-content: 	flex-end;
 	background-color: 	var(--app_footer_bg_color);
@@ -108,7 +108,7 @@
 
 #webapp_dialog_EditCommandsFooterBtnOkID,
 #webapp_dialog_EditCommandsFooterBtnCnlID {
-	margin-left:		20px;
-	margin-right:		2px;
+	margin-left:		1.25em;
+	margin-right:		0.125em;
 	cursor: 			pointer;
 }

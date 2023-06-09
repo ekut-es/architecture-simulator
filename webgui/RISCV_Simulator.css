@@ -4,15 +4,15 @@
 
     color: black;
 
-    padding-top: 5px;
+    padding-top: 0.3125em;
 
-	padding-left: 5px;
+	padding-left: 0.3125em;
 
-	padding-right: 20px;
+	padding-right: 1.25em;
 
-	padding-bottom: 2px;
+	padding-bottom: 0.125em;
 
-	border-radius: 4px;
+	border-radius: 0.25em;
 
 	background-color: var(--tool_footer_color);
 
@@ -34,11 +34,11 @@
 
 	text-align: right;
 
-	padding-top: 1px;
+	padding-top: 0.0625em;
 
-	padding-left: 10px;
+	padding-left: 0.625em;
 
-	padding-right: 10px;
+	padding-right: 0.625em;
 
 	font-family: var(--tool_font_family);
 
@@ -48,23 +48,23 @@
 
 }
 
-.tool_toolbox input[type=text]{ 
+.tool_toolbox input[type=text]{
 
-	border-radius: 3px;
+	border-radius: 0.1875em;
 
 	border-top: none;
 
 	border-left: none;
 
-	padding-right: 10px;
+	padding-right: 0.625em;
 
 	color:var(--app_nav_text_color);
 
 	font-size: 14px;
 
-	height: 20px;
+	height: 1.25em;
 
-	width: 90px;
+	width: 5.625em;
 
 }
 
@@ -74,18 +74,18 @@
 
 	font-size: 15px;
 
-	border-radius: 4px;
+	border-radius: 0.25em;
 
-	padding-left: 10px;
+	padding-left: 0.625em;
 
     text-decoration: none;
 
-    margin: 1px;
+    margin: 0.0625em;
 
     cursor: pointer;
 
-	height: 25px;
+	height: 1.5625em;
 
-	width: 90px;
+	width: 5.625em;
 
 }
