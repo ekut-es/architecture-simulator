@@ -58,20 +58,16 @@ class RiscvParser:
         pp.Optional("-")
         + (
             (
-                pp.Word(pp.nums)
-                | pp.Combine("0x" + pp.Word(pp.hexnums))
+                pp.Combine("0x" + pp.Word(pp.hexnums))
                 | pp.Combine("0b" + pp.Word("01"))
+                | pp.Word(pp.nums)
             )
         )
     )
 
-    pattern_uimm = pp.Word(pp.nums)("uimm")
-
     pattern_offset = pp.Optional(
         PLUS + pp.Combine("0x" + pp.Word(pp.hexnums))("offset")
     )
-
-    pattern_hex = pp.Combine("0x" + pp.Word(pp.hexnums))
 
     # R-Types
     pattern_reg_reg_reg_instruction = pp.Group(
@@ -121,7 +117,7 @@ class RiscvParser:
         pp.Word(pp.alphas)("mnemonic")
         + pattern_register("rd")
         + COMMA
-        + pattern_hex("csr")
+        + pattern_imm("csr")
         + COMMA
         + pattern_register("rs1")
     )
@@ -131,9 +127,9 @@ class RiscvParser:
         pp.Word(pp.alphas)("mnemonic")
         + pattern_register("rd")
         + COMMA
-        + pattern_hex("csr")
+        + pattern_imm("csr")
         + COMMA
-        + pattern_uimm("uimm")
+        + pattern_imm("uimm")
     )
 
     line = (
@@ -145,8 +141,8 @@ class RiscvParser:
             | pattern_reg_reg_imm_instruction
             | pattern_reg_smth_instruction
             | (pattern_label + D_COL)
-            | pp.Word(pp.alphas)("mnemonic")
-        )  # for ecall, ebreak
+            | pp.Word(pp.alphas)("mnemonic")  # for ecall, ebreak
+        )
     ) + pp.StringEnd().suppress()
 
     def convert_label_or_imm(
@@ -314,7 +310,7 @@ class RiscvParser:
                     instruction_class(
                         rd=self.p_reg(instruction_parsed.rd),
                         csr=int(instruction_parsed.csr, base=0),
-                        uimm=int(instruction_parsed.uimm),
+                        uimm=int(instruction_parsed.uimm, base=0),
                     )
                 )
             elif instruction_class.__base__ is instruction_types.fence:
