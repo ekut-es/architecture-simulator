@@ -163,6 +163,14 @@ class RiscvParser:
             return (labels[instruction_parsed.label] + offset - address_count) // 2
 
     def p_reg(self, parsed_register: pp.ParseResults) -> int:
+        """Parses a register string into a number of the correct register
+
+        Args:
+            parsed_register (pp.ParseResults): parse result of the register name or number. May be an ABI name or a number like x18.
+
+        Returns:
+            int: number of the register
+        """
         if parsed_register[0] == "x":
             return int(parsed_register[1])
         else:
@@ -232,6 +240,7 @@ class RiscvParser:
 
         for instruction_parsed in parse_result:
             if isinstance(instruction_parsed, str):
+                # skip if instruction_parsed is a label, but do not skip ecall/ebreak
                 if instruction_parsed == "ecall":
                     instructions.append(ECALL(imm=0, rs1=0, rd=0))
                     address_count += ECALL.length
@@ -240,7 +249,7 @@ class RiscvParser:
                     address_count += EBREAK.length
                 continue
             instruction_class = instruction_map[instruction_parsed.mnemonic.lower()]
-            if instruction_class.__base__ is instruction_types.RTypeInstruction:
+            if issubclass(instruction_class, instruction_types.RTypeInstruction):
                 instructions.append(
                     instruction_class(
                         rs1=self.p_reg(instruction_parsed.rs1),
@@ -248,17 +257,17 @@ class RiscvParser:
                         rd=self.p_reg(instruction_parsed.rd),
                     )
                 )
-            elif instruction_class.__base__ is instruction_types.ITypeInstruction:
+            elif issubclass(instruction_class, instruction_types.ITypeInstruction):
                 instructions.append(
                     instruction_class(
                         imm=int(instruction_parsed.imm, base=0),
-                        # because an i type instruction may be written in two diffrent patterns the "reg" notation is used
-                        # ex: lb x1, 33(x2) | addi x1, x2, 33
+                        # note: since I/S/B-Types use the same patterns but have different names for the registers (rs1,rs2 vs. rd,rs1),
+                        # we instead use reg1 and reg2 as names
                         rs1=self.p_reg(instruction_parsed.reg2),
                         rd=self.p_reg(instruction_parsed.reg1),
                     )
                 )
-            elif instruction_class.__base__ is instruction_types.STypeInstruction:
+            elif issubclass(instruction_class, instruction_types.STypeInstruction):
                 instructions.append(
                     instruction_class(
                         rs1=self.p_reg(instruction_parsed.reg2),
@@ -266,7 +275,8 @@ class RiscvParser:
                         imm=int(instruction_parsed.imm, base=0),
                     )
                 )
-            elif instruction_class.__base__ is instruction_types.BTypeInstruction:
+            elif issubclass(instruction_class, instruction_types.BTypeInstruction):
+                # B-Types can use labels or numerical immediates, so convert that first
                 imm_val = self.convert_label_or_imm(
                     instruction_parsed, labels, address_count
                 )
@@ -278,14 +288,15 @@ class RiscvParser:
                         imm=imm_val,
                     )
                 )
-            elif instruction_class.__base__ is instruction_types.UTypeInstruction:
+            elif issubclass(instruction_class, instruction_types.UTypeInstruction):
                 instructions.append(
                     instruction_class(
                         rd=self.p_reg(instruction_parsed.rd),
                         imm=int(instruction_parsed.imm, base=0),
                     )
                 )
-            elif instruction_class.__base__ is instruction_types.JTypeInstruction:
+            elif issubclass(instruction_class, instruction_types.JTypeInstruction):
+                # J-Types can use labels or numerical immediates, so convert that first
                 imm_val = self.convert_label_or_imm(
                     instruction_parsed, labels, address_count
                 )
@@ -296,7 +307,7 @@ class RiscvParser:
                         imm=imm_val,
                     )
                 )
-            elif instruction_class.__base__ is instruction_types.CSRTypeInstruction:
+            elif issubclass(instruction_class, instruction_types.CSRTypeInstruction):
                 instructions.append(
                     instruction_class(
                         rd=self.p_reg(instruction_parsed.rd),
@@ -304,7 +315,7 @@ class RiscvParser:
                         rs1=self.p_reg(instruction_parsed.rs1),
                     )
                 )
-            elif instruction_class.__base__ is instruction_types.CSRITypeInstruction:
+            elif issubclass(instruction_class, instruction_types.CSRITypeInstruction):
                 # TODO: Add parser element for this type
                 instructions.append(
                     instruction_class(
@@ -313,7 +324,7 @@ class RiscvParser:
                         uimm=int(instruction_parsed.uimm, base=0),
                     )
                 )
-            elif instruction_class.__base__ is instruction_types.fence:
+            elif issubclass(instruction_class, instruction_types.fence):
                 # TODO: Change me, if Fence gets implemented
                 instructions.append(FENCE())
             address_count += instruction_map[instruction_parsed.mnemonic.lower()].length
