@@ -18,6 +18,9 @@ class RTypeInstruction(Instruction):
         self.rs2 = rs2
         self.rd = rd
 
+    def __repr__(self) -> str:
+        return f"{self.mnemonic} x{self.rd}, x{self.rs1}, x{self.rs2}"
+
 
 class CSRTypeInstruction(Instruction):
     """Create an I-Type instruction
@@ -34,6 +37,9 @@ class CSRTypeInstruction(Instruction):
         self.csr = csr
         self.rs1 = rs1
 
+    def __repr__(self) -> str:
+        return f"{self.mnemonic} x{self.rd}, {hex(self.csr)}, x{self.rs1}"
+
 
 class CSRITypeInstruction(Instruction):
     """Create an I-Type instruction
@@ -49,6 +55,9 @@ class CSRITypeInstruction(Instruction):
         self.rd = rd
         self.csr = csr
         self.uimm = uimm
+
+    def __repr__(self) -> str:
+        return f"{self.mnemonic} x{self.rd}, {hex(self.csr)}, {self.uimm}"
 
 
 class BTypeInstruction(Instruction):
@@ -71,6 +80,9 @@ class BTypeInstruction(Instruction):
         self.rs2 = rs2
         self.imm = imm
 
+    def __repr__(self) -> str:
+        return f"{self.mnemonic} x{self.rs1}, x{self.rs2}, {self.imm*2}"
+
 
 class STypeInstruction(Instruction):
     def __init__(self, rs1: int, rs2: int, imm: int, **args):
@@ -84,6 +96,9 @@ class STypeInstruction(Instruction):
         self.rs2 = rs2
         self.imm = imm
 
+    def __repr__(self) -> str:
+        return f"{self.mnemonic} x{self.rs2}, {self.imm}(x{self.rs1})"
+
 
 class UTypeInstruction(Instruction):
     def __init__(self, rd: int, imm: int, **args):
@@ -95,6 +110,9 @@ class UTypeInstruction(Instruction):
             )
         self.rd = rd
         self.imm = imm
+
+    def __repr__(self) -> str:
+        return f"{self.mnemonic} x{self.rd}, {self.imm}"
 
 
 class JTypeInstruction(Instruction):
@@ -108,10 +126,17 @@ class JTypeInstruction(Instruction):
         self.rd = rd
         self.imm = imm
 
+    def __repr__(self) -> str:
+        return f"{self.mnemonic} x{self.rd}, {self.imm*2}"
+
 
 class fence(Instruction):
     def __init__(self, **args):
         super().__init__(**args)
+
+    # TODO: Change me, if Fence gets implemented
+    # def __repr__(self) -> str:
+    #    return f"{self.mnemonic}"
 
 
 class ITypeInstruction(Instruction):
@@ -132,3 +157,23 @@ class ITypeInstruction(Instruction):
         self.imm = imm
         self.rs1 = rs1
         self.rd = rd
+
+    def __repr__(self) -> str:
+        from architecture_simulator.isa.rv32i_instructions import (
+            LB,
+            LH,
+            LW,
+            LBU,
+            LHU,
+            ECALL,
+            EBREAK,
+        )
+
+        memory_instructions = (LB, LH, LW, LBU, LHU)
+        e_instructions = (ECALL, EBREAK)
+        if isinstance(self, memory_instructions):
+            return f"{self.mnemonic} x{self.rd}, {self.imm}(x{self.rs1})"
+        elif isinstance(self, e_instructions):
+            return f"{self.mnemonic}"
+        else:
+            return f"{self.mnemonic} x{self.rd}, x{self.rs1}, {self.imm}"
