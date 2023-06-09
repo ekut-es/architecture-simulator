@@ -24,6 +24,7 @@ from architecture_simulator.isa.parser import RiscvParser
 
 class TestParser(unittest.TestCase):
     program = """
+
 Ananas:#dfsdfsdf
      add x0,x1,x2
 addi x0, x1, -20
@@ -33,20 +34,26 @@ addi x0, x1, -20
         _Banune24_de:
 lb x0, 7(x1)
 sb x1, 666(x2)
-BEQ x4, x5, 42
-lui x12, 8000
+BEQ x4,     x5, 42
+lui x12,                    8000
+
 Chinakohl:
-jal x20, 220
+
+    jal x20, 220
 bne x3, x10, Banane
-jal x10, Ananas+0x24
+
+
+    jal x10, Ananas+0x24
 ecall
 ebreak
 fence x10, x12
-csrrw x2, 0x448, x9
+            csrrw x2, 0x448, x9
 csrrwi x2, 0x448, 20
 beq x0, x1, Ban0n3
 Ban0n3:
 beq x0, x1, Ban0n3
+
+
 """
 
     program_2 = "8asfsdfs:"

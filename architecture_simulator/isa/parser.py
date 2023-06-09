@@ -65,8 +65,6 @@ class RiscvParser:
         )
     )
 
-    pp.ParseResults().get_name()
-
     pattern_uimm = pp.Word(pp.nums)("uimm")
 
     pattern_offset = pp.Optional(
@@ -175,21 +173,24 @@ class RiscvParser:
             return reg_mapping["".join(parsed_register)]
 
     def parse_assembly(self, assembly: str) -> list[pp.ParseResults]:
-        """Turn assembly code into parse results.
+        """Turn assembly code into a list of parse results.
 
         Args:
             assembly (str): Text assembly which may contain labels and comments.
 
         Returns:
-            pp.ParseResults: Parse results.
+            list[pp.ParseResults]: List of ParseResults, where each element is a instruction or label.
         """
+        # remove empty lines, lines that only contain white space and comment lines
         lines = [
-            (line.split("#", 1)[0].strip()).strip()
+            line
             for line in assembly.splitlines()
-            if line and not line.strip().startswith("#")
+            if line.strip() and not line.strip().startswith("#")
         ]
-        a = [self.line.parse_string(line)[0] for line in lines]
-        return a
+        # remove comments from linese that also contain an instruction and strip the line
+        lines = [line.split("#", 1)[0].strip() for line in lines]
+        # a line is a list of ParseResults, but there is only one element in each of those lists
+        return [self.line.parse_string(line)[0] for line in lines]
 
     def compute_labels(
         self, parse_result: list[pp.ParseResults], start_address: int
