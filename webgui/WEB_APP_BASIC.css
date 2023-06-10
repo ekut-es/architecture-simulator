@@ -14,7 +14,7 @@
 
 :root {
 
-  --app_width:					60em;
+  --app_width:					100%;
 
   --app_height:					37.5em;
 
@@ -456,6 +456,8 @@ body main #gui_base_div_id {
 
 	height: 			100%;
 
+	overflow: 			auto;
+
 }
 
 
@@ -468,13 +470,13 @@ body main #gui_cmd_div_id {
 
 	margin-bottom: 		1.875em;
 
-	margin-right: 		1.875em;
+	margin-right: 		2%;
 
-	margin-left: 		1.875em;
+	margin-left: 		2%;
 
 	width: 				14.375em;
 
-	overflow-x: 		hidden;
+	overflow-x: 		auto;
 
 	overflow-y: 		auto;
 
@@ -508,7 +510,7 @@ body main #gui_cmd_div_id .button_edit_cmd {
 
 body main #gui_cmd_table_id {
 
-	table-layout: 		fixed;
+	table-layout: 		auto;
 
 	font-family: 		"Trebuchet MS", Arial, Helvetica, sans-serif;
 
@@ -616,13 +618,13 @@ body main #gui_memory_div_id {
 
 	margin-bottom: 		1.875em;
 
-	margin-right: 		1.875em;
+	margin-right: 		2%;
 
-	margin-left: 		1.875em;
+	margin-left: 		2%;
 
 	width: 				14.375em;
 
-	overflow-x: 		hidden;
+	overflow-x: 		scroll;
 
 	overflow-y: 		auto;
 
@@ -632,7 +634,7 @@ body main #gui_memory_div_id {
 
 body main #gui_memory_table_id {
 
-	table-layout: 		fixed;
+	table-layout: 		auto;
 
 	font-family: 		"Trebuchet MS", Arial, Helvetica, sans-serif;
 
@@ -756,13 +758,13 @@ body main #gui_registers_div_id {
 
 	margin-bottom: 		1.875em;
 
-	margin-right: 		1.875em;
+	margin-right: 		2%;
 
-	margin-left: 		1.875em;
+	margin-left: 		2%;
 
 	width: 				14.375em;
 
-	overflow-x: 		hidden;
+	overflow-x: 		scroll;
 
 	overflow-y: 		auto;
 
@@ -772,7 +774,7 @@ body main #gui_registers_div_id {
 
 body main #gui_registers_table_id {
 
-	table-layout: 		fixed;
+	table-layout: 		auto;
 
 	font-family: 		"Trebuchet MS", Arial, Helvetica, sans-serif;
 
