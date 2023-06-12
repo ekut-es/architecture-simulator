@@ -1,6 +1,7 @@
 const output = document.getElementById("output");
-const registers = document.getElementById("registers");
-const memory = document.getElementById("memory");
+const registers = document.getElementById("gui_registers_table_id");
+const memory = document.getElementById("gui_memory_table_id");
+const instructions = document.getElementById("gui_cmd_table_body_id");
 const input = document.getElementById("input");
 
 function addToOutput(s) {
@@ -10,13 +11,15 @@ function addToOutput(s) {
 
 // Object containing functions to be exported to python
 const archsim_js = {
-    append_register: function(reg, val) {
+    update_register: function(reg, val) {
         tr = document.createElement("tr")
+        empty_td0 = document.createElement("td");
         td1 = document.createElement("td")
         td1.innerText = "x"+reg
         td2 = document.createElement("td")
         td2.innerText = val
         td2.id = "val_x"+reg
+        tr.appendChild(empty_td0)
         tr.appendChild(td1)
         tr.appendChild(td2)
         registers.appendChild(tr)
@@ -24,19 +27,15 @@ const archsim_js = {
     update_single_register: function(reg, val) {
         document.getElementById("val_x"+reg).innerText = val
     },
-    append_registers: function(reg_json_str) {
-        temp_simulation_json = JSON.parse(simulation_json)
-        temp_reg_json_str = JSON.parse(reg_json_str)
-        temp_simulation_json.registers_list = temp_reg_json_str
-        simulation_json = JSON.stringify(temp_simulation_json)
-    },
-    append_memory: function(address, val) {
+    update_memory: function(address, val) {
         tr = document.createElement("tr")
+        empty_td0 = document.createElement("td");
         td1 = document.createElement("td")
         td1.innerText = address
         td2 = document.createElement("td")
         td2.innerText = val
         td2.id = "memory"+address
+        tr.appendChild(empty_td0)
         tr.appendChild(td1)
         tr.appendChild(td2)
         memory.appendChild(tr)
@@ -58,17 +57,20 @@ const archsim_js = {
         memory.appendChild(tr)
         }
     },
-    append_memories: function(mem_json_str) {
-        temp_simulation_json = JSON.parse(simulation_json)
-        temp_mem_json_str = JSON.parse(mem_json_str)
-        temp_simulation_json.memory_list = temp_mem_json_str
-        simulation_json = JSON.stringify(temp_simulation_json)
+    clear_memory_table: function() {
+        this.clear_a_table(memory);
+
     },
-    append_instructions: function(cmd_json_str) {
-        temp_simulation_json = JSON.parse(simulation_json)
-        temp_cmd_json_str = JSON.parse(cmd_json_str)
-        temp_simulation_json.cmd_list = temp_cmd_json_str
-        simulation_json = JSON.stringify(temp_simulation_json)
+    clear_register_table: function() {
+        this.clear_a_table(registers);
+    },
+    clear_instruction_table: function() {
+        this.clear_a_table(instructions);
+    },
+    clear_a_table: function(table) {
+        while (table.childNodes.length > 2) {
+            table.removeChild(table.lastChild);
+        }
     }
 };
 

@@ -13,11 +13,7 @@ let dialogEditCommands = null;
 								"gui_memory_table_body_id",
 								"gui_registers_table_body_id"
 								);
-				//alert(simulation_json)
 				dialogEditCommands.setCommandString(simulation_json);
-				dialogEditCommands.updateMainCommandTable();
-				dialogEditCommands.updateMainMemoryTable();
-				dialogEditCommands.updateMainRegistersTable();
 
 			document.getElementById("button_gui_cmd_edit_id").addEventListener("click", () => {
 				if(dialogEditCommands){
@@ -29,26 +25,16 @@ let dialogEditCommands = null;
 			document.getElementById("button_simulation_start_id").addEventListener("click", () => {
 				evaluatePython_run_sim();
 				dialogEditCommands.setCommandString(simulation_json);
-				dialogEditCommands.updateMainCommandTable();
-				dialogEditCommands.updateMainMemoryTable();
-				dialogEditCommands.updateMainRegistersTable();
 			});
 
 			document.getElementById("button_simulation_next_id").addEventListener("click", () => {
-				//alert(simulation_json)
 				evaluatePython_step_sim();
 				dialogEditCommands.setCommandString(simulation_json);
-				dialogEditCommands.updateMainCommandTable();
-				dialogEditCommands.updateMainMemoryTable();
-				dialogEditCommands.updateMainRegistersTable();
 			});
 
 			document.getElementById("button_simulation_stop_id").addEventListener("click", () => {
 				evaluatePython_reset_sim();
 				dialogEditCommands.setCommandString(simulation_json);
-				dialogEditCommands.updateMainCommandTable();
-				dialogEditCommands.updateMainMemoryTable();
-				dialogEditCommands.updateMainRegistersTable();
 			});
 
 		});
