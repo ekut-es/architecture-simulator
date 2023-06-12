@@ -66,11 +66,11 @@ const archsim_js = {
         td1.innerText = address
         td2 = document.createElement("td")
         td2.innerText = val
-        td2.id = "memory"+address
+        td2.id = "instr"+address
         tr.appendChild(empty_td0)
         tr.appendChild(td1)
         tr.appendChild(td2)
-        memory.appendChild(tr)
+        instructions.appendChild(tr)
     },
     clear_memory_table: function() {
         this.clear_a_table(memory);
@@ -110,7 +110,6 @@ sim_init()
 let pyodideReadyPromise = main();
 
 async function evaluatePython_step_sim() {
-    alert("step")
     loading_screen.showModal()
     let pyodide = await pyodideReadyPromise;
     loading_screen.close();
@@ -122,7 +121,6 @@ async function evaluatePython_step_sim() {
     } catch (err) {
         addToOutput(err);
     }
-    alert(simulation_json)
 }
 
 async function evaluatePython_run_sim() {

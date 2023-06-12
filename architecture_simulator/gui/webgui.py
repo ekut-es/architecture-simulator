@@ -52,7 +52,7 @@ def step_sim(instr: str):
     return simulation
 
 
-# runs the simulation, takes a json string as input and returns the whole simulation
+# runs the simulation, takes a string as input and returns the whole simulation
 def run_sim(instr: str):
     global simulation
     if simulation is None:
