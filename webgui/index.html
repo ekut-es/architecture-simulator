@@ -10,8 +10,6 @@
 	<link 	rel="stylesheet"	 	type="text/css" 		href="WEB_APP_BASIC.css">
 	<link 	rel="stylesheet"	 	type="text/css" 		href="RISCV_DialogEditCommands.css">
 	<!--	****************************************************************************************************************************** -->
-  <script type="text/javascript" 							src="js/RISCV_DialogEditCommands.js"></script>
-	<!--	****************************************************************************************************************************** -->
 	<script type="text/javascript"							src="js/scripts.js"></script>
 </head>
 <body id="webapp_body_id">
@@ -37,14 +35,12 @@
 	</nav>
 	<main id="webapp_main_id">
 		<div id="gui_base_div_id">
+    		<textarea id="input" style="width: 20%;" rows="20" ></textarea>
 			<div id="gui_cmd_div_id">
 				<table id="gui_cmd_table_id">
 					<thead>
 						<tr>
 							<th>
-								<button type="button" id="button_gui_cmd_edit_id" class="button_edit_cmd" title="edit input">
-									<img src="cmd_edit.svg" width="20px" height="20px">
-								</button>
 							</th>
 							<th title="Programm Counter">PC</th>
 							<th title="Command">Command</th>
@@ -86,22 +82,10 @@
 					</tbody>
 				</table>
 			</div>
-
+			<textarea id="output" style="width: 20%;" rows="20" disabled></textarea>
 		</div>
 
     </main>
-	<table>
-		<thead><td>Register</td><td>Value</td></thead>
-		<tbody id="registers" ></tbody>
-	  </table>
-	  <table>
-		<thead><td>Memory</td><td>Value</td></thead>
-		<tbody id="memory" ></tbody>
-	  </table>
-	  <div>Input:</div>
-    <textarea id="input" style="width: 100%;" rows="20" ></textarea>
-	  <div>Output:</div>
-    <textarea id="output" style="width: 100%;" rows="20" disabled></textarea>
 	<footer id="webapp_footer_id">
 	</footer>
 	<!--  ****************** Modale Form ********************************************* -->

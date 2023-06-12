@@ -109,11 +109,19 @@ def update_tables(simulation):
         # appends all the registers either one at a time, or all at once with a json string
     archsim_js.clear_register_table()
     for reg_i, reg_val in enumerate(simulation.state.register_file.registers):
-        archsim_js.update_register(reg_i, int(reg_val))
+        archsim_js.update_register_table(reg_i, int(reg_val))
 
     # appends all the memory either one at a time or all at once with a json string
     archsim_js.clear_memory_table()
     for address, address_val in sorted(
         simulation.state.memory.memory_file.items(), key=lambda item: item[0]
     ):
-        archsim_js.update_memory(hex(address), bin(address_val))
+        archsim_js.update_memory_table(hex(address), bin(address_val))
+    
+    #change the for call and delete this comment
+    
+    #archsim_js.clear_instruction_table()
+    #for address, address_val in sorted(
+    #    simulation.state.memory.memory_file.items(), key=lambda item: item[0]
+    #):
+    #    archsim_js.update_instruction_table(hex(address), bin(address_val))

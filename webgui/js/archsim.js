@@ -11,7 +11,7 @@ function addToOutput(s) {
 
 // Object containing functions to be exported to python
 const archsim_js = {
-    update_register: function(reg, val) {
+    update_register_table: function(reg, val) {
         tr = document.createElement("tr")
         empty_td0 = document.createElement("td");
         td1 = document.createElement("td")
@@ -27,7 +27,7 @@ const archsim_js = {
     update_single_register: function(reg, val) {
         document.getElementById("val_x"+reg).innerText = val
     },
-    update_memory: function(address, val) {
+    update_memory_table: function(address, val) {
         tr = document.createElement("tr")
         empty_td0 = document.createElement("td");
         td1 = document.createElement("td")
@@ -57,6 +57,20 @@ const archsim_js = {
         memory.appendChild(tr)
         }
     },
+    //ids und inner texts have to be changed then delete this comment
+    update_instruction_table: function(address, val) {
+        tr = document.createElement("tr")
+        empty_td0 = document.createElement("td");
+        td1 = document.createElement("td")
+        td1.innerText = address
+        td2 = document.createElement("td")
+        td2.innerText = val
+        td2.id = "memory"+address
+        tr.appendChild(empty_td0)
+        tr.appendChild(td1)
+        tr.appendChild(td2)
+        memory.appendChild(tr)
+    },
     clear_memory_table: function() {
         this.clear_a_table(memory);
 
@@ -74,7 +88,8 @@ const archsim_js = {
     }
 };
 
-output.value = "Initializing... ";
+output.value = "Output \n\nInitializing... ";
+input.value = "add x1, x2, x3"
 // init Pyodide
 async function main() {
     let pyodide = await loadPyodide();
