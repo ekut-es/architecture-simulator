@@ -25,9 +25,9 @@ const archsim_js = {
         tr.appendChild(td2)
         registers.appendChild(tr)
     },
-    update_single_register: function(reg, val) {
-        document.getElementById("val_x"+reg).innerText = val
-    },
+    // update_single_register: function(reg, val) {
+    //     document.getElementById("val_x"+reg).innerText = val
+    // },
     update_memory_table: function(address, val) {
         tr = document.createElement("tr")
         empty_td0 = document.createElement("td");
@@ -41,23 +41,23 @@ const archsim_js = {
         tr.appendChild(td2)
         memory.appendChild(tr)
     },
-    update_single_memory_address: function(address, val) {
-        try{
-        document.getElementById("memory"+address).innerText = val
-        }
-        catch
-        {
-        tr = document.createElement("tr")
-        td1 = document.createElement("td")
-        td1.innerText = address
-        td2 = document.createElement("td")
-        td2.innerText = val
-        td2.id = "memory"+address
-        tr.appendChild(td1)
-        tr.appendChild(td2)
-        memory.appendChild(tr)
-        }
-    },
+    // update_single_memory_address: function(address, val) {
+    //     try{
+    //     document.getElementById("memory"+address).innerText = val
+    //     }
+    //     catch
+    //     {
+    //     tr = document.createElement("tr")
+    //     td1 = document.createElement("td")
+    //     td1.innerText = address
+    //     td2 = document.createElement("td")
+    //     td2.innerText = val
+    //     td2.id = "memory"+address
+    //     tr.appendChild(td1)
+    //     tr.appendChild(td2)
+    //     memory.appendChild(tr)
+    //     }
+    // },
     //ids und inner texts have to be changed then delete this comment
     update_instruction_table: function(address, val) {
         tr = document.createElement("tr")
@@ -110,6 +110,7 @@ sim_init()
 let pyodideReadyPromise = main();
 
 async function evaluatePython_step_sim() {
+    alert("step")
     loading_screen.showModal()
     let pyodide = await pyodideReadyPromise;
     loading_screen.close();
@@ -121,7 +122,7 @@ async function evaluatePython_step_sim() {
     } catch (err) {
         addToOutput(err);
     }
-    //alert(simulation_json)
+    alert(simulation_json)
 }
 
 async function evaluatePython_run_sim() {
