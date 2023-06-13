@@ -141,8 +141,8 @@ async function evaluatePython_reset_sim() {
     loading_screen.showModal()
     let pyodide = await pyodideReadyPromise;
     loading_screen.close();
-    registers.innerHTML = ""
-    memory.innerHTML = ""
+    //registers.innerHTML = ""
+    //memory.innerHTML = ""
     try {
         reset_sim = pyodide.globals.get("reset_sim");
         let output = reset_sim();
