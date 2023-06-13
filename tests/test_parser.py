@@ -24,29 +24,36 @@ from architecture_simulator.isa.parser import RiscvParser
 
 class TestParser(unittest.TestCase):
     program = """
+
 Ananas:#dfsdfsdf
-add x0,x1,x2
+     add x0,x1,x2
 addi x0, x1, -20
-#aaaaa
-Banane:
-##asdsadad
-_Banune24_de:
+   #aaaaa
+ Banane:
+    ##asdsadad
+        _Banune24_de:
 lb x0, 7(x1)
 sb x1, 666(x2)
-BEQ x4, x5, 42
-lui x12, 8000
+BEQ x4,     x5, 42
+lui x12,                    8000
+
 Chinakohl:
-jal x20, 220
+
+    jal x20, 220
 bne x3, x10, Banane
-jal x10, Ananas+0x24
+
+
+    jal x10, Ananas+0x24
 ecall
 ebreak
 fence x10, x12
-csrrw x2, 0x448, x9
+            csrrw x2, 0x448, x9
 csrrwi x2, 0x448, 20
 beq x0, x1, Ban0n3
 Ban0n3:
 beq x0, x1, Ban0n3
+
+
 """
 
     program_2 = "8asfsdfs:"
@@ -106,7 +113,10 @@ beq zero, ra, Ban0n3
     def test_bnf(self):
         parser = RiscvParser()
         instr = parser.parse_assembly(self.program)
-        self.assertEqual(instr.as_list(), self.expected)
+        self.assertEqual(
+            [result if type(result) == str else result.as_list() for result in instr],
+            self.expected,
+        )
         self.assertNotEqual(instr[1].mnemonic, "")
         # self.assertEqual(instr[1].mnemonic, "")
 
@@ -436,3 +446,77 @@ fibonacci:
             simulation.step_simulation()
             simulation.state.register_file.registers[0] = 0
         self.assertEqual(int(simulation.state.register_file.registers[15]), 55)
+
+    def test_neg_imm_where_lables_are_accepted(self):
+        # This test ensures, that the fix for negative imm values where labels can be used works
+        text = """main:
+        beq x0, x1, -4
+        blt x1, x2, main
+        bge x3, x4, 8
+        jal x7, -12
+        jal zero, 8
+        jal zero, main
+        """
+        parser = RiscvParser()
+        instr = parser.parse_res_to_instructions(
+            parser.parse_assembly(text), start_address=0
+        )
+        self.assertEqual(instr[0].imm, -2)
+        self.assertEqual(instr[1].imm, -2)
+        self.assertEqual(instr[2].imm, 4)
+        self.assertEqual(instr[3].imm, -6)
+        self.assertEqual(instr[4].imm, 4)
+        self.assertEqual(instr[5].imm, -10)
+
+    def test_hex_imm(self):
+        text = """
+        addi x0, x0, 0x0FF
+        andi x0, x1, -0x000F
+        slli x3, t3, 0x0A
+        sb x2, 0x00011(x3)
+        beq x0, zero, -0x0AC
+        lui x0, -0xAF
+        jal x0, 0x3a
+        csrrw sp, 0x448, s1
+        csrrwi sp, 0x448, 0x20"""
+        parser = RiscvParser()
+        instr = parser.parse_res_to_instructions(
+            parser.parse_assembly(text), start_address=0
+        )
+
+        self.assertEqual(instr[0].imm, 0xFF)
+        self.assertEqual(instr[1].imm, -15)
+        self.assertEqual(instr[2].imm, 0xA)
+        self.assertEqual(instr[3].imm, 0x11)
+        self.assertEqual(instr[4].imm, -0xAC // 2)
+        self.assertEqual(instr[5].imm, -0xAF)
+        self.assertEqual(instr[6].imm, 0x3A // 2)
+        self.assertEqual(instr[7].csr, 0x448)
+        self.assertEqual(instr[8].csr, 0x448)
+        self.assertEqual(instr[8].uimm, 0x20)
+
+    def test_bin_imm(self):
+        text = """
+        addi x0, x0, 0b0011111111
+        andi x0, x1, -0b01111
+        slli x3, t3, 0b0001010
+        sb x2, 0b10001(x3)
+        beq x0, zero, -0b10101100
+        lui x0, -0b10101111
+        jal x0, 0b0000111010
+        csrrw sp, 0b010001001000, s1
+        csrrwi sp, 0b010001001000, 0b100000"""
+        parser = RiscvParser()
+        instr = parser.parse_res_to_instructions(
+            parser.parse_assembly(text), start_address=0
+        )
+        self.assertEqual(instr[0].imm, 0xFF)
+        self.assertEqual(instr[1].imm, -15)
+        self.assertEqual(instr[2].imm, 0xA)
+        self.assertEqual(instr[3].imm, 0x11)
+        self.assertEqual(instr[4].imm, -0xAC // 2)
+        self.assertEqual(instr[5].imm, -0xAF)
+        self.assertEqual(instr[6].imm, 0x3A // 2)
+        self.assertEqual(instr[7].csr, 0x448)
+        self.assertEqual(instr[8].csr, 0x448)
+        self.assertEqual(instr[8].uimm, 0x20)
