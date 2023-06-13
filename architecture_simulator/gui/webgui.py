@@ -78,9 +78,7 @@ def reset_sim():
     global simulation
     if simulation is None:
         raise RuntimeError("state has not been initialized.")
-    simulation = Simulation(
-        state=ArchitecturalState(register_file=RegisterFile()), instructions={}
-    )
+    simulation = Simulation()
     update_tables()
     return simulation
 
@@ -105,6 +103,7 @@ def update_tables():
     # appends all the instructions one at a time
     archsim_js.clear_instruction_table()
     for address, cmd in sorted(
-        simulation.instructions.items(), key=lambda item: item[0]
+        simulation.state.instruction_memory.instructions.items(),
+        key=lambda item: item[0],
     ):
         archsim_js.update_instruction_table(hex(address), cmd.__repr__())

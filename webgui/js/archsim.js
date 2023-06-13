@@ -97,7 +97,7 @@ async function main() {
     let pyodide = await loadPyodide();
     await pyodide.loadPackage("micropip");
     const micropip = pyodide.pyimport("micropip");
-    await micropip.install(window.location.origin+"/dist/architecture_simulator-0.1.0-py3-none-any.whl");
+    await micropip.install("/dist/architecture_simulator-0.1.0-py3-none-any.whl");
     pyodide.registerJsModule("archsim_js", archsim_js);
     await pyodide.runPython(`
 from architecture_simulator.gui.webgui import *
