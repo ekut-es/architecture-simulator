@@ -21,7 +21,7 @@ const archsim_js = {
         tr.appendChild(td2)
         registers.appendChild(tr)
     },
-    update_register: function(reg, val) {
+    update_single_register: function(reg, val) {
         document.getElementById("val_x"+reg).innerText = val
     },
     append_registers: function(reg_json_str) {
@@ -41,7 +41,7 @@ const archsim_js = {
         tr.appendChild(td2)
         memory.appendChild(tr)
     },
-    update_memory: function(address, val) {
+    update_single_memory_address: function(address, val) {
         try{
         document.getElementById("memory"+address).innerText = val
         }
@@ -65,7 +65,10 @@ const archsim_js = {
         simulation_json = JSON.stringify(temp_simulation_json)
     },
     append_instructions: function(cmd_json_str) {
-        //setCommandString(cmd_json_str)
+        temp_simulation_json = JSON.parse(simulation_json)
+        temp_cmd_json_str = JSON.parse(cmd_json_str)
+        temp_simulation_json.cmd_list = temp_cmd_json_str
+        simulation_json = JSON.stringify(temp_simulation_json)
     }
 };
 
