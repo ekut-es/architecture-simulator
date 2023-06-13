@@ -884,7 +884,8 @@ class TestInstructions(unittest.TestCase):
                         (pow(2, 32) - 1, fixedint.MutableUInt8(4)),
                         (2047, fixedint.MutableUInt8(5)),
                     ]
-                )
+                ),
+                min_bytes=0,
             ),
         )
         # imm=0, rs1=0 try with both values at 0
@@ -969,7 +970,8 @@ class TestInstructions(unittest.TestCase):
                         (pow(2, 32) - 1, fixedint.MutableUInt8(8)),
                         (2047, fixedint.MutableUInt8(5)),
                     ]
-                )
+                ),
+                min_bytes=0,
             ),
         )
         # imm=0, rs1=0 try with both values at 0
@@ -1070,7 +1072,8 @@ class TestInstructions(unittest.TestCase):
                         (pow(2, 32) - 1, fixedint.MutableUInt8(4)),
                         (2047, fixedint.MutableUInt8(5)),
                     ]
-                )
+                ),
+                min_bytes=0,
             ),
         )
         # imm=0, rs1=0 try with both values at 0
@@ -1172,7 +1175,8 @@ class TestInstructions(unittest.TestCase):
                         (pow(2, 32) - 1, fixedint.MutableUInt8(4)),
                         (2047, fixedint.MutableUInt8(5)),
                     ]
-                )
+                ),
+                min_bytes=0,
             ),
         )
         # imm=0, rs1=0 try with both values at 0
@@ -1254,7 +1258,8 @@ class TestInstructions(unittest.TestCase):
                         (pow(2, 32) - 1, fixedint.MutableUInt8(8)),
                         (2047, fixedint.MutableUInt8(5)),
                     ]
-                )
+                ),
+                min_bytes=0,
             ),
         )
         # imm=0, rs1=0 try with both values at 0
@@ -1436,9 +1441,9 @@ class TestInstructions(unittest.TestCase):
                     fixedint.MutableUInt32(128),
                     fixedint.MutableUInt32(1024),
                 ]
-            )
+            ),
+            memory=Memory(min_bytes=0),
         )
-
         sb_0 = SB(rs1=0, rs2=0, imm=0)
         state = sb_0.behavior(state)
         self.assertEqual(state.memory.load_byte(0), 0)
@@ -1481,7 +1486,8 @@ class TestInstructions(unittest.TestCase):
                     fixedint.MutableUInt32(256),
                     fixedint.MutableUInt32(65535),
                 ]
-            )
+            ),
+            memory=Memory(min_bytes=0),
         )
 
         sh_0 = SH(rs1=0, rs2=0, imm=0)
@@ -1529,7 +1535,8 @@ class TestInstructions(unittest.TestCase):
                     fixedint.MutableUInt32(256),
                     fixedint.MutableUInt32(4294967295),
                 ]
-            )
+            ),
+            memory=Memory(min_bytes=0),
         )
 
         sw_0 = SW(rs1=0, rs2=0, imm=0)

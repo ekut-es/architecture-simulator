@@ -61,92 +61,70 @@ class RegisterFile:
 class Memory:
     # Address length in bits. Can be used to limit memory size.
     address_length: int = 32
+    # min address (inclusive)
+    min_bytes: int = 2**14
     memory_file: dict[int, fixedint.MutableUInt8] = field(default_factory=dict)
 
     def load_byte(self, address: int) -> fixedint.MutableUInt8:
+        address_with_overflow = address % pow(2, self.address_length)
+        if address_with_overflow < self.min_bytes:
+            raise ValueError("You can not access the instruction memory this way.")
         try:
-            addr1 = fixedint.MutableUInt8(
-                int(self.memory_file[address % pow(2, self.address_length)])
-            )
+            addr1 = fixedint.MutableUInt8(int(self.memory_file[address_with_overflow]))
         except KeyError:
             addr1 = fixedint.MutableUInt8(0)
         return addr1
 
     def store_byte(self, address: int, value: fixedint.MutableUInt8):
+        address_with_overflow = address % pow(2, self.address_length)
+        if address_with_overflow < self.min_bytes:
+            raise ValueError("You can not access the instruction memory this way.")
         safe_value = fixedint.MutableUInt8(int(value))
-        self.memory_file[address % pow(2, self.address_length)] = safe_value
+        self.memory_file[address_with_overflow] = safe_value
 
     def load_halfword(self, address: int) -> fixedint.MutableUInt16:
-        try:
-            addr1 = fixedint.MutableUInt16(
-                int(self.memory_file[address % pow(2, self.address_length)])
-            )
-        except KeyError:
-            addr1 = fixedint.MutableUInt16(0)
-        try:
-            addr2 = fixedint.MutableUInt16(
-                int(self.memory_file[(address + 1) % pow(2, self.address_length)]) << 8
-            )
-        except KeyError:
-            addr2 = fixedint.MutableUInt16(0)
+        addr1 = int(self.load_byte(address))
+        addr2 = int(self.load_byte(address + 1)) << 8
 
-        return addr2 | addr1
+        return fixedint.MutableUInt16(addr1 | addr2)
 
     def store_halfword(self, address: int, value: fixedint.MutableUInt16):
         safe_value = fixedint.MutableUInt16(int(value))
-        self.memory_file[address % pow(2, self.address_length)] = fixedint.MutableUInt8(
-            int(safe_value[0:8])
+        self.store_byte(
+            address=address, value=fixedint.MutableUInt8(int(safe_value[0:8]))
         )
-        self.memory_file[
-            (address + 1) % pow(2, self.address_length)
-        ] = fixedint.MutableUInt8(int(safe_value[8:16]))
+        self.store_byte(
+            address=address + 1, value=fixedint.MutableUInt8(int(safe_value[8:16]))
+        )
 
     def load_word(self, address: int) -> fixedint.MutableUInt32:
-        try:
-            addr1 = fixedint.MutableUInt32(
-                int(self.memory_file[address % pow(2, self.address_length)])
-            )
-        except KeyError:
-            addr1 = fixedint.MutableUInt32(0)
-        try:
-            addr2 = fixedint.MutableUInt32(
-                int(self.memory_file[(address + 1) % pow(2, self.address_length)]) << 8
-            )
-        except KeyError:
-            addr2 = fixedint.MutableUInt32(0)
-        try:
-            addr3 = fixedint.MutableUInt32(
-                int(self.memory_file[(address + 2) % pow(2, self.address_length)]) << 16
-            )
-        except KeyError:
-            addr3 = fixedint.MutableUInt32(0)
-        try:
-            addr4 = fixedint.MutableUInt32(
-                int(self.memory_file[(address + 3) % pow(2, self.address_length)]) << 24
-            )
-        except KeyError:
-            addr4 = fixedint.MutableUInt32(0)
-        return addr4 | addr3 | addr2 | addr1
+        addr1 = int(self.load_byte(address))
+        addr2 = int(self.load_byte(address + 1)) << 8
+        addr3 = int(self.load_byte(address + 2)) << 16
+        addr4 = int(self.load_byte(address + 3)) << 24
+        return fixedint.MutableUInt32(addr4 | addr3 | addr2 | addr1)
 
     def store_word(self, address: int, value: fixedint.MutableUInt32):
         safe_value = fixedint.MutableUInt32(int(value))
-        self.memory_file[address % pow(2, self.address_length)] = fixedint.MutableUInt8(
-            int(safe_value[0:8])
+        self.store_byte(
+            address=address, value=fixedint.MutableUInt8(int(safe_value[0:8]))
         )
-        self.memory_file[
-            (address + 1) % pow(2, self.address_length)
-        ] = fixedint.MutableUInt8(int(safe_value[8:16]))
-        self.memory_file[
-            (address + 2) % pow(2, self.address_length)
-        ] = fixedint.MutableUInt8(int(safe_value[16:24]))
-        self.memory_file[
-            (address + 3) % pow(2, self.address_length)
-        ] = fixedint.MutableUInt8(int(safe_value[24:32]))
+        self.store_byte(
+            address=address + 1, value=fixedint.MutableUInt8(int(safe_value[8:16]))
+        )
+        self.store_byte(
+            address=address + 2, value=fixedint.MutableUInt8(int(safe_value[16:24]))
+        )
+        self.store_byte(
+            address=address + 3, value=fixedint.MutableUInt8(int(safe_value[24:32]))
+        )
 
 
-@dataclass
 class CsrRegisterFile(Memory):
-    privilege_level: int = 0
+    def __init__(self, privilege_level: int = 0, min_bytes: int = 0):
+        super().__init__()
+        self.privilege_level = privilege_level
+        self.min_bytes = min_bytes
 
     def load_byte(self, address: int) -> fixedint.MutableUInt8:
         self.check_for_legal_address(address)
@@ -199,7 +177,41 @@ class CsrRegisterFile(Memory):
 
 
 @dataclass
+class InstructionMemory:
+    instructions: dict = field(default_factory=dict)
+
+    # max address (exclusive)
+    max_bytes: int = 2**14
+
+    def save_instruction(self, address: int, instr):
+        if address >= 0 and (address + instr.length - 1) < self.max_bytes:
+            self.instructions[address] = instr
+        else:
+            # TODO: Custom exceptions
+            raise ValueError("Incorrect address")
+
+    def load_instruction(self, address):
+        return self.instructions[address]
+
+    def append_instructions(self, program: str):
+        from ..isa.parser import RiscvParser
+
+        if self.instructions:
+            last_address = max(self.instructions.keys())
+            next_address = last_address + self.instructions[last_address].length
+        else:
+            next_address = 0
+        parser: RiscvParser = RiscvParser()
+        for instr in parser.parse_res_to_instructions(
+            parser.parse_assembly(program), start_address=0
+        ):
+            self.save_instruction(next_address, instr=instr)
+            next_address += instr.length
+
+
+@dataclass
 class ArchitecturalState:
+    instruction_memory: InstructionMemory = field(default_factory=InstructionMemory)
     register_file: RegisterFile = field(default_factory=RegisterFile)
     memory: Memory = field(default_factory=Memory)
     csr_registers: CsrRegisterFile = field(default_factory=CsrRegisterFile)

@@ -47,7 +47,9 @@ class TestArchitecture(unittest.TestCase):
         )
 
     def test_mem(self):
-        state = ArchitecturalState(register_file=RegisterFile(registers=()))
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=()), memory=Memory(min_bytes=0)
+        )
         # store_byte test
         state.memory.store_byte(0, fixedint.MutableUInt8(1))
         self.assertEqual(state.memory.load_byte(0), fixedint.MutableUInt8(1))
@@ -87,7 +89,7 @@ class TestArchitecture(unittest.TestCase):
         # tests are now with 16 bit length of memory
         state = ArchitecturalState(
             register_file=RegisterFile(registers=()),
-            memory=Memory(memory_file={}, address_length=16),
+            memory=Memory(memory_file={}, address_length=16, min_bytes=0),
         )
 
         # store_byte test
@@ -101,3 +103,46 @@ class TestArchitecture(unittest.TestCase):
         # store_word test
         state.memory.store_word(pow(2, 16), fixedint.MutableUInt32(4))
         self.assertEqual(state.memory.load_word(0), fixedint.MutableUInt32(4))
+
+    def test_unified_memory(self):
+        state = ArchitecturalState()
+
+        # Save instr tests:
+        state.instruction_memory.save_instruction(
+            address=0, instr=ADD(rd=0, rs1=0, rs2=0)
+        )
+        self.assertEqual(
+            state.instruction_memory.instructions[0], ADD(rd=0, rs1=0, rs2=0)
+        )
+        state.instruction_memory.save_instruction(
+            address=2**14 - 4, instr=ADD(rd=1, rs1=2, rs2=3)
+        )
+        self.assertEqual(
+            state.instruction_memory.instructions[2**14 - 4], ADD(rd=1, rs1=2, rs2=3)
+        )
+
+        # Illegal access out of bounds of instr memory
+        with self.assertRaises(ValueError):
+            state.instruction_memory.save_instruction(
+                address=2**14, instr=ADD(rd=1, rs1=2, rs2=3)
+            )
+
+        with self.assertRaises(ValueError):
+            state.instruction_memory.save_instruction(
+                address=-1, instr=ADD(rd=1, rs1=2, rs2=3)
+            )
+
+        # load instr tests:
+        self.assertEqual(
+            state.instruction_memory.load_instruction(0), ADD(rd=0, rs1=0, rs2=0)
+        )
+        self.assertEqual(
+            state.instruction_memory.load_instruction(2**14 - 4),
+            ADD(rd=1, rs1=2, rs2=3),
+        )
+
+        with self.assertRaises(KeyError):
+            state.instruction_memory.load_instruction(4)
+
+        with self.assertRaises(KeyError):
+            state.instruction_memory.load_instruction(2**14)

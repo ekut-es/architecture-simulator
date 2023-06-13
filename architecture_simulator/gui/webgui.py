@@ -1,6 +1,10 @@
 import archsim_js
 
-from architecture_simulator.uarch.architectural_state import RegisterFile, Memory
+from architecture_simulator.uarch.architectural_state import (
+    RegisterFile,
+    Memory,
+    InstructionMemory,
+)
 from architecture_simulator.isa.instruction_types import Instruction
 from architecture_simulator.isa.rv32i_instructions import ADD
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
@@ -29,7 +33,6 @@ def sim_init():
                 )
             ),
         ),
-        instructions={},
     )
     update_tables()
     return simulation
@@ -41,8 +44,8 @@ def step_sim(instr: str):
         raise RuntimeError("state has not been initialized.")
 
     # parse the instr json string into a python dict
-    if simulation.instructions == {}:
-        simulation.append_instructions(instr)
+    if simulation.state.instruction_memory.instructions == {}:
+        simulation.state.instruction_memory.append_instructions(instr)
 
     # step the simulation
     simulation.step_simulation()
@@ -59,10 +62,9 @@ def run_sim(instr: str):
         raise RuntimeError("state has not been initialized.")
 
     # reset the instruction list
-    simulation.instructions = {}
-    simulation.state.program_counter = 0
+    simulation = Simulation()
 
-    simulation.append_instructions(instr)
+    simulation.state.instruction_memory.append_instructions(instr)
     # run the simulation
     simulation.run_simulation()
 
