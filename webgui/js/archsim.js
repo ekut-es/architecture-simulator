@@ -97,7 +97,19 @@ async function main() {
     let pyodide = await loadPyodide();
     await pyodide.loadPackage("micropip");
     const micropip = pyodide.pyimport("micropip");
-    await micropip.install("/dist/architecture_simulator-0.1.0-py3-none-any.whl");
+    console.log(window.location.protocol)
+    console.log(window.location.href)
+    console.log(window.location.origin)
+    if(window.location.protocol == 'https:')
+    {
+        console.log("if_https")
+        await micropip.install(window.location.href+"/dist/architecture_simulator-0.1.0-py3-none-any.whl");
+    }
+    else
+    {
+        console.log("if_http_or_else")
+        await micropip.install(window.location.origin+"/dist/architecture_simulator-0.1.0-py3-none-any.whl");
+    }
     pyodide.registerJsModule("archsim_js", archsim_js);
     await pyodide.runPython(`
 from architecture_simulator.gui.webgui import *
