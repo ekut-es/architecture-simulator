@@ -54,15 +54,20 @@ class RiscvParser:
 
     pattern_label = pp.Word(pp.alphas + "_", pp.alphanums + "_")("label")
 
-    pattern_imm = pp.Combine(pp.Optional("-") + pp.Word(pp.nums))("imm")
-
-    pattern_uimm = pp.Word(pp.nums)("uimm")
+    pattern_imm = pp.Combine(
+        pp.Optional("-")
+        + (
+            (
+                pp.Combine("0x" + pp.Word(pp.hexnums))
+                | pp.Combine("0b" + pp.Word("01"))
+                | pp.Word(pp.nums)
+            )
+        )
+    )
 
     pattern_offset = pp.Optional(
         PLUS + pp.Combine("0x" + pp.Word(pp.hexnums))("offset")
     )
-
-    pattern_hex = pp.Combine("0x" + pp.Word(pp.hexnums))
 
     # R-Types
     pattern_reg_reg_reg_instruction = pp.Group(
@@ -81,7 +86,7 @@ class RiscvParser:
         + COMMA
         + pattern_register("reg2")
         + COMMA
-        + (pattern_imm | (pattern_label + pattern_offset))
+        + (pattern_imm("imm") | (pattern_label + pattern_offset))
     )
 
     # I-Types, B-Types, S-Types
@@ -89,7 +94,7 @@ class RiscvParser:
         pp.Word(pp.alphas)("mnemonic")
         + pattern_register("reg1")
         + COMMA
-        + pattern_imm
+        + pattern_imm("imm")
         + Paren_L
         + pattern_register("reg2")
         + Paren_R
@@ -100,7 +105,11 @@ class RiscvParser:
         pp.Word(pp.alphas)("mnemonic")
         + pattern_register("rd")
         + COMMA
-        + (pattern_imm | pattern_register("rs1") | (pattern_label + pattern_offset))
+        + (
+            pattern_imm("imm")
+            | pattern_register("rs1")
+            | (pattern_label + pattern_offset)
+        )
     )
 
     # CSR-Types
@@ -108,7 +117,7 @@ class RiscvParser:
         pp.Word(pp.alphas)("mnemonic")
         + pattern_register("rd")
         + COMMA
-        + pattern_hex("csr")
+        + pattern_imm("csr")
         + COMMA
         + pattern_register("rs1")
     )
@@ -118,13 +127,13 @@ class RiscvParser:
         pp.Word(pp.alphas)("mnemonic")
         + pattern_register("rd")
         + COMMA
-        + pattern_hex("csr")
+        + pattern_imm("csr")
         + COMMA
-        + pattern_uimm("uimm")
+        + pattern_imm("uimm")
     )
 
-    riscv_bnf = (
-        pp.OneOrMore(
+    line = (
+        (
             pattern_reg_reg_reg_instruction
             | pattern_reg_imm_reg_instruction
             | pattern_reg_csr_reg_instruction
@@ -134,36 +143,71 @@ class RiscvParser:
             | (pattern_label + D_COL)
             | pp.Word(pp.alphas)("mnemonic")  # for ecall, ebreak
         )
-        + pp.StringEnd()
-    ).ignore(pp.Char("#") + pp.rest_of_line())
+    ) + pp.StringEnd().suppress()
+
+    def convert_label_or_imm(
+        self,
+        instruction_parsed: pp.ParseResults,
+        labels: dict[str, int],
+        address_count: int,
+    ) -> int:
+        # Checks if a imm or label was given
+        # returns the integer value used in the construction of the instruction
+        # TODO: Throws exception if imm is uneven
+        if instruction_parsed.get("imm"):
+            return int(instruction_parsed.imm, base=0) // 2
+        else:
+            offset = 0
+            if instruction_parsed.offset:
+                offset = int(instruction_parsed.offset, base=0)
+            return (labels[instruction_parsed.label] + offset - address_count) // 2
 
     def p_reg(self, parsed_register: pp.ParseResults) -> int:
+        """Parses a register string into a number of the correct register
+
+        Args:
+            parsed_register (pp.ParseResults): parse result of the register name or number. May be an ABI name or a number like x18.
+
+        Returns:
+            int: number of the register
+        """
         if parsed_register[0] == "x":
             return int(parsed_register[1])
         else:
             return reg_mapping["".join(parsed_register)]
 
-    def parse_assembly(self, assembly: str) -> pp.ParseResults:
-        """Turn assembly code into parse results.
+    def parse_assembly(self, assembly: str) -> list[pp.ParseResults]:
+        """Turn assembly code into a list of parse results.
 
         Args:
             assembly (str): Text assembly which may contain labels and comments.
 
         Returns:
-            pp.ParseResults: Parse results.
+            list[pp.ParseResults]: List of ParseResults, where each element is a instruction or label.
         """
-        return self.riscv_bnf.parse_string(assembly)
+        # remove empty lines, lines that only contain white space and comment lines
+        lines = [
+            line
+            for line in assembly.splitlines()
+            if line.strip() and not line.strip().startswith("#")
+        ]
+        # remove comments from linese that also contain an instruction and strip the line
+        lines = [line.split("#", 1)[0].strip() for line in lines]
+        # a line is a list of ParseResults, but there is only one element in each of those lists
+        return [self.line.parse_string(line)[0] for line in lines]
 
-    def compute_labels(self, parse_result: pp.ParseResults, start_address: int) -> dict:
+    def compute_labels(
+        self, parse_result: list[pp.ParseResults], start_address: int
+    ) -> dict:
         """Compute the addresses for the labels.
         Args:
-            parse_result (pp.ParseResults): Parsed assembly which may contain labels
+            parse_result list[pp.ParseResults]: Parsed assembly which may contain labels
             start_address (int): address of the first instruction.
 
         Returns:
             dict: addresses for the labels.
         """
-        labels = {}
+        labels: dict[str, int] = {}
         instruction_address = start_address
         for i_parsed in parse_result:
             if (
@@ -180,12 +224,12 @@ class RiscvParser:
         return labels
 
     def parse_res_to_instructions(
-        self, parse_result: pp.ParseResults, start_address: int
+        self, parse_result: list[pp.ParseResults], start_address: int
     ) -> list[Instruction]:
         """Turn parse results into instructions.
 
         Args:
-            parse_result (pp.ParseResults): parsed assembly which may contain labels.
+            parse_result (list[pp.ParseResults]): parsed assembly which may contain labels.
 
         Returns:
             list[Instruction]: executable list of instructions
@@ -196,6 +240,7 @@ class RiscvParser:
 
         for instruction_parsed in parse_result:
             if isinstance(instruction_parsed, str):
+                # skip if instruction_parsed is a label, but do not skip ecall/ebreak
                 if instruction_parsed == "ecall":
                     instructions.append(ECALL(imm=0, rs1=0, rd=0))
                     address_count += ECALL.length
@@ -204,7 +249,7 @@ class RiscvParser:
                     address_count += EBREAK.length
                 continue
             instruction_class = instruction_map[instruction_parsed.mnemonic.lower()]
-            if instruction_class.__base__ is instruction_types.RTypeInstruction:
+            if issubclass(instruction_class, instruction_types.RTypeInstruction):
                 instructions.append(
                     instruction_class(
                         rs1=self.p_reg(instruction_parsed.rs1),
@@ -212,36 +257,29 @@ class RiscvParser:
                         rd=self.p_reg(instruction_parsed.rd),
                     )
                 )
-            elif instruction_class.__base__ is instruction_types.ITypeInstruction:
+            elif issubclass(instruction_class, instruction_types.ITypeInstruction):
                 instructions.append(
                     instruction_class(
-                        imm=int(instruction_parsed.imm),
-                        # because an i type instruction may be written in two diffrent patterns the "reg" notation is used
-                        # ex: lb x1, 33(x2) | addi x1, x2, 33
+                        imm=int(instruction_parsed.imm, base=0),
+                        # note: since I/S/B-Types use the same patterns but have different names for the registers (rs1,rs2 vs. rd,rs1),
+                        # we instead use reg1 and reg2 as names
                         rs1=self.p_reg(instruction_parsed.reg2),
                         rd=self.p_reg(instruction_parsed.reg1),
                     )
                 )
-            elif instruction_class.__base__ is instruction_types.STypeInstruction:
+            elif issubclass(instruction_class, instruction_types.STypeInstruction):
                 instructions.append(
                     instruction_class(
                         rs1=self.p_reg(instruction_parsed.reg2),
                         rs2=self.p_reg(instruction_parsed.reg1),
-                        imm=int(instruction_parsed.imm),
+                        imm=int(instruction_parsed.imm, base=0),
                     )
                 )
-            elif instruction_class.__base__ is instruction_types.BTypeInstruction:
-                # TODO: Throws exception if imm is uneven
-                imm_val = -1
-                if instruction_parsed.imm.isdigit():
-                    imm_val = int(instruction_parsed.imm) // 2
-                else:
-                    offset = 0
-                    if instruction_parsed.offset != "":
-                        offset = int(instruction_parsed.offset, 0)
-                    imm_val = (
-                        labels[instruction_parsed.label] + offset - address_count
-                    ) // 2
+            elif issubclass(instruction_class, instruction_types.BTypeInstruction):
+                # B-Types can use labels or numerical immediates, so convert that first
+                imm_val = self.convert_label_or_imm(
+                    instruction_parsed, labels, address_count
+                )
 
                 instructions.append(
                     instruction_class(
@@ -250,25 +288,18 @@ class RiscvParser:
                         imm=imm_val,
                     )
                 )
-            elif instruction_class.__base__ is instruction_types.UTypeInstruction:
+            elif issubclass(instruction_class, instruction_types.UTypeInstruction):
                 instructions.append(
                     instruction_class(
                         rd=self.p_reg(instruction_parsed.rd),
-                        imm=int(instruction_parsed.imm),
+                        imm=int(instruction_parsed.imm, base=0),
                     )
                 )
-            elif instruction_class.__base__ is instruction_types.JTypeInstruction:
-                # TODO: Throws exception if imm is uneven
-                imm_val = -1
-                if instruction_parsed.imm.isdigit():
-                    imm_val = int(instruction_parsed.imm) // 2
-                else:
-                    offset = 0
-                    if instruction_parsed.offset != "":
-                        offset = int(instruction_parsed.offset, 0)
-                    imm_val = (
-                        labels[instruction_parsed.label] + offset - address_count
-                    ) // 2
+            elif issubclass(instruction_class, instruction_types.JTypeInstruction):
+                # J-Types can use labels or numerical immediates, so convert that first
+                imm_val = self.convert_label_or_imm(
+                    instruction_parsed, labels, address_count
+                )
 
                 instructions.append(
                     instruction_class(
@@ -276,24 +307,24 @@ class RiscvParser:
                         imm=imm_val,
                     )
                 )
-            elif instruction_class.__base__ is instruction_types.CSRTypeInstruction:
+            elif issubclass(instruction_class, instruction_types.CSRTypeInstruction):
                 instructions.append(
                     instruction_class(
                         rd=self.p_reg(instruction_parsed.rd),
-                        csr=int(instruction_parsed.csr, 0),
+                        csr=int(instruction_parsed.csr, base=0),
                         rs1=self.p_reg(instruction_parsed.rs1),
                     )
                 )
-            elif instruction_class.__base__ is instruction_types.CSRITypeInstruction:
+            elif issubclass(instruction_class, instruction_types.CSRITypeInstruction):
                 # TODO: Add parser element for this type
                 instructions.append(
                     instruction_class(
                         rd=self.p_reg(instruction_parsed.rd),
-                        csr=int(instruction_parsed.csr, 0),
-                        uimm=int(instruction_parsed.uimm),
+                        csr=int(instruction_parsed.csr, base=0),
+                        uimm=int(instruction_parsed.uimm, base=0),
                     )
                 )
-            elif instruction_class.__base__ is instruction_types.fence:
+            elif issubclass(instruction_class, instruction_types.fence):
                 # TODO: Change me, if Fence gets implemented
                 instructions.append(FENCE())
             address_count += instruction_map[instruction_parsed.mnemonic.lower()].length

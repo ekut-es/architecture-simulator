@@ -14,15 +14,15 @@
 
 :root {
 
-  --app_width:					980px;
+  --app_width:					100%;
 
-  --app_height:					600px;
+  --app_height:					37.5em;
 
   --app_margin:					0;
 
   --app_padding:				0;
 
-  --app_border:					1px;
+  --app_border:					0.625em;
 
   --app_border_color:			#E6E6E6;
 
@@ -32,7 +32,7 @@
 
   --app_header_width:			var(--app_width);
 
-  --app_header_height:			40px;
+  --app_header_height:			2.5em;
 
   --app_header_bg_color:		#0066AA;
 
@@ -40,13 +40,13 @@
 
   --app_header_font_family: 	"Times New Roman", Garamond, serif;
 
-  --app_header_icons_width:		20px;
+  --app_header_icons_width:		1.25em;
 
   --app_header_title_width:		calc(var(--app_header_width) - calc(var(--app_header_icons_width) * 3));
 
   --app_nav_width:				var(--app_header_width);
 
-  --app_nav_height:				40px;
+  --app_nav_height:				3.5em;
 
   --app_nav_bg_color:			#D8D8D8;
 
@@ -62,7 +62,7 @@
 
   --app_footer_width:			var(--app_header_width);
 
-  --app_footer_height:			30px;
+  --app_footer_height:			1.875em;
 
   --app_footer_bg_color:		#D8D8D8;
 
@@ -107,7 +107,7 @@ input:out-of-range {
 
     background-color: var(--input_invalid_color);
 
-    border: 2px solid red;
+    border: 0.125em solid red;
 
 }
 
@@ -183,7 +183,7 @@ html{
 
 	padding:			var(--app_padding);
 
-	border:				1px;
+	border:				0.625em;
 
 }
 
@@ -203,7 +203,7 @@ body header {
 
 	color: 				var(--app_header_title_color);
 
-	border-radius: 		4px;
+	border-radius: 		0.25em;
 
 	background-color: 	var(--app_header_bg_color);
 
@@ -225,9 +225,9 @@ body header img{
 
 	height:				var(--app_header_icons_width);
 
-	padding-top:		10px;
+	padding-top:		0.625em;
 
-	padding-left:		10px;
+	padding-left:		0.625em;
 
 }
 
@@ -235,11 +235,11 @@ body header img{
 
 body header #webapp_header_app_name_id{
 
-	padding-top:		5px;
+	padding-top:		0.3125em;
 
-	padding-left:		15px;
+	padding-left:		0.9375em;
 
-	font-size: 			25px;
+	font-size: 			1.5625em;
 
 	width: 				var(--app_header_title_width);
 
@@ -277,7 +277,7 @@ body nav {
 
 	border-style: 	 	solid;
 
-	border-radius: 		4px;
+	border-radius: 		0.25em;
 
 }
 
@@ -305,7 +305,7 @@ body main {
 
 	border-style: 	 	solid;
 
-	border-radius: 		4px;
+	border-radius: 		0.25em;
 
 }
 
@@ -333,7 +333,7 @@ body footer {
 
 	border-style: 	 	solid;
 
-	border-radius: 		4px;
+	border-radius: 		0.25em;
 
 }
 
@@ -343,51 +343,53 @@ body footer {
 
 	color: 				var(--button_text_color);
 
-	font-size: 			15px;
+	font-size: 			0.9375em;
 
 	background-color: 	var(--button_green_color);
 
-	border-radius: 		4px;
+	border-radius: 		0.25em;
 
-	padding: 			1px;
+	padding: 			0.0625em;
 
-	padding-right: 		1px;
+	padding-right: 		0.0625em;
 
     text-decoration: 	none;
 
-    margin: 			5px;
+    margin: 			0.3125em;
 
     cursor: 			pointer;
 
-	height: 			29px;
+	height: 			1.8125em;
 
-	width: 				29px;
+	width: 				1.8125em;
 
 }
 
-.button_stop_simulation {
+.button_refresh_simulation {
 
 	color: 				var(--button_text_color);
 
-	font-size: 			15px;
+	stroke:				#25253b;
+
+	font-size: 			0.9375em;
 
 	background-color: 	var(--button_red_color);
 
-	border-radius: 		4px;
+	border-radius: 		0.25em;
 
-	padding: 			1px;
+	padding: 			0.0625em;
 
-	padding-right: 		1px;
+	padding-right: 		0.0625em;
 
     text-decoration: 	none;
 
-    margin: 			5px;
+    margin: 			0.3125em;
 
     cursor: 			pointer;
 
-	height: 			29px;
+	height: 			1.8125em;
 
-	width: 				29px;
+	width: 				1.8125em;
 
 }
 
@@ -395,25 +397,25 @@ body footer {
 
 	color: 				var(--button_text_color);
 
-	font-size: 			15px;
+	font-size: 			0.9375em;
 
 	background-color: 	var(--button_green_color);
 
-	border-radius: 		4px;
+	border-radius: 		0.25em;
 
-	padding: 			1px;
+	padding: 			0.0625em;
 
-	padding-right: 		1px;
+	padding-right: 		0.0625em;
 
     text-decoration: 	none;
 
-    margin: 			5px;
+    margin: 			0.3125em;
 
     cursor: 			pointer;
 
-	height: 			29px;
+	height: 			1.8125em;
 
-	width: 				29px;
+	width: 				1.8125em;
 
 }
 
@@ -422,25 +424,25 @@ body footer {
 
 	color: 				var(--button_text_color);
 
-	font-size: 			15px;
+	font-size: 			0.9375em;
 
 	background-color: 	var(--button_blue_color);
 
-	border-radius: 		4px;
+	border-radius: 		0.25em;
 
-	padding: 			1px;
+	padding: 			0.0625em;
 
-	padding-right: 		1px;
+	padding-right: 		0.0625em;
 
     text-decoration: 	none;
 
-    margin: 			5px;
+    margin: 			0.3125em;
 
     cursor: 			pointer;
 
-	height: 			29px;
+	height: 			1.8125em;
 
-	width: 				29px;
+	width: 				1.8125em;
 
 }
 
@@ -456,6 +458,8 @@ body main #gui_base_div_id {
 
 	height: 			100%;
 
+	overflow: 			auto;
+
 }
 
 
@@ -464,17 +468,17 @@ body main #gui_cmd_div_id {
 
 	/*background-color: 	DodgerBlue;*/
 
-	margin-top: 		10px;
+	margin-top: 		0.625em;
 
-	margin-bottom: 		30px;
+	margin-bottom: 		1.875em;
 
-	margin-right: 		30px;
+	margin-right: 		2%;
 
-	margin-left: 		30px;
+	margin-left: 		2%;
 
-	width: 				230px;
+	width: 				14.375em;
 
-	overflow-x: 		hidden;
+	overflow-x: 		auto;
 
 	overflow-y: 		auto;
 
@@ -486,21 +490,21 @@ body main #gui_cmd_div_id .button_edit_cmd {
 
 	color: 				var(--button_text_color);
 
-	font-size: 			15px;
+	font-size: 			0.9375em;
 
-	border-radius: 		4px;
+	border-radius: 		0.25em;
 
-	padding: 			0px;
+	padding: 			0em;
 
     text-decoration: 	none;
 
-    margin: 			1px;
+    margin: 			0.0625em;
 
     cursor: 			pointer;
 
-	height: 			29px;
+	height: 			1.8125em;
 
-	width: 				29px;
+	width: 				1.8125em;
 
 }
 
@@ -508,17 +512,17 @@ body main #gui_cmd_div_id .button_edit_cmd {
 
 body main #gui_cmd_table_id {
 
-	table-layout: 		fixed;
+	table-layout: 		auto;
 
 	font-family: 		"Trebuchet MS", Arial, Helvetica, sans-serif;
 
-	font-size: 			11px;
+	font-size: 			0.6875em;
 
 	border-collapse: 	collapse;
 
-	margin: 			1px auto;
+	margin: 			0.0625em auto;
 
-	padding-top: 		40px;
+	padding-top: 		2.5em;
 
 	width: 				100%;
 
@@ -526,11 +530,11 @@ body main #gui_cmd_table_id {
 
 body main #gui_cmd_table_id th 	{
 
-	padding-top: 		1px;
+	padding-top: 		0.0625em;
 
-	padding-bottom: 	1px;
+	padding-bottom: 	0.0625em;
 
-	padding-left: 		1px;
+	padding-left: 		0.0625em;
 
 	text-align: 		center;
 
@@ -540,20 +544,20 @@ body main #gui_cmd_table_id th 	{
 
 	vertical-align: 	middle;
 
-	border: 			1px solid #848484;
+	border: 			0.0625em solid #848484;
 
 	background-color: 	#848484;
 
 	color: 				white;
 
-	height: 			25px;
+	height: 			1.5625em;
 
 }
 
 body main #gui_cmd_table_id th:nth-child(1) {
 
-	width: 				30px;
-	border: 			0px solid #9a9393;
+	width: 				1.875em;
+	border: 			0em solid #9a9393;
 
 	background-color: var(--app_main_bg_color);
 
@@ -561,17 +565,17 @@ body main #gui_cmd_table_id th:nth-child(1) {
 
 body main #gui_cmd_table_id th:nth-child(2) {
 
-	width: 				60px;
+	width: 				3.75em;
 
 }
 
 body main #gui_cmd_table_id td 	{
 
-	padding-top: 		1px;
+	padding-top: 		0.0625em;
 
-	padding-bottom: 	1px;
+	padding-bottom: 	0.0625em;
 
-	padding-left: 		5px;
+	padding-left: 		0.3125em;
 
 	text-align: 		center;
 
@@ -579,50 +583,32 @@ body main #gui_cmd_table_id td 	{
 
 	vertical-align: 	middle;
 
-	border: 			1px solid #9a9393;
+	border: 			0.0625em solid #9a9393;
 
 	color: 				#585858;
 
 	background-color: 	white;
 
-	height: 			25px;
+	height: 			1.5625em;
 
 }
 
 body main #gui_cmd_table_id td:nth-child(1) {
 
-	border: 			0px solid #9a9393;
+	border: 			0em solid #9a9393;
 
 	background-color: var(--app_main_bg_color);
 
-	width: 				30px;
+	width: 				1.875em;
 
 }
 
 body main #gui_cmd_table_id td:nth-child(2) {
 
-	width: 				60px;
+	width: 				3.75em;
 
 }
 
-
-body main #gui_memory_table_id select {
-
-	padding: 			1px;
-
-	width: 				80px;
-
-	height: 			25px;
-
-	margin-top: 		0px;
-
-}
-
-body main #gui_memory_table_id option:disabled {
-
-	color: 				#F78181;
-
-}
 
 
 
@@ -630,17 +616,17 @@ body main #gui_memory_div_id {
 
 	/*background-color: 	DodgerBlue;*/
 
-	margin-top: 		10px;
+	margin-top: 		0.625em;
 
-	margin-bottom: 		30px;
+	margin-bottom: 		1.875em;
 
-	margin-right: 		30px;
+	margin-right: 		2%;
 
-	margin-left: 		30px;
+	margin-left: 		2%;
 
-	width: 				230px;
+	width: 				14.375em;
 
-	overflow-x: 		hidden;
+	overflow-x: 		scroll;
 
 	overflow-y: 		auto;
 
@@ -650,7 +636,7 @@ body main #gui_memory_div_id {
 
 body main #gui_memory_table_id {
 
-	table-layout: 		fixed;
+	table-layout: 		auto;
 
 	font-family: 		"Trebuchet MS", Arial, Helvetica, sans-serif;
 
@@ -658,9 +644,9 @@ body main #gui_memory_table_id {
 
 	border-collapse: 	collapse;
 
-	margin: 			1px auto;
+	margin: 			0.0625em auto;
 
-	padding-top: 		40px;
+	padding-top: 		2.5em;
 
 	width: 				100%;
 
@@ -668,11 +654,11 @@ body main #gui_memory_table_id {
 
 body main #gui_memory_table_id th 	{
 
-	padding-top: 		1px;
+	padding-top: 		0.0625em;
 
-	padding-bottom: 	1px;
+	padding-bottom: 	0.0625em;
 
-	padding-left: 		1px;
+	padding-left: 		0.625em;
 
 	text-align: 		center;
 
@@ -682,21 +668,21 @@ body main #gui_memory_table_id th 	{
 
 	vertical-align: 	middle;
 
-	border: 			1px solid #848484;
+	border: 			0.0625em solid #848484;
 
 	background-color: 	#848484;
 
 	color: 				white;
 
-	height: 			25px;
+	height: 			2em;
 
 }
 
 body main #gui_memory_table_id th:nth-child(1) {
 
-	width: 				30px;
+	width: 				1.875em;
 
-	border: 			0px solid #9a9393;
+	border: 			0em solid #9a9393;
 
 	background-color: var(--app_main_bg_color);
 
@@ -704,17 +690,17 @@ body main #gui_memory_table_id th:nth-child(1) {
 
 body main #gui_memory_table_id th:nth-child(2) {
 
-	width: 				60px;
+	width: 				3.75em;
 
 }
 
 body main #gui_memory_table_id td 	{
 
-	padding-top: 		1px;
+	padding-top: 		0.0625em;
 
-	padding-bottom: 	1px;
+	padding-bottom: 	0.0625em;
 
-	padding-left: 		5px;
+	padding-left: 		0.3125em;
 
 	text-align: 		center;
 
@@ -722,13 +708,13 @@ body main #gui_memory_table_id td 	{
 
 	vertical-align: 	middle;
 
-	border: 			1px solid #9a9393;
+	border: 			0.0625em solid #9a9393;
 
 	color: 				#585858;
 
 	background-color: 	white;
 
-	height: 			25px;
+	height: 			2em;
 
 }
 
@@ -738,25 +724,25 @@ body main #gui_memory_table_id td:nth-child(1) {
 
 	background-color: var(--app_main_bg_color);
 
-	width: 				30px;
+	width: 				1.875em;
 
 }
 
 body main #gui_memory_table_id td:nth-child(2) {
 
-	width: 				60px;
+	width: 				3.75em;
 
 }
 
 body main #gui_memory_table_id select {
 
-	padding: 			1px;
+	padding: 			0.0625em;
 
-	width: 				80px;
+	width: 				5em;
 
-	height: 			25px;
+	height: 			1.5625em;
 
-	margin-top: 		0px;
+	margin-top: 		0em;
 
 }
 
@@ -765,43 +751,22 @@ body main #gui_memory_table_id option:disabled {
 	color: 				#F78181;
 
 }
-
-
-body main #gui_memory_table_id select {
-
-	padding: 			1px;
-
-	width: 				80px;
-
-	height: 			25px;
-
-	margin-top: 		0px;
-
-}
-
-body main #gui_memory_table_id option:disabled {
-
-	color: 				#F78181;
-
-}
-
-
 
 body main #gui_registers_div_id {
 
 	/*background-color: 	DodgerBlue;*/
 
-	margin-top: 		10px;
+	margin-top: 		0.625em;
 
-	margin-bottom: 		30px;
+	margin-bottom: 		1.875em;
 
-	margin-right: 		30px;
+	margin-right: 		2%;
 
-	margin-left: 		30px;
+	margin-left: 		2%;
 
-	width: 				230px;
+	width: 				14.375em;
 
-	overflow-x: 		hidden;
+	overflow-x: 		scroll;
 
 	overflow-y: 		auto;
 
@@ -811,7 +776,7 @@ body main #gui_registers_div_id {
 
 body main #gui_registers_table_id {
 
-	table-layout: 		fixed;
+	table-layout: 		auto;
 
 	font-family: 		"Trebuchet MS", Arial, Helvetica, sans-serif;
 
@@ -819,9 +784,9 @@ body main #gui_registers_table_id {
 
 	border-collapse: 	collapse;
 
-	margin: 			1px auto;
+	margin: 			0.0625em auto;
 
-	padding-top: 		40px;
+	padding-top: 		2.5em;
 
 	width: 				100%;
 
@@ -829,11 +794,11 @@ body main #gui_registers_table_id {
 
 body main #gui_registers_table_id th 	{
 
-	padding-top: 		1px;
+	padding-top: 		0.0625em;
 
-	padding-bottom: 	1px;
+	padding-bottom: 	0.0625em;
 
-	padding-left: 		1px;
+	padding-left: 		0.625em;
 
 	text-align: 		center;
 
@@ -843,21 +808,21 @@ body main #gui_registers_table_id th 	{
 
 	vertical-align: 	middle;
 
-	border: 			1px solid #848484;
+	border: 			0.0625em solid #848484;
 
 	background-color: 	#848484;
 
 	color: 				white;
 
-	height: 			25px;
+	height: 			2em;
 
 }
 
 body main #gui_registers_table_id th:nth-child(1) {
 
-	width: 				30px;
+	width: 				1.875em;
 
-	border: 			0px solid #9a9393;
+	border: 			0em solid #9a9393;
 
 	background-color: var(--app_main_bg_color);
 
@@ -865,17 +830,17 @@ body main #gui_registers_table_id th:nth-child(1) {
 
 body main #gui_registers_table_id th:nth-child(2) {
 
-	width: 				60px;
+	width: 				3.75em;
 
 }
 
 body main #gui_registers_table_id td 	{
 
-	padding-top: 		1px;
+	padding-top: 		0.0625em;
 
-	padding-bottom: 	1px;
+	padding-bottom: 	0.0625em;
 
-	padding-left: 		5px;
+	padding-left: 		0.3125em;
 
 	text-align: 		center;
 
@@ -883,13 +848,13 @@ body main #gui_registers_table_id td 	{
 
 	vertical-align: 	middle;
 
-	border: 			1px solid #9a9393;
+	border: 			0.0625em solid #9a9393;
 
 	color: 				#585858;
 
 	background-color: 	white;
 
-	height: 			25px;
+	height: 			2em;
 
 }
 
@@ -899,25 +864,25 @@ body main #gui_registers_table_id td:nth-child(1) {
 
 	background-color: var(--app_main_bg_color);
 
-	width: 				30px;
+	width: 				1.875em;
 
 }
 
 body main #gui_registers_table_id td:nth-child(2) {
 
-	width: 				60px;
+	width: 				3.75em;
 
 }
 
 body main #gui_registers_table_id select {
 
-	padding: 			1px;
+	padding: 			0.0625em;
 
-	width: 				80px;
+	width: 				5em;
 
-	height: 			25px;
+	height: 			1.5625em;
 
-	margin-top: 		0px;
+	margin-top: 		0em;
 
 }
 
