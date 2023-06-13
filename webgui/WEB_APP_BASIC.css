@@ -365,9 +365,11 @@ body footer {
 
 }
 
-.button_stop_simulation {
+.button_refresh_simulation {
 
 	color: 				var(--button_text_color);
+
+	stroke:				#25253b;
 
 	font-size: 			0.9375em;
 

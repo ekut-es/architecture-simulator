@@ -8,9 +8,6 @@
 	<link 	rel="shortcut icon" 	type="image/x-icon" 	href="favicon.ico">
 	<!--	****************************************************************************************************************************** -->
 	<link 	rel="stylesheet"	 	type="text/css" 		href="WEB_APP_BASIC.css">
-	<link 	rel="stylesheet"	 	type="text/css" 		href="RISCV_DialogEditCommands.css">
-	<!--	****************************************************************************************************************************** -->
-  <script type="text/javascript" 							src="js/RISCV_DialogEditCommands.js"></script>
 	<!--	****************************************************************************************************************************** -->
 	<script type="text/javascript"							src="js/scripts.js"></script>
 </head>
@@ -31,20 +28,21 @@
 		<button type="button" id="button_simulation_next_id" class="button_next_step_simulation" title="next step">
 			<img src="next.svg" width="25px" height="25px">
 		</button>
-		<button type="button" id="button_simulation_stop_id" class="button_stop_simulation" title="reset">
-			<img src="stop.svg" width="25px" height="25px">
+		<button type="button" id="button_simulation_refresh_id" class="button_refresh_simulation" title="reset">
+			<img src="refresh.svg" width="25px" height="25px">
 		</button>
 	</nav>
 	<main id="webapp_main_id">
+		<dialog id="loading_screen">
+			<img src="loading.jpg" alt="loading">
+		</dialog>
 		<div id="gui_base_div_id">
+    		<textarea id="input" style="width: 20%;" rows="20" ></textarea>
 			<div id="gui_cmd_div_id">
 				<table id="gui_cmd_table_id">
 					<thead>
 						<tr>
 							<th>
-								<button type="button" id="button_gui_cmd_edit_id" class="button_edit_cmd" title="edit input">
-									<img src="cmd_edit.svg" width="20px" height="20px">
-								</button>
 							</th>
 							<th title="Programm Counter">PC</th>
 							<th title="Command">Command</th>
@@ -65,7 +63,7 @@
 								<th>
 								</th>
 								<th title="register">Register</th>
-								<th title="register value">Hex Value</th>
+								<th title="register value">Value</th>
 							</tr>
 						</thead>
 						<tbody id="gui_registers_table_body_id">
@@ -79,29 +77,17 @@
 							<th>
 							</th>
 							<th title="memory address">Address</th>
-							<th title="memory value">Hex Value</th>
+							<th title="memory value">Value</th>
 						</tr>
 					</thead>
 					<tbody id="gui_memory_table_body_id">
 					</tbody>
 				</table>
 			</div>
-
+			<textarea id="output" style="width: 20%;" rows="20" disabled></textarea>
 		</div>
 
     </main>
-	<table>
-		<thead><td>Register</td><td>Value</td></thead>
-		<tbody id="registers" ></tbody>
-	  </table>
-	  <table>
-		<thead><td>Memory</td><td>Value</td></thead>
-		<tbody id="memory" ></tbody>
-	  </table>
-	  <div>Input:</div>
-    <textarea id="input" style="width: 100%;" rows="20" ></textarea>
-	  <div>Output:</div>
-    <textarea id="output" style="width: 100%;" rows="20" disabled></textarea>
 	<footer id="webapp_footer_id">
 	</footer>
 	<!--  ****************** Modale Form ********************************************* -->

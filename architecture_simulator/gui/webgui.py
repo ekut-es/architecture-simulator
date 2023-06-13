@@ -6,7 +6,6 @@ from architecture_simulator.isa.rv32i_instructions import ADD
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 from architecture_simulator.simulation.simulation import Simulation
 import fixedint
-import json
 
 simulation = None
 
@@ -32,28 +31,7 @@ def sim_init():
         ),
         instructions={},
     )
-
-    # appends all the registers either one at a time, or all at once with a json string
-    json_array = []
-    for reg_i, reg_val in enumerate(simulation.state.register_file.registers):
-        json_array.append({"index": reg_i, "value": reg_val})
-        archsim_js.append_register(reg_i, int(reg_val))
-    archsim_js.append_registers(json.dumps(json_array))
-
-    # appends all the memory either one at a time or all at once with a json string
-    json_array = []
-    for address, address_val in sorted(
-        simulation.state.memory.memory_file.items(), key=lambda item: item[0]
-    ):
-        json_array.append({"index": hex(address), "value": int(address_val)})
-        archsim_js.append_memory(hex(address), bin(address_val))
-    archsim_js.append_memories(json.dumps(json_array))
-    # create a json string with all instructions in it
-    """json_array = []
-    for address, cmd in simulation.instructions.items():
-        json_array.append({hex(address): cmd})
-
-    archsim_js.append_instructions(json.dumps({"cmd_list": json_array}))"""
+    update_tables()
     return simulation
 
 
@@ -69,26 +47,12 @@ def step_sim(instr: str):
     # step the simulation
     simulation.step_simulation()
 
-    # update the registers after exeution of the instruction/s
-    json_registers = []
-    for reg_i, reg_val in enumerate(simulation.state.register_file.registers):
-        json_registers.append({"index": int(reg_i), "value": int(reg_val)})
-        archsim_js.update_single_register(reg_i, int(reg_val))
-    archsim_js.append_registers(json.dumps(json_registers))
-
-    # update the memory after exeution of the instruction/s
-    json_memory = []
-    for address, address_val in sorted(
-        simulation.state.memory.memory_file.items(), key=lambda item: item[0]
-    ):
-        json_memory.append({"index": hex(address), "value": int(address_val)})
-        archsim_js.update_single_memory_address(hex(address), bin(address_val))
-    archsim_js.append_memories(json.dumps(json_memory))
+    update_tables()
 
     return simulation
 
 
-# runs the simulation, takes a json string as input and returns the whole simulation
+# runs the simulation, takes a string as input and returns the whole simulation
 def run_sim(instr: str):
     global simulation
     if simulation is None:
@@ -102,27 +66,7 @@ def run_sim(instr: str):
     # run the simulation
     simulation.run_simulation()
 
-    # update the instructions after exeution of the instruction/s
-    json_instructions = []
-    for address, cmd in simulation.instructions.items():
-        json_instructions.append({"add": int(address), "cmd": cmd.__repr__()})
-    archsim_js.append_instructions(json.dumps(json_instructions))
-
-    # update the registers after exeution of the instruction/s
-    json_registers = []
-    for reg_i, reg_val in enumerate(simulation.state.register_file.registers):
-        json_registers.append({"index": int(reg_i), "value": int(reg_val)})
-        archsim_js.update_single_register(reg_i, int(reg_val))
-    archsim_js.append_registers(json.dumps(json_registers))
-
-    # update the memory after exeution of the instruction/s
-    json_memory = []
-    for address, address_val in sorted(
-        simulation.state.memory.memory_file.items(), key=lambda item: item[0]
-    ):
-        json_memory.append({"index": hex(address), "value": int(address_val)})
-        archsim_js.update_single_memory_address(hex(address), bin(address_val))
-    archsim_js.append_memories(json.dumps(json_memory))
+    update_tables()
 
     return simulation
 
@@ -135,21 +79,30 @@ def reset_sim():
     simulation = Simulation(
         state=ArchitecturalState(register_file=RegisterFile()), instructions={}
     )
+    update_tables()
+    return simulation
 
-    # appends all the registers either one at a time, or all at once with a json string
-    json_array = []
+
+def update_tables():
+    global simulation
+    if simulation is None:
+        raise RuntimeError("state has not been initialized.")
+
+    # appends all the registers one at a time
+    archsim_js.clear_register_table()
     for reg_i, reg_val in enumerate(simulation.state.register_file.registers):
-        json_array.append({"index": int(reg_i), "value": int(reg_val)})
-        archsim_js.append_register(reg_i, int(reg_val))
-    archsim_js.append_registers(json.dumps(json_array))
+        archsim_js.update_register_table(reg_i, int(reg_val))
 
-    # appends all the memory either one at a time or all at once with a json string
-    json_array = []
+    # appends all the memory one at a time
+    archsim_js.clear_memory_table()
     for address, address_val in sorted(
         simulation.state.memory.memory_file.items(), key=lambda item: item[0]
     ):
-        json_array.append({"index": hex(address), "value": int(address_val)})
-        archsim_js.append_memory(hex(address), bin(address_val))
-    archsim_js.append_memories(json.dumps(json_array))
+        archsim_js.update_memory_table(hex(address), bin(address_val))
 
-    return simulation
+    # appends all the instructions one at a time
+    archsim_js.clear_instruction_table()
+    for address, cmd in sorted(
+        simulation.instructions.items(), key=lambda item: item[0]
+    ):
+        archsim_js.update_instruction_table(hex(address), cmd.__repr__())
