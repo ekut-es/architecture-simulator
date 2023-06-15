@@ -155,11 +155,11 @@ class ITypeInstruction(Instruction):
             rd (int): destination register
         """
         super().__init__(**args)
-        if imm < -2048 or 2047 < imm:
-            raise ValueError(
-                "ITypeInstruction can only take 12 bit immediates. Given immediate was "
-                + str(imm)
-            )
+        # if imm < -2048 or 2047 < imm:
+        #     raise ValueError(
+        #         "ITypeInstruction can only take 12 bit immediates. Given immediate was "
+        #         + str(imm)
+        #     )
         self.imm = imm
         self.rs1 = rs1
         self.rd = rd

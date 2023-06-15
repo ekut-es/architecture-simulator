@@ -539,6 +539,7 @@ class ADDI(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = x[rs1] + sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
+        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         architectural_state.register_file.registers[
             self.rd
         ] = rs1 + fixedint.MutableUInt32(self.imm)
@@ -552,6 +553,7 @@ class ANDI(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = x[rs1] & sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
+        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         architectural_state.register_file.registers[
             self.rd
         ] = rs1 & fixedint.MutableUInt32(self.imm)
@@ -565,6 +567,7 @@ class ORI(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = x[rs1] | sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
+        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         architectural_state.register_file.registers[
             self.rd
         ] = rs1 | fixedint.MutableUInt32(self.imm)
@@ -578,6 +581,7 @@ class XORI(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = x[rs1] ^ sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
+        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         architectural_state.register_file.registers[
             self.rd
         ] = rs1 ^ fixedint.MutableUInt32(self.imm)
@@ -591,9 +595,9 @@ class SLLI(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = x[rs1] << shamt  (imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
-        architectural_state.register_file.registers[
-            self.rd
-        ] = rs1 << fixedint.MutableUInt32(self.imm)
+        architectural_state.register_file.registers[self.rd] = (
+            rs1 << fixedint.MutableUInt32(self.imm)[0:5]
+        )
         return architectural_state
 
 
@@ -604,9 +608,9 @@ class SRLI(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = x[rs1] >>u shamt  (imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
-        architectural_state.register_file.registers[
-            self.rd
-        ] = rs1 >> fixedint.MutableUInt32(self.imm)
+        architectural_state.register_file.registers[self.rd] = (
+            rs1 >> fixedint.MutableUInt32(self.imm)[0:5]
+        )
         return architectural_state
 
 
@@ -616,7 +620,8 @@ class SLTI(ITypeInstruction):
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = x[rs1] <s sext(imm)"""
-        rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
+        rs1 = fixedint.Int32(architectural_state.register_file.registers[self.rs1])
+        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         architectural_state.register_file.registers[self.rd] = (
             fixedint.MutableUInt32(1)
             if rs1 < fixedint.Int32(self.imm)
@@ -632,6 +637,7 @@ class SLTIU(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = x[rs1] <u sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
+        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         architectural_state.register_file.registers[self.rd] = (
             fixedint.MutableUInt32(1)
             if rs1 < fixedint.MutableUInt32(self.imm)
