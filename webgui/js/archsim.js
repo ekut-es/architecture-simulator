@@ -28,13 +28,14 @@ const archsim_js = {
     // update_single_register: function(reg, val) {
     //     document.getElementById("val_x"+reg).innerText = val
     // },
-    update_memory_table: function(address, val) {
+    update_memory_table: function(address, representations) {
         tr = document.createElement("tr")
         empty_td0 = document.createElement("td");
         td1 = document.createElement("td")
         td1.innerText = address
         td2 = document.createElement("td")
-        td2.innerText = val
+        td2.innerText = representations[representation_mode]
+        alert(representations)
         td2.id = "memory"+address
         tr.appendChild(empty_td0)
         tr.appendChild(td1)

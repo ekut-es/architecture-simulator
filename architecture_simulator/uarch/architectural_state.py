@@ -62,7 +62,7 @@ class Memory:
     # Address length in bits. Can be used to limit memory size.
     address_length: int = 32
     # min address (inclusive)
-    min_bytes: int = 2**14
+    min_bytes: int = 0#2**14
     memory_file: dict[int, fixedint.MutableUInt8] = field(default_factory=dict)
 
     def memory_wordwise_repr(self) -> dict[int, tuple]:
