@@ -48,9 +48,12 @@ class RiscvParser:
     D_COL = pp.Literal(":").suppress()
     PLUS = pp.Literal("+").suppress()
 
-    pattern_register = pp.Group(
-        pp.one_of("x zero ra sp gp tp t s fp a") + pp.Optional(pp.Word(pp.nums))
+    pattern_register = pp.oneOf(list(reg_mapping.keys())) | pp.Group(
+        "x" + pp.Word(pp.nums, min=1, max=2)
     )
+    # pp.Group(
+    #     pp.one_of("x zero ra sp gp tp t s fp a") + pp.Optional(pp.Word(pp.nums))
+    # )
 
     pattern_label = pp.Word(pp.alphas + "_", pp.alphanums + "_")("label")
 
@@ -86,7 +89,7 @@ class RiscvParser:
         + COMMA
         + pattern_register("reg2")
         + COMMA
-        + (pattern_imm("imm") | (pattern_label + pattern_offset))
+        + (pattern_imm("imm") ^ (pattern_label + pattern_offset))
     )
 
     # I-Types, B-Types, S-Types
@@ -107,8 +110,8 @@ class RiscvParser:
         + COMMA
         + (
             pattern_imm("imm")
-            | pattern_register("rs1")
-            | (pattern_label + pattern_offset)
+            ^ pattern_register("rs1")
+            ^ (pattern_label + pattern_offset)
         )
     )
 
@@ -135,13 +138,13 @@ class RiscvParser:
     line = (
         (
             pattern_reg_reg_reg_instruction
-            | pattern_reg_imm_reg_instruction
-            | pattern_reg_csr_reg_instruction
-            | pattern_reg_csr_imm_instruction
-            | pattern_reg_reg_imm_instruction
-            | pattern_reg_smth_instruction
-            | (pattern_label + D_COL)
-            | pp.Word(pp.alphas)("mnemonic")  # for ecall, ebreak
+            ^ pattern_reg_imm_reg_instruction
+            ^ pattern_reg_csr_reg_instruction
+            ^ pattern_reg_csr_imm_instruction
+            ^ pattern_reg_reg_imm_instruction
+            ^ pattern_reg_smth_instruction
+            ^ (pattern_label + D_COL)
+            ^ pp.Word(pp.alphas)("mnemonic")  # for ecall, ebreak
         )
     ) + pp.StringEnd().suppress()
 
@@ -162,7 +165,7 @@ class RiscvParser:
                 offset = int(instruction_parsed.offset, base=0)
             return (labels[instruction_parsed.label] + offset - address_count) // 2
 
-    def p_reg(self, parsed_register: pp.ParseResults) -> int:
+    def p_reg(self, parsed_register: pp.ParseResults | str) -> int:
         """Parses a register string into a number of the correct register
 
         Args:
@@ -171,10 +174,10 @@ class RiscvParser:
         Returns:
             int: number of the register
         """
-        if parsed_register[0] == "x":
-            return int(parsed_register[1])
+        if type(parsed_register[0]) == str:
+            return reg_mapping[parsed_register[0]]
         else:
-            return reg_mapping["".join(parsed_register)]
+            return int(parsed_register[0][1])
 
     def parse_assembly(self, assembly: str) -> list[pp.ParseResults]:
         """Turn assembly code into a list of parse results.

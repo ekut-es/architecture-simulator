@@ -496,3 +496,24 @@ fibonacci:
         self.assertEqual(instr[7].csr, 0x448)
         self.assertEqual(instr[8].csr, 0x448)
         self.assertEqual(instr[8].uimm, 0x20)
+
+    def test_reg_label_names(self):
+        parser = RiscvParser()
+        program = """t0Test:
+        sp3:
+        beq x0, x1, t0Test
+        add x0, x1, x2
+        jal x2, sp3
+        """
+
+        parsed = parser.parse_assembly(program)
+        self.assertEqual(
+            [result if type(result) == str else result.as_list() for result in parsed],
+            [
+                "t0Test",
+                "sp3",
+                ["beq", ["x", "0"], ["x", "1"], "t0Test"],
+                ["add", ["x", "0"], ["x", "1"], ["x", "2"]],
+                ["jal", ["x", "2"], "sp3"],
+            ],
+        )
