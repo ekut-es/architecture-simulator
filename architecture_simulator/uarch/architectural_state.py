@@ -71,31 +71,111 @@ class Memory:
         for address in self.memory_file.keys():
             if address % number_of_bytes == 0:
                 word = self.load_word(address=address)
+                bin_word = "{:032b}".format(int(word))
+                hex_word = "{:08X}".format(word)
+                bin_word_with_spaces = (
+                    bin_word[0:8]
+                    + " "
+                    + bin_word[8:16]
+                    + " "
+                    + bin_word[16:24]
+                    + " "
+                    + bin_word[24:32]
+                )
+                hex_word_with_spaces = (
+                    hex_word[0:2]
+                    + " "
+                    + hex_word[2:4]
+                    + " "
+                    + hex_word[4:6]
+                    + " "
+                    + hex_word[6:8]
+                )
                 wordwise_mem[address] = (
-                    "{:032b}".format(int(word)),
+                    bin_word_with_spaces,
                     int(word),
-                    "0x{:08X}".format(word),
+                    hex_word_with_spaces,
                 )
             elif address % number_of_bytes == 1:
                 word = self.load_word(address=address - 1)
+                bin_word = "{:032b}".format(int(word))
+                hex_word = "{:08X}".format(word)
+                bin_word_with_spaces = (
+                    bin_word[0:8]
+                    + " "
+                    + bin_word[8:16]
+                    + " "
+                    + bin_word[16:24]
+                    + " "
+                    + bin_word[24:32]
+                )
+                hex_word_with_spaces = (
+                    hex_word[0:2]
+                    + " "
+                    + hex_word[2:4]
+                    + " "
+                    + hex_word[4:6]
+                    + " "
+                    + hex_word[6:8]
+                )
                 wordwise_mem[address - 1] = (
-                    "{:032b}".format(int(word)),
+                    bin_word_with_spaces,
                     int(word),
-                    "0x{:08X}".format(word),
+                    hex_word_with_spaces,
                 )
             elif address % number_of_bytes == 2:
                 word = self.load_word(address=address - 2)
+                bin_word = "{:032b}".format(int(word))
+                hex_word = "{:08X}".format(word)
+                bin_word_with_spaces = (
+                    bin_word[0:8]
+                    + " "
+                    + bin_word[8:16]
+                    + " "
+                    + bin_word[16:24]
+                    + " "
+                    + bin_word[24:32]
+                )
+                hex_word_with_spaces = (
+                    hex_word[0:2]
+                    + " "
+                    + hex_word[2:4]
+                    + " "
+                    + hex_word[4:6]
+                    + " "
+                    + hex_word[6:8]
+                )
                 wordwise_mem[address - 2] = (
-                    "{:032b}".format(int(word)),
+                    bin_word_with_spaces,
                     int(word),
-                    "0x{:08X}".format(word),
+                    hex_word_with_spaces,
                 )
             elif address % number_of_bytes == 3:
                 word = self.load_word(address=address - 3)
+                bin_word = "{:032b}".format(int(word))
+                hex_word = "{:08X}".format(word)
+                bin_word_with_spaces = (
+                    bin_word[0:8]
+                    + " "
+                    + bin_word[8:16]
+                    + " "
+                    + bin_word[16:24]
+                    + " "
+                    + bin_word[24:32]
+                )
+                hex_word_with_spaces = (
+                    hex_word[0:2]
+                    + " "
+                    + hex_word[2:4]
+                    + " "
+                    + hex_word[4:6]
+                    + " "
+                    + hex_word[6:8]
+                )
                 wordwise_mem[address - 3] = (
-                    "{:032b}".format(int(word)),
+                    bin_word_with_spaces,
                     int(word),
-                    "0x{:08X}".format(word),
+                    hex_word_with_spaces,
                 )
         return wordwise_mem
 
