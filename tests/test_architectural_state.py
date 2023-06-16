@@ -47,6 +47,36 @@ class TestArchitecture(unittest.TestCase):
         )
 
     def test_mem(self):
+        # test the wordwise repr method
+        state = ArchitecturalState(memory=Memory(min_bytes=0))
+        state.memory.store_word(0, fixedint.MutableUInt32(1))
+        state.memory.store_word(6, fixedint.MutableUInt32(6))
+        state.memory.store_byte(21, fixedint.MutableUInt32(20))
+        self.assertEqual(state.memory.memory_wordwise_repr()[0][0], "{:032b}".format(1))
+        self.assertEqual(state.memory.memory_wordwise_repr()[0][1], 1)
+        self.assertEqual(
+            state.memory.memory_wordwise_repr()[0][2], "0x{:08X}".format(1)
+        )
+        self.assertEqual(
+            state.memory.memory_wordwise_repr()[4][0], "{:032b}".format(6 << 16)
+        )
+        self.assertEqual(state.memory.memory_wordwise_repr()[4][1], 6 << 16)
+        self.assertEqual(
+            state.memory.memory_wordwise_repr()[4][2], "0x{:08X}".format(6 << 16)
+        )
+        self.assertEqual(state.memory.memory_wordwise_repr()[8][0], "{:032b}".format(0))
+        self.assertEqual(state.memory.memory_wordwise_repr()[8][1], 0)
+        self.assertEqual(
+            state.memory.memory_wordwise_repr()[8][2], "0x{:08X}".format(0)
+        )
+        self.assertEqual(
+            state.memory.memory_wordwise_repr()[20][0], "{:032b}".format(20 << 8)
+        )
+        self.assertEqual(state.memory.memory_wordwise_repr()[20][1], 20 << 8)
+        self.assertEqual(
+            state.memory.memory_wordwise_repr()[20][2], "0x{:08X}".format(20 << 8)
+        )
+
         state = ArchitecturalState(
             register_file=RegisterFile(registers=()), memory=Memory(min_bytes=0)
         )

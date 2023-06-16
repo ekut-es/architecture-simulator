@@ -65,6 +65,40 @@ class Memory:
     min_bytes: int = 2**14
     memory_file: dict[int, fixedint.MutableUInt8] = field(default_factory=dict)
 
+    def memory_wordwise_repr(self) -> dict[int, tuple]:
+        wordwise_mem: dict[int, tuple] = dict()
+        number_of_bytes = self.address_length / 8
+        for address in self.memory_file.keys():
+            if address % number_of_bytes == 0:
+                word = self.load_word(address=address)
+                wordwise_mem[address] = (
+                    "{:032b}".format(int(word)),
+                    int(word),
+                    "0x{:08X}".format(word),
+                )
+            elif address % number_of_bytes == 1:
+                word = self.load_word(address=address - 1)
+                wordwise_mem[address - 1] = (
+                    "{:032b}".format(int(word)),
+                    int(word),
+                    "0x{:08X}".format(word),
+                )
+            elif address % number_of_bytes == 2:
+                word = self.load_word(address=address - 2)
+                wordwise_mem[address - 2] = (
+                    "{:032b}".format(int(word)),
+                    int(word),
+                    "0x{:08X}".format(word),
+                )
+            elif address % number_of_bytes == 3:
+                word = self.load_word(address=address - 3)
+                wordwise_mem[address - 3] = (
+                    "{:032b}".format(int(word)),
+                    int(word),
+                    "0x{:08X}".format(word),
+                )
+        return wordwise_mem
+
     def load_byte(self, address: int) -> fixedint.MutableUInt8:
         address_with_overflow = address % pow(2, self.address_length)
         if address_with_overflow < self.min_bytes:
