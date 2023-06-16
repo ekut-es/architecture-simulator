@@ -12,13 +12,13 @@ function addToOutput(s) {
 
 // Object containing functions to be exported to python
 const archsim_js = {
-    update_register_table: function(reg, val) {
+    update_register_table: function(reg, representations) {
         tr = document.createElement("tr")
         empty_td0 = document.createElement("td");
         td1 = document.createElement("td")
         td1.innerText = "x"+reg
         td2 = document.createElement("td")
-        td2.innerText = val
+        td2.innerText = Array.from(representations)[representation_mode]
         td2.id = "val_x"+reg
         tr.appendChild(empty_td0)
         tr.appendChild(td1)

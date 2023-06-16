@@ -46,6 +46,30 @@ class TestArchitecture(unittest.TestCase):
             state.register_file.registers[4], fixedint.MutableUInt32(0x_80_00_00_00)
         )
 
+        # reg_repr tests
+        state = ArchitecturalState()
+        state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        state.register_file.registers[2] = fixedint.MutableUInt32(-1)
+        state.register_file.registers[3] = fixedint.MutableUInt32(3)
+        self.assertEqual(
+            state.register_file.reg_repr()[1][0],
+            "00000000 00000000 00000000 00000001",
+        )
+        self.assertEqual(state.register_file.reg_repr()[1][1], 1)
+        self.assertEqual(state.register_file.reg_repr()[1][2], "00 00 00 01")
+        self.assertEqual(
+            state.register_file.reg_repr()[2][0],
+            "11111111 11111111 11111111 11111111",
+        )
+        self.assertEqual(state.register_file.reg_repr()[2][1], 4294967295)
+        self.assertEqual(state.register_file.reg_repr()[2][2], "FF FF FF FF")
+        self.assertEqual(
+            state.register_file.reg_repr()[3][0],
+            "00000000 00000000 00000000 00000011",
+        )
+        self.assertEqual(state.register_file.reg_repr()[3][1], 3)
+        self.assertEqual(state.register_file.reg_repr()[3][2], "00 00 00 03")
+
     def test_mem(self):
         # test the wordwise repr method
         state = ArchitecturalState(memory=Memory(min_bytes=0))
