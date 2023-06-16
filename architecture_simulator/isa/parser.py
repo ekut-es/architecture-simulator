@@ -3,6 +3,7 @@ from architecture_simulator.isa.instruction_types import Instruction
 from architecture_simulator.isa.rv32i_instructions import instruction_map
 from architecture_simulator.isa import instruction_types as instruction_types
 from architecture_simulator.isa.rv32i_instructions import ECALL, EBREAK, FENCE
+from dataclasses import dataclass
 
 reg_mapping = {
     "zero": 0,
@@ -40,6 +41,8 @@ reg_mapping = {
     "t6": 31,
 }
 
+reg_numbers = [str(i) for i in range(32)]
+
 
 class RiscvParser:
     COMMA = pp.Literal(",").suppress()
@@ -49,7 +52,7 @@ class RiscvParser:
     PLUS = pp.Literal("+").suppress()
 
     pattern_register = pp.oneOf(list(reg_mapping.keys())) | pp.Group(
-        "x" + pp.Word(pp.nums, min=1, max=2)
+        "x" + pp.oneOf(reg_numbers)
     )
     # pp.Group(
     #     pp.one_of("x zero ra sp gp tp t s fp a") + pp.Optional(pp.Word(pp.nums))
@@ -72,9 +75,11 @@ class RiscvParser:
         PLUS + pp.Combine("0x" + pp.Word(pp.hexnums))("offset")
     )
 
+    pattern_mnemonic = pp.oneOf(list(instruction_map.keys()), caseless=True)
+
     # R-Types
     pattern_reg_reg_reg_instruction = pp.Group(
-        pp.Word(pp.alphas)("mnemonic")
+        pattern_mnemonic("mnemonic")
         + pattern_register("rd")
         + COMMA
         + pattern_register("rs1")
@@ -84,7 +89,7 @@ class RiscvParser:
 
     # I-Types, B-Types, S-Types
     pattern_reg_reg_imm_instruction = pp.Group(
-        pp.Word(pp.alphas)("mnemonic")
+        pattern_mnemonic("mnemonic")
         + pattern_register("reg1")
         + COMMA
         + pattern_register("reg2")
@@ -94,7 +99,7 @@ class RiscvParser:
 
     # I-Types, B-Types, S-Types
     pattern_reg_imm_reg_instruction = pp.Group(
-        pp.Word(pp.alphas)("mnemonic")
+        pattern_mnemonic("mnemonic")
         + pattern_register("reg1")
         + COMMA
         + pattern_imm("imm")
@@ -105,7 +110,7 @@ class RiscvParser:
 
     # U-Types, J-Types, Fence
     pattern_reg_smth_instruction = pp.Group(
-        pp.Word(pp.alphas)("mnemonic")
+        pattern_mnemonic("mnemonic")
         + pattern_register("rd")
         + COMMA
         + (
@@ -117,7 +122,7 @@ class RiscvParser:
 
     # CSR-Types
     pattern_reg_csr_reg_instruction = pp.Group(
-        pp.Word(pp.alphas)("mnemonic")
+        pattern_mnemonic("mnemonic")
         + pattern_register("rd")
         + COMMA
         + pattern_imm("csr")
@@ -127,7 +132,7 @@ class RiscvParser:
 
     # CSRI-Types
     pattern_reg_csr_imm_instruction = pp.Group(
-        pp.Word(pp.alphas)("mnemonic")
+        pattern_mnemonic("mnemonic")
         + pattern_register("rd")
         + COMMA
         + pattern_imm("csr")
@@ -144,7 +149,7 @@ class RiscvParser:
             ^ pattern_reg_reg_imm_instruction
             ^ pattern_reg_smth_instruction
             ^ (pattern_label + D_COL)
-            ^ pp.Word(pp.alphas)("mnemonic")  # for ecall, ebreak
+            ^ pattern_mnemonic("mnemonic")  # for ecall, ebreak
         )
     ) + pp.StringEnd().suppress()
 
@@ -153,17 +158,27 @@ class RiscvParser:
         instruction_parsed: pp.ParseResults,
         labels: dict[str, int],
         address_count: int,
+        line: str,
+        line_number: int,
     ) -> int:
         # Checks if a imm or label was given
         # returns the integer value used in the construction of the instruction
-        # TODO: Throws exception if imm is uneven
         if instruction_parsed.get("imm"):
-            return int(instruction_parsed.imm, base=0) // 2
+            imm_value = int(instruction_parsed.imm, base=0)
+            if imm_value % 2:
+                raise ParserOddImmediateException(line_number=line_number, line=line)
+            else:
+                return int(instruction_parsed.imm, base=0) // 2
         else:
             offset = 0
             if instruction_parsed.offset:
                 offset = int(instruction_parsed.offset, base=0)
-            return (labels[instruction_parsed.label] + offset - address_count) // 2
+            try:
+                return (labels[instruction_parsed.label] + offset - address_count) // 2
+            except KeyError:
+                raise ParserLabelException(
+                    line_number=line_number, line=line, label=instruction_parsed.label
+                )
 
     def p_reg(self, parsed_register: pp.ParseResults | str) -> int:
         """Parses a register string into a number of the correct register
@@ -188,16 +203,24 @@ class RiscvParser:
         Returns:
             list[pp.ParseResults]: List of ParseResults, where each element is a instruction or label.
         """
-        # remove empty lines, lines that only contain white space and comment lines
-        lines = [
-            line
-            for line in assembly.splitlines()
+        # remove empty lines, lines that only contain white space and comment lines. Enumerate all lines before removing lines.
+        enumerated_lines = [
+            (index, line)
+            for index, line in enumerate(assembly.splitlines())
             if line.strip() and not line.strip().startswith("#")
         ]
-        # remove comments from linese that also contain an instruction and strip the line
-        lines = [line.split("#", 1)[0].strip() for line in lines]
+        # remove comments from lines that also contain an instruction and strip the line
+        enumerated_lines = [
+            (index, line.split("#", 1)[0].strip()) for index, line in enumerated_lines
+        ]
         # a line is a list of ParseResults, but there is only one element in each of those lists
-        return [self.line.parse_string(line)[0] for line in lines]
+        res: list[Instruction] = []
+        for index, line in enumerated_lines:
+            try:
+                res.append((index, line, self.line.parse_string(line)[0]))
+            except pp.ParseException:
+                raise ParserSyntaxException(line_number=index + 1, line=line)
+        return res
 
     def compute_labels(
         self, parse_result: list[pp.ParseResults], start_address: int
@@ -227,7 +250,7 @@ class RiscvParser:
         return labels
 
     def parse_res_to_instructions(
-        self, parse_result: list[pp.ParseResults], start_address: int
+        self, parse_result: list[tuple[int, str, pp.ParseResults]], start_address: int
     ) -> list[Instruction]:
         """Turn parse results into instructions.
 
@@ -238,10 +261,11 @@ class RiscvParser:
             list[Instruction]: executable list of instructions
         """
         instructions: list[Instruction] = []
-        labels = self.compute_labels(parse_result, start_address)
+        pure_parse_results = [result[2] for result in parse_result]
+        labels = self.compute_labels(pure_parse_results, start_address)
         address_count: int = start_address
 
-        for instruction_parsed in parse_result:
+        for line_number, line, instruction_parsed in parse_result:
             if isinstance(instruction_parsed, str):
                 # skip if instruction_parsed is a label, but do not skip ecall/ebreak
                 if instruction_parsed == "ecall":
@@ -281,7 +305,11 @@ class RiscvParser:
             elif issubclass(instruction_class, instruction_types.BTypeInstruction):
                 # B-Types can use labels or numerical immediates, so convert that first
                 imm_val = self.convert_label_or_imm(
-                    instruction_parsed, labels, address_count
+                    instruction_parsed,
+                    labels,
+                    address_count,
+                    line_number=line_number,
+                    line=line,
                 )
 
                 instructions.append(
@@ -301,7 +329,11 @@ class RiscvParser:
             elif issubclass(instruction_class, instruction_types.JTypeInstruction):
                 # J-Types can use labels or numerical immediates, so convert that first
                 imm_val = self.convert_label_or_imm(
-                    instruction_parsed, labels, address_count
+                    instruction_parsed,
+                    labels,
+                    address_count,
+                    line_number=line_number,
+                    line=line,
                 )
 
                 instructions.append(
@@ -332,3 +364,33 @@ class RiscvParser:
                 instructions.append(FENCE())
             address_count += instruction_map[instruction_parsed.mnemonic.lower()].length
         return instructions
+
+    def parse(self, program: str, start_address: int = 0) -> list[Instruction]:
+        parsed = self.parse_assembly(program)
+        return self.parse_res_to_instructions(parsed, start_address=start_address)
+
+
+@dataclass
+class ParserException(Exception):
+    line_number: int
+    line: str
+
+
+@dataclass
+class ParserSyntaxException(ParserException):
+    def __repr__(self) -> str:
+        return f"There was a syntax error in line {self.line_number}: {self.line}"
+
+
+@dataclass
+class ParserLabelException(ParserException):
+    label: str
+
+    def __repr__(self) -> str:
+        return f"Label does not exist in line {self.line_number}: {self.line}"
+
+
+@dataclass
+class ParserOddImmediateException(ParserException):
+    def __repr__(self) -> str:
+        return f"Immediate has to be even in line {self.line_number}: {self.line}"

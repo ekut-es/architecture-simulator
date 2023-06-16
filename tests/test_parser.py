@@ -23,7 +23,13 @@ from architecture_simulator.isa.rv32i_instructions import (
 )
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 
-from architecture_simulator.isa.parser import RiscvParser
+from architecture_simulator.isa.parser import (
+    RiscvParser,
+    ParserException,
+    ParserLabelException,
+    ParserOddImmediateException,
+    ParserSyntaxException,
+)
 
 
 class TestParser(unittest.TestCase):
@@ -94,7 +100,7 @@ beq zero, ra, Ban0n3
         "_Banune24_de",
         ["lb", ["x", "0"], "7", ["x", "1"]],
         ["sb", ["x", "1"], "666", ["x", "2"]],
-        ["BEQ", ["x", "4"], ["x", "5"], "42"],
+        ["beq", ["x", "4"], ["x", "5"], "42"],
         ["lui", ["x", "12"], "8000"],
         "Chinakohl",
         ["jal", ["x", "20"], "220"],
@@ -112,7 +118,7 @@ beq zero, ra, Ban0n3
 
     def test_bnf(self):
         parser = RiscvParser()
-        instr = parser.parse_assembly(self.program)
+        instr = [instr for line_num, line, instr in parser.parse_assembly(self.program)]
         self.assertEqual(
             [result if type(result) == str else result.as_list() for result in instr],
             self.expected,
@@ -120,14 +126,14 @@ beq zero, ra, Ban0n3
         self.assertNotEqual(instr[1].mnemonic, "")
         # self.assertEqual(instr[1].mnemonic, "")
 
-        with self.assertRaises(pp.exceptions.ParseException):
+        with self.assertRaises(ParserSyntaxException):
             parser.parse_assembly(self.program_2)
 
-        with self.assertRaises(pp.exceptions.ParseException):
+        with self.assertRaises(ParserSyntaxException):
             parser.parse_assembly(self.program_3)
 
-        # just check that there is no parser exception
-        parser.parse_assembly(self.program_4)
+        with self.assertRaises(ParserSyntaxException):
+            parser.parse_assembly(self.program_4)
 
     def test_process_labels(self):
         parser = RiscvParser()
@@ -139,7 +145,7 @@ beq zero, ra, Ban0n3
             "Ban0n3": 60,
         }
         bnf_result = parser.parse_assembly(self.program)
-        proc_labels = parser.compute_labels(bnf_result, 0)
+        proc_labels = parser.compute_labels([result[2] for result in bnf_result], 0)
         self.assertEqual(proc_labels, expected_labels)
 
     def assert_inst_values(self, instr):
@@ -235,7 +241,7 @@ beq zero, ra, Ban0n3
         )
         self.assert_inst_values(instr)
 
-        with self.assertRaises(KeyError):
+        with self.assertRaises(ParserSyntaxException):
             parser.parse_res_to_instructions(
                 parser.parse_assembly(self.program_4), start_address=0
             )
@@ -434,9 +440,7 @@ fibonacci:
         jal zero, main
         """
         parser = RiscvParser()
-        instr = parser.parse_res_to_instructions(
-            parser.parse_assembly(text), start_address=0
-        )
+        instr = parser.parse(text, start_address=0)
         self.assertEqual(instr[0].imm, -2)
         self.assertEqual(instr[1].imm, -2)
         self.assertEqual(instr[2].imm, 4)
@@ -456,9 +460,7 @@ fibonacci:
         csrrw sp, 0x448, s1
         csrrwi sp, 0x448, 0x20"""
         parser = RiscvParser()
-        instr = parser.parse_res_to_instructions(
-            parser.parse_assembly(text), start_address=0
-        )
+        instr = parser.parse(text, start_address=0)
 
         self.assertEqual(instr[0].imm, 0xFF)
         self.assertEqual(instr[1].imm, -15)
@@ -483,9 +485,7 @@ fibonacci:
         csrrw sp, 0b010001001000, s1
         csrrwi sp, 0b010001001000, 0b100000"""
         parser = RiscvParser()
-        instr = parser.parse_res_to_instructions(
-            parser.parse_assembly(text), start_address=0
-        )
+        instr = parser.parse(text, start_address=0)
         self.assertEqual(instr[0].imm, 0xFF)
         self.assertEqual(instr[1].imm, -15)
         self.assertEqual(instr[2].imm, 0xA)
@@ -515,7 +515,7 @@ fibonacci:
         jal x2, sp3
         """
 
-        parsed = parser.parse_assembly(program)
+        parsed = [result[2] for result in parser.parse_assembly(program)]
         self.assertEqual(
             [result if type(result) == str else result.as_list() for result in parsed],
             [
@@ -535,3 +535,12 @@ fibonacci:
                 ["jal", ["x", "2"], "sp3"],
             ],
         )
+
+    def test_custom_exceptions(self):
+        false_code_1 = """
+        addi x1, x0, 15
+        subi x1, x0, 15
+        """
+        parser = RiscvParser()
+        with self.assertRaises(ParserSyntaxException):
+            parser.parse_assembly(false_code_1)

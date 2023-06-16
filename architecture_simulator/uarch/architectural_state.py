@@ -202,9 +202,7 @@ class InstructionMemory:
         else:
             next_address = 0
         parser: RiscvParser = RiscvParser()
-        for instr in parser.parse_res_to_instructions(
-            parser.parse_assembly(program), start_address=0
-        ):
+        for instr in parser.parse(program, start_address=0):
             self.save_instruction(next_address, instr=instr)
             next_address += instr.length
 
