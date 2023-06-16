@@ -34,8 +34,8 @@ const archsim_js = {
         td1 = document.createElement("td")
         td1.innerText = address
         td2 = document.createElement("td")
-        td2.innerText = representations[representation_mode]
-        alert(representations)
+        //alert(Array.from(representations))
+        td2.innerText = Array.from(representations)[representation_mode]
         td2.id = "memory"+address
         tr.appendChild(empty_td0)
         tr.appendChild(td1)
@@ -160,6 +160,20 @@ async function evaluatePython_reset_sim() {
         reset_sim = pyodide.globals.get("reset_sim");
         let output = reset_sim();
         addToOutput(output);
+    } catch (err) {
+        addToOutput(err);
+    }
+}
+
+async function evaluatePython_update_tables() {
+    loading_screen.showModal()
+    let pyodide = await pyodideReadyPromise;
+    loading_screen.close();
+    //registers.innerHTML = ""
+    //memory.innerHTML = ""
+    try {
+        update_tables = pyodide.globals.get("update_tables");
+        let output = update_tables();
     } catch (err) {
         addToOutput(err);
     }

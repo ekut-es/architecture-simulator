@@ -19,14 +19,17 @@ let representation_mode = binary_representation; //change this to set another de
 
 			document.getElementById("button_binary_representation_id").addEventListener("click", () => {
 				representation_mode = binary_representation;
+				evaluatePython_update_tables();
 			});
 
 			document.getElementById("button_decimal_representation_id").addEventListener("click", () => {
 				representation_mode = decimal_representation;
+				evaluatePython_update_tables();
 			});
 
 			document.getElementById("button_hexa_representation_id").addEventListener("click", () => {
 				representation_mode = hexa_representation;
+				evaluatePython_update_tables();
 			});
 
 		});
