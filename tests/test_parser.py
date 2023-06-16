@@ -501,7 +501,16 @@ fibonacci:
         parser = RiscvParser()
         program = """t0Test:
         sp3:
+        zero_187_jo_do:
+        _test01:
+        _sp_:
+        sp_0x_0xF:
         beq x0, x1, t0Test
+        beq x0, x1, sp3
+        beq x0, x1, zero_187_jo_do
+        beq x0, x1, _test01
+        beq x0, x1, _sp
+        beq x0, x1, sp_0x_0xF
         add x0, x1, x2
         jal x2, sp3
         """
@@ -512,7 +521,16 @@ fibonacci:
             [
                 "t0Test",
                 "sp3",
+                "zero_187_jo_do",
+                "_test01",
+                "_sp_",
+                "sp_0x_0xF",
                 ["beq", ["x", "0"], ["x", "1"], "t0Test"],
+                ["beq", ["x", "0"], ["x", "1"], "sp3"],
+                ["beq", ["x", "0"], ["x", "1"], "zero_187_jo_do"],
+                ["beq", ["x", "0"], ["x", "1"], "_test01"],
+                ["beq", ["x", "0"], ["x", "1"], "_sp"],
+                ["beq", ["x", "0"], ["x", "1"], "sp_0x_0xF"],
                 ["add", ["x", "0"], ["x", "1"], ["x", "2"]],
                 ["jal", ["x", "2"], "sp3"],
             ],
