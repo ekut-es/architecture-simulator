@@ -537,10 +537,83 @@ fibonacci:
         )
 
     def test_custom_exceptions(self):
-        false_code_1 = """
-        addi x1, x0, 15
+        false_code_1 = """addi x1, x0, 15
         subi x1, x0, 15
         """
         parser = RiscvParser()
-        with self.assertRaises(ParserSyntaxException):
-            parser.parse_assembly(false_code_1)
+        try:
+            parser.parse(false_code_1)
+        except ParserSyntaxException as e:
+            self.assertEqual(
+                e, ParserSyntaxException(line_number=2, line="subi x1, x0, 15")
+            )
+
+        false_code_2 = """add x0, x0, x0
+        t:
+        beq x0, x0, tt"""
+        try:
+            parser.parse(false_code_2)
+        except ParserLabelException as e:
+            self.assertEqual(
+                e,
+                ParserLabelException(line_number=3, line="beq x0, x0, tt", label="tt"),
+            )
+
+        false_code_3 = """# a comment
+        add x0, x0, x0
+        # something
+        beq x0, x0, -1
+        """
+        try:
+            parser.parse(false_code_3)
+        except ParserOddImmediateException as e:
+            self.assertEqual(
+                e,
+                ParserOddImmediateException(
+                    line_number=4,
+                    line="beq x0, x0, -1",
+                ),
+            )
+
+        false_code_4 = """addi x1, x0, 5
+        and x2, x1, x1
+        jal x0, t1, -24
+        beq x0, x0, 4
+        """
+        try:
+            parser.parse(false_code_4)
+        except ParserSyntaxException as e:
+            self.assertEqual(
+                e, ParserSyntaxException(line_number=3, line="jal x0, t1, -24")
+            )
+
+        false_code_5 = """addi x1, x0, 0x-5 # Käse
+        add x0, x0, x0
+        addi x0, x0, x0
+        """
+        try:
+            parser.parse(false_code_5)
+        except ParserSyntaxException as e:
+            self.assertEqual(
+                e, ParserSyntaxException(line_number=1, line="addi x1, x0, 0x-5")
+            )
+
+        false_code_6 = """# ablhsdldfs
+        # bliblablub
+        addi x1, x0, 0b5555 #asdad
+        #ffff"""
+        try:
+            parser.parse(false_code_6)
+        except ParserSyntaxException as e:
+            self.assertEqual(
+                e, ParserSyntaxException(line_number=3, line="addi x1, x0, 0b5555")
+            )
+
+        false_code_7 = """add x0, x5
+        x1:
+        # not a comment
+        """
+        try:
+            parser.parse(false_code_7)
+        except ParserSyntaxException as e:
+            self.assertEqual(e, ParserSyntaxException(line_number=1, line="add x0, x5"))

@@ -5,6 +5,7 @@ from architecture_simulator.isa import instruction_types as instruction_types
 from architecture_simulator.isa.rv32i_instructions import ECALL, EBREAK, FENCE
 from dataclasses import dataclass
 
+# abi register names
 reg_mapping = {
     "zero": 0,
     "ra": 1,
@@ -41,6 +42,44 @@ reg_mapping = {
     "t6": 31,
 }
 
+reg_reg_reg_mnemonics = [
+    "add",
+    "sub",
+    "sll",
+    "slt",
+    "sltu",
+    "xor",
+    "srl",
+    "sra",
+    "or",
+    "and",
+]
+
+csr_mnemonics = ["csrrw", "csrrs", "csrrc"]
+
+csr_i_mnemonics = ["csrrwi", "csrrsi", "csrrci"]
+
+b_type_mnemonics = ["beq", "bne", "blt", "bge", "bltu", "bgeu"]
+
+s_type_mnemonics = ["sb", "sh", "sw"]
+
+normal_i_type_mnemonics = [
+    "addi",
+    "slti",
+    "sltiu",
+    "xori",
+    "ori",
+    "andi",
+    "slli",
+    "srli",
+    "srai",
+]
+
+mem_i_type_mnemonics = ["lb", "lh", "lw", "lbu", "lhu", "jalr"]
+
+u_type_mnemonic = ["lui", "auipc"]
+
+# 0 to 31 for x... register names
 reg_numbers = [str(i) for i in range(32)]
 
 
@@ -54,9 +93,6 @@ class RiscvParser:
     pattern_register = pp.oneOf(list(reg_mapping.keys())) | pp.Group(
         "x" + pp.oneOf(reg_numbers)
     )
-    # pp.Group(
-    #     pp.one_of("x zero ra sp gp tp t s fp a") + pp.Optional(pp.Word(pp.nums))
-    # )
 
     pattern_label = pp.Word(pp.alphas + "_", pp.alphanums + "_")("label")
 
@@ -75,11 +111,9 @@ class RiscvParser:
         PLUS + pp.Combine("0x" + pp.Word(pp.hexnums))("offset")
     )
 
-    pattern_mnemonic = pp.oneOf(list(instruction_map.keys()), caseless=True)
-
     # R-Types
-    pattern_reg_reg_reg_instruction = pp.Group(
-        pattern_mnemonic("mnemonic")
+    pattern_r_type_instruction = pp.Group(
+        pp.oneOf(reg_reg_reg_mnemonics, caseless=True)("mnemonic")
         + pattern_register("rd")
         + COMMA
         + pattern_register("rs1")
@@ -89,17 +123,33 @@ class RiscvParser:
 
     # I-Types, B-Types, S-Types
     pattern_reg_reg_imm_instruction = pp.Group(
-        pattern_mnemonic("mnemonic")
+        pp.oneOf(
+            normal_i_type_mnemonics
+            + mem_i_type_mnemonics
+            + b_type_mnemonics
+            + s_type_mnemonics,
+            caseless=True,
+        )("mnemonic")
         + pattern_register("reg1")
         + COMMA
         + pattern_register("reg2")
         + COMMA
-        + (pattern_imm("imm") ^ (pattern_label + pattern_offset))
+        + pattern_imm("imm")
     )
 
-    # I-Types, B-Types, S-Types
-    pattern_reg_imm_reg_instruction = pp.Group(
-        pattern_mnemonic("mnemonic")
+    # B-Types
+    pattern_b_type_instruction = pp.Group(
+        pp.oneOf(b_type_mnemonics, caseless=True)("mnemonic")
+        + pattern_register("reg1")
+        + COMMA
+        + pattern_register("reg2")
+        + COMMA
+        + (pattern_label + pattern_offset)
+    )
+
+    # I-Type-Memory-Instructions and S-Types
+    pattern_memory_instruction = pp.Group(
+        pp.oneOf(mem_i_type_mnemonics + s_type_mnemonics, caseless=True)("mnemonic")
         + pattern_register("reg1")
         + COMMA
         + pattern_imm("imm")
@@ -108,21 +158,33 @@ class RiscvParser:
         + Paren_R
     )
 
-    # U-Types, J-Types, Fence
-    pattern_reg_smth_instruction = pp.Group(
-        pattern_mnemonic("mnemonic")
+    # J-Types
+    pattern_jal_instruction = pp.Group(
+        pp.CaselessLiteral("jal")("mnemonic")
         + pattern_register("rd")
         + COMMA
-        + (
-            pattern_imm("imm")
-            ^ pattern_register("rs1")
-            ^ (pattern_label + pattern_offset)
-        )
+        + (pattern_imm("imm") ^ (pattern_label + pattern_offset))
+    )
+
+    # U-Types
+    pattern_u_type_instruction = pp.Group(
+        pp.oneOf(u_type_mnemonic, caseless=True)("mnemonic")
+        + pattern_register("rd")
+        + COMMA
+        + pattern_imm("imm")
+    )
+
+    # FENCE
+    pattern_fence_instruction = pp.Group(
+        pp.CaselessLiteral("fence")("mnemonic")
+        + pattern_register("rd")
+        + COMMA
+        + pattern_register("rs1")
     )
 
     # CSR-Types
     pattern_reg_csr_reg_instruction = pp.Group(
-        pattern_mnemonic("mnemonic")
+        pp.oneOf(csr_mnemonics, caseless=True)("mnemonic")
         + pattern_register("rd")
         + COMMA
         + pattern_imm("csr")
@@ -132,7 +194,7 @@ class RiscvParser:
 
     # CSRI-Types
     pattern_reg_csr_imm_instruction = pp.Group(
-        pattern_mnemonic("mnemonic")
+        pp.oneOf(csr_i_mnemonics, caseless=True)("mnemonic")
         + pattern_register("rd")
         + COMMA
         + pattern_imm("csr")
@@ -140,16 +202,24 @@ class RiscvParser:
         + pattern_imm("uimm")
     )
 
+    # ecall ebreak
+    pattern_ecall_ebreak_instruction = (
+        pp.CaselessLiteral("ecall") | pp.CaselessLiteral("ebreak")
+    )("mnemonic")
+
     line = (
         (
-            pattern_reg_reg_reg_instruction
-            ^ pattern_reg_imm_reg_instruction
+            pattern_r_type_instruction
+            ^ pattern_u_type_instruction
+            ^ pattern_b_type_instruction
+            ^ pattern_memory_instruction
             ^ pattern_reg_csr_reg_instruction
             ^ pattern_reg_csr_imm_instruction
             ^ pattern_reg_reg_imm_instruction
-            ^ pattern_reg_smth_instruction
+            ^ pattern_fence_instruction
+            ^ pattern_jal_instruction
+            ^ pattern_ecall_ebreak_instruction
             ^ (pattern_label + D_COL)
-            ^ pattern_mnemonic("mnemonic")  # for ecall, ebreak
         )
     ) + pp.StringEnd().suppress()
 
@@ -158,8 +228,8 @@ class RiscvParser:
         instruction_parsed: pp.ParseResults,
         labels: dict[str, int],
         address_count: int,
-        line: str,
-        line_number: int,
+        line: str,  # for Exceptions
+        line_number: int,  # for Exceptions
     ) -> int:
         # Checks if a imm or label was given
         # returns the integer value used in the construction of the instruction
@@ -184,7 +254,7 @@ class RiscvParser:
         """Parses a register string into a number of the correct register
 
         Args:
-            parsed_register (pp.ParseResults): parse result of the register name or number. May be an ABI name or a number like x18.
+            parsed_register (pp.ParseResults | str): parse result of the register name or number. May be an ABI name or a number like x18.
 
         Returns:
             int: number of the register
@@ -194,18 +264,18 @@ class RiscvParser:
         else:
             return int(parsed_register[0][1])
 
-    def parse_assembly(self, assembly: str) -> list[pp.ParseResults]:
+    def parse_assembly(self, assembly: str) -> list[tuple[int, str, pp.ParseResults]]:
         """Turn assembly code into a list of parse results.
 
         Args:
             assembly (str): Text assembly which may contain labels and comments.
 
         Returns:
-            list[pp.ParseResults]: List of ParseResults, where each element is a instruction or label.
+            list[tuple[int, str, pp.ParseResults]]: List of line number, original line and ParseResult.
         """
         # remove empty lines, lines that only contain white space and comment lines. Enumerate all lines before removing lines.
         enumerated_lines = [
-            (index, line)
+            (index + 1, line)
             for index, line in enumerate(assembly.splitlines())
             if line.strip() and not line.strip().startswith("#")
         ]
@@ -214,12 +284,12 @@ class RiscvParser:
             (index, line.split("#", 1)[0].strip()) for index, line in enumerated_lines
         ]
         # a line is a list of ParseResults, but there is only one element in each of those lists
-        res: list[Instruction] = []
+        res: list[tuple[int, str, pp.ParseResults]] = []
         for index, line in enumerated_lines:
             try:
                 res.append((index, line, self.line.parse_string(line)[0]))
             except pp.ParseException:
-                raise ParserSyntaxException(line_number=index + 1, line=line)
+                raise ParserSyntaxException(line_number=index, line=line)
         return res
 
     def compute_labels(
@@ -255,10 +325,10 @@ class RiscvParser:
         """Turn parse results into instructions.
 
         Args:
-            parse_result (list[pp.ParseResults]): parsed assembly which may contain labels.
+            parse_result (list[tuple[int, str, pp.ParseResults]]): parsed assembly which may contain labels.
 
         Returns:
-            list[Instruction]: executable list of instructions
+            list[Instruction]: list of executable instructions
         """
         instructions: list[Instruction] = []
         pure_parse_results = [result[2] for result in parse_result]
@@ -366,6 +436,14 @@ class RiscvParser:
         return instructions
 
     def parse(self, program: str, start_address: int = 0) -> list[Instruction]:
+        """Turn assembly code into a list of executable instructions.
+
+        Args:
+            assembly (str): Text assembly which may contain labels and comments.
+
+        Returns:
+            list[Instructions]: List of executable instructions.
+        """
         parsed = self.parse_assembly(program)
         return self.parse_res_to_instructions(parsed, start_address=start_address)
 
@@ -387,7 +465,7 @@ class ParserLabelException(ParserException):
     label: str
 
     def __repr__(self) -> str:
-        return f"Label does not exist in line {self.line_number}: {self.line}"
+        return f"Label '{self.label}' does not exist in line {self.line_number}: {self.line}"
 
 
 @dataclass
