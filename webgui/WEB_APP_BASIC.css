@@ -446,6 +446,34 @@ body footer {
 
 }
 
+.button_switch_representation {
+
+	color: 				#8B008B;
+
+	font-size: 			0.9375em;
+
+	background-color: 	#DA70D6;
+
+	border-radius: 		0.25em;
+
+	padding: 			0.0625em;
+
+	padding-right: 		0.0625em;
+
+    text-decoration: 	none;
+
+    margin: 			0.3125em;
+
+    cursor: 			pointer;
+
+	height: 			1.8125em;
+
+	width: 				1.8125em;
+
+	float:				right;
+
+}
+
 
 
 body main #gui_base_div_id {
@@ -526,6 +554,8 @@ body main #gui_cmd_table_id {
 
 	width: 				100%;
 
+	text-align: 		right;
+
 }
 
 body main #gui_cmd_table_id th 	{
@@ -536,7 +566,7 @@ body main #gui_cmd_table_id th 	{
 
 	padding-left: 		0.0625em;
 
-	text-align: 		center;
+	text-align: 		right;
 
 	font-weight: 		bold;
 
@@ -577,7 +607,7 @@ body main #gui_cmd_table_id td 	{
 
 	padding-left: 		0.3125em;
 
-	text-align: 		center;
+	text-align: 		right;
 
 	font-size: 			12px;
 
@@ -650,6 +680,8 @@ body main #gui_memory_table_id {
 
 	width: 				100%;
 
+	text-align: 		right;
+
 }
 
 body main #gui_memory_table_id th 	{
@@ -660,7 +692,7 @@ body main #gui_memory_table_id th 	{
 
 	padding-left: 		0.625em;
 
-	text-align: 		center;
+	text-align: 		right;
 
 	font-weight: 		bold;
 
@@ -702,7 +734,7 @@ body main #gui_memory_table_id td 	{
 
 	padding-left: 		0.3125em;
 
-	text-align: 		center;
+	text-align: 		right;
 
 	font-size: 			12px;
 
@@ -790,6 +822,8 @@ body main #gui_registers_table_id {
 
 	width: 				100%;
 
+	text-align: 		right;
+
 }
 
 body main #gui_registers_table_id th 	{
@@ -800,7 +834,7 @@ body main #gui_registers_table_id th 	{
 
 	padding-left: 		0.625em;
 
-	text-align: 		center;
+	text-align: 		right;
 
 	font-weight: 		bold;
 
@@ -842,7 +876,7 @@ body main #gui_registers_table_id td 	{
 
 	padding-left: 		0.3125em;
 
-	text-align: 		center;
+	text-align: 		right;
 
 	font-size: 			12px;
 
