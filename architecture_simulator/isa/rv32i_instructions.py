@@ -629,7 +629,7 @@ class SLTI(ITypeInstruction):
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = x[rs1] <s sext(imm)"""
-        rs1 = fixedint.Int32(architectural_state.register_file.registers[self.rs1])
+        rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         architectural_state.register_file.registers[self.rd] = (
             fixedint.MutableUInt32(1)
