@@ -194,3 +194,17 @@ class TestSimulation(unittest.TestCase):
         simulation1.state.memory.store_byte(address=5, value=fixedint.MutableUInt8(12))
         self.assertEqual(int(simulation1.state.memory.load_byte(address=5)), 12)
         self.assertEqual(int(simulation2.state.memory.load_byte(address=5)), 0)
+
+    def test_step_simulation_over(self):
+        simulation = Simulation()
+        simulation.state.instruction_memory.instructions = {
+            0: ADDI(rd=1, rs1=1, imm=1),
+            4: ADDI(rd=1, rs1=1, imm=1),
+            8: ADDI(rd=1, rs1=1, imm=1),
+            12: ADDI(rd=1, rs1=1, imm=1),
+        }
+
+        self.assert_(simulation.step_simulation())
+        self.assert_(simulation.step_simulation())
+        self.assert_(simulation.step_simulation())
+        self.assert_(not simulation.step_simulation())
