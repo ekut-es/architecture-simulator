@@ -4,6 +4,7 @@ const memory = document.getElementById("gui_memory_table_id");
 const instructions = document.getElementById("gui_cmd_table_body_id");
 const input = document.getElementById("input");
 const loading_screen = document.getElementById("loading_screen");
+pause_flag = false;
 
 function addToOutput(s) {
     output.value += ">>>" + input.value + "\n" + s + "\n";
@@ -125,7 +126,7 @@ async function evaluatePython_step_sim() {
     input_str = input.value
     try {
         step_sim = pyodide.globals.get("step_sim");
-        let output =  Array.from(step_sim(input_str))[0];
+        let output =  Array.from(step_sim(input_str));
         addToOutput(output);
     } catch (err) {
         addToOutput(err);
@@ -143,15 +144,17 @@ async function evaluatePython_run_sim() {
         reset_sim = pyodide.globals.get("reset_sim");
         reset_sim();
 
-        simulation_ended_flag = false
+        simulation_ended_flag = true
         //run_sim = pyodide.globals.get("run_sim");
         //let output = run_sim(input_str);
         step_sim = pyodide.globals.get("step_sim");
 
-        while(simulation_ended_flag == false)
+        while(simulation_ended_flag == true && pause_flag == false)
         {
-            simulation_ended_flag = Array.from(step_sim(input_str))[1]
-            output =  Array.from(step_sim(input_str))[0];
+            flag_and_simulation_array = Array.from(step_sim(input_str))
+            simulation_ended_flag = flag_and_simulation_array[1]
+            output =  flag_and_simulation_array[0];
+            console.log(simulation_ended_flag)
         }
         addToOutput(output);
     } catch (err) {
@@ -185,5 +188,17 @@ async function evaluatePython_update_tables() {
         let output = update_tables();
     } catch (err) {
         addToOutput(err);
+    }
+}
+
+
+function pause_sim(){
+    if(pause_flag == false){
+        pause_flag = true
+        console.log(pause_flag)
+    }
+    else if(pause_flag == true){
+        pause_flag = false
+        console.log(pause_flag)
     }
 }

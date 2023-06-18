@@ -6,7 +6,12 @@ let representation_mode = binary_representation; //change this to set another de
 		let waiting_for_pyodide_flag = true
 		window.addEventListener('DOMContentLoaded', function () {
 			document.getElementById("button_simulation_start_id").addEventListener("click", () => {
+				pause_flag = false;
 				evaluatePython_run_sim();
+			});
+
+			document.getElementById("button_simulation_pause_id").addEventListener("click", () => {
+				pause_sim();
 			});
 
 			document.getElementById("button_simulation_next_id").addEventListener("click", () => {
@@ -14,6 +19,7 @@ let representation_mode = binary_representation; //change this to set another de
 			});
 
 			document.getElementById("button_simulation_refresh_id").addEventListener("click", () => {
+				pause_flag = false;
 				evaluatePython_reset_sim();
 			});
 
