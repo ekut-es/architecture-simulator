@@ -101,6 +101,9 @@ async function main() {
     console.log(window.location.protocol)
     console.log(window.location.href)
     console.log(window.location.origin)
+    console.log(window.location.hash)
+    console.log(window.location.host)
+    console.log(window.location.hostname)
     if(window.location.protocol == 'https:')
     {
         console.log("if_https")
