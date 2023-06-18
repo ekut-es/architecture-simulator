@@ -31,11 +31,11 @@ def step_sim(instr: str):
         simulation.state.instruction_memory.append_instructions(instr)
 
     # step the simulation
-    simulation.step_simulation()
+    simulation_ended_flag = simulation.step_simulation()
 
     update_tables()
 
-    return simulation
+    return (simulation, simulation_ended_flag)
 
 
 # runs the simulation, takes a string as input and returns the whole simulation

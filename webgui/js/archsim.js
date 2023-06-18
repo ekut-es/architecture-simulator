@@ -91,7 +91,7 @@ const archsim_js = {
 };
 
 output.value = "Output \n\nInitializing... ";
-input.value = "add x1, x2, x3"
+input.value = "add x1, x2, x3 \nlui x1, 1"
 // init Pyodide
 async function main() {
     loading_screen.showModal()
@@ -125,7 +125,7 @@ async function evaluatePython_step_sim() {
     input_str = input.value
     try {
         step_sim = pyodide.globals.get("step_sim");
-        let output = step_sim(input_str);
+        let output =  Array.from(step_sim(input_str))[0];
         addToOutput(output);
     } catch (err) {
         addToOutput(err);
@@ -137,9 +137,22 @@ async function evaluatePython_run_sim() {
     let pyodide = await pyodideReadyPromise;
     loading_screen.close();
     input_str = input.value
+    let output;
     try {
-        run_sim = pyodide.globals.get("run_sim");
-        let output = run_sim(input_str);
+        // reset the sim before executing run
+        reset_sim = pyodide.globals.get("reset_sim");
+        reset_sim();
+
+        simulation_ended_flag = false
+        //run_sim = pyodide.globals.get("run_sim");
+        //let output = run_sim(input_str);
+        step_sim = pyodide.globals.get("step_sim");
+
+        while(simulation_ended_flag == false)
+        {
+            simulation_ended_flag = Array.from(step_sim(input_str))[1]
+            output =  Array.from(step_sim(input_str))[0];
+        }
         addToOutput(output);
     } catch (err) {
         addToOutput(err);
