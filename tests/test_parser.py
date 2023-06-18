@@ -20,6 +20,7 @@ from architecture_simulator.isa.rv32i_instructions import (
     EBREAK,
     ADDI,
     FENCE,
+    LW,
 )
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 
@@ -617,3 +618,39 @@ fibonacci:
             parser.parse(false_code_7)
         except ParserSyntaxException as e:
             self.assertEqual(e, ParserSyntaxException(line_number=1, line="add x0, x5"))
+
+    def test_multiple_notations(self):
+        program = """toast:
+        beq x0, x0, toast
+        beq x0, x0, 8
+        beq x0, x0, toast+0x4"""
+
+        parser = RiscvParser()
+        instr = parser.parse(program)
+        self.assertIsInstance(instr[0], BEQ)
+        self.assertEqual(instr[0].rs1, 0)
+        self.assertEqual(instr[0].rs2, 0)
+        self.assertEqual(instr[0].imm, 0)
+
+        self.assertIsInstance(instr[1], BEQ)
+        self.assertEqual(instr[1].rs1, 0)
+        self.assertEqual(instr[1].rs2, 0)
+        self.assertEqual(instr[1].imm, 4)
+
+        self.assertIsInstance(instr[2], BEQ)
+        self.assertEqual(instr[2].rs1, 0)
+        self.assertEqual(instr[2].rs2, 0)
+        self.assertEqual(instr[2].imm, -2)
+
+        program_2 = """lw x0, x1, 8
+        lw x0, 8(x1)"""
+        instr_2 = parser.parse(program_2)
+        self.assertIsInstance(instr_2[0], LW)
+        self.assertEqual(instr_2[0].rd, 0)
+        self.assertEqual(instr_2[0].rs1, 1)
+        self.assertEqual(instr_2[0].imm, 8)
+
+        self.assertIsInstance(instr_2[1], LW)
+        self.assertEqual(instr_2[1].rd, 0)
+        self.assertEqual(instr_2[1].rs1, 1)
+        self.assertEqual(instr_2[1].imm, 8)
