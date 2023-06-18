@@ -56,14 +56,160 @@ class RegisterFile:
         default_factory=lambda: Registers([fixedint.MutableUInt32(0)] * 32)
     )
 
+    def reg_repr(self) -> dict[int, tuple]:
+        reg_repr: dict[int, tuple] = dict()
+        index = 0
+        for reg in self.registers:
+            bin_reg = "{:032b}".format(int(reg))
+            hex_reg = "{:08X}".format(int(reg))
+            bin_reg_with_spaces = (
+                bin_reg[0:8]
+                + " "
+                + bin_reg[8:16]
+                + " "
+                + bin_reg[16:24]
+                + " "
+                + bin_reg[24:32]
+            )
+            hex_reg_with_spaces = (
+                hex_reg[0:2]
+                + " "
+                + hex_reg[2:4]
+                + " "
+                + hex_reg[4:6]
+                + " "
+                + hex_reg[6:8]
+            )
+            reg_repr[index] = (
+                bin_reg_with_spaces,
+                int(reg),
+                hex_reg_with_spaces,
+            )
+            index += 1
+        return reg_repr
+
 
 @dataclass
 class Memory:
     # Address length in bits. Can be used to limit memory size.
     address_length: int = 32
     # min address (inclusive)
-    min_bytes: int = 2**14
+    min_bytes: int = 0  # 2**14
     memory_file: dict[int, fixedint.MutableUInt8] = field(default_factory=dict)
+
+    def memory_wordwise_repr(self) -> dict[int, tuple]:
+        wordwise_mem: dict[int, tuple] = dict()
+        number_of_bytes = self.address_length / 8
+        for address in self.memory_file.keys():
+            if address % number_of_bytes == 0:
+                word = self.load_word(address=address)
+                bin_word = "{:032b}".format(int(word))
+                hex_word = "{:08X}".format(int(word))
+                bin_word_with_spaces = (
+                    bin_word[0:8]
+                    + " "
+                    + bin_word[8:16]
+                    + " "
+                    + bin_word[16:24]
+                    + " "
+                    + bin_word[24:32]
+                )
+                hex_word_with_spaces = (
+                    hex_word[0:2]
+                    + " "
+                    + hex_word[2:4]
+                    + " "
+                    + hex_word[4:6]
+                    + " "
+                    + hex_word[6:8]
+                )
+                wordwise_mem[address] = (
+                    bin_word_with_spaces,
+                    int(word),
+                    hex_word_with_spaces,
+                )
+            elif address % number_of_bytes == 1:
+                word = self.load_word(address=address - 1)
+                bin_word = "{:032b}".format(int(word))
+                hex_word = "{:08X}".format(int(word))
+                bin_word_with_spaces = (
+                    bin_word[0:8]
+                    + " "
+                    + bin_word[8:16]
+                    + " "
+                    + bin_word[16:24]
+                    + " "
+                    + bin_word[24:32]
+                )
+                hex_word_with_spaces = (
+                    hex_word[0:2]
+                    + " "
+                    + hex_word[2:4]
+                    + " "
+                    + hex_word[4:6]
+                    + " "
+                    + hex_word[6:8]
+                )
+                wordwise_mem[address - 1] = (
+                    bin_word_with_spaces,
+                    int(word),
+                    hex_word_with_spaces,
+                )
+            elif address % number_of_bytes == 2:
+                word = self.load_word(address=address - 2)
+                bin_word = "{:032b}".format(int(word))
+                hex_word = "{:08X}".format(int(word))
+                bin_word_with_spaces = (
+                    bin_word[0:8]
+                    + " "
+                    + bin_word[8:16]
+                    + " "
+                    + bin_word[16:24]
+                    + " "
+                    + bin_word[24:32]
+                )
+                hex_word_with_spaces = (
+                    hex_word[0:2]
+                    + " "
+                    + hex_word[2:4]
+                    + " "
+                    + hex_word[4:6]
+                    + " "
+                    + hex_word[6:8]
+                )
+                wordwise_mem[address - 2] = (
+                    bin_word_with_spaces,
+                    int(word),
+                    hex_word_with_spaces,
+                )
+            elif address % number_of_bytes == 3:
+                word = self.load_word(address=address - 3)
+                bin_word = "{:032b}".format(int(word))
+                hex_word = "{:08X}".format(int(word))
+                bin_word_with_spaces = (
+                    bin_word[0:8]
+                    + " "
+                    + bin_word[8:16]
+                    + " "
+                    + bin_word[16:24]
+                    + " "
+                    + bin_word[24:32]
+                )
+                hex_word_with_spaces = (
+                    hex_word[0:2]
+                    + " "
+                    + hex_word[2:4]
+                    + " "
+                    + hex_word[4:6]
+                    + " "
+                    + hex_word[6:8]
+                )
+                wordwise_mem[address - 3] = (
+                    bin_word_with_spaces,
+                    int(word),
+                    hex_word_with_spaces,
+                )
+        return wordwise_mem
 
     def load_byte(self, address: int) -> fixedint.MutableUInt8:
         address_with_overflow = address % pow(2, self.address_length)

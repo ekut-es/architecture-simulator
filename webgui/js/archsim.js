@@ -12,13 +12,13 @@ function addToOutput(s) {
 
 // Object containing functions to be exported to python
 const archsim_js = {
-    update_register_table: function(reg, val) {
+    update_register_table: function(reg, representations) {
         tr = document.createElement("tr")
         empty_td0 = document.createElement("td");
         td1 = document.createElement("td")
         td1.innerText = "x"+reg
         td2 = document.createElement("td")
-        td2.innerText = val
+        td2.innerText = Array.from(representations)[representation_mode]
         td2.id = "val_x"+reg
         tr.appendChild(empty_td0)
         tr.appendChild(td1)
@@ -28,13 +28,14 @@ const archsim_js = {
     // update_single_register: function(reg, val) {
     //     document.getElementById("val_x"+reg).innerText = val
     // },
-    update_memory_table: function(address, val) {
+    update_memory_table: function(address, representations) {
         tr = document.createElement("tr")
         empty_td0 = document.createElement("td");
         td1 = document.createElement("td")
         td1.innerText = address
         td2 = document.createElement("td")
-        td2.innerText = val
+        //alert(Array.from(representations))
+        td2.innerText = Array.from(representations)[representation_mode]
         td2.id = "memory"+address
         tr.appendChild(empty_td0)
         tr.appendChild(td1)
@@ -159,6 +160,20 @@ async function evaluatePython_reset_sim() {
         reset_sim = pyodide.globals.get("reset_sim");
         let output = reset_sim();
         addToOutput(output);
+    } catch (err) {
+        addToOutput(err);
+    }
+}
+
+async function evaluatePython_update_tables() {
+    loading_screen.showModal()
+    let pyodide = await pyodideReadyPromise;
+    loading_screen.close();
+    //registers.innerHTML = ""
+    //memory.innerHTML = ""
+    try {
+        update_tables = pyodide.globals.get("update_tables");
+        let output = update_tables();
     } catch (err) {
         addToOutput(err);
     }

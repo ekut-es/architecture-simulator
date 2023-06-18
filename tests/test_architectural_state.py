@@ -46,7 +46,61 @@ class TestArchitecture(unittest.TestCase):
             state.register_file.registers[4], fixedint.MutableUInt32(0x_80_00_00_00)
         )
 
+        # reg_repr tests
+        state = ArchitecturalState()
+        state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        state.register_file.registers[2] = fixedint.MutableUInt32(-1)
+        state.register_file.registers[3] = fixedint.MutableUInt32(3)
+        self.assertEqual(
+            state.register_file.reg_repr()[1][0],
+            "00000000 00000000 00000000 00000001",
+        )
+        self.assertEqual(state.register_file.reg_repr()[1][1], 1)
+        self.assertEqual(state.register_file.reg_repr()[1][2], "00 00 00 01")
+        self.assertEqual(
+            state.register_file.reg_repr()[2][0],
+            "11111111 11111111 11111111 11111111",
+        )
+        self.assertEqual(state.register_file.reg_repr()[2][1], 4294967295)
+        self.assertEqual(state.register_file.reg_repr()[2][2], "FF FF FF FF")
+        self.assertEqual(
+            state.register_file.reg_repr()[3][0],
+            "00000000 00000000 00000000 00000011",
+        )
+        self.assertEqual(state.register_file.reg_repr()[3][1], 3)
+        self.assertEqual(state.register_file.reg_repr()[3][2], "00 00 00 03")
+
     def test_mem(self):
+        # test the wordwise repr method
+        state = ArchitecturalState(memory=Memory(min_bytes=0))
+        state.memory.store_word(0, fixedint.MutableUInt32(1))
+        state.memory.store_word(6, fixedint.MutableUInt32(6))
+        state.memory.store_byte(21, fixedint.MutableUInt32(20))
+        self.assertEqual(
+            state.memory.memory_wordwise_repr()[0][0],
+            "00000000 00000000 00000000 00000001",
+        )
+        self.assertEqual(state.memory.memory_wordwise_repr()[0][1], 1)
+        self.assertEqual(state.memory.memory_wordwise_repr()[0][2], "00 00 00 01")
+        self.assertEqual(
+            state.memory.memory_wordwise_repr()[4][0],
+            "00000000 00000110 00000000 00000000",
+        )
+        self.assertEqual(state.memory.memory_wordwise_repr()[4][1], 6 << 16)
+        self.assertEqual(state.memory.memory_wordwise_repr()[4][2], "00 06 00 00")
+        self.assertEqual(
+            state.memory.memory_wordwise_repr()[8][0],
+            "00000000 00000000 00000000 00000000",
+        )
+        self.assertEqual(state.memory.memory_wordwise_repr()[8][1], 0)
+        self.assertEqual(state.memory.memory_wordwise_repr()[8][2], "00 00 00 00")
+        self.assertEqual(
+            state.memory.memory_wordwise_repr()[20][0],
+            "00000000 00000000 00010100 00000000",
+        )
+        self.assertEqual(state.memory.memory_wordwise_repr()[20][1], 20 << 8)
+        self.assertEqual(state.memory.memory_wordwise_repr()[20][2], "00 00 14 00")
+
         state = ArchitecturalState(
             register_file=RegisterFile(registers=()), memory=Memory(min_bytes=0)
         )
