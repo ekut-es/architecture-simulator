@@ -224,3 +224,6 @@ class ArchitecturalState:
 
     def get_privilege_level(self):
         return self.csr_registers.privilege_level
+
+    def instruction_at_pc(self) -> bool:
+        return self.program_counter in self.instruction_memory.instructions
