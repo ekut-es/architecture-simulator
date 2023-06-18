@@ -76,11 +76,6 @@ class BTypeInstruction(Instruction):
             rs2 (int): source register 2
             imm (int): offset to be added to the pc. Needs to be a 12 bit signed integer. Interpreted as multiple of 2 bytes.
         """
-        if imm < -2048 or 2047 < imm:
-            raise ValueError(
-                "B-Type Instruction immediate values have to be in range(-2048, 2048). Given immediate was "
-                + str(imm)
-            )
         super().__init__(**args)
         self.rs1 = rs1
         self.rs2 = rs2
@@ -93,11 +88,6 @@ class BTypeInstruction(Instruction):
 class STypeInstruction(Instruction):
     def __init__(self, rs1: int, rs2: int, imm: int, **args):
         super().__init__(**args)
-        if imm < -2048 or 2047 < imm:
-            raise ValueError(
-                "STypeInstruction can only take 12 bit immediates. Given immediate was "
-                + str(imm)
-            )
         self.rs1 = rs1
         self.rs2 = rs2
         self.imm = imm
@@ -109,11 +99,6 @@ class STypeInstruction(Instruction):
 class UTypeInstruction(Instruction):
     def __init__(self, rd: int, imm: int, **args):
         super().__init__(**args)
-        if imm < -pow(2, 19) or pow(2, 19) - 1 < imm:
-            raise ValueError(
-                "UTypeInstruction can only take 20 bit immediates. Given immediate was "
-                + str(imm)
-            )
         self.rd = rd
         self.imm = imm
 

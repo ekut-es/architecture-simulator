@@ -570,7 +570,7 @@ class TestInstructions(unittest.TestCase):
     def test_csrrsi(self):
         max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
         test_number_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
-        test_mask_1 = fixedint.MutableUInt32(0x00_00_00_01)
+        test_mask_1 = 1
         state = ArchitecturalState(register_file=RegisterFile(registers=[0]))
         cssrsi_1 = CSRRSI(csr=0, uimm=test_mask_1, rd=0)
         state.csr_registers.store_word(0, test_number_1)
@@ -580,30 +580,14 @@ class TestInstructions(unittest.TestCase):
 
     def test_csrrci(self):
         max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
-        test_result_1 = fixedint.MutableUInt32(0x00_00_00_01)
-        test_mask_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
+        test_result_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
+        test_mask_1 = 1
         state = ArchitecturalState(register_file=RegisterFile(registers=[0]))
         state.csr_registers.store_word(0, max_number)
         cssrci_1 = CSRRCI(csr=0, uimm=test_mask_1, rd=0)
         state = cssrci_1.behavior(state)
         self.assertEqual(state.register_file.registers, [max_number])
         self.assertEqual(state.csr_registers.load_word(cssrci_1.csr), test_result_1)
-
-    def test_btype(self):
-        # valid immediates
-        try:
-            BTypeInstruction(rs1=0, rs2=0, imm=0, mnemonic="x")
-            BTypeInstruction(rs1=0, rs2=0, imm=2047, mnemonic="x")
-            BTypeInstruction(rs1=0, rs2=0, imm=-2048, mnemonic="x")
-        except Exception:
-            print(Exception)
-            self.fail("BTypeInstruction raised an exception upon instantiation")
-
-        # invalid immediates
-        with self.assertRaises(ValueError):
-            BTypeInstruction(rs1=0, rs2=0, imm=-2049, mnemonic="x")
-        with self.assertRaises(ValueError):
-            BTypeInstruction(rs1=0, rs2=0, imm=2048, mnemonic="x")
 
     def test_beq(self):
         state = ArchitecturalState(
@@ -1417,19 +1401,6 @@ class TestInstructions(unittest.TestCase):
             instr = EBREAK(imm=0, rs1=0, rd=0)
             state = instr.behavior(state)
 
-    def test_stype(self):
-        try:
-            SB(rs1=0, rs2=4, imm=-2048)
-            SW(rs1=4, rs2=2, imm=2047)
-        except Exception:
-            print(Exception)
-            self.fail("STypeInstruction raised an exception upon instantiation")
-
-        with self.assertRaises(ValueError):
-            SH(rs1=3, rs2=8, imm=-2049)
-        with self.assertRaises(ValueError):
-            SB(rs1=11, rs2=9, imm=2048)
-
     def test_sb(self):
         state = ArchitecturalState(
             register_file=RegisterFile(
@@ -1571,19 +1542,30 @@ class TestInstructions(unittest.TestCase):
         state = sw_7.behavior(state)
         self.assertEqual(int(state.memory.load_word(8)), 4294967295)
 
-    def test_utype(self):
-        try:
-            LUI(rd=0, imm=524287)
-            AUIPC(rd=1, imm=-524288)
-        except Exception:
-            print(Exception)
-            self.fail("UTypeInstruction raised an exception upon instantiation")
+    # def test_utype(self):
+    #     try:
+    #         LUI(rd=0, imm=524287)
+    #         AUIPC(rd=1, imm=-524288)
+    #     except Exception:
+    #         print(Exception)
+    #         self.fail("UTypeInstruction raised an exception upon instantiation")
 
-        with self.assertRaises(ValueError):
-            LUI(rd=10, imm=524288)
-            AUIPC(rd=9, imm=-524289)
+    #     with self.assertRaises(ValueError):
+    #         LUI(rd=10, imm=524288)
+    #         AUIPC(rd=9, imm=-524289)
 
     def test_lui(self):
+        fixedint.MutableUInt32(0)
+        fixedint.MutableUInt32(1)
+        fixedint.MutableUInt32(5)
+        fixedint.MutableUInt32(pow(2, 31) - 1)
+        fixedint.MutableUInt32(-pow(2, 31))
+        fixedint.MutableUInt32(2047)
+        fixedint.MutableUInt32(-2048)
+        fixedint.MutableUInt32(-1)
+        fixedint.MutableUInt32(3320171255)
+        fixedint.MutableUInt32(3320171260)
+
         state = ArchitecturalState(register_file=RegisterFile(registers=[0, 1, 2, 3]))
 
         lui_0 = LUI(rd=0, imm=0)
@@ -1601,6 +1583,25 @@ class TestInstructions(unittest.TestCase):
         lui_3 = LUI(rd=1, imm=3)
         state = lui_3.behavior(state)
         self.assertEqual(int(state.register_file.registers[1]), 12288)
+
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[0, 0, 0, 0, 0])
+        )
+        lui_1 = LUI(rd=0, imm=2097151)
+        state = lui_1.behavior(state)
+        self.assertEqual(
+            int(state.register_file.registers[0]), fixedint.MutableUInt32(-4096)
+        )
+        lui_1 = LUI(rd=0, imm=2097152)
+        state = lui_1.behavior(state)
+        self.assertEqual(
+            int(state.register_file.registers[0]), fixedint.MutableUInt32(0)
+        )
+        lui_1 = LUI(rd=0, imm=-1)
+        state = lui_1.behavior(state)
+        self.assertEqual(
+            int(state.register_file.registers[0]), fixedint.MutableUInt32(-4096)
+        )
 
     def test_auipc(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=[0, 1, 2, 3]))
@@ -1623,6 +1624,31 @@ class TestInstructions(unittest.TestCase):
         auipc_3 = AUIPC(rd=3, imm=3)
         state = auipc_3.behavior(state)
         self.assertEqual(int(state.register_file.registers[3]), 12290)
+
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 0, 0, 0]))
+
+        state.program_counter = 0
+        auipc_0 = AUIPC(rd=0, imm=2097151)
+        state = auipc_0.behavior(state)
+        self.assertEqual(
+            int(state.register_file.registers[0]), fixedint.MutableUInt32(-4096)
+        )
+        auipc_0 = AUIPC(rd=0, imm=2097152)
+        state = auipc_0.behavior(state)
+        self.assertEqual(
+            int(state.register_file.registers[0]), fixedint.MutableUInt32(0)
+        )
+        auipc_0 = AUIPC(rd=0, imm=-1)
+        state = auipc_0.behavior(state)
+        self.assertEqual(
+            int(state.register_file.registers[0]), fixedint.MutableUInt32(-4096)
+        )
+        state.program_counter = 4
+        auipc_0 = AUIPC(rd=0, imm=2097151)
+        state = auipc_0.behavior(state)
+        self.assertEqual(
+            int(state.register_file.registers[0]), fixedint.MutableUInt32(-4092)
+        )
 
     def test_jtype(self):
         try:

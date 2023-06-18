@@ -250,6 +250,7 @@ class BEQ(BTypeInstruction):
         """if (x[rs1] == x[rs2]) pc += sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
+        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         if rs1 == rs2:
             architectural_state.program_counter += self.imm * 2 - self.length
             architectural_state.performance_metrics.branch_count += 1
@@ -264,6 +265,7 @@ class BNE(BTypeInstruction):
         """if (x[rs1] != x[rs2]) pc += sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
+        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         if rs1 != rs2:
             architectural_state.program_counter += self.imm * 2 - self.length
             architectural_state.performance_metrics.branch_count += 1
@@ -278,6 +280,7 @@ class BLT(BTypeInstruction):
         """if (x[rs1] <s x[rs2]) pc += sext(imm)"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         rs2 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs2]))
+        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         if rs1 < rs2:
             architectural_state.program_counter += self.imm * 2 - self.length
             architectural_state.performance_metrics.branch_count += 1
@@ -292,6 +295,7 @@ class BGE(BTypeInstruction):
         """if (x[rs1] >= x[rs2]) pc += sext(imm)"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         rs2 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs2]))
+        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         if rs1 >= rs2:
             architectural_state.program_counter += self.imm * 2 - self.length
             architectural_state.performance_metrics.branch_count += 1
@@ -306,6 +310,7 @@ class BLTU(BTypeInstruction):
         """if (x[rs1] <u x[rs2]) pc += sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
+        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         if rs1 < rs2:
             architectural_state.program_counter += self.imm * 2 - self.length
             architectural_state.performance_metrics.branch_count += 1
@@ -320,6 +325,7 @@ class BGEU(BTypeInstruction):
         """if (x[rs1] >=u x[rs2]) pc += sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
+        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         if rs1 >= rs2:
             architectural_state.program_counter += self.imm * 2 - self.length
             architectural_state.performance_metrics.branch_count += 1
@@ -412,7 +418,7 @@ class CSRRWI(CSRITypeInstruction):
             self.rd
         ] = architectural_state.csr_registers.load_word(self.csr)
         architectural_state.csr_registers.store_word(
-            self.csr, fixedint.MutableUInt32(self.uimm)
+            self.csr, fixedint.MutableUInt32(fixedint.Int8(self.uimm)[0:5])
         )
 
         return architectural_state
@@ -436,7 +442,7 @@ class CSRRSI(CSRITypeInstruction):
         ] = architectural_state.csr_registers.load_word(self.csr)
         temp = architectural_state.csr_registers.load_word(
             self.csr
-        ) | fixedint.MutableUInt32(self.uimm)
+        ) | fixedint.MutableUInt32(fixedint.Int8(self.uimm)[0:5])
         architectural_state.csr_registers.store_word(self.csr, temp)
 
         return architectural_state
@@ -459,7 +465,7 @@ class CSRRCI(CSRITypeInstruction):
             self.rd
         ] = architectural_state.csr_registers.load_word(self.csr)
         temp = architectural_state.csr_registers.load_word(self.csr) & (
-            ~(fixedint.MutableUInt32(self.uimm))
+            ~(fixedint.MutableUInt32(fixedint.Int8(self.uimm)[0:5]))
         )
         architectural_state.csr_registers.store_word(self.csr, temp)
 
@@ -497,6 +503,7 @@ class SB(STypeInstruction):
         """M[x[rs1] + sext(imm)] = x[rs2][7:0]"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2][:8]
+        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         architectural_state.memory.store_byte(
             int(rs1 + fixedint.MutableUInt32(self.imm)), fixedint.MutableUInt8(int(rs2))
         )
@@ -511,6 +518,7 @@ class SH(STypeInstruction):
         """M[x[rs1] + sext(imm)] = x[rs2][15:0]"""
         rs2 = architectural_state.register_file.registers[self.rs2][:16]
         rs1 = architectural_state.register_file.registers[self.rs1]
+        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         architectural_state.memory.store_halfword(
             int(rs1 + fixedint.MutableUInt32(self.imm)),
             fixedint.MutableUInt16(int(rs2)),
@@ -526,6 +534,7 @@ class SW(STypeInstruction):
         """M[x[rs1] + sext(imm)] = x[rs2][31:0]"""
         rs2 = architectural_state.register_file.registers[self.rs2]
         rs1 = architectural_state.register_file.registers[self.rs1]
+        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         architectural_state.memory.store_word(
             int(rs1 + fixedint.MutableUInt32(self.imm)), rs2
         )
@@ -652,6 +661,7 @@ class LUI(UTypeInstruction):
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = sext(imm[31:12] << 12)"""
+        self.imm = (self.imm & 2097151) - (self.imm & 2097152)  # 20-bit sext
         imm = self.imm << 12
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             imm
@@ -665,6 +675,7 @@ class AUIPC(UTypeInstruction):
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = pc + sext(imm[31:12] << 12)"""
+        self.imm = (self.imm & 2097151) - (self.imm & 2097152)  # 20-bit sext
         imm = self.imm << 12
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             architectural_state.program_counter + imm
@@ -702,6 +713,7 @@ class LB(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = sext(M[x[rs1] + sext(imm)][7:0])"""
         rs1 = architectural_state.register_file.registers[self.rs1]
+        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         # casting like this is necessary for sign extension
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             int(
@@ -720,6 +732,7 @@ class LH(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = sext(M[x[rs1] + sext(imm)][15:0])"""
         rs1 = architectural_state.register_file.registers[self.rs1]
+        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             int(
                 fixedint.Int16(
@@ -737,6 +750,7 @@ class LW(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = sext(M[x[rs1] + sext(imm)][31:0])"""
         rs1 = architectural_state.register_file.registers[self.rs1]
+        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         architectural_state.register_file.registers[
             self.rd
         ] = architectural_state.memory.load_word(int(rs1) + self.imm)
@@ -750,6 +764,7 @@ class LBU(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = M[x[rs1] + sext(imm)][7:0]"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
+        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             int(architectural_state.memory.load_byte(int(rs1) + self.imm))
         )
@@ -763,6 +778,7 @@ class LHU(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = M[x[rs1] + sext(imm)][15:0]"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
+        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             int(architectural_state.memory.load_halfword(int(rs1) + self.imm))
         )
@@ -776,11 +792,12 @@ class JALR(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """t=pc+4; pc=(x[rs1]+sext(imm))&∼1; x[rd]=t"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
+        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             architectural_state.program_counter + 4
         )
         architectural_state.program_counter = (
-            int((rs1 + fixedint.Int16(self.imm)[0:12])) & (pow(2, 32) - 2)
+            int((rs1 + fixedint.Int16(self.imm))) & (pow(2, 32) - 2)
         ) - self.length
         return architectural_state
 
