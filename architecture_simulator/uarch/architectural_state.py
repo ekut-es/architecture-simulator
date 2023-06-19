@@ -328,19 +328,27 @@ class CsrRegisterFile(Memory):
 
     def check_privilege_level(self, address: int):
         if (address & 0b001100000000) > self.privilege_level:
-            raise Exception(
+            raise CSRError(
                 "illegal action: privilege level too low to access this csr register"
             )
 
     def check_for_legal_address(self, address: int):
         if address < 0 or address > 4095:
-            raise Exception("illegal action: csr register does not exist")
+            raise CSRError("illegal action: csr register does not exist")
 
     def check_read_only(self, address: int):
         if address & 0b100000000000 and address & 0b010000000000:
-            raise Exception(
+            raise CSRError(
                 "illegal action: attempting to write into read-only csr register"
             )
+
+
+@dataclass
+class CSRError(ValueError):
+    message: str
+
+    def __repr__(self):
+        return self.message
 
 
 @dataclass
