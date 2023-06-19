@@ -10,7 +10,14 @@ class Simulation:
         current_instruction = self.state.instruction_memory.load_instruction(
             self.state.program_counter
         )
-        self.state = current_instruction.behavior(self.state)
+        try:
+            self.state = current_instruction.behavior(self.state)
+        except Exception as e:
+            raise InstructionExecutionException(
+                address=self.state.program_counter,
+                instruction_repr=current_instruction.__repr__(),
+                error_message=e.__repr__(),
+            )
         self.state.program_counter += current_instruction.length
         self.state.performance_metrics.instruction_count += 1
         return self.state.instruction_at_pc()
@@ -22,3 +29,13 @@ class Simulation:
             while self.state.instruction_at_pc():
                 self.step_simulation()
         self.state.performance_metrics.stop_timer()
+
+
+@dataclass
+class InstructionExecutionException(RuntimeError):
+    address: int
+    instruction_repr: str
+    error_message: str
+
+    def __repr__(self):
+        return f"There was an error executing the instruction at address '{self.address}': '{self.instruction_repr}':\n{self.error_message}"

@@ -105,7 +105,7 @@ class Memory:
     # Address length in bits. Can be used to limit memory size.
     address_length: int = 32
     # min address (inclusive)
-    min_bytes: int = 0  # 2**14
+    min_bytes: int = 2**14  # 2**14
     memory_file: dict[int, fixedint.MutableUInt8] = field(default_factory=dict)
 
     def memory_wordwise_repr(self) -> dict[int, tuple]:
@@ -228,7 +228,7 @@ class Memory:
             raise MemoryAddressError(
                 address=address_with_overflow,
                 min_address_incl=self.min_bytes,
-                max_address_incl=(2**self.address_length),
+                max_address_incl=(2**self.address_length) - 1,
                 memory_type="data memory",
             )
         try:
@@ -243,7 +243,7 @@ class Memory:
             raise MemoryAddressError(
                 address=address_with_overflow,
                 min_address_incl=self.min_bytes,
-                max_address_incl=(2**self.address_length),
+                max_address_incl=(2**self.address_length) - 1,
                 memory_type="data memory",
             )
         safe_value = fixedint.MutableUInt8(int(value))
