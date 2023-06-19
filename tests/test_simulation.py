@@ -218,6 +218,8 @@ class TestSimulation(unittest.TestCase):
         simulation.state.instruction_memory.instructions = {
             0: ADDI(rd=1, rs1=1, imm=1),
             4: LW(rd=1, rs1=0, imm=0),
+            8: ADDI(rd=1, rs1=1, imm=1),
+            12: ADDI(rd=1, rs1=1, imm=1),
         }
 
         with self.assertRaises(InstructionExecutionException) as cm:

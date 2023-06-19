@@ -542,82 +542,78 @@ fibonacci:
         subi x1, x0, 15
         """
         parser = RiscvParser()
-        try:
+        with self.assertRaises(ParserSyntaxException) as cm:
             parser.parse(false_code_1)
-        except ParserSyntaxException as e:
-            self.assertEqual(
-                e, ParserSyntaxException(line_number=2, line="subi x1, x0, 15")
-            )
+        self.assertEqual(
+            cm.exception, ParserSyntaxException(line_number=2, line="subi x1, x0, 15")
+        )
 
         false_code_2 = """add x0, x0, x0
         t:
         beq x0, x0, tt"""
-        try:
+        with self.assertRaises(ParserLabelException) as cm:
             parser.parse(false_code_2)
-        except ParserLabelException as e:
-            self.assertEqual(
-                e,
-                ParserLabelException(line_number=3, line="beq x0, x0, tt", label="tt"),
-            )
+        self.assertEqual(
+            cm.exception,
+            ParserLabelException(line_number=3, line="beq x0, x0, tt", label="tt"),
+        )
 
         false_code_3 = """# a comment
         add x0, x0, x0
         # something
         beq x0, x0, -1
         """
-        try:
+        with self.assertRaises(ParserOddImmediateException) as cm:
             parser.parse(false_code_3)
-        except ParserOddImmediateException as e:
-            self.assertEqual(
-                e,
-                ParserOddImmediateException(
-                    line_number=4,
-                    line="beq x0, x0, -1",
-                ),
-            )
+        self.assertEqual(
+            cm.exception,
+            ParserOddImmediateException(
+                line_number=4,
+                line="beq x0, x0, -1",
+            ),
+        )
 
         false_code_4 = """addi x1, x0, 5
         and x2, x1, x1
         jal x0, t1, -24
         beq x0, x0, 4
         """
-        try:
+        with self.assertRaises(ParserSyntaxException) as cm:
             parser.parse(false_code_4)
-        except ParserSyntaxException as e:
-            self.assertEqual(
-                e, ParserSyntaxException(line_number=3, line="jal x0, t1, -24")
-            )
+        self.assertEqual(
+            cm.exception, ParserSyntaxException(line_number=3, line="jal x0, t1, -24")
+        )
 
         false_code_5 = """addi x1, x0, 0x-5 # Käse
         add x0, x0, x0
         addi x0, x0, x0
         """
-        try:
+        with self.assertRaises(ParserSyntaxException) as cm:
             parser.parse(false_code_5)
-        except ParserSyntaxException as e:
-            self.assertEqual(
-                e, ParserSyntaxException(line_number=1, line="addi x1, x0, 0x-5")
-            )
+        self.assertEqual(
+            cm.exception, ParserSyntaxException(line_number=1, line="addi x1, x0, 0x-5")
+        )
 
         false_code_6 = """# ablhsdldfs
         # bliblablub
         addi x1, x0, 0b5555 #asdad
         #ffff"""
-        try:
+        with self.assertRaises(ParserSyntaxException) as cm:
             parser.parse(false_code_6)
-        except ParserSyntaxException as e:
-            self.assertEqual(
-                e, ParserSyntaxException(line_number=3, line="addi x1, x0, 0b5555")
-            )
+        self.assertEqual(
+            cm.exception,
+            ParserSyntaxException(line_number=3, line="addi x1, x0, 0b5555"),
+        )
 
         false_code_7 = """add x0, x5
         x1:
         # not a comment
         """
-        try:
+        with self.assertRaises(ParserSyntaxException) as cm:
             parser.parse(false_code_7)
-        except ParserSyntaxException as e:
-            self.assertEqual(e, ParserSyntaxException(line_number=1, line="add x0, x5"))
+        self.assertEqual(
+            cm.exception, ParserSyntaxException(line_number=1, line="add x0, x5")
+        )
 
     def test_multiple_notations(self):
         program = """toast:
