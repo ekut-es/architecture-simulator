@@ -17,30 +17,13 @@ simulation = None
 
 @dataclass
 class StateNotInitializedError(RuntimeError):
-    def __repr__():
+    def __repr__(self):
         return "state has not been initialized."
 
 
 def sim_init():
     global simulation
-    simulation = Simulation(
-        state=ArchitecturalState(
-            register_file=RegisterFile(registers=[0, 2, 0, 8, 6]),
-            memory=Memory(
-                memory_file=dict(
-                    [
-                        (0, fixedint.MutableUInt8(1)),
-                        (1, fixedint.MutableUInt8(2)),
-                        (2, fixedint.MutableUInt8(3)),
-                        (3, fixedint.MutableUInt8(-1)),
-                        (pow(2, 32) - 1, fixedint.MutableUInt8(4)),
-                        (2047, fixedint.MutableUInt8(5)),
-                        (10, fixedint.MutableUInt8(10)),
-                    ]
-                )
-            ),
-        ),
-    )
+    simulation = Simulation()
     update_tables()
     return simulation
 
