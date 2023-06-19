@@ -90,6 +90,17 @@ class RegisterFile:
 
 
 @dataclass
+class MemoryAddressError(ValueError):
+    address: int
+    min_address_incl: int
+    max_address_incl: int
+    memory_type: str
+
+    def __repr__(self):
+        return f"MemoryAddressError: Cannot access {self.memory_type} at address {self.address}: Addresses go from {self.min_address_incl} to {self.max_address_incl}"
+
+
+@dataclass
 class Memory:
     # Address length in bits. Can be used to limit memory size.
     address_length: int = 32
@@ -214,7 +225,12 @@ class Memory:
     def load_byte(self, address: int) -> fixedint.MutableUInt8:
         address_with_overflow = address % pow(2, self.address_length)
         if address_with_overflow < self.min_bytes:
-            raise ValueError("You can not access the instruction memory this way.")
+            raise MemoryAddressError(
+                address=address_with_overflow,
+                min_address_incl=self.min_bytes,
+                max_address_incl=(2**self.address_length),
+                memory_type="data memory",
+            )
         try:
             addr1 = fixedint.MutableUInt8(int(self.memory_file[address_with_overflow]))
         except KeyError:
@@ -224,7 +240,12 @@ class Memory:
     def store_byte(self, address: int, value: fixedint.MutableUInt8):
         address_with_overflow = address % pow(2, self.address_length)
         if address_with_overflow < self.min_bytes:
-            raise ValueError("You can not access the instruction memory this way.")
+            raise MemoryAddressError(
+                address=address_with_overflow,
+                min_address_incl=self.min_bytes,
+                max_address_incl=(2**self.address_length),
+                memory_type="data memory",
+            )
         safe_value = fixedint.MutableUInt8(int(value))
         self.memory_file[address_with_overflow] = safe_value
 
@@ -330,11 +351,22 @@ class InstructionMemory:
     max_bytes: int = 2**14
 
     def save_instruction(self, address: int, instr):
-        if address >= 0 and (address + instr.length - 1) < self.max_bytes:
-            self.instructions[address] = instr
+        if address < 0:
+            raise MemoryAddressError(
+                address=address,
+                min_address_incl=0,
+                max_address_incl=self.max_bytes - 1,
+                memory_type="instruction memory",
+            )
+        elif (address + instr.length - 1) >= self.max_bytes:
+            raise MemoryAddressError(
+                address=(address + instr.length - 1),
+                min_address_incl=0,
+                max_address_incl=self.max_bytes - 1,
+                memory_type="instruction memory",
+            )
         else:
-            # TODO: Custom exceptions
-            raise ValueError("Incorrect address")
+            self.instructions[address] = instr
 
     def load_instruction(self, address):
         return self.instructions[address]

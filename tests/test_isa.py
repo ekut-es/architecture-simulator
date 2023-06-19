@@ -39,8 +39,6 @@ from architecture_simulator.isa.rv32i_instructions import (
     JALR,
     ECALL,
     EBREAK,
-    EBREAKException,
-    ECALLException,
     ADDI,
     SLTI,
     SLTIU,
@@ -50,6 +48,7 @@ from architecture_simulator.isa.rv32i_instructions import (
     SLLI,
     SRLI,
     FENCE,
+    InstructionNotImplemented,
 )
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 
@@ -1405,17 +1404,19 @@ class TestInstructions(unittest.TestCase):
 
     def test_ecall(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=()))
-        # Raise ECALL Exception
-        with self.assertRaises(ECALLException):
+        try:
             instr = ECALL(imm=0, rs1=0, rd=0)
             state = instr.behavior(state)
+        except InstructionNotImplemented as e:
+            self.assertEquals(e, InstructionNotImplemented(mnemonic="ecall"))
 
     def test_ebreak(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=()))
-        # Raise ECALL Exception
-        with self.assertRaises(EBREAKException):
+        try:
             instr = EBREAK(imm=0, rs1=0, rd=0)
             state = instr.behavior(state)
+        except InstructionNotImplemented as e:
+            self.assertEquals(e, InstructionNotImplemented(mnemonic="ebreak"))
 
     def test_stype(self):
         try:
