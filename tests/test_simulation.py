@@ -6,9 +6,13 @@ from architecture_simulator.uarch.architectural_state import (
     Memory,
     InstructionMemory,
     ArchitecturalState,
+    MemoryAddressError,
 )
-from architecture_simulator.simulation.simulation import Simulation
-from architecture_simulator.isa.rv32i_instructions import ADDI, BNE, BEQ, JAL
+from architecture_simulator.simulation.simulation import (
+    Simulation,
+    InstructionExecutionException,
+)
+from architecture_simulator.isa.rv32i_instructions import ADDI, BNE, BEQ, JAL, LW
 
 
 class TestSimulation(unittest.TestCase):
@@ -208,3 +212,28 @@ class TestSimulation(unittest.TestCase):
         self.assert_(simulation.step_simulation())
         self.assert_(simulation.step_simulation())
         self.assert_(not simulation.step_simulation())
+
+    def test_simulation_errors(self):
+        simulation = Simulation()
+        simulation.state.instruction_memory.instructions = {
+            0: ADDI(rd=1, rs1=1, imm=1),
+            4: LW(rd=1, rs1=0, imm=0),
+            8: ADDI(rd=1, rs1=1, imm=1),
+            12: ADDI(rd=1, rs1=1, imm=1),
+        }
+
+        with self.assertRaises(InstructionExecutionException) as cm:
+            simulation.run_simulation()
+        self.assertEqual(
+            cm.exception.__repr__(),
+            InstructionExecutionException(
+                address=4,
+                instruction_repr=simulation.state.instruction_memory.instructions[4],
+                error_message=MemoryAddressError(
+                    address=0,
+                    min_address_incl=2**14,
+                    max_address_incl=2**32 - 1,
+                    memory_type="data memory",
+                ).__repr__(),
+            ).__repr__(),
+        )

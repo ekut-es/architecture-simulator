@@ -39,8 +39,6 @@ from architecture_simulator.isa.rv32i_instructions import (
     JALR,
     ECALL,
     EBREAK,
-    EBREAKException,
-    ECALLException,
     ADDI,
     SLTI,
     SLTIU,
@@ -50,8 +48,12 @@ from architecture_simulator.isa.rv32i_instructions import (
     SLLI,
     SRLI,
     FENCE,
+    InstructionNotImplemented,
 )
-from architecture_simulator.uarch.architectural_state import ArchitecturalState
+from architecture_simulator.uarch.architectural_state import (
+    ArchitecturalState,
+    CSRError,
+)
 
 import fixedint
 
@@ -497,7 +499,7 @@ class TestInstructions(unittest.TestCase):
     def test_csrrw_privilege_level_too_low(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
         state.csr_registers.privilege_level = 0
-        with self.assertRaises(Exception) as context:
+        with self.assertRaises(CSRError) as context:
             state.csr_registers.store_word(3000, fixedint.MutableUInt32(3))
         self.assertTrue(
             "illegal action: privilege level too low to access this csr register"
@@ -506,7 +508,7 @@ class TestInstructions(unittest.TestCase):
 
     def test_csrrw_attempting_to_write_to_read_only(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
-        with self.assertRaises(Exception) as context:
+        with self.assertRaises(CSRError) as context:
             state.csr_registers.store_word(3072, fixedint.MutableUInt32(3))
         self.assertTrue(
             "illegal action: attempting to write into read-only csr register"
@@ -516,7 +518,7 @@ class TestInstructions(unittest.TestCase):
     def test_csrrw_invalid_address(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
         state.csr_registers.privilege_level = 4
-        with self.assertRaises(Exception) as context:
+        with self.assertRaises(CSRError) as context:
             state.csr_registers.store_word(7000, fixedint.MutableUInt32(3))
         self.assertTrue(
             "illegal action: csr register does not exist" in str(context.exception)
@@ -1405,17 +1407,17 @@ class TestInstructions(unittest.TestCase):
 
     def test_ecall(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=()))
-        # Raise ECALL Exception
-        with self.assertRaises(ECALLException):
+        with self.assertRaises(InstructionNotImplemented) as cm:
             instr = ECALL(imm=0, rs1=0, rd=0)
             state = instr.behavior(state)
+        self.assertEquals(cm.exception, InstructionNotImplemented(mnemonic="ecall"))
 
     def test_ebreak(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=()))
-        # Raise ECALL Exception
-        with self.assertRaises(EBREAKException):
+        with self.assertRaises(InstructionNotImplemented) as cm:
             instr = EBREAK(imm=0, rs1=0, rd=0)
             state = instr.behavior(state)
+        self.assertEquals(cm.exception, InstructionNotImplemented(mnemonic="ebreak"))
 
     def test_stype(self):
         try:

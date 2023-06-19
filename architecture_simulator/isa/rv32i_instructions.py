@@ -10,16 +10,16 @@ from architecture_simulator.isa.instruction_types import JTypeInstruction
 from architecture_simulator.isa.instruction_types import fence
 from architecture_simulator.isa.instruction_types import Instruction
 from typing import Type
+from dataclasses import dataclass
 import fixedint
 
 
-# todo: use ctypes
-class ECALLException(Exception):
-    "Raises when an ECALL is executed"
+@dataclass
+class InstructionNotImplemented(NotImplementedError):
+    mnemonic: str
 
-
-class EBREAKException(Exception):
-    "Raises when an EBREAK is executed"
+    def __repr__(self):
+        return f"Instruction {self.mnemonic} is not yet implemented"
 
 
 class ADD(RTypeInstruction):
@@ -686,7 +686,7 @@ class FENCE(fence):
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """fence(pred,succ)"""
-        raise NotImplementedError
+        raise InstructionNotImplemented(mnemonic=self.mnemonic)
 
 
 class LB(ITypeInstruction):
@@ -785,7 +785,7 @@ class ECALL(ITypeInstruction):
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """RaiseException(EnvironmentCall)"""
-        raise ECALLException
+        raise InstructionNotImplemented(mnemonic=self.mnemonic)
         return architectural_state
 
 
@@ -795,7 +795,7 @@ class EBREAK(ITypeInstruction):
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """RaiseException(EnvironmentCall)"""
-        raise EBREAKException
+        raise InstructionNotImplemented(mnemonic=self.mnemonic)
         return architectural_state
 
 

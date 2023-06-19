@@ -10,30 +10,20 @@ from architecture_simulator.isa.rv32i_instructions import ADD
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 from architecture_simulator.simulation.simulation import Simulation
 import fixedint
+from dataclasses import dataclass
 
 simulation = None
 
 
+@dataclass
+class StateNotInitializedError(RuntimeError):
+    def __repr__(self):
+        return "state has not been initialized."
+
+
 def sim_init():
     global simulation
-    simulation = Simulation(
-        state=ArchitecturalState(
-            register_file=RegisterFile(registers=[0, 2, 0, 8, 6]),
-            memory=Memory(
-                memory_file=dict(
-                    [
-                        (0, fixedint.MutableUInt8(1)),
-                        (1, fixedint.MutableUInt8(2)),
-                        (2, fixedint.MutableUInt8(3)),
-                        (3, fixedint.MutableUInt8(-1)),
-                        (pow(2, 32) - 1, fixedint.MutableUInt8(4)),
-                        (2047, fixedint.MutableUInt8(5)),
-                        (10, fixedint.MutableUInt8(10)),
-                    ]
-                )
-            ),
-        ),
-    )
+    simulation = Simulation()
     update_tables()
     return simulation
 
@@ -41,7 +31,7 @@ def sim_init():
 def step_sim(instr: str):
     global simulation
     if simulation is None:
-        raise RuntimeError("state has not been initialized.")
+        raise StateNotInitializedError()
 
     # parse the instr json string into a python dict
     if simulation.state.instruction_memory.instructions == {}:
@@ -59,7 +49,7 @@ def step_sim(instr: str):
 def run_sim(instr: str):
     global simulation
     if simulation is None:
-        raise RuntimeError("state has not been initialized.")
+        raise StateNotInitializedError()
 
     # reset the instruction list
     simulation = Simulation()
@@ -77,7 +67,7 @@ def run_sim(instr: str):
 def reset_sim():
     global simulation
     if simulation is None:
-        raise RuntimeError("state has not been initialized.")
+        raise StateNotInitializedError()
     simulation = Simulation()
     update_tables()
     return simulation
@@ -86,7 +76,7 @@ def reset_sim():
 def update_tables():
     global simulation
     if simulation is None:
-        raise RuntimeError("state has not been initialized.")
+        raise StateNotInitializedError()
 
     # appends all the registers one at a time
     archsim_js.clear_register_table()

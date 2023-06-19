@@ -90,11 +90,22 @@ class RegisterFile:
 
 
 @dataclass
+class MemoryAddressError(ValueError):
+    address: int
+    min_address_incl: int
+    max_address_incl: int
+    memory_type: str
+
+    def __repr__(self):
+        return f"MemoryAddressError: Cannot access {self.memory_type} at address {self.address}: Addresses go from {self.min_address_incl} to {self.max_address_incl}"
+
+
+@dataclass
 class Memory:
     # Address length in bits. Can be used to limit memory size.
     address_length: int = 32
     # min address (inclusive)
-    min_bytes: int = 0  # 2**14
+    min_bytes: int = 2**14  # 2**14
     memory_file: dict[int, fixedint.MutableUInt8] = field(default_factory=dict)
 
     def memory_wordwise_repr(self) -> dict[int, tuple]:
@@ -214,7 +225,12 @@ class Memory:
     def load_byte(self, address: int) -> fixedint.MutableUInt8:
         address_with_overflow = address % pow(2, self.address_length)
         if address_with_overflow < self.min_bytes:
-            raise ValueError("You can not access the instruction memory this way.")
+            raise MemoryAddressError(
+                address=address_with_overflow,
+                min_address_incl=self.min_bytes,
+                max_address_incl=(2**self.address_length) - 1,
+                memory_type="data memory",
+            )
         try:
             addr1 = fixedint.MutableUInt8(int(self.memory_file[address_with_overflow]))
         except KeyError:
@@ -224,7 +240,12 @@ class Memory:
     def store_byte(self, address: int, value: fixedint.MutableUInt8):
         address_with_overflow = address % pow(2, self.address_length)
         if address_with_overflow < self.min_bytes:
-            raise ValueError("You can not access the instruction memory this way.")
+            raise MemoryAddressError(
+                address=address_with_overflow,
+                min_address_incl=self.min_bytes,
+                max_address_incl=(2**self.address_length) - 1,
+                memory_type="data memory",
+            )
         safe_value = fixedint.MutableUInt8(int(value))
         self.memory_file[address_with_overflow] = safe_value
 
@@ -307,19 +328,27 @@ class CsrRegisterFile(Memory):
 
     def check_privilege_level(self, address: int):
         if (address & 0b001100000000) > self.privilege_level:
-            raise Exception(
+            raise CSRError(
                 "illegal action: privilege level too low to access this csr register"
             )
 
     def check_for_legal_address(self, address: int):
         if address < 0 or address > 4095:
-            raise Exception("illegal action: csr register does not exist")
+            raise CSRError("illegal action: csr register does not exist")
 
     def check_read_only(self, address: int):
         if address & 0b100000000000 and address & 0b010000000000:
-            raise Exception(
+            raise CSRError(
                 "illegal action: attempting to write into read-only csr register"
             )
+
+
+@dataclass
+class CSRError(ValueError):
+    message: str
+
+    def __repr__(self):
+        return self.message
 
 
 @dataclass
@@ -330,11 +359,22 @@ class InstructionMemory:
     max_bytes: int = 2**14
 
     def save_instruction(self, address: int, instr):
-        if address >= 0 and (address + instr.length - 1) < self.max_bytes:
-            self.instructions[address] = instr
+        if address < 0:
+            raise MemoryAddressError(
+                address=address,
+                min_address_incl=0,
+                max_address_incl=self.max_bytes - 1,
+                memory_type="instruction memory",
+            )
+        elif (address + instr.length - 1) >= self.max_bytes:
+            raise MemoryAddressError(
+                address=(address + instr.length - 1),
+                min_address_incl=0,
+                max_address_incl=self.max_bytes - 1,
+                memory_type="instruction memory",
+            )
         else:
-            # TODO: Custom exceptions
-            raise ValueError("Incorrect address")
+            self.instructions[address] = instr
 
     def load_instruction(self, address):
         return self.instructions[address]

@@ -5,6 +5,7 @@ from architecture_simulator.uarch.architectural_state import (
     RegisterFile,
     ArchitecturalState,
     Memory,
+    MemoryAddressError,
 )
 from architecture_simulator.isa.rv32i_instructions import ADD, SLL
 
@@ -176,15 +177,33 @@ class TestArchitecture(unittest.TestCase):
         )
 
         # Illegal access out of bounds of instr memory
-        with self.assertRaises(ValueError):
+        with self.assertRaises(MemoryAddressError) as cm:
             state.instruction_memory.save_instruction(
                 address=2**14, instr=ADD(rd=1, rs1=2, rs2=3)
             )
+        self.assertEqual(
+            cm.exception,
+            MemoryAddressError(
+                address=2**14 + 3,
+                min_address_incl=0,
+                max_address_incl=2**14 - 1,
+                memory_type="instruction memory",
+            ),
+        )
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(MemoryAddressError) as cm:
             state.instruction_memory.save_instruction(
                 address=-1, instr=ADD(rd=1, rs1=2, rs2=3)
             )
+        self.assertEqual(
+            cm.exception,
+            MemoryAddressError(
+                address=-1,
+                min_address_incl=0,
+                max_address_incl=2**14 - 1,
+                memory_type="instruction memory",
+            ),
+        )
 
         # load instr tests:
         self.assertEqual(
@@ -200,3 +219,58 @@ class TestArchitecture(unittest.TestCase):
 
         with self.assertRaises(KeyError):
             state.instruction_memory.load_instruction(2**14)
+
+        self.assertEqual(
+            state.memory.load_byte(address=2**14), fixedint.MutableUInt8(0)
+        )
+        self.assertEqual(
+            state.memory.load_byte(address=2**32 - 1), fixedint.MutableUInt8(0)
+        )
+
+        with self.assertRaises(MemoryAddressError) as cm:
+            state.memory.load_byte(address=2**14 - 1)
+        self.assertEqual(
+            cm.exception,
+            MemoryAddressError(
+                address=2**14 - 1,
+                min_address_incl=2**14,
+                max_address_incl=2**32 - 1,
+                memory_type="data memory",
+            ),
+        )
+
+        with self.assertRaises(MemoryAddressError) as cm:
+            state.memory.load_byte(address=2**32)
+        self.assertEqual(
+            cm.exception,
+            MemoryAddressError(
+                address=0,
+                min_address_incl=2**14,
+                max_address_incl=2**32 - 1,
+                memory_type="data memory",
+            ),
+        )
+
+        with self.assertRaises(MemoryAddressError) as cm:
+            state.memory.load_word(address=2**14 - 4)
+        self.assertEqual(
+            cm.exception,
+            MemoryAddressError(
+                address=2**14 - 4,
+                min_address_incl=2**14,
+                max_address_incl=2**32 - 1,
+                memory_type="data memory",
+            ),
+        )
+
+        with self.assertRaises(MemoryAddressError) as cm:
+            state.memory.load_word(address=2**32)
+        self.assertEqual(
+            cm.exception,
+            MemoryAddressError(
+                address=0,
+                min_address_incl=2**14,
+                max_address_incl=2**32 - 1,
+                memory_type="data memory",
+            ),
+        )
