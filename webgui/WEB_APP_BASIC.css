@@ -289,7 +289,7 @@ body main {
 
 	width: 				var(--app_main_width);
 
-	height:				var(--app_main_height);
+	height:				100%;
 
 	margin:				0 auto;					     /* horizontal zentriert */
 
@@ -306,6 +306,8 @@ body main {
 	border-style: 	 	solid;
 
 	border-radius: 		0.25em;
+
+	display: 			flex;
 
 }
 
@@ -452,7 +454,11 @@ body main #gui_base_div_id {
 
 	display: 			flex;
 
-	flex-wrap: 			nowrap;
+	flex-wrap: 			wrap;
+
+	justify-content: 	space-evenly;
+
+	align-items: 		flex-start;
 
 	width: 				100%;
 
@@ -460,6 +466,10 @@ body main #gui_base_div_id {
 
 	overflow: 			auto;
 
+}
+
+body main #input {
+	width: 				25em;
 }
 
 
@@ -472,10 +482,6 @@ body main #gui_cmd_div_id {
 
 	margin-bottom: 		1.875em;
 
-	margin-right: 		2%;
-
-	margin-left: 		2%;
-
 	width: 				14.375em;
 
 	overflow-x: 		auto;
@@ -486,28 +492,6 @@ body main #gui_cmd_div_id {
 
 
 
-body main #gui_cmd_div_id .button_edit_cmd {
-
-	color: 				var(--button_text_color);
-
-	font-size: 			0.9375em;
-
-	border-radius: 		0.25em;
-
-	padding: 			0em;
-
-    text-decoration: 	none;
-
-    margin: 			0.0625em;
-
-    cursor: 			pointer;
-
-	height: 			1.8125em;
-
-	width: 				1.8125em;
-
-}
-
 
 
 body main #gui_cmd_table_id {
@@ -516,7 +500,7 @@ body main #gui_cmd_table_id {
 
 	font-family: 		"Trebuchet MS", Arial, Helvetica, sans-serif;
 
-	font-size: 			0.6875em;
+	font-size: 			11px;
 
 	border-collapse: 	collapse;
 
@@ -534,7 +518,7 @@ body main #gui_cmd_table_id th 	{
 
 	padding-bottom: 	0.0625em;
 
-	padding-left: 		0.0625em;
+	padding-left: 		0.625em;
 
 	text-align: 		center;
 
@@ -620,13 +604,9 @@ body main #gui_memory_div_id {
 
 	margin-bottom: 		1.875em;
 
-	margin-right: 		2%;
-
-	margin-left: 		2%;
-
 	width: 				14.375em;
 
-	overflow-x: 		scroll;
+	overflow-x: 		auto;
 
 	overflow-y: 		auto;
 
@@ -760,13 +740,9 @@ body main #gui_registers_div_id {
 
 	margin-bottom: 		1.875em;
 
-	margin-right: 		2%;
-
-	margin-left: 		2%;
-
 	width: 				14.375em;
 
-	overflow-x: 		scroll;
+	overflow-x: 		auto;
 
 	overflow-y: 		auto;
 
@@ -860,7 +836,7 @@ body main #gui_registers_table_id td 	{
 
 body main #gui_registers_table_id td:nth-child(1) {
 
-	border: 			0px solid #9a9393;
+	border: 			0em solid #9a9393;
 
 	background-color: var(--app_main_bg_color);
 
@@ -889,5 +865,11 @@ body main #gui_registers_table_id select {
 body main #gui_registers_table_id option:disabled {
 
 	color: 				#F78181;
+
+}
+
+body main #output{
+	width: 				25em;
+	margin-left: 		2.5em;
 
 }

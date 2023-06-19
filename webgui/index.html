@@ -15,21 +15,21 @@
 	<!-- ************  Tool Title  ****************************************************-->
 	<header id="webapp_header_id">
 		<div 	id="webapp_header_app_name_id" > RISC-V Simulator </div>
-		<img 	id="webapp_header_help_image_id" src="WEB_APP_BASIC_Help.svg"/>
+		<img 	id="webapp_header_help_image_id" src="svg/WEB_APP_BASIC_Help.svg"/>
 		<img 	id="webapp_header_icon_image_id" src="favicon.ico"/>
 	</header>
 	<nav id="webapp_nav_id">
 		<button type="button" id="button_simulation_start_id" class="button_start_simulation" title="start simulation">
-			<img src="start.svg" width="25px" height="25px">
+			<img src="svg/start.svg" width="25px" height="25px">
 		</button>
 		<button type="button" id="button_simulation_pause_id" class="button_pause_simulation" title="pause simulation">
-			<img src="pause.svg" width="25px" height="25px">
+			<img src="svg/pause.svg" width="25px" height="25px">
 		</button>
 		<button type="button" id="button_simulation_next_id" class="button_next_step_simulation" title="next step">
-			<img src="next.svg" width="25px" height="25px">
+			<img src="svg/next.svg" width="25px" height="25px">
 		</button>
 		<button type="button" id="button_simulation_refresh_id" class="button_refresh_simulation" title="reset">
-			<img src="refresh.svg" width="25px" height="25px">
+			<img src="svg/refresh.svg" width="25px" height="25px">
 		</button>
 	</nav>
 	<main id="webapp_main_id">
@@ -37,23 +37,18 @@
 			<img src="loading.jpg" alt="loading">
 		</dialog>
 		<div id="gui_base_div_id">
-    		<textarea id="input" style="width: 20%;" rows="20" ></textarea>
+    		<textarea id="input" rows="20" ></textarea>
 			<div id="gui_cmd_div_id">
 				<table id="gui_cmd_table_id">
 					<thead>
 						<tr>
 							<th>
 							</th>
-							<th title="Programm Counter">PC</th>
-							<th title="Command">Command</th>
+							<th title="address">Address</th>
+							<th title="command">Command</th>
 						</tr>
 					</thead>
-          <tbody id="gui_cmd_table_body_id">
-            <tr>
-              <td></td>
-              <td>0X0000</td>
-              <td>SUB A0, T0, T1</td>
-            </tr>
+          			<tbody id="gui_cmd_table_body_id">
 				</table>
 			</div>
 			<div id="gui_registers_div_id">
@@ -84,44 +79,13 @@
 					</tbody>
 				</table>
 			</div>
-			<textarea id="output" style="width: 20%;" rows="20" disabled></textarea>
+			<textarea id="output" rows="20" disabled></textarea>
 		</div>
 
     </main>
 	<footer id="webapp_footer_id">
 	</footer>
-	<!--  ****************** Modale Form ********************************************* -->
-	<!--  ****************** Modale Form CMD Edit ************************************ -->
-	<dialog id="webapp_dialog_EditCommandsID" >
-		<div id="webapp_dialog_EditCommandsHeaderDivID">
-			<label id="webapp_dialog_EditCommandsHeaderLabelID"> Command Editor </label>
-		</div>
-		<div>
-			<!--missing number input check (only multiples of 4) & display as hex, also get max from python (max number of registers) -->
-			<input type="number" id="webapp_dialog_EditCommandsPcAddressID" min="0" max="127" step="4">
-			<input type="text"   id="webapp_dialog_EditCommandsTextInputID">
-		</div>
-		<div id="webapp_dialog_EditCommandsTextDivID">
-			<table id="webapp_dialog_EditCommandsTableID">
-				<thead>
-					<tr>
-						<th title="Programm Counter">PC</th>
-						<th title="Auszuführender Befehl">Command</th>
-					</tr>
-				</thead>
-				<tbody id="webapp_dialog_EditCommandsTableBodyID">
-					<tr>
-						<td>0X0000</td>
-						<td>SUB A0, T0, T1</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-		<div id="webapp_dialog_EditCommandsFooterDivID">
-			<button type="button" id="webapp_dialog_EditCommandsFooterBtnOkID"  title="Eingaben werden übernommen">Übernehmen</button>
-			<button type="button" id="webapp_dialog_EditCommandsFooterBtnCnlID" title="Eingaben werden verworfen">Abbrechen</button>
-		</div>
-	</dialog>
+
 	<dialog id="webapp_dialog_AppHelpID" >
 	</dialog>
 	<script type="text/javascript" 							src="https://cdn.jsdelivr.net/pyodide/v0.22.1/full/pyodide.js"></script>
