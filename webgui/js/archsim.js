@@ -3,7 +3,6 @@ const registers = document.getElementById("gui_registers_table_id");
 const memory = document.getElementById("gui_memory_table_id");
 const instructions = document.getElementById("gui_cmd_table_body_id");
 const input = document.getElementById("input");
-pause_flag = false;
 
 function addToOutput(s) {
     output.value += ">>>" + input.value + "\n" + s + "\n";
@@ -131,41 +130,45 @@ async function evaluatePython_step_sim() {
     input_str = input.value
     try {
         step_sim = pyodide.globals.get("step_sim");
-        let output =  Array.from(step_sim(input_str));
-        addToOutput(output);
-    } catch (err) {
-        addToOutput(err);
-    }
-}
-
-async function evaluatePython_run_sim() {
-    start_loading_animation();
-    let pyodide = await pyodideReadyPromise;
-    stop_loading_animation();
-    input_str = input.value
-    let output;
-    try {
-        // reset the sim before executing run
-        reset_sim = pyodide.globals.get("reset_sim");
-        reset_sim();
-
-        simulation_ended_flag = true
-        //run_sim = pyodide.globals.get("run_sim");
-        //let output = run_sim(input_str);
-        step_sim = pyodide.globals.get("step_sim");
-
-        while(simulation_ended_flag == true && pause_flag == false)
+        let output_repr =  Array.from(step_sim(input_str));
+        if (output_repr[1] == false)
         {
-            flag_and_simulation_array = Array.from(step_sim(input_str))
-            simulation_ended_flag = flag_and_simulation_array[1]
-            output =  flag_and_simulation_array[0];
-            console.log(simulation_ended_flag)
+            stop_loading_animation();
+            disable_pause();
+            disable_step();
+            disable_run();
+            clearInterval(run);
         }
-        addToOutput(output);
+        //addToOutput(output[0]);
+        output.value = output_repr[0];
     } catch (err) {
         addToOutput(err);
+        stop_loading_animation();
+        disable_pause();
+        disable_step();
+        disable_run();
+        clearInterval(run);
     }
 }
+
+// async function evaluatePython_run_sim() {
+//     start_loading_animation();
+//     let pyodide = await pyodideReadyPromise;
+//     stop_loading_animation();
+//     input_str = input.value
+//     let output;
+//     try {
+//         // reset the sim before executing run
+//         reset_sim = pyodide.globals.get("reset_sim");
+//         reset_sim();
+
+//         run_sim = pyodide.globals.get("run_sim");
+//         let output = run_sim(input_str);
+//         addToOutput(output);
+//     } catch (err) {
+//         addToOutput(err);
+//     }
+// }
 
 async function evaluatePython_reset_sim() {
     start_loading_animation();
@@ -187,18 +190,6 @@ async function evaluatePython_update_tables() {
         let output = update_tables();
     } catch (err) {
         addToOutput(err);
-    }
-}
-
-
-function pause_sim(){
-    if(pause_flag == false){
-        pause_flag = true
-        console.log(pause_flag)
-    }
-    else if(pause_flag == true){
-        pause_flag = false
-        console.log(pause_flag)
     }
 }
 

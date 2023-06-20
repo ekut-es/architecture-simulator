@@ -12,13 +12,8 @@ var run;
 					stop_loading_animation();
 					clearInterval(run);
 				}
-				try{
-					start_loading_animation();
-					run = setInterval(evaluatePython_step_sim,1);
-				} catch {
-					stop_loading_animation();
-					clearInterval(run);
-				}
+				start_loading_animation();
+				run = setInterval(evaluatePython_step_sim,1);
 				disable_run();
 				enable_pause();
 				disable_step();
