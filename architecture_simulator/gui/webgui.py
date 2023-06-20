@@ -100,9 +100,9 @@ def update_tables():
     ):
         archsim_js.update_instruction_table(hex(address), cmd.__repr__())
         
-#def update_performance_metrics():
+#def update_output():
 #    global simulation
 #    if simulation is None:
 #        raise RuntimeError("state has not been initialized.")
 #                    
-#    archsim_js.update_performance_metrics(simulation.performance_metrics.repr)
+#    archsim_js.update_output(simulation.performance_metrics.repr)

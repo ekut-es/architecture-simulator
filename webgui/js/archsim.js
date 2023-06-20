@@ -1,5 +1,4 @@
 const output = document.getElementById("output");
-//const performance = document.getElementById("performance")
 const registers = document.getElementById("gui_registers_table_id");
 const memory = document.getElementById("gui_memory_table_id");
 const instructions = document.getElementById("gui_cmd_table_body_id");
@@ -203,6 +202,6 @@ function pause_sim(){
     }
 }
 
-//function update_performance_metrics(performance_metrics) {
-//    performance.value = performance_metrics;
+//function update_output(output_string) {
+//    output.value = output_string;
 //}
