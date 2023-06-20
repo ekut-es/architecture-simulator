@@ -99,10 +99,11 @@ def update_tables():
         key=lambda item: item[0],
     ):
         archsim_js.update_instruction_table(hex(address), cmd.__repr__())
-        
+    
+#actual comment: output = performance metric repr but if parser produces error, overwrite output with error
 #def update_output():
 #    global simulation
 #    if simulation is None:
 #        raise RuntimeError("state has not been initialized.")
 #                    
-#    archsim_js.update_output(simulation.performance_metrics.repr)
+#    archsim_js.update_output(repr(simulation.performance_metrics))
