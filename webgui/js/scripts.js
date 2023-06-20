@@ -93,3 +93,35 @@ var run;
 		document.getElementById("button_simulation_next_id").disabled = false;
 		document.getElementById("button_simulation_next_id").style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue("--button_blue_color");
 	}
+	function disable_reset() {
+		document.getElementById("button_simulation_refresh_id").disabled = true;
+		document.getElementById("button_simulation_refresh_id").style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue("--button_disabled_color");
+	}
+	function enable_reset() {
+		document.getElementById("button_simulation_refresh_id").disabled = false;
+		document.getElementById("button_simulation_refresh_id").style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue("--button_red_color");
+	}
+
+	function disable_control_buttons() {
+		disable_run();
+		disable_pause();
+		disable_step();
+		disable_reset();
+	}
+
+	function enable_control_buttons() {
+		enable_run();
+		enable_pause();
+		enable_step();
+		enable_reset();
+	}
+
+	function start_loading_visuals() {
+		disable_control_buttons();
+		document.getElementById("loading_id").style.visibility = "visible";
+	}
+
+	function stop_loading_visuals() {
+		enable_control_buttons();
+		document.getElementById("loading_id").style.visibility = "hidden";
+	}
