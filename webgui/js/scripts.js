@@ -136,4 +136,5 @@ var run;
 	function stop_loading_visuals() {
 		enable_control_buttons();
 		stop_loading_animation();
+		disable_pause();
 	}
