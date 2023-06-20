@@ -8,44 +8,48 @@ var run;
 		window.addEventListener('DOMContentLoaded', function () {
 			document.getElementById("button_simulation_start_id").addEventListener("click", () => {
 				document.getElementById("input").disabled = true;
-				disable_run();
-				enable_pause();
-				disable_step();
 				if(run) {
+					stop_loading_animation();
 					clearInterval(run);
 				}
 				try{
-					run = setInterval(evaluatePython_step_sim,10);
+					start_loading_animation();
+					run = setInterval(evaluatePython_step_sim,1);
 				} catch {
+					stop_loading_animation();
 					clearInterval(run);
 				}
+				disable_run();
+				enable_pause();
+				disable_step();
 			});
 
 			document.getElementById("button_simulation_pause_id").addEventListener("click", () => {
 				document.getElementById("input").disabled = true;
+				clearInterval(run);
 				enable_run();
 				disable_pause();
 				enable_step();
-				clearInterval(run);
+				stop_loading_animation();
 			});
 
 			document.getElementById("button_simulation_next_id").addEventListener("click", () => {
 				document.getElementById("input").disabled = true;
+				document.getElementById("input").disabled = true;
+				evaluatePython_step_sim();
 				enable_run();
 				disable_pause();
 				enable_step();
-				document.getElementById("input").disabled = true;
-				evaluatePython_step_sim();
 			});
 
 			document.getElementById("button_simulation_refresh_id").addEventListener("click", () => {
 				document.getElementById("input").disabled = true;
-				enable_run();
-				disable_pause();
-				enable_step();
 				clearInterval(run);
 				evaluatePython_reset_sim();
 				document.getElementById("input").disabled = false;
+				enable_run();
+				disable_pause();
+				enable_step();
 			});
 
 			document.getElementById("button_binary_representation_id").addEventListener("click", () => {
@@ -116,12 +120,20 @@ var run;
 		enable_reset();
 	}
 
+	function start_loading_animation() {
+		document.getElementById("loading_id").style.visibility = "visible";
+	}
+
+	function stop_loading_animation() {
+		document.getElementById("loading_id").style.visibility = "hidden";
+	}
+
 	function start_loading_visuals() {
 		disable_control_buttons();
-		document.getElementById("loading_id").style.visibility = "visible";
+		start_loading_animation();
 	}
 
 	function stop_loading_visuals() {
 		enable_control_buttons();
-		document.getElementById("loading_id").style.visibility = "hidden";
+		stop_loading_animation();
 	}
