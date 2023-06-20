@@ -107,7 +107,15 @@ async function main() {
     console.log(window.location.hostname)
     console.log(window.location.pathname)
     console.log(window.location.port)
-    await micropip.install(window.location.origin+"/archsim/dist/architecture_simulator-0.1.0-py3-none-any.whl");
+    if(window.location.href == 'https://atreus.cs.uni-tuebingen.de/archsim/')
+    {
+        await micropip.install(window.location.href+"/dist/architecture_simulator-0.1.0-py3-none-any.whl");
+    }
+    else
+    {
+        await micropip.install(window.location.origin+"/dist/architecture_simulator-0.1.0-py3-none-any.whl");
+    }
+
     pyodide.registerJsModule("archsim_js", archsim_js);
     await pyodide.runPython(`
 from architecture_simulator.gui.webgui import *
