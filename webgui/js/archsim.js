@@ -3,7 +3,6 @@ const registers = document.getElementById("gui_registers_table_id");
 const memory = document.getElementById("gui_memory_table_id");
 const instructions = document.getElementById("gui_cmd_table_body_id");
 const input = document.getElementById("input");
-const loading_screen = document.getElementById("loading_screen");
 
 function addToOutput(s) {
     output.value += ">>>" + input.value + "\n" + s + "\n";
@@ -91,10 +90,10 @@ const archsim_js = {
 };
 
 output.value = "Output \n\nInitializing... ";
-input.value = "add x1, x2, x3"
+input.value = "add x1, x2, x3 \nlui x1, 1"
 // init Pyodide
 async function main() {
-    loading_screen.showModal()
+    start_loading_visuals();
     let pyodide = await loadPyodide();
     await pyodide.loadPackage("micropip");
     const micropip = pyodide.pyimport("micropip");
@@ -104,6 +103,7 @@ async function main() {
     console.log(window.location.hash)
     console.log(window.location.host)
     console.log(window.location.hostname)
+    console.log(window.location.pathname)
     console.log(window.location.port)
     if(window.location.href == 'https://atreus.cs.uni-tuebingen.de/archsim/')
     {
@@ -113,51 +113,67 @@ async function main() {
     {
         await micropip.install(window.location.origin+"/dist/architecture_simulator-0.1.0-py3-none-any.whl");
     }
+
     pyodide.registerJsModule("archsim_js", archsim_js);
     await pyodide.runPython(`
 from architecture_simulator.gui.webgui import *
 sim_init()
     `);
     output.value += "Ready!\n";
-    loading_screen.close();
+    stop_loading_visuals();
     return pyodide;
 }
 let pyodideReadyPromise = main();
 
 async function evaluatePython_step_sim() {
-    loading_screen.showModal()
     let pyodide = await pyodideReadyPromise;
-    loading_screen.close();
     input_str = input.value
     try {
         step_sim = pyodide.globals.get("step_sim");
-        let output = step_sim(input_str);
-        addToOutput(output);
+        let output_repr =  Array.from(step_sim(input_str));
+        if (output_repr[1] == false)
+        {
+            stop_loading_animation();
+            disable_pause();
+            disable_step();
+            disable_run();
+            clearInterval(run);
+        }
+        //addToOutput(output[0]);
+        output.value = output_repr[0];
     } catch (err) {
         addToOutput(err);
+        stop_loading_animation();
+        disable_pause();
+        disable_step();
+        disable_run();
+        clearInterval(run);
     }
 }
 
-async function evaluatePython_run_sim() {
-    loading_screen.showModal()
-    let pyodide = await pyodideReadyPromise;
-    loading_screen.close();
-    input_str = input.value
-    try {
-        run_sim = pyodide.globals.get("run_sim");
-        let output = run_sim(input_str);
-        addToOutput(output);
-    } catch (err) {
-        addToOutput(err);
-    }
-}
+// async function evaluatePython_run_sim() {
+//     start_loading_animation();
+//     let pyodide = await pyodideReadyPromise;
+//     stop_loading_animation();
+//     input_str = input.value
+//     let output;
+//     try {
+//         // reset the sim before executing run
+//         reset_sim = pyodide.globals.get("reset_sim");
+//         reset_sim();
+
+//         run_sim = pyodide.globals.get("run_sim");
+//         let output = run_sim(input_str);
+//         addToOutput(output);
+//     } catch (err) {
+//         addToOutput(err);
+//     }
+// }
 
 async function evaluatePython_reset_sim() {
-    loading_screen.showModal()
+    start_loading_animation();
     let pyodide = await pyodideReadyPromise;
-    loading_screen.close();
-    //registers.innerHTML = ""
-    //memory.innerHTML = ""
+    stop_loading_animation();
     try {
         reset_sim = pyodide.globals.get("reset_sim");
         let output = reset_sim();
@@ -168,11 +184,7 @@ async function evaluatePython_reset_sim() {
 }
 
 async function evaluatePython_update_tables() {
-    loading_screen.showModal()
     let pyodide = await pyodideReadyPromise;
-    loading_screen.close();
-    //registers.innerHTML = ""
-    //memory.innerHTML = ""
     try {
         update_tables = pyodide.globals.get("update_tables");
         let output = update_tables();
@@ -180,3 +192,7 @@ async function evaluatePython_update_tables() {
         addToOutput(err);
     }
 }
+
+//function update_output(output_string) {
+//    output.value = output_string;
+//}

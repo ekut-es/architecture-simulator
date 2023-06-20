@@ -22,7 +22,7 @@
 		<button type="button" id="button_simulation_start_id" class="button_start_simulation" title="start simulation">
 			<img src="svg/start.svg" width="25px" height="25px">
 		</button>
-		<button type="button" id="button_simulation_pause_id" class="button_pause_simulation" title="pause simulation">
+		<button type="button" id="button_simulation_pause_id" class="button_pause_simulation" title="pause simulation" disabled>
 			<img src="svg/pause.svg" width="25px" height="25px">
 		</button>
 		<button type="button" id="button_simulation_next_id" class="button_next_step_simulation" title="next step">
@@ -31,6 +31,7 @@
 		<button type="button" id="button_simulation_refresh_id" class="button_refresh_simulation" title="reset">
 			<img src="svg/refresh.svg" width="25px" height="25px">
 		</button>
+		<img type="button" id="loading_id" title="loading" disabled style = "visibility: hidden;" src="loading.gif" width="25px" height="25px">
 		<button type="button" id="button_binary_representation_id" class="button_switch_representation" title="enable binary representation">
 			<img src="binary_representation.svg" width="25px" height="25px">
 		</button>
@@ -42,9 +43,6 @@
 		</button>
 	</nav>
 	<main id="webapp_main_id">
-		<dialog id="loading_screen">
-			<img src="loading.jpg" alt="loading">
-		</dialog>
 		<div id="gui_base_div_id">
     		<textarea id="input" rows="20" ></textarea>
 			<div id="gui_cmd_div_id">
@@ -88,7 +86,7 @@
 					</tbody>
 				</table>
 			</div>
-			<textarea id="output" rows="20" disabled></textarea>
+			<textarea id="output" style="width: 20%;" rows="20" disabled></textarea> <br>
 		</div>
 
     </main>

@@ -60,6 +60,8 @@
 
   --button_red_color:			#F78181;
 
+  --button_disabled_color:			#AAAAAA;
+
   --app_footer_width:			var(--app_header_width);
 
   --app_footer_height:			1.875em;
@@ -339,8 +341,6 @@ body footer {
 
 }
 
-
-
 .button_start_simulation {
 
 	color: 				var(--button_text_color);
@@ -401,7 +401,7 @@ body footer {
 
 	font-size: 			0.9375em;
 
-	background-color: 	var(--button_green_color);
+	background-color: 	var(--button_disabled_color);
 
 	border-radius: 		0.25em;
 
@@ -446,6 +446,10 @@ body footer {
 
 	width: 				1.8125em;
 
+}
+
+.loading{
+	padding-bottom: 0.11em;
 }
 
 .button_switch_representation {
@@ -530,6 +534,8 @@ body main #gui_cmd_table_id {
 
 	font-size: 			11px;
 
+	font: 				monospace;
+
 	border-collapse: 	collapse;
 
 	margin: 			0.0625em auto;
@@ -537,8 +543,6 @@ body main #gui_cmd_table_id {
 	padding-top: 		2.5em;
 
 	width: 				100%;
-
-	text-align: 		right;
 
 }
 
@@ -553,6 +557,8 @@ body main #gui_cmd_table_id th 	{
 	text-align: 		right;
 
 	font-weight: 		bold;
+
+	font: 				monospace;
 
 	font-size: 			12px;
 
@@ -591,7 +597,7 @@ body main #gui_cmd_table_id td 	{
 
 	padding-left: 		0.3125em;
 
-	text-align: 		right;
+	text-align: 		left;
 
 	font-size: 			12px;
 
@@ -652,6 +658,8 @@ body main #gui_memory_table_id {
 
 	font-size: 			11px;
 
+	font: 				monospace;
+
 	border-collapse: 	collapse;
 
 	margin: 			0.0625em auto;
@@ -677,6 +685,8 @@ body main #gui_memory_table_id th 	{
 	font-weight: 		bold;
 
 	font-size: 			12px;
+
+	font: 				monospace;
 
 	vertical-align: 	middle;
 
@@ -790,6 +800,8 @@ body main #gui_registers_table_id {
 
 	font-size: 			11px;
 
+	font: 				monospace;
+
 	border-collapse: 	collapse;
 
 	margin: 			0.0625em auto;
@@ -815,6 +827,8 @@ body main #gui_registers_table_id th 	{
 	font-weight: 		bold;
 
 	font-size: 			12px;
+
+	font: 				monospace;
 
 	vertical-align: 	middle;
 

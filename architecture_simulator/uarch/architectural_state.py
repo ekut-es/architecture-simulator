@@ -23,6 +23,20 @@ class PerformanceMetrics:
             else 0
         )
 
+    def __repr__(self) -> str:
+        representation = ""
+        representation += (
+            "execution time in seconds: " + str(self.execution_time_s) + "\n"
+        )
+        representation += (
+            "instructions per second: " + str(self.instructions_per_second) + "\n"
+        )
+        representation += "instruction count: " + str(self.instruction_count) + "\n"
+        representation += "branch count: " + str(self.branch_count) + "\n"
+        representation += "procedure count: " + str(self.procedure_count) + "\n"
+        representation += "start: " + str(self.start)
+        return representation
+
 
 class Registers(list):
     """

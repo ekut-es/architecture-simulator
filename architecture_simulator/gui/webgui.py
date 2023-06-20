@@ -24,7 +24,7 @@ class StateNotInitializedError(RuntimeError):
 def sim_init():
     global simulation
     simulation = Simulation()
-    update_tables()
+    update_ui()
     return simulation
 
 
@@ -38,29 +38,29 @@ def step_sim(instr: str):
         simulation.state.instruction_memory.append_instructions(instr)
 
     # step the simulation
-    simulation.step_simulation()
+    simulation_ended_flag = simulation.step_simulation()
 
-    update_tables()
+    update_ui()
 
-    return simulation
+    return (simulation.state.performance_metrics.__repr__(), simulation_ended_flag)
 
 
 # runs the simulation, takes a string as input and returns the whole simulation
-def run_sim(instr: str):
-    global simulation
-    if simulation is None:
-        raise StateNotInitializedError()
+# def run_sim(instr: str):
+#     global simulation
+#     if simulation is None:
+#         raise StateNotInitializedError()
 
-    # reset the instruction list
-    simulation = Simulation()
+#     # reset the instruction list
+#     simulation = Simulation()
 
-    simulation.state.instruction_memory.append_instructions(instr)
-    # run the simulation
-    simulation.run_simulation()
+#     simulation.state.instruction_memory.append_instructions(instr)
+#     # run the simulation
+#     simulation.run_simulation()
 
-    update_tables()
+#     update_ui()
 
-    return simulation
+#     return simulation
 
 
 # resets the entire simulation
@@ -69,8 +69,13 @@ def reset_sim():
     if simulation is None:
         raise StateNotInitializedError()
     simulation = Simulation()
-    update_tables()
+    update_ui()
     return simulation
+
+
+def update_ui():
+    update_tables()
+    # update_performance_metrics()
 
 
 def update_tables():
@@ -103,3 +108,12 @@ def update_tables():
         key=lambda item: item[0],
     ):
         archsim_js.update_instruction_table(hex(address), cmd.__repr__())
+
+
+# #actual comment: output = performance metric repr but if parser produces error, overwrite output with error
+# def update_output():
+#     global simulation
+#     if simulation is None:
+#         raise RuntimeError("state has not been initialized.")
+
+#     archsim_js.update_output(simulation.state.performance_metrics.__repr__())
