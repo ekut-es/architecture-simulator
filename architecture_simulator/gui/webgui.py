@@ -17,7 +17,7 @@ simulation = None
 def sim_init():
     global simulation
     simulation = Simulation()
-    update_tables()
+    update_ui()
     return simulation
 
 
@@ -33,7 +33,7 @@ def step_sim(instr: str):
     # step the simulation
     simulation_ended_flag = simulation.step_simulation()
 
-    update_tables()
+    update_ui()
 
     return (simulation, simulation_ended_flag)
 
@@ -51,7 +51,7 @@ def run_sim(instr: str):
     # run the simulation
     simulation.run_simulation()
 
-    update_tables()
+    update_ui()
 
     return simulation
 
@@ -62,9 +62,12 @@ def reset_sim():
     if simulation is None:
         raise RuntimeError("state has not been initialized.")
     simulation = Simulation()
-    update_tables()
+    update_ui()
     return simulation
 
+def update_ui():
+    update_tables()
+    #update_performance_metrics()
 
 def update_tables():
     global simulation
@@ -96,3 +99,10 @@ def update_tables():
         key=lambda item: item[0],
     ):
         archsim_js.update_instruction_table(hex(address), cmd.__repr__())
+        
+#def update_performance_metrics():
+#    global simulation
+#    if simulation is None:
+#        raise RuntimeError("state has not been initialized.")
+#                    
+#    archsim_js.update_performance_metrics(simulation.performance_metrics.repr)

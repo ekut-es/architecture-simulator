@@ -60,6 +60,8 @@
 
   --button_red_color:			#F78181;
 
+  --button_disabled_color:			#AAAAAA;
+
   --app_footer_width:			var(--app_header_width);
 
   --app_footer_height:			1.875em;
@@ -337,8 +339,6 @@ body footer {
 
 }
 
-
-
 .button_start_simulation {
 
 	color: 				var(--button_text_color);
@@ -399,7 +399,7 @@ body footer {
 
 	font-size: 			0.9375em;
 
-	background-color: 	var(--button_green_color);
+	background-color: 	var(--button_disabled_color);
 
 	border-radius: 		0.25em;
 
