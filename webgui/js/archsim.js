@@ -142,7 +142,7 @@ async function evaluatePython_step_sim() {
         //addToOutput(output[0]);
         output.value = output_repr[0];
     } catch (err) {
-        addToOutput(err);
+        output.value = err;
         stop_loading_animation();
         disable_pause();
         disable_step();
