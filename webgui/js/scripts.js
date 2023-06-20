@@ -2,25 +2,32 @@ const binary_representation = 0;
 const decimal_representation = 1;
 const hexa_representation = 2;
 let representation_mode = binary_representation; //change this to set another default repr.
+let iterrupt_autp_step = false;
+var run;
 
 		let waiting_for_pyodide_flag = true
 		window.addEventListener('DOMContentLoaded', function () {
 			document.getElementById("button_simulation_start_id").addEventListener("click", () => {
-				pause_flag = false;
-				evaluatePython_run_sim();
+				document.getElementById("input").disabled = true;
+				if(run) {
+					clearInterval(run);
+				}
+				run = setInterval(evaluatePython_step_sim,10);
 			});
 
 			document.getElementById("button_simulation_pause_id").addEventListener("click", () => {
-				pause_sim();
+				clearInterval(run);
 			});
 
 			document.getElementById("button_simulation_next_id").addEventListener("click", () => {
+				document.getElementById("input").disabled = true;
 				evaluatePython_step_sim();
 			});
 
 			document.getElementById("button_simulation_refresh_id").addEventListener("click", () => {
-				pause_flag = false;
+				clearInterval(run);
 				evaluatePython_reset_sim();
+				document.getElementById("input").disabled = false;
 			});
 
 			document.getElementById("button_binary_representation_id").addEventListener("click", () => {
