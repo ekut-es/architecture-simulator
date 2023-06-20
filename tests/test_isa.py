@@ -5,7 +5,6 @@ from architecture_simulator.isa.rv32i_instructions import (
     BEQ,
     BLT,
     BNE,
-    BTypeInstruction,
     SUB,
     BGE,
     BLTU,
@@ -1542,29 +1541,7 @@ class TestInstructions(unittest.TestCase):
         state = sw_7.behavior(state)
         self.assertEqual(int(state.memory.load_word(8)), 4294967295)
 
-    # def test_utype(self):
-    #     try:
-    #         LUI(rd=0, imm=524287)
-    #         AUIPC(rd=1, imm=-524288)
-    #     except Exception:
-    #         print(Exception)
-    #         self.fail("UTypeInstruction raised an exception upon instantiation")
-
-    #     with self.assertRaises(ValueError):
-    #         LUI(rd=10, imm=524288)
-    #         AUIPC(rd=9, imm=-524289)
-
     def test_lui(self):
-        fixedint.MutableUInt32(0)
-        fixedint.MutableUInt32(1)
-        fixedint.MutableUInt32(5)
-        fixedint.MutableUInt32(pow(2, 31) - 1)
-        fixedint.MutableUInt32(-pow(2, 31))
-        fixedint.MutableUInt32(2047)
-        fixedint.MutableUInt32(-2048)
-        fixedint.MutableUInt32(-1)
-        fixedint.MutableUInt32(3320171255)
-        fixedint.MutableUInt32(3320171260)
 
         state = ArchitecturalState(register_file=RegisterFile(registers=[0, 1, 2, 3]))
 
@@ -1698,7 +1675,6 @@ class TestInstructions(unittest.TestCase):
     def test_addi(self):
         b0 = fixedint.MutableUInt32(0)
         b1 = fixedint.MutableUInt32(1)
-        fixedint.MutableUInt32(5)
         bmaxint = fixedint.MutableUInt32(pow(2, 31) - 1)
         bminint = fixedint.MutableUInt32(-pow(2, 31))
         bmaximm = fixedint.MutableUInt32(2047)
@@ -1837,14 +1813,10 @@ class TestInstructions(unittest.TestCase):
     def test_ori(self):
         b0 = fixedint.MutableUInt32(0)
         b1 = fixedint.MutableUInt32(1)
-        fixedint.MutableUInt32(5)
-        fixedint.MutableUInt32(pow(2, 31) - 1)
-        fixedint.MutableUInt32(-pow(2, 31))
         bmaximm = fixedint.MutableUInt32(2047)
         bminimm = fixedint.MutableUInt32(-2048)
         bn1 = fixedint.MutableUInt32(-1)
         brandom = fixedint.MutableUInt32(3320171255)
-        fixedint.MutableUInt32(3320171260)
 
         # 0 | 0  == 0
         # 0 | 1  == 1
@@ -1901,7 +1873,6 @@ class TestInstructions(unittest.TestCase):
     def test_xori(self):
         b0 = fixedint.MutableUInt32(0)
         b1 = fixedint.MutableUInt32(1)
-        fixedint.MutableUInt32(5)
         bmaxint = fixedint.MutableUInt32(pow(2, 31) - 1)
         bminint = fixedint.MutableUInt32(-pow(2, 31))
         bmaximm = fixedint.MutableUInt32(2047)
@@ -1962,14 +1933,10 @@ class TestInstructions(unittest.TestCase):
         state = xori_1.behavior(state)
         self.assertEqual(state.register_file.registers, [bminimm, bmaximm, bn1, b0])
 
-    # FIXME Dont create instructions with fixedints as immediates
     def test_slli(self):
         b0 = fixedint.MutableUInt32(0)
         b1 = fixedint.MutableUInt32(1)
         b2 = fixedint.MutableUInt32(2)
-        fixedint.MutableUInt32(20)
-        fixedint.MutableUInt32(31)
-        fixedint.MutableUInt32(127)
         b2_20 = fixedint.MutableUInt32(pow(2, 20))
         b111 = fixedint.MutableUInt32(-1)  # 11111....
         b110 = fixedint.MutableUInt32(pow(2, 32) - 2)  # 111...110
@@ -2036,10 +2003,6 @@ class TestInstructions(unittest.TestCase):
     def test_srli(self):
         b0 = fixedint.MutableUInt32(0)
         b1 = fixedint.MutableUInt32(1)
-        fixedint.MutableUInt32(2)
-        fixedint.MutableUInt32(20)
-        fixedint.MutableUInt32(31)
-        fixedint.MutableUInt32(127)
         b111 = fixedint.MutableUInt32(pow(2, 32) - 1)  # 11111....
         b011 = fixedint.MutableUInt32(pow(2, 31) - 1)  # 01111....
         brandom = fixedint.MutableUInt32(3320171255)
