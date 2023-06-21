@@ -1,6 +1,6 @@
 const output = document.getElementById("output");
-const registers = document.getElementById("gui_registers_table_id");
-const memory = document.getElementById("gui_memory_table_id");
+const registers = document.getElementById("gui_registers_table_body_id");
+const memory = document.getElementById("gui_memory_table_body_id");
 const instructions = document.getElementById("gui_cmd_table_body_id");
 const input = document.getElementById("input");
 
@@ -83,9 +83,7 @@ const archsim_js = {
         this.clear_a_table(instructions);
     },
     clear_a_table: function(table) {
-        while (table.childNodes.length > 2) {
-            table.removeChild(table.lastChild);
-        }
+        table.innerHTML = ""
     }
 };
 
