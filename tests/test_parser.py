@@ -454,7 +454,7 @@ fibonacci:
         lui x0, -0xAF
         jal x0, 0x3a
         csrrw sp, 0x448, s1
-        csrrwi sp, 0x448, 0x20"""
+        csrrwi sp, 0x448, 0x1F"""
         parser = RiscvParser()
         instr = parser.parse_res_to_instructions(
             parser.parse_assembly(text), start_address=0
@@ -469,7 +469,7 @@ fibonacci:
         self.assertEqual(instr[6].imm, 0x3A // 2)
         self.assertEqual(instr[7].csr, 0x448)
         self.assertEqual(instr[8].csr, 0x448)
-        self.assertEqual(instr[8].uimm, 0x20)
+        self.assertEqual(instr[8].uimm, 0x1F)
 
     def test_bin_imm(self):
         text = """
@@ -481,7 +481,7 @@ fibonacci:
         lui x0, -0b10101111
         jal x0, 0b0000111010
         csrrw sp, 0b010001001000, s1
-        csrrwi sp, 0b010001001000, 0b100000"""
+        csrrwi sp, 0b010001001000, 0b11111"""
         parser = RiscvParser()
         instr = parser.parse_res_to_instructions(
             parser.parse_assembly(text), start_address=0
@@ -495,4 +495,4 @@ fibonacci:
         self.assertEqual(instr[6].imm, 0x3A // 2)
         self.assertEqual(instr[7].csr, 0x448)
         self.assertEqual(instr[8].csr, 0x448)
-        self.assertEqual(instr[8].uimm, 0x20)
+        self.assertEqual(instr[8].uimm, 0x1F)

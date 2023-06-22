@@ -558,6 +558,18 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.register_file.registers, [max_number, test_mask_1])
         self.assertEqual(state.csr_registers.load_word(cssrc_1.csr), test_result_1)
 
+    def test_csritype(self):
+        cssrwi_1 = CSRRWI(csr=0, rd=0, uimm=0)
+        self.assertEqual(cssrwi_1.uimm, 0)
+        cssrwi_1 = CSRRWI(csr=0, rd=0, uimm=1)
+        self.assertEqual(cssrwi_1.uimm, 1)
+        cssrwi_1 = CSRRWI(csr=0, rd=0, uimm=31)
+        self.assertEqual(cssrwi_1.uimm, 31)
+        cssrwi_1 = CSRRWI(csr=0, rd=0, uimm=32)
+        self.assertEqual(cssrwi_1.uimm, 0)
+        cssrwi_1 = CSRRWI(csr=0, rd=0, uimm=-1)
+        self.assertEqual(cssrwi_1.uimm, 31)
+
     def test_csrrwi(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=[0]))
         state.csr_registers.store_word(0, 3)
@@ -587,6 +599,18 @@ class TestInstructions(unittest.TestCase):
         state = cssrci_1.behavior(state)
         self.assertEqual(state.register_file.registers, [max_number])
         self.assertEqual(state.csr_registers.load_word(cssrci_1.csr), test_result_1)
+
+    def test_btype(self):
+        btype = BEQ(rs1=0, rs2=0, imm=0)
+        self.assertEqual(btype.imm, 0)
+        btype = BEQ(rs1=0, rs2=0, imm=1)
+        self.assertEqual(btype.imm, 1)
+        btype = BEQ(rs1=0, rs2=0, imm=2047)
+        self.assertEqual(btype.imm, 2047)
+        btype = BEQ(rs1=0, rs2=0, imm=2048)
+        self.assertEqual(btype.imm, -2048)
+        btype = BEQ(rs1=0, rs2=0, imm=-2049)
+        self.assertEqual(btype.imm, 2047)
 
     def test_beq(self):
         state = ArchitecturalState(
@@ -853,6 +877,22 @@ class TestInstructions(unittest.TestCase):
         instruction = BGEU(rs1=4, rs2=3, imm=6)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
+
+    def test_itype(self):
+        itype = LB(rs1=0, rd=0, imm=0)
+        self.assertEqual(itype.imm, 0)
+        itype = LH(rs1=0, rd=0, imm=1)
+        self.assertEqual(itype.imm, 1)
+        itype = LW(rs1=0, rd=0, imm=-1)
+        self.assertEqual(itype.imm, -1)
+        itype = LB(rs1=0, rd=0, imm=2047)
+        self.assertEqual(itype.imm, 2047)
+        itype = LH(rs1=0, rd=0, imm=-2048)
+        self.assertEqual(itype.imm, -2048)
+        itype = LW(rs1=0, rd=0, imm=2048)
+        self.assertEqual(itype.imm, -2048)
+        itype = LW(rs1=0, rd=0, imm=-2049)
+        self.assertEqual(itype.imm, 2047)
 
     def test_lb(self):
         state = ArchitecturalState(
@@ -1400,6 +1440,22 @@ class TestInstructions(unittest.TestCase):
             instr = EBREAK(imm=0, rs1=0, rd=0)
             state = instr.behavior(state)
 
+    def test_stype(self):
+        stype = SB(rs1=0, rs2=0, imm=0)
+        self.assertEqual(stype.imm, 0)
+        stype = SB(rs1=0, rs2=0, imm=1)
+        self.assertEqual(stype.imm, 1)
+        stype = SB(rs1=0, rs2=0, imm=-1)
+        self.assertEqual(stype.imm, -1)
+        stype = SB(rs1=0, rs2=0, imm=2047)
+        self.assertEqual(stype.imm, 2047)
+        stype = SB(rs1=0, rs2=0, imm=-2048)
+        self.assertEqual(stype.imm, -2048)
+        stype = SB(rs1=0, rs2=0, imm=2048)
+        self.assertEqual(stype.imm, -2048)
+        stype = SB(rs1=0, rs2=0, imm=-2049)
+        self.assertEqual(stype.imm, 2047)
+
     def test_sb(self):
         state = ArchitecturalState(
             register_file=RegisterFile(
@@ -1541,6 +1597,22 @@ class TestInstructions(unittest.TestCase):
         state = sw_7.behavior(state)
         self.assertEqual(int(state.memory.load_word(8)), 4294967295)
 
+    def test_utype(self):
+        utype = LUI(rd=0, imm=0)
+        self.assertEqual(utype.imm, 0)
+        utype = LUI(rd=0, imm=1)
+        self.assertEqual(utype.imm, 1)
+        utype = LUI(rd=0, imm=-1)
+        self.assertEqual(utype.imm, -1)
+        utype = LUI(rd=0, imm=(2**19) - 1)
+        self.assertEqual(utype.imm, (2**19) - 1)
+        utype = LUI(rd=0, imm=-(2**19))
+        self.assertEqual(utype.imm, -(2**19))
+        utype = LUI(rd=0, imm=2**19)
+        self.assertEqual(utype.imm, -(2**19))
+        utype = LUI(rd=0, imm=-(2**19) - 1)
+        self.assertEqual(utype.imm, (2**19) - 1)
+
     def test_lui(self):
 
         state = ArchitecturalState(register_file=RegisterFile(registers=[0, 1, 2, 3]))
@@ -1628,17 +1700,20 @@ class TestInstructions(unittest.TestCase):
         )
 
     def test_jtype(self):
-        try:
-            JAL(rd=3, imm=524287)
-            JAL(rd=3, imm=-524288)
-        except Exception:
-            print(Exception)
-            self.fail("JTypeInstruction raised an exception upon instantiation")
-
-        with self.assertRaises(ValueError):
-            JAL(rd=11, imm=524288)
-        with self.assertRaises(ValueError):
-            JAL(rd=1, imm=-524289)
+        jtype = JAL(rd=0, imm=0)
+        self.assertEqual(jtype.imm, 0)
+        jtype = JAL(rd=0, imm=1)
+        self.assertEqual(jtype.imm, 1)
+        jtype = JAL(rd=0, imm=-1)
+        self.assertEqual(jtype.imm, -1)
+        jtype = JAL(rd=0, imm=(2**19) - 1)
+        self.assertEqual(jtype.imm, (2**19) - 1)
+        jtype = JAL(rd=0, imm=-(2**19))
+        self.assertEqual(jtype.imm, -(2**19))
+        jtype = JAL(rd=0, imm=(2**19))
+        self.assertEqual(jtype.imm, -(2**19))
+        jtype = JAL(rd=0, imm=-(2**19) - 1)
+        self.assertEqual(jtype.imm, (2**19) - 1)
 
     def test_jal(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=[1, 1, 1]))

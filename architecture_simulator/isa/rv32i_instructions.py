@@ -710,7 +710,6 @@ class LB(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = sext(M[x[rs1] + sext(imm)][7:0])"""
         rs1 = architectural_state.register_file.registers[self.rs1]
-        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         # casting like this is necessary for sign extension
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             int(
@@ -729,7 +728,6 @@ class LH(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = sext(M[x[rs1] + sext(imm)][15:0])"""
         rs1 = architectural_state.register_file.registers[self.rs1]
-        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             int(
                 fixedint.Int16(
@@ -747,7 +745,6 @@ class LW(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = sext(M[x[rs1] + sext(imm)][31:0])"""
         rs1 = architectural_state.register_file.registers[self.rs1]
-        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         architectural_state.register_file.registers[
             self.rd
         ] = architectural_state.memory.load_word(int(rs1) + self.imm)
@@ -761,7 +758,6 @@ class LBU(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = M[x[rs1] + sext(imm)][7:0]"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
-        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             int(architectural_state.memory.load_byte(int(rs1) + self.imm))
         )
@@ -775,7 +771,6 @@ class LHU(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """x[rd] = M[x[rs1] + sext(imm)][15:0]"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
-        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             int(architectural_state.memory.load_halfword(int(rs1) + self.imm))
         )
@@ -789,7 +784,6 @@ class JALR(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """t=pc+4; pc=(x[rs1]+sext(imm))&∼1; x[rd]=t"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
-        self.imm = (self.imm & 2047) - (self.imm & 2048)  # 12-bit sext
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             architectural_state.program_counter + 4
         )

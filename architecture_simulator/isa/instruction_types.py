@@ -176,7 +176,7 @@ class ITypeInstruction(Instruction):
             return f"{self.mnemonic} x{self.rd}, x{self.rs1}, {self.imm}"
 
 
-class ShiftITypeInstruction(Instruction):
+class ShiftITypeInstruction(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int, **args):
         """Create an I-Type instruction that requires shamt
 
@@ -185,9 +185,7 @@ class ShiftITypeInstruction(Instruction):
             rs1 (int): source register 1
             rd (int): destination register
         """
-        super().__init__(**args)
-        self.rs1 = rs1
-        self.rd = rd
+        super().__init__(rd, rs1, imm, **args)
         self.imm = imm & (2**5) - 1  # [0:5]
 
     def __repr__(self) -> str:
