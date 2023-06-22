@@ -1,7 +1,7 @@
 const binary_representation = 0;
 const decimal_representation = 1;
 const hexa_representation = 2;
-let representation_mode = binary_representation; //change this to set another default repr.
+let representation_mode = hexa_representation; //change this to set another default repr.
 var run;
 
 		let waiting_for_pyodide_flag = true
