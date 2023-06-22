@@ -534,8 +534,6 @@ body main #gui_cmd_table_id {
 
 	font-size: 			11px;
 
-	font: 				monospace;
-
 	border-collapse: 	collapse;
 
 	margin: 			0.0625em auto;
@@ -558,7 +556,7 @@ body main #gui_cmd_table_id th 	{
 
 	font-weight: 		bold;
 
-	font: 				monospace;
+	font-family: 		monospace;
 
 	font-size: 			12px;
 
@@ -598,6 +596,8 @@ body main #gui_cmd_table_id td 	{
 	padding-left: 		0.3125em;
 
 	text-align: 		left;
+
+	font-family: 		monospace;
 
 	font-size: 			12px;
 
@@ -658,7 +658,7 @@ body main #gui_memory_table_id {
 
 	font-size: 			11px;
 
-	font: 				monospace;
+	font-family: 		monospace;
 
 	border-collapse: 	collapse;
 
@@ -686,7 +686,7 @@ body main #gui_memory_table_id th 	{
 
 	font-size: 			12px;
 
-	font: 				monospace;
+	font-family: 		monospace;
 
 	vertical-align: 	middle;
 
@@ -727,6 +727,8 @@ body main #gui_memory_table_id td 	{
 	text-align: 		right;
 
 	font-size: 			12px;
+
+	font-family: 		monospace;
 
 	vertical-align: 	middle;
 
@@ -800,7 +802,7 @@ body main #gui_registers_table_id {
 
 	font-size: 			11px;
 
-	font: 				monospace;
+	font-family: 		monospace;
 
 	border-collapse: 	collapse;
 
@@ -828,7 +830,7 @@ body main #gui_registers_table_id th 	{
 
 	font-size: 			12px;
 
-	font: 				monospace;
+	font-family: 		monospace;
 
 	vertical-align: 	middle;
 
@@ -869,6 +871,8 @@ body main #gui_registers_table_id td 	{
 	text-align: 		right;
 
 	font-size: 			12px;
+
+	font-family: 		monospace;
 
 	vertical-align: 	middle;
 
