@@ -2008,6 +2008,20 @@ class TestInstructions(unittest.TestCase):
         state = xori_1.behavior(state)
         self.assertEqual(state.register_file.registers, [bminimm, bmaximm, bn1, b0])
 
+    def test_shiftitype(self):
+        shiftitype = SLLI(rd=0, rs1=0, imm=0)
+        self.assertEqual(shiftitype.imm, 0)
+        shiftitype = SLLI(rd=0, rs1=0, imm=1)
+        self.assertEqual(shiftitype.imm, 1)
+        shiftitype = SLLI(rd=0, rs1=0, imm=31)
+        self.assertEqual(shiftitype.imm, 31)
+        shiftitype = SLLI(rd=0, rs1=0, imm=32)
+        self.assertEqual(shiftitype.imm, 0)
+        shiftitype = SLLI(rd=0, rs1=0, imm=-1)
+        self.assertEqual(shiftitype.imm, 31)
+        shiftitype = SLLI(rd=0, rs1=0, imm=-2)
+        self.assertEqual(shiftitype.imm, 30)
+
     def test_slli(self):
         b0 = fixedint.MutableUInt32(0)
         b1 = fixedint.MutableUInt32(1)
