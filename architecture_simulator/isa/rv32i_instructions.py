@@ -2,6 +2,7 @@
 
 from .instruction_types import RTypeInstruction, CSRTypeInstruction, CSRITypeInstruction
 from .instruction_types import ITypeInstruction
+from .instruction_types import ShiftITypeInstruction
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 from .instruction_types import BTypeInstruction
 from architecture_simulator.isa.instruction_types import STypeInstruction
@@ -242,6 +243,29 @@ class OR(RTypeInstruction):
         return architectural_state
 
 
+class AND(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="and")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """
+        AND:
+            rd = rs1 & rs2
+
+        (executed bitwise)
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        architectural_state.register_file.registers[self.rd] = rs1 & rs2
+        return architectural_state
+
+
 class BEQ(BTypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1=rs1, rs2=rs2, imm=imm, mnemonic="beq")
@@ -466,29 +490,6 @@ class CSRRCI(CSRITypeInstruction):
         return architectural_state
 
 
-class AND(RTypeInstruction):
-    def __init__(self, rd: int, rs1: int, rs2: int):
-        super().__init__(rd, rs1, rs2, mnemonic="and")
-
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
-        """
-        AND:
-            rd = rs1 & rs2
-
-        (executed bitwise)
-
-        Args:
-            architectural_state
-
-        Returns:
-            architectural_state
-        """
-        rs1 = architectural_state.register_file.registers[self.rs1]
-        rs2 = architectural_state.register_file.registers[self.rs2]
-        architectural_state.register_file.registers[self.rd] = rs1 & rs2
-        return architectural_state
-
-
 class SB(STypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1, rs2, imm, mnemonic="sb")
@@ -584,7 +585,7 @@ class XORI(ITypeInstruction):
         return architectural_state
 
 
-class SLLI(ITypeInstruction):
+class SLLI(ShiftITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="slli")
 
@@ -597,7 +598,7 @@ class SLLI(ITypeInstruction):
         return architectural_state
 
 
-class SRLI(ITypeInstruction):
+class SRLI(ShiftITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="srli")
 
@@ -607,6 +608,19 @@ class SRLI(ITypeInstruction):
         architectural_state.register_file.registers[
             self.rd
         ] = rs1 >> fixedint.MutableUInt32(self.imm)
+        return architectural_state
+
+
+class SRAI(ShiftITypeInstruction):
+    def __init__(self, rd: int, rs1: int, imm: int):
+        super().__init__(rd, rs1, imm, mnemonic="srai")
+
+    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        """x[rd] = x[rs1] >>s shamt   (imm)"""
+        rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
+        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
+            rs1 >> int(fixedint.UInt16(self.imm))
+        )
         return architectural_state
 
 
@@ -774,7 +788,7 @@ class JALR(ITypeInstruction):
             architectural_state.program_counter + 4
         )
         architectural_state.program_counter = (
-            int((rs1 + fixedint.Int16(self.imm)[0:12])) & (pow(2, 32) - 2)
+            int((rs1 + fixedint.Int16(self.imm))) & (pow(2, 32) - 2)
         ) - self.length
         return architectural_state
 
@@ -796,19 +810,6 @@ class EBREAK(ITypeInstruction):
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
         """RaiseException(EnvironmentCall)"""
         raise InstructionNotImplemented(mnemonic=self.mnemonic)
-        return architectural_state
-
-
-class SRAI(ITypeInstruction):
-    def __init__(self, rd: int, rs1: int, imm: int):
-        super().__init__(rd, rs1, imm, mnemonic="srai")
-
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
-        """x[rd] = x[rs1] >>s shamt"""
-        rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
-        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            rs1 >> int(fixedint.UInt16(self.imm)[0:6])
-        )
         return architectural_state
 
 

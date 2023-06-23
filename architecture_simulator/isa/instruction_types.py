@@ -18,6 +18,14 @@ class Instruction:
 
 
 class RTypeInstruction(Instruction):
+    """Create an R-Type instruction
+
+    Args:
+        rd (int): register destination
+        rs1 (int): source register 1
+        rs2 (int): source register 2
+    """
+
     def __init__(self, rd: int, rs1: int, rs2: int, **args):
         super().__init__(**args)
         self.rs1 = rs1
@@ -29,7 +37,7 @@ class RTypeInstruction(Instruction):
 
 
 class CSRTypeInstruction(Instruction):
-    """Create an I-Type instruction
+    """Create a CSR-Type instruction
 
     Args:
         rd (int): register destination
@@ -48,19 +56,19 @@ class CSRTypeInstruction(Instruction):
 
 
 class CSRITypeInstruction(Instruction):
-    """Create an I-Type instruction
+    """Create a CSRI-Type instruction
 
     Args:
         rd (int): register destination
         csr (int): the control/status register's index
-        imm (int): immediate
+        uimm (int): immediate
     """
 
     def __init__(self, rd: int, csr: int, uimm: int, **args):
         super().__init__(**args)
         self.rd = rd
         self.csr = csr
-        self.uimm = uimm
+        self.uimm = uimm & (2**5) - 1  # [0:5]
 
     def __repr__(self) -> str:
         return f"{self.mnemonic} x{self.rd}, {hex(self.csr)}, {self.uimm}"
@@ -76,31 +84,29 @@ class BTypeInstruction(Instruction):
             rs2 (int): source register 2
             imm (int): offset to be added to the pc. Needs to be a 12 bit signed integer. Interpreted as multiple of 2 bytes.
         """
-        if imm < -2048 or 2047 < imm:
-            raise ValueError(
-                "B-Type Instruction immediate values have to be in range(-2048, 2048). Given immediate was "
-                + str(imm)
-            )
         super().__init__(**args)
         self.rs1 = rs1
         self.rs2 = rs2
-        self.imm = imm
+        self.imm = (imm & 2047) - (imm & 2048)  # 12-bit sext
 
     def __repr__(self) -> str:
         return f"{self.mnemonic} x{self.rs1}, x{self.rs2}, {self.imm*2}"
 
 
 class STypeInstruction(Instruction):
+    """Create an S-Type instruction
+
+    Args:
+        rs1 (int): source register 1
+        rs2 (int): source register 2
+        imm (int): offset to be added to the rs1
+    """
+
     def __init__(self, rs1: int, rs2: int, imm: int, **args):
         super().__init__(**args)
-        if imm < -2048 or 2047 < imm:
-            raise ValueError(
-                "STypeInstruction can only take 12 bit immediates. Given immediate was "
-                + str(imm)
-            )
         self.rs1 = rs1
         self.rs2 = rs2
-        self.imm = imm
+        self.imm = (imm & 2047) - (imm & 2048)  # 12-bit sext
 
     def __repr__(self) -> str:
         return f"{self.mnemonic} x{self.rs2}, {self.imm}(x{self.rs1})"
@@ -109,13 +115,8 @@ class STypeInstruction(Instruction):
 class UTypeInstruction(Instruction):
     def __init__(self, rd: int, imm: int, **args):
         super().__init__(**args)
-        if imm < -pow(2, 19) or pow(2, 19) - 1 < imm:
-            raise ValueError(
-                "UTypeInstruction can only take 20 bit immediates. Given immediate was "
-                + str(imm)
-            )
         self.rd = rd
-        self.imm = imm
+        self.imm = (imm & (2**19) - 1) - (imm & 2**19)  # 20-bit sext
 
     def __repr__(self) -> str:
         return f"{self.mnemonic} x{self.rd}, {self.imm}"
@@ -124,13 +125,8 @@ class UTypeInstruction(Instruction):
 class JTypeInstruction(Instruction):
     def __init__(self, rd: int, imm: int, **args):
         super().__init__(**args)
-        if imm < -pow(2, 19) or pow(2, 19) - 1 < imm:
-            raise ValueError(
-                "JTypeInstruction can only take 20 bit immediates. Given immediate was "
-                + str(imm)
-            )
         self.rd = rd
-        self.imm = imm
+        self.imm = (imm & (2**19) - 1) - (imm & 2**19)  # 20-bit sext
 
     def __repr__(self) -> str:
         return f"{self.mnemonic} x{self.rd}, {self.imm*2}"
@@ -155,14 +151,9 @@ class ITypeInstruction(Instruction):
             rd (int): destination register
         """
         super().__init__(**args)
-        if imm < -2048 or 2047 < imm:
-            raise ValueError(
-                "ITypeInstruction can only take 12 bit immediates. Given immediate was "
-                + str(imm)
-            )
-        self.imm = imm
         self.rs1 = rs1
         self.rd = rd
+        self.imm = (imm & (2**11) - 1) - (imm & 2**11)  # 12-bit sext
 
     def __repr__(self) -> str:
         from architecture_simulator.isa.rv32i_instructions import (
@@ -183,3 +174,19 @@ class ITypeInstruction(Instruction):
             return f"{self.mnemonic}"
         else:
             return f"{self.mnemonic} x{self.rd}, x{self.rs1}, {self.imm}"
+
+
+class ShiftITypeInstruction(ITypeInstruction):
+    def __init__(self, rd: int, rs1: int, imm: int, **args):
+        """Create an I-Type instruction that requires shamt
+
+        Args:
+            imm (int): shift amount
+            rs1 (int): source register 1
+            rd (int): destination register
+        """
+        super().__init__(rd, rs1, imm, **args)
+        self.imm = imm & (2**5) - 1  # [0:5]
+
+    def __repr__(self) -> str:
+        return f"{self.mnemonic} x{self.rd}, x{self.rs1}, {self.imm}"
