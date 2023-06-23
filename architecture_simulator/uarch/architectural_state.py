@@ -1,27 +1,29 @@
 from dataclasses import dataclass, field
 import fixedint
 import time
+from typing import Optional
 
 
 @dataclass
 class PerformanceMetrics:
-    execution_time_s: float = -1
+    execution_time_s: float = 0
     instruction_count: int = 0
     instructions_per_second: float = -1
     branch_count: int = 0
     procedure_count: int = 0
-    start: float = -1
+    start: Optional[float] = None
 
-    def start_timer(self):
+    def resume_timer(self):
         self.start = time.time()
 
     def stop_timer(self):
-        self.execution_time_s = time.time() - self.start
+        self.execution_time_s += time.time() - self.start
         self.instructions_per_second = (
             (self.instruction_count / self.execution_time_s)
             if self.execution_time_s
             else 0
         )
+        self.start = None
 
     def __repr__(self) -> str:
         representation = ""
