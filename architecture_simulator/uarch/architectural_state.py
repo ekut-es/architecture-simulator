@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 import fixedint
 import time
-from typing import Optional, Any
+from typing import Optional
 
 
 @dataclass
@@ -411,48 +411,6 @@ class InstructionMemory:
         for instr in parser.parse(program, start_address=0):
             self.save_instruction(next_address, instr=instr)
             next_address += instr.length
-
-
-@dataclass
-class StageData:
-    instruction: Any
-    ...
-
-
-class Stage:
-    # input data class
-    # output data class
-    ...
-
-    def behavior(self, data: StageData) -> StageData:
-        return StageData(instruction="None")
-
-    def get_data(self):
-        pass
-
-    def pass_data_along(self):
-        return
-
-
-class Pipeline:
-    def __init__(self, stages: list[Stage], execution_ordering: list[int]) -> None:
-        self.stages = stages
-        self.num_stages = len(stages)
-        self.execution_ordering = execution_ordering
-
-    stage_data = []
-
-    def step(self):
-        for index in self.execution_ordering:
-            self.stages[index].behavior()
-        for stage in self.stages:
-            stage
-
-    def stall(self):
-        ...
-
-    def flush(self):
-        ...
 
 
 @dataclass

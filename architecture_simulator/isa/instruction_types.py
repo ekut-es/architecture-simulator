@@ -190,3 +190,7 @@ class ShiftITypeInstruction(ITypeInstruction):
 
     def __repr__(self) -> str:
         return f"{self.mnemonic} x{self.rd}, x{self.rs1}, {self.imm}"
+
+
+class EmptyInstruction(Instruction):
+    pass

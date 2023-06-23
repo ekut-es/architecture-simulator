@@ -1,6 +1,5 @@
 from ..uarch.architectural_state import ArchitecturalState
 from dataclasses import dataclass, field
-from ..uarch.pipeline_stages import IF_Stage
 
 
 @dataclass
