@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 import fixedint
 import time
-from typing import Optional
+from typing import Optional, Any
 
 
 @dataclass
@@ -414,6 +414,48 @@ class InstructionMemory:
 
 
 @dataclass
+class StageData:
+    instruction: Any
+    ...
+
+
+class Stage:
+    # input data class
+    # output data class
+    ...
+
+    def behavior(self, data: StageData) -> StageData:
+        return StageData(instruction="None")
+
+    def get_data(self):
+        pass
+
+    def pass_data_along(self):
+        return
+
+
+class Pipeline:
+    def __init__(self, stages: list[Stage], execution_ordering: list[int]) -> None:
+        self.stages = stages
+        self.num_stages = len(stages)
+        self.execution_ordering = execution_ordering
+
+    stage_data = []
+
+    def step(self):
+        for index in self.execution_ordering:
+            self.stages[index].behavior()
+        for stage in self.stages:
+            stage
+
+    def stall(self):
+        ...
+
+    def flush(self):
+        ...
+
+
+@dataclass
 class ArchitecturalState:
     instruction_memory: InstructionMemory = field(default_factory=InstructionMemory)
     register_file: RegisterFile = field(default_factory=RegisterFile)
@@ -421,6 +463,7 @@ class ArchitecturalState:
     csr_registers: CsrRegisterFile = field(default_factory=CsrRegisterFile)
     program_counter: int = 0
     performance_metrics: PerformanceMetrics = field(default_factory=PerformanceMetrics)
+    # pipeline: Pipeline
 
     def change_privilege_level(self, level: int):
         if not level < 0 and not level > 3:
