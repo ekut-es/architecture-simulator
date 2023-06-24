@@ -133,15 +133,14 @@ async function evaluatePython_step_sim() {
         let output_repr =  Array.from(step_sim(input_str));
         if (output_repr[1] == false)
         {
-            pyodide.globals.get("stop_timer")();
+            stop_timer();
             stop_loading_animation();
             disable_pause();
             disable_step();
             disable_run();
             clearInterval(run);
         }
-        //addToOutput(output[0]);
-        output.value = output_repr[0];
+        update_performance_metrics();
     } catch (err) {
         output.value = err;
         stop_loading_animation();
@@ -150,6 +149,24 @@ async function evaluatePython_step_sim() {
         disable_run();
         clearInterval(run);
     }
+}
+
+async function resume_timer() {
+    let pyodide = await pyodideReadyPromise;
+    resume_timer = pyodide.globals.get("resume_timer");
+    resume_timer();
+}
+
+async function stop_timer() {
+    let pyodide = await pyodideReadyPromise;
+    stop_timer = pyodide.globals.get("stop_timer");
+    stop_timer();
+}
+
+async function update_performance_metrics() {
+    let pyodide = await pyodideReadyPromise;
+    get_performance_metrics = pyodide.globals.get("get_performance_metrics");
+    output.value = get_performance_metrics();
 }
 
 // async function evaluatePython_run_sim() {

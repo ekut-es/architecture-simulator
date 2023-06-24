@@ -14,7 +14,8 @@ class PerformanceMetrics:
     start: Optional[float] = None
 
     def resume_timer(self):
-        self.start = time.time()
+        if self.start is None:
+            self.start = time.time()
 
     def stop_timer(self):
         self.execution_time_s += time.time() - self.start
