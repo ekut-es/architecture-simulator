@@ -10,7 +10,7 @@ from architecture_simulator.isa.instruction_types import UTypeInstruction
 from architecture_simulator.isa.instruction_types import JTypeInstruction
 from architecture_simulator.isa.instruction_types import fence
 from architecture_simulator.isa.instruction_types import Instruction
-from typing import Type
+from typing import Optional, Type
 from dataclasses import dataclass
 import fixedint
 
@@ -43,6 +43,14 @@ class ADD(RTypeInstruction):
         architectural_state.register_file.registers[self.rd] = rs1 + rs2
         return architectural_state
 
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.MutableUInt32(alu_in_1)
+        right = fixedint.MutableUInt32(alu_in_2)
+        result = int(left + right)
+        return (result == 0, result)
+
 
 class SUB(RTypeInstruction):
     def __init__(self, rd: int, rs1: int, rs2: int):
@@ -65,6 +73,14 @@ class SUB(RTypeInstruction):
             int(fixedint.Int32(int(rs1)) - fixedint.Int32(int(rs2)))
         )
         return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.MutableUInt32(alu_in_1)
+        right = fixedint.MutableUInt32(alu_in_2)
+        result = int(fixedint.Int32(int(left)) - fixedint.Int32(int(right)))
+        return (result == 0, result)
 
 
 class SLL(RTypeInstruction):
@@ -91,6 +107,14 @@ class SLL(RTypeInstruction):
         architectural_state.register_file.registers[self.rd] = rs1 << rs2
         return architectural_state
 
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.MutableUInt32(alu_in_1)
+        right = fixedint.MutableUInt32(alu_in_2) % fixedint.MutableUInt32(32)
+        result = int(left << right)
+        return (result == 0, result)
+
 
 class SLT(RTypeInstruction):
     def __init__(self, rd: int, rs1: int, rs2: int):
@@ -115,6 +139,14 @@ class SLT(RTypeInstruction):
             fixedint.MutableUInt32(1) if rs1 < rs2 else fixedint.MutableUInt32(0)
         )
         return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.Int32(alu_in_1)
+        right = fixedint.Int32(alu_in_2)
+        result = 1 if left < right else 0
+        return (result == 0, result)
 
 
 class SLTU(RTypeInstruction):
@@ -141,6 +173,14 @@ class SLTU(RTypeInstruction):
         )
         return architectural_state
 
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.UInt32(alu_in_1)
+        right = fixedint.UInt32(alu_in_2)
+        result = 1 if left < right else 0
+        return (result == 0, result)
+
 
 class XOR(RTypeInstruction):
     def __init__(self, rd: int, rs1: int, rs2: int):
@@ -163,6 +203,14 @@ class XOR(RTypeInstruction):
         rs2 = architectural_state.register_file.registers[self.rs2]
         architectural_state.register_file.registers[self.rd] = rs1 ^ rs2
         return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.MutableUInt32(alu_in_1)
+        right = fixedint.MutableUInt32(alu_in_2)
+        result = int(left ^ right)
+        return (result == 0, result)
 
 
 class SRL(RTypeInstruction):
@@ -188,6 +236,14 @@ class SRL(RTypeInstruction):
         ] % fixedint.MutableUInt32(32)
         architectural_state.register_file.registers[self.rd] = rs1 >> rs2
         return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.MutableUInt32(alu_in_1)
+        right = fixedint.MutableUInt32(alu_in_2) % fixedint.MutableUInt32(32)
+        result = int(left >> right)
+        return (result == 0, result)
 
 
 class SRA(RTypeInstruction):
@@ -219,6 +275,16 @@ class SRA(RTypeInstruction):
         )
         return architectural_state
 
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.Int32(alu_in_1)
+        right = fixedint.Int32(
+            int(fixedint.UInt32(alu_in_2) % fixedint.MutableUInt32(32))
+        )
+        result = int(left >> right)
+        return (result == 0, result)
+
 
 class OR(RTypeInstruction):
     def __init__(self, rd: int, rs1: int, rs2: int):
@@ -242,6 +308,14 @@ class OR(RTypeInstruction):
         architectural_state.register_file.registers[self.rd] = rs1 | rs2
         return architectural_state
 
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.MutableUInt32(alu_in_1)
+        right = fixedint.MutableUInt32(alu_in_2)
+        result = int(left | right)
+        return (result == 0, result)
+
 
 class AND(RTypeInstruction):
     def __init__(self, rd: int, rs1: int, rs2: int):
@@ -264,6 +338,14 @@ class AND(RTypeInstruction):
         rs2 = architectural_state.register_file.registers[self.rs2]
         architectural_state.register_file.registers[self.rd] = rs1 & rs2
         return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.MutableUInt32(alu_in_1)
+        right = fixedint.MutableUInt32(alu_in_2)
+        result = int(left & right)
+        return (result == 0, result)
 
 
 class BEQ(BTypeInstruction):

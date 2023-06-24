@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 from typing import Optional
+import fixedint
 
 
 @dataclass
@@ -29,10 +30,20 @@ class Instruction:
     def get_write_register(self):
         pass
 
-    def memory_access(self, address: Optional[int], write_data: Optional[int]):
+    def memory_access(
+        self,
+        address: Optional[int],
+        write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ):
         pass
 
-    def write_back(self, write_register: Optional[int], write_data: Optional[int]):
+    def write_back(
+        self,
+        write_register: Optional[int],
+        write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ):
         pass
 
 
@@ -64,20 +75,42 @@ class RTypeInstruction(Instruction):
         )
 
     def control_unit_signals(self):
+        from ..uarch.pipeline import ControlUnitSignals
+
         # jump, alu_op
-        return (False, 2, False, False, False, False, False, True)
+        return ControlUnitSignals(
+            alu_src=False,
+            mem_to_reg=False,
+            reg_write=True,
+            mem_read=False,
+            mem_write=False,
+            branch=False,
+            jump=False,
+            alu_op=2,
+        )
 
     def get_write_register(self):
-        pass
+        return self.rd
 
-    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
-        pass
+    def memory_access(
+        self,
+        address: Optional[int],
+        write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ):
+        return None
 
-    def memory_access(self, address: Optional[int], write_data: Optional[int]):
-        pass
-
-    def write_back(self, write_register: Optional[int], write_data: Optional[int]):
-        pass
+    def write_back(
+        self,
+        write_register: Optional[int],
+        write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ):
+        assert write_register is not None
+        assert write_data is not None
+        architectural_state.register_file.registers[
+            write_register
+        ] = fixedint.MutableUInt32(write_data)
 
 
 class CSRTypeInstruction(Instruction):
@@ -136,6 +169,32 @@ class BTypeInstruction(Instruction):
     def __repr__(self) -> str:
         return f"{self.mnemonic} x{self.rs1}, x{self.rs2}, {self.imm*2}"
 
+    def access_register_file(self, architectural_state: ArchitecturalState):
+        return (
+            self.rs1,
+            self.rs2,
+            architectural_state.register_file.registers[self.rs1],
+            architectural_state.register_file.registers[self.rs2],
+            self.imm,
+        )
+
+    def control_unit_signals(self):
+        from ..uarch.pipeline import ControlUnitSignals
+
+        return ControlUnitSignals(
+            alu_src=False,
+            mem_to_reg=None,
+            reg_write=False,
+            mem_read=False,
+            mem_write=False,
+            branch=True,
+            jump=False,
+            alu_op=1,
+        )
+
+    def get_write_register(self):
+        return None
+
 
 class STypeInstruction(Instruction):
     """Create an S-Type instruction
@@ -154,6 +213,40 @@ class STypeInstruction(Instruction):
 
     def __repr__(self) -> str:
         return f"{self.mnemonic} x{self.rs2}, {self.imm}(x{self.rs1})"
+
+    def access_register_file(self, architectural_state: ArchitecturalState):
+        return (
+            self.rs1,
+            self.rs2,
+            architectural_state.register_file.registers[self.rs1],
+            architectural_state.register_file.registers[self.rs2],
+            self.imm,
+        )
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        pass
+
+    def control_unit_signals(self):
+        pass
+
+    def get_write_register(self):
+        pass
+
+    def memory_access(
+        self,
+        address: Optional[int],
+        write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ):
+        pass
+
+    def write_back(
+        self,
+        write_register: Optional[int],
+        write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ):
+        pass
 
 
 class UTypeInstruction(Instruction):
@@ -237,4 +330,32 @@ class ShiftITypeInstruction(ITypeInstruction):
 
 
 class EmptyInstruction(Instruction):
-    pass
+    def access_register_file(self, architectural_state: ArchitecturalState):
+        return (None, None, None, None, None)
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        return (None, None)
+
+    def control_unit_signals(self):
+        from ..uarch.pipeline import ControlUnitSignals
+
+        return ControlUnitSignals()
+
+    def get_write_register(self):
+        return None
+
+    def memory_access(
+        self,
+        address: Optional[int],
+        write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ):
+        return None
+
+    def write_back(
+        self,
+        write_register: Optional[int],
+        write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ):
+        pass
