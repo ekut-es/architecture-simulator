@@ -208,10 +208,10 @@ class TestSimulation(unittest.TestCase):
             12: ADDI(rd=1, rs1=1, imm=1),
         }
 
-        self.assert_(simulation.step_simulation())
-        self.assert_(simulation.step_simulation())
-        self.assert_(simulation.step_simulation())
-        self.assert_(not simulation.step_simulation())
+        self.assertTrue(simulation.step_simulation())
+        self.assertTrue(simulation.step_simulation())
+        self.assertTrue(simulation.step_simulation())
+        self.assertTrue(not simulation.step_simulation())
 
     def test_simulation_errors(self):
         simulation = Simulation()

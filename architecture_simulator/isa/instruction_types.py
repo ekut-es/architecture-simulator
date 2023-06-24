@@ -330,6 +330,9 @@ class ShiftITypeInstruction(ITypeInstruction):
 
 
 class EmptyInstruction(Instruction):
+    def __init__(self, **kwargs):
+        super().__init__(mnemonic="Empty")
+
     def access_register_file(self, architectural_state: ArchitecturalState):
         return (None, None, None, None, None)
 

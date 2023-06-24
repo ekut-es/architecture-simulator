@@ -1433,14 +1433,14 @@ class TestInstructions(unittest.TestCase):
         with self.assertRaises(InstructionNotImplemented) as cm:
             instr = ECALL(imm=0, rs1=0, rd=0)
             state = instr.behavior(state)
-        self.assertEquals(cm.exception, InstructionNotImplemented(mnemonic="ecall"))
+        self.assertEqual(cm.exception, InstructionNotImplemented(mnemonic="ecall"))
 
     def test_ebreak(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=()))
         with self.assertRaises(InstructionNotImplemented) as cm:
             instr = EBREAK(imm=0, rs1=0, rd=0)
             state = instr.behavior(state)
-        self.assertEquals(cm.exception, InstructionNotImplemented(mnemonic="ebreak"))
+        self.assertEqual(cm.exception, InstructionNotImplemented(mnemonic="ebreak"))
 
     def test_stype(self):
         stype = SB(rs1=0, rs2=0, imm=0)

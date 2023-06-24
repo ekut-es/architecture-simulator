@@ -92,6 +92,8 @@ class InstructionFetchStage(Stage):
     ) -> StageData:
         return InstructionFetchStageData(
             instruction=state.instruction_memory.load_instruction(state.program_counter)
+            if state.instruction_at_pc()
+            else EmptyInstruction()
         )
 
 
@@ -198,7 +200,7 @@ class Pipeline:
         self.execution_ordering = execution_ordering
         self.state = state
         self.stage_data: list[StageData] = [
-            StageData(EmptyInstruction())
+            StageData(instruction=EmptyInstruction())
         ] * self.num_stages
         self.initialized_stages = 0
 
@@ -209,14 +211,18 @@ class Pipeline:
                 continue
             # first stage in pipeline does not consume any StageData
             if index == 0:
-                next_stage_data[0] = self.stages[0].behavior(data=StageData())
+                next_stage_data[0] = self.stages[0].behavior(
+                    data=StageData(instruction=EmptyInstruction()), state=self.state
+                )
             # last stage in pipeline comsumes StageData, but the StageData it returns is not used
             elif index == self.num_stages - 1:
-                self.stages[index].behavior(data=self.stage_data[index - 1])
+                self.stages[index].behavior(
+                    data=self.stage_data[index - 1], state=self.state
+                )
             # all other pipeline stages consume StageData and return StageData
             else:
                 next_stage_data[index] = self.stages[index].behavior(
-                    data=self.stage_data[index - 1]
+                    data=self.stage_data[index - 1], state=self.state
                 )
         self.stage_data = next_stage_data
         self.initialized_stages = max(self.initialized_stages + 1, self.num_stages)
