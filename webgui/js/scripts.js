@@ -13,6 +13,7 @@ var run;
 					clearInterval(run);
 				}
 				start_loading_animation();
+                pyodide.globals.get("resume_timer")();
 				run = setInterval(evaluatePython_step_sim,1);
 				disable_run();
 				enable_pause();
@@ -22,6 +23,7 @@ var run;
 			document.getElementById("button_simulation_pause_id").addEventListener("click", () => {
 				document.getElementById("input").disabled = true;
 				clearInterval(run);
+                pyodide.globals.get("stop_timer")();
 				enable_run();
 				disable_pause();
 				enable_step();
@@ -31,7 +33,9 @@ var run;
 			document.getElementById("button_simulation_next_id").addEventListener("click", () => {
 				document.getElementById("input").disabled = true;
 				document.getElementById("input").disabled = true;
+                pyodide.globals.get("resume_timer")();
 				evaluatePython_step_sim();
+                pyodide.globals.get("stop_timer")();
 				enable_run();
 				disable_pause();
 				enable_step();

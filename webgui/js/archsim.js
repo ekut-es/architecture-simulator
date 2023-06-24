@@ -133,6 +133,7 @@ async function evaluatePython_step_sim() {
         let output_repr =  Array.from(step_sim(input_str));
         if (output_repr[1] == false)
         {
+            pyodide.globals.get("stop_timer")();
             stop_loading_animation();
             disable_pause();
             disable_step();

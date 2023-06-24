@@ -45,6 +45,22 @@ def step_sim(instr: str):
     return (simulation.state.performance_metrics.__repr__(), simulation_ended_flag)
 
 
+def resume_timer():
+    global simulation
+    if simulation is None:
+        raise StateNotInitializedError()
+
+    simulation.state.performance_metrics.resume_timer()
+
+
+def stop_timer():
+    global simulation
+    if simulation is None:
+        raise StateNotInitializedError()
+
+    simulation.state.performance_metrics.stop_timer()
+
+
 # runs the simulation, takes a string as input and returns the whole simulation
 # def run_sim(instr: str):
 #     global simulation
