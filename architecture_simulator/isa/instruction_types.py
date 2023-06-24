@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
+from typing import Optional
 
 
 @dataclass
@@ -14,6 +15,24 @@ class Instruction:
         self.mnemonic = kwargs["mnemonic"]
 
     def behavior(self, architectural_state: ArchitecturalState):
+        pass
+
+    def access_register_file(self, architectural_state: ArchitecturalState):
+        pass
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        pass
+
+    def control_unit_signals(self):
+        pass
+
+    def get_write_register(self):
+        pass
+
+    def memory_access(self, address: Optional[int], write_data: Optional[int]):
+        pass
+
+    def write_back(self, write_register: Optional[int], write_data: Optional[int]):
         pass
 
 
@@ -34,6 +53,31 @@ class RTypeInstruction(Instruction):
 
     def __repr__(self) -> str:
         return f"{self.mnemonic} x{self.rd}, x{self.rs1}, x{self.rs2}"
+
+    def access_register_file(self, architectural_state: ArchitecturalState):
+        return (
+            self.rs1,
+            self.rs2,
+            int(architectural_state.register_file.registers[self.rs1]),
+            int(architectural_state.register_file.registers[self.rs2]),
+            None,
+        )
+
+    def control_unit_signals(self):
+        # jump, alu_op
+        return (False, 2, False, False, False, False, False, True)
+
+    def get_write_register(self):
+        pass
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        pass
+
+    def memory_access(self, address: Optional[int], write_data: Optional[int]):
+        pass
+
+    def write_back(self, write_register: Optional[int], write_data: Optional[int]):
+        pass
 
 
 class CSRTypeInstruction(Instruction):
