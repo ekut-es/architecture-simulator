@@ -1,13 +1,22 @@
 {
-    // "version": "0.2.0",
+    "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch localhost",
             "type": "firefox",
             "request": "launch",
             "reAttach": true,
+            "name": "Launch localhost",
             "url": "http://127.0.0.1:3000/webgui/index.html",
-            "webRoot": "${workspaceFolder}",
+            "webRoot": "${workspaceFolder}"
+        },
+
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true
         }
     ]
 }
