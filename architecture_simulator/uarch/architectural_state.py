@@ -11,20 +11,20 @@ class PerformanceMetrics:
     instructions_per_second: float = -1
     branch_count: int = 0
     procedure_count: int = 0
-    start: Optional[float] = None
+    _start: Optional[float] = None
 
     def resume_timer(self):
-        if self.start is None:
-            self.start = time.time()
+        if self._start is None:
+            self._start = time.time()
 
     def stop_timer(self):
-        self.execution_time_s += time.time() - self.start
+        self.execution_time_s += time.time() - self._start
         self.instructions_per_second = (
             (self.instruction_count / self.execution_time_s)
             if self.execution_time_s
             else 0
         )
-        self.start = None
+        self._start = None
 
     def __repr__(self) -> str:
         representation = ""
@@ -36,8 +36,7 @@ class PerformanceMetrics:
         )
         representation += "instruction count: " + str(self.instruction_count) + "\n"
         representation += "branch count: " + str(self.branch_count) + "\n"
-        representation += "procedure count: " + str(self.procedure_count) + "\n"
-        representation += "start: " + str(self.start)
+        representation += "procedure count: " + str(self.procedure_count)
         return representation
 
 
