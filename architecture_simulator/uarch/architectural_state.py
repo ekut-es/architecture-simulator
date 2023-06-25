@@ -28,15 +28,19 @@ class PerformanceMetrics:
 
     def __repr__(self) -> str:
         representation = ""
-        representation += (
-            "execution time in seconds: " + str(self.execution_time_s) + "\n"
+        # self.execution_time_s only counts the time until the last "stop" of the timer
+        # so we add the time since the last start if the simulation is currently running
+        execution_time = self.execution_time_s + (
+            (time.time() - self._start) if self._start is not None else 0
         )
-        representation += (
-            "instructions per second: " + str(self.instructions_per_second) + "\n"
-        )
-        representation += "instruction count: " + str(self.instruction_count) + "\n"
-        representation += "branch count: " + str(self.branch_count) + "\n"
-        representation += "procedure count: " + str(self.procedure_count)
+        representation += f"execution time: {execution_time:.2f}s\n"
+        if self.instructions_per_second != -1:
+            representation += (
+                f"instructions per second: {self.instructions_per_second:.2f}\n"
+            )
+        representation += f"instruction count: {self.instruction_count} \n"
+        representation += f"branch count: {self.branch_count}\n"
+        representation += f"procedure count: {self.procedure_count}"
         return representation
 
 
