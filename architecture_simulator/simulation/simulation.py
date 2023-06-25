@@ -24,7 +24,7 @@ class Simulation:
 
     def run_simulation(self):
         """run the current simulation until no more instructions are left (pc stepped over last instruction)"""
-        self.state.performance_metrics.start_timer()
+        self.state.performance_metrics.resume_timer()
         if self.state.instruction_memory.instructions:
             while self.state.instruction_at_pc():
                 self.step_simulation()
