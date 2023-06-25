@@ -195,6 +195,8 @@ class BTypeInstruction(Instruction):
     def get_write_register(self):
         return None
 
+    # TODO: no longer sub by 4. This no longer happens.
+
 
 class STypeInstruction(Instruction):
     """Create an S-Type instruction

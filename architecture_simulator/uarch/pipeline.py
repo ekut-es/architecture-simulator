@@ -2,9 +2,11 @@ from architecture_simulator.uarch.architectural_state import ArchitecturalState
 from .architectural_state import ArchitecturalState
 from ..isa.instruction_types import Instruction, EmptyInstruction
 from typing import Optional
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
-
+#
+# Classes for a 5 Stage Pipeline:
+#
 @dataclass
 class ControlUnitSignals:
     alu_src: Optional[bool] = None
@@ -19,7 +21,7 @@ class ControlUnitSignals:
 
 @dataclass
 class StageData:
-    instruction: Instruction
+    instruction: Instruction = field(default_factory=EmptyInstruction)
 
 
 @dataclass
@@ -29,7 +31,7 @@ class InstructionFetchStageData(StageData):
 
 @dataclass
 class InstructionDecodeStageData(StageData):
-    control_unit_signals: ControlUnitSignals
+    control_unit_signals: ControlUnitSignals = field(default_factory=ControlUnitSignals)
     read_addr_1: Optional[int] = None
     read_addr_2: Optional[int] = None
     read_data_1: Optional[int] = None
@@ -40,7 +42,7 @@ class InstructionDecodeStageData(StageData):
 
 @dataclass
 class ExecuteStageData(StageData):
-    control_unit_signals: ControlUnitSignals
+    control_unit_signals: ControlUnitSignals = field(default_factory=ControlUnitSignals)
     alu_in_1: Optional[int] = None
     alu_in_2: Optional[int] = None
     # alu_in_2 is one of read_data_2 and imm
@@ -54,7 +56,7 @@ class ExecuteStageData(StageData):
 
 @dataclass
 class MemoryAccessStageData(StageData):
-    control_unit_signals: ControlUnitSignals
+    control_unit_signals: ControlUnitSignals = field(default_factory=ControlUnitSignals)
     address: Optional[int] = None
     result: Optional[int] = None
     write_data: Optional[int] = None
@@ -68,7 +70,7 @@ class MemoryAccessStageData(StageData):
 
 @dataclass
 class RegisterWritebackStageData(StageData):
-    control_unit_signals: ControlUnitSignals
+    control_unit_signals: ControlUnitSignals = field(default_factory=ControlUnitSignals)
     write_data: Optional[int] = None
     write_register: Optional[int] = None
     read_data: Optional[int] = None
@@ -81,7 +83,7 @@ class Stage:
         data: StageData,
         state: ArchitecturalState,
     ) -> StageData:
-        return StageData(instruction=EmptyInstruction())
+        return StageData()
 
 
 class InstructionFetchStage(Stage):
@@ -99,93 +101,128 @@ class InstructionFetchStage(Stage):
 
 class InstructionDecodeStage(Stage):
     def behavior(self, data: StageData, state: ArchitecturalState) -> StageData:
-        assert isinstance(data, InstructionFetchStageData)
-        (
-            read_addr_1,
-            read_addr_2,
-            read_data_1,
-            read_data_2,
-            imm,
-        ) = data.instruction.access_register_file(architectural_state=state)
-        write_register = data.instruction.get_write_register()
+        if isinstance(data, InstructionFetchStageData):
+            (
+                read_addr_1,
+                read_addr_2,
+                read_data_1,
+                read_data_2,
+                imm,
+            ) = data.instruction.access_register_file(architectural_state=state)
+            write_register = data.instruction.get_write_register()
 
-        control_unit_signals = data.instruction.control_unit_signals()
-        return InstructionDecodeStageData(
-            instruction=data.instruction,
-            read_addr_1=read_addr_1,
-            read_addr_2=read_addr_2,
-            read_data_1=read_data_1,
-            read_data_2=read_data_2,
-            imm=imm,
-            write_register=write_register,
-            control_unit_signals=control_unit_signals,
-        )
+            control_unit_signals = data.instruction.control_unit_signals()
+            return InstructionDecodeStageData(
+                instruction=data.instruction,
+                read_addr_1=read_addr_1,
+                read_addr_2=read_addr_2,
+                read_data_1=read_data_1,
+                read_data_2=read_data_2,
+                imm=imm,
+                write_register=write_register,
+                control_unit_signals=control_unit_signals,
+            )
+        else:
+            return InstructionDecodeStageData()
 
 
 class ExecuteStage(Stage):
     def behavior(self, data: StageData, state: ArchitecturalState) -> StageData:
-        assert isinstance(data, InstructionDecodeStageData)
-        alu_in_1 = data.read_data_1
-        alu_in_2 = data.imm if data.control_unit_signals.alu_src else data.read_data_2
-        zero, result = data.instruction.alu_compute(
-            alu_in_1=alu_in_1, alu_in_2=alu_in_2
-        )
-        return ExecuteStageData(
-            instruction=data.instruction,
-            alu_in_1=alu_in_1,
-            alu_in_2=alu_in_2,
-            read_data_2=data.read_data_2,
-            imm=data.imm,
-            result=result,
-            zero=zero,
-            write_register=data.write_register,
-            control_unit_signals=data.control_unit_signals,
-        )
+        if isinstance(data, InstructionDecodeStageData):
+            alu_in_1 = data.read_data_1
+            alu_in_2 = (
+                data.imm if data.control_unit_signals.alu_src else data.read_data_2
+            )
+            zero, result = data.instruction.alu_compute(
+                alu_in_1=alu_in_1, alu_in_2=alu_in_2
+            )
+            return ExecuteStageData(
+                instruction=data.instruction,
+                alu_in_1=alu_in_1,
+                alu_in_2=alu_in_2,
+                read_data_2=data.read_data_2,
+                imm=data.imm,
+                result=result,
+                zero=zero,
+                write_register=data.write_register,
+                control_unit_signals=data.control_unit_signals,
+            )
+        else:
+            return ExecuteStageData()
 
 
 class MemoryAccessStage(Stage):
     def behavior(self, data: StageData, state: ArchitecturalState) -> StageData:
-        assert isinstance(data, ExecuteStageData)
-        address = data.result
-        write_data = data.read_data_2
-        read_data = data.instruction.memory_access(
-            address=address, write_data=write_data, architectural_state=state
-        )
-        zero_and_branch = data.zero and data.control_unit_signals.branch
-        pc_src = data.control_unit_signals.jump or zero_and_branch
-        return MemoryAccessStageData(
-            instruction=data.instruction,
-            address=address,
-            result=data.result,
-            write_data=write_data,
-            read_data=read_data,
-            zero=data.zero,
-            zero_and_branch=zero_and_branch,
-            pc_src=pc_src,
-            write_register=data.write_register,
-            control_unit_signals=data.control_unit_signals,
-        )
+        if isinstance(data, ExecuteStageData):
+            address = data.result
+            write_data = data.read_data_2
+            read_data = data.instruction.memory_access(
+                address=address, write_data=write_data, architectural_state=state
+            )
+            zero_and_branch = data.zero and data.control_unit_signals.branch
+            pc_src = data.control_unit_signals.jump or zero_and_branch
+            if pc_src:
+                assert data.imm is not None
+                state.program_counter += data.imm
+            else:
+                # FIXME: Do not use fixed length for the instruction length
+                state.program_counter += 4
+            return MemoryAccessStageData(
+                instruction=data.instruction,
+                address=address,
+                result=data.result,
+                write_data=write_data,
+                read_data=read_data,
+                zero=data.zero,
+                zero_and_branch=zero_and_branch,
+                pc_src=pc_src,
+                write_register=data.write_register,
+                control_unit_signals=data.control_unit_signals,
+            )
+        else:
+            # FIXME: Do not use fixed length for the instruction length
+            state.program_counter += 4
+            return MemoryAccessStageData()
 
 
 class RegisterWritebackStage(Stage):
     def behavior(self, data: StageData, state: ArchitecturalState) -> StageData:
-        assert isinstance(data, MemoryAccessStageData)
-        data.instruction.write_back(
-            write_register=data.write_register,
-            write_data=data.write_data,
-            architectural_state=state,
-        )
-        write_data = (
-            data.read_data if data.control_unit_signals.mem_to_reg else data.result
-        )
-        return RegisterWritebackStageData(
-            instruction=data.instruction,
-            write_data=write_data,
-            write_register=data.write_register,
-            read_data=data.read_data,
-            alu_result=data.result,
-            control_unit_signals=data.control_unit_signals,
-        )
+        if isinstance(data, MemoryAccessStageData):
+            write_data = (
+                data.read_data if data.control_unit_signals.mem_to_reg else data.result
+            )
+            data.instruction.write_back(
+                write_register=data.write_register,
+                write_data=write_data,
+                architectural_state=state,
+            )
+            return RegisterWritebackStageData(
+                instruction=data.instruction,
+                write_data=write_data,
+                write_register=data.write_register,
+                read_data=data.read_data,
+                alu_result=data.result,
+                control_unit_signals=data.control_unit_signals,
+            )
+        else:
+            return RegisterWritebackStageData()
+
+
+#
+# Single stage Pipeline:
+#
+class SingleStage(Stage):
+    def behavior(self, data: StageData, state: ArchitecturalState) -> StageData:
+        if state.instruction_at_pc():
+            instr = state.instruction_memory.load_instruction(state.program_counter)
+            state.program_counter += instr.length
+            instr.behavior(state)
+        return StageData()
+
+
+#
+# Pipeline wrapper Classs
+#
 
 
 class Pipeline:
@@ -202,13 +239,10 @@ class Pipeline:
         self.stage_data: list[StageData] = [
             StageData(instruction=EmptyInstruction())
         ] * self.num_stages
-        self.initialized_stages = 0
 
     def step(self):
         next_stage_data = [None] * self.num_stages
         for index in self.execution_ordering:
-            if index > self.initialized_stages:
-                continue
             # first stage in pipeline does not consume any StageData
             if index == 0:
                 next_stage_data[0] = self.stages[0].behavior(
@@ -225,7 +259,6 @@ class Pipeline:
                     data=self.stage_data[index - 1], state=self.state
                 )
         self.stage_data = next_stage_data
-        self.initialized_stages = max(self.initialized_stages + 1, self.num_stages)
 
     def stall(self):
         ...
