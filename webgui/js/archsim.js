@@ -178,8 +178,8 @@ async function evaluatePython_reset_sim() {
     stop_loading_animation();
     try {
         reset_sim = pyodide.globals.get("reset_sim");
-        let output = reset_sim();
-        addToOutput(output);
+        reset_sim();
+        output.value = "";
     } catch (err) {
         addToOutput(err);
     }
