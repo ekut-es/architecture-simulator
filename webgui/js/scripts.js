@@ -11,6 +11,7 @@ var input_timer;
 let representation_mode = decimal_representation; //change this to set another default repr.
 var run;
 
+
 		let waiting_for_pyodide_flag = true
 		window.addEventListener('DOMContentLoaded', function () {
 			document.getElementById("button_simulation_start_id").addEventListener("click", () => {
@@ -88,6 +89,10 @@ var run;
 			});
 
 			document.getElementById("input").addEventListener("keyup", () => {
+				const numberOfLines = input.value.split('\n').length;
+				lineNumbers = this.document.getElementById("line_numbers");
+				lineNumbers.innerHTML = Array(numberOfLines).fill('<span></span>').join('');
+
 				clearTimeout(input_timer);
 				input_timer = setTimeout(finished_typing, run_sim_after_not_typing_for_n_ms);
 			});
