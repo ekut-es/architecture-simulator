@@ -97,6 +97,15 @@ def reset_sim():
     return simulation
 
 
+def parse_input(instr: str):
+    global simulation
+    if simulation is None:
+        raise StateNotInitializedError()
+    simulation.state.instruction_memory.instructions = {}
+    simulation.state.instruction_memory.append_instructions(instr)
+    update_ui()
+
+
 def update_ui():
     update_tables()
     # update_performance_metrics()

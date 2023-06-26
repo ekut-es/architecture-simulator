@@ -209,6 +209,18 @@ async function evaluatePython_update_tables() {
     }
 }
 
+async function evaluatePython_parse_input() {
+    let pyodide = await pyodideReadyPromise;
+    input_str = input.value;
+    try {
+        parse_input = pyodide.globals.get("parse_input");
+        parse_input(input_str);
+    } catch (err) {
+        addToOutput(err);
+    }
+}
+
+
 //function update_output(output_string) {
 //    output.value = output_string;
 //}
