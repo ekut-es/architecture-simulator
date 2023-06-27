@@ -502,10 +502,11 @@ body main #gui_base_div_id {
 
 body main #input {
 	width: 				25em;
-	line-height: 21px;
+	line-height: 1.5em;
 	padding: 0;
 	border: 0;
 	resize: none;
+	overflow: auto;
 }
 
 
@@ -935,11 +936,14 @@ body main #output{
 	gap: 10px;
 	font-family: monospace;
 	line-height: 21px;
+	overflow: auto;
   }
 
 .line_numbers {
   width: 20px;
+  line-height: 1.5em;
   text-align: right;
+  overflow:auto;
 }
 
 .line_numbers span {

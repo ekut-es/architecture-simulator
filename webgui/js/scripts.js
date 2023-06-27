@@ -6,7 +6,7 @@ const hexa_representation = 2;
 const steps_per_interval = 100;
 //set use_more_than_one_step_per_10ms to false if you only want to call up evaluatePython_step_sim() more than once per interval (10ms)
 const use_more_than_one_step_per_10ms = true;
-const run_sim_after_not_typing_for_n_ms = 2000;
+const parse_sim_after_not_typing_for_n_ms = 2000;
 var input_timer;
 let representation_mode = decimal_representation; //change this to set another default repr.
 var run;
@@ -14,6 +14,8 @@ var run;
 
 		let waiting_for_pyodide_flag = true
 		window.addEventListener('DOMContentLoaded', function () {
+			clearTimeout(input_timer);
+			input_timer = setTimeout(finished_typing, parse_sim_after_not_typing_for_n_ms);
 			document.getElementById("button_simulation_start_id").addEventListener("click", () => {
 				document.getElementById("input").disabled = true;
 				if(run) {
@@ -64,7 +66,7 @@ var run;
 				disable_pause();
 				enable_step();
 				clearTimeout(input_timer);
-				input_timer = setTimeout(finished_typing, run_sim_after_not_typing_for_n_ms);
+				input_timer = setTimeout(finished_typing, parse_sim_after_not_typing_for_n_ms);
 			});
 
 			function step_n_times() {
@@ -89,12 +91,14 @@ var run;
 			});
 
 			document.getElementById("input").addEventListener("keyup", () => {
+				// line numbers:
 				const numberOfLines = input.value.split('\n').length;
 				lineNumbers = this.document.getElementById("line_numbers");
 				lineNumbers.innerHTML = Array(numberOfLines).fill('<span></span>').join('');
 
+				// autoparse
 				clearTimeout(input_timer);
-				input_timer = setTimeout(finished_typing, run_sim_after_not_typing_for_n_ms);
+				input_timer = setTimeout(finished_typing, parse_sim_after_not_typing_for_n_ms);
 			});
 
 			document.getElementById("input").addEventListener("keydown", () => {
