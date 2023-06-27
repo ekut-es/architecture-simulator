@@ -87,7 +87,10 @@ const archsim_js = {
         this.clear_a_table(instructions);
     },
     clear_a_table: function(table) {
-        table.innerHTML = ""
+        table.innerHTML = "";
+    },
+    set_output: function(str){
+        output.value = str;
     }
 };
 
@@ -212,6 +215,18 @@ async function evaluatePython_update_tables() {
         addToOutput(err);
     }
 }
+
+async function evaluatePython_parse_input() {
+    let pyodide = await pyodideReadyPromise;
+    input_str = input.value;
+    try {
+        parse_input = pyodide.globals.get("parse_input");
+        parse_input(input_str);
+    } catch (err) {
+        addToOutput(err);
+    }
+}
+
 
 //function update_output(output_string) {
 //    output.value = output_string;
