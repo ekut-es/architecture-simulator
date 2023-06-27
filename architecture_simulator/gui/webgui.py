@@ -114,7 +114,8 @@ def update_tables():
         representations.items(),
         key=lambda item: item[0],
     ):
-        archsim_js.update_register_table(reg_i, reg_val)  # int(reg_val)
+        reg_abi = simulation.state.register_file.get_abi_names(reg_i)
+        archsim_js.update_register_table(reg_i, reg_val, reg_abi)  # int(reg_val)
 
     # appends all the memory one at a time
     archsim_js.clear_memory_table()
