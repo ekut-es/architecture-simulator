@@ -83,7 +83,10 @@ const archsim_js = {
         this.clear_a_table(instructions);
     },
     clear_a_table: function(table) {
-        table.innerHTML = ""
+        table.innerHTML = "";
+    },
+    set_output: function(str){
+        output.value = str;
     }
 };
 

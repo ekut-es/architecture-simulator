@@ -1,4 +1,5 @@
 import archsim_js
+from architecture_simulator.isa.parser import ParserException
 
 from architecture_simulator.uarch.architectural_state import (
     RegisterFile,
@@ -35,7 +36,10 @@ def step_sim(instr: str):
 
     # parse the instr json string into a python dict
     if simulation.state.instruction_memory.instructions == {}:
-        simulation.state.instruction_memory.append_instructions(instr)
+        try:
+            simulation.state.instruction_memory.append_instructions(instr)
+        except ParserException as Parser_Exception:
+            archsim_js.set_output(Parser_Exception.__repr__())
 
     # step the simulation
     simulation_ended_flag = simulation.step_simulation()
@@ -102,7 +106,10 @@ def parse_input(instr: str):
     if simulation is None:
         raise StateNotInitializedError()
     simulation.state.instruction_memory.instructions = {}
-    simulation.state.instruction_memory.append_instructions(instr)
+    try:
+        simulation.state.instruction_memory.append_instructions(instr)
+    except ParserException as Parser_Exception:
+        archsim_js.set_output(Parser_Exception.__repr__())
     update_ui()
 
 
