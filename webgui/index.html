@@ -1,108 +1,169 @@
 <!DOCTYPE html>
 <html lang="de">
-<head>
-	<meta 	charset='utf-8'/>
-	<meta 	name="viewport" 								content="width=device-width, initial-scale=1.0">
-	<title	> RISC-V Simulator</title>
-	<!--	****************************************************************************************************************************** -->
-	<link 	rel="shortcut icon" 	type="image/x-icon" 	href="favicon.ico">
-	<!--	****************************************************************************************************************************** -->
-	<link 	rel="stylesheet"	 	type="text/css" 		href="WEB_APP_BASIC.css">
-	<!--	****************************************************************************************************************************** -->
-	<script type="text/javascript"							src="js/scripts.js"></script>
-</head>
-<body id="webapp_body_id">
-	<!-- ************  Tool Title  ****************************************************-->
-	<header id="webapp_header_id">
-		<div 	id="webapp_header_app_name_id" > RISC-V Simulator </div>
-		<img 	id="webapp_header_help_image_id" src="svg/WEB_APP_BASIC_Help.svg"/>
-		<img 	id="webapp_header_icon_image_id" src="favicon.ico"/>
-	</header>
-	<nav id="webapp_nav_id">
-		<button type="button" id="button_simulation_start_id" class="button_start_simulation" title="start simulation">
-			<img src="svg/start.svg" width="25px" height="25px">
-		</button>
-		<button type="button" id="button_simulation_pause_id" class="button_pause_simulation" title="pause simulation" disabled>
-			<img src="svg/pause.svg" width="25px" height="25px">
-		</button>
-		<button type="button" id="button_simulation_next_id" class="button_next_step_simulation" title="next step">
-			<img src="svg/next.svg" width="25px" height="25px">
-		</button>
-		<button type="button" id="button_simulation_refresh_id" class="button_refresh_simulation" title="reset">
-			<img src="svg/refresh.svg" width="25px" height="25px">
-		</button>
-		<img type="button" id="loading_id" title="loading" disabled style = "visibility: hidden;" src="loading.gif" width="25px" height="25px">
-		<button type="button" id="button_binary_representation_id" class="button_switch_representation" title="show binary representation">
-			<img src="svg/binary_representation.svg" width="25px" height="25px">
-		</button>
-		<button type="button" id="button_decimal_representation_id" class="button_switch_representation" title="show decimal representation">
-			<img src="svg/decimal_representation.svg" width="25px" height="25px">
-		</button>
-		<button type="button" id="button_hexa_representation_id" class="button_switch_representation" title="show hexadecimal representation">
-			<img src="svg/hexadecimal_representation.svg" width="25px" height="25px">
-		</button>
-	</nav>
-	<main id="webapp_main_id">
-		<div id="gui_base_div_id">
-			<div class="editor">
-				<div id = "line_numbers" class="line_numbers">
-					<span></span>
-					<span></span>
-				</div>
-    		<textarea id="input" rows="20" ></textarea>
-			</div>
-			<div id="gui_cmd_div_id">
-				<table id="gui_cmd_table_id">
-					<thead>
-						<tr>
-							<th>
-							</th>
-							<th title="address">Address</th>
-							<th title="command">Command</th>
-						</tr>
-					</thead>
-          			<tbody id="gui_cmd_table_body_id">
-				</table>
-			</div>
-			<div id="gui_registers_div_id">
-					<table id="gui_registers_table_id">
-						<thead>
-							<tr>
-								<th>
-								</th>
-								<th title="abi_name">Register</th>
-								<th title="register"></th>
-								<th title="register value">Value</th>
-							</tr>
-						</thead>
-						<tbody id="gui_registers_table_body_id">
-					</tbody>
-				</table>
-			</div>
-			<div id="gui_memory_div_id">
-				<table id="gui_memory_table_id">
-					<thead>
-						<tr>
-							<th>
-							</th>
-							<th title="memory address">Address</th>
-							<th title="memory value">Value</th>
-						</tr>
-					</thead>
-					<tbody id="gui_memory_table_body_id">
-					</tbody>
-				</table>
-			</div>
-			<textarea id="output" style="width: 20%;" rows="20" disabled></textarea> <br>
-		</div>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>RISC-V Simulator</title>
+        <!--	****************************************************************************************************************************** -->
+        <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+        <!--	****************************************************************************************************************************** -->
+        <link rel="stylesheet" type="text/css" href="WEB_APP_BASIC.css" />
+        <!--	****************************************************************************************************************************** -->
+        <script type="text/javascript" src="js/scripts.js"></script>
+    </head>
+    <body id="webapp_body_id">
+        <!-- ************  Tool Title  ****************************************************-->
+        <header id="webapp_header_id">
+            <div id="webapp_header_app_name_id">RISC-V Simulator</div>
+            <img
+                id="webapp_header_help_image_id"
+                src="svg/WEB_APP_BASIC_Help.svg"
+            />
+            <img id="webapp_header_icon_image_id" src="favicon.ico" />
+        </header>
+        <nav id="webapp_nav_id">
+            <button
+                type="button"
+                id="button_simulation_start_id"
+                class="button_start_simulation"
+                title="start simulation"
+            >
+                <img src="svg/start.svg" width="25px" height="25px" />
+            </button>
+            <button
+                type="button"
+                id="button_simulation_pause_id"
+                class="button_pause_simulation"
+                title="pause simulation"
+                disabled
+            >
+                <img src="svg/pause.svg" width="25px" height="25px" />
+            </button>
+            <button
+                type="button"
+                id="button_simulation_next_id"
+                class="button_next_step_simulation"
+                title="next step"
+            >
+                <img src="svg/next.svg" width="25px" height="25px" />
+            </button>
+            <button
+                type="button"
+                id="button_simulation_refresh_id"
+                class="button_refresh_simulation"
+                title="reset"
+            >
+                <img src="svg/refresh.svg" width="25px" height="25px" />
+            </button>
+            <img
+                type="button"
+                id="loading_id"
+                title="loading"
+                disabled
+                style="visibility: hidden"
+                src="loading.gif"
+                width="25px"
+                height="25px"
+            />
+            <button
+                type="button"
+                id="button_binary_representation_id"
+                class="button_switch_representation"
+                title="show binary representation"
+            >
+                <img
+                    src="svg/binary_representation.svg"
+                    width="25px"
+                    height="25px"
+                />
+            </button>
+            <button
+                type="button"
+                id="button_decimal_representation_id"
+                class="button_switch_representation"
+                title="show decimal representation"
+            >
+                <img
+                    src="svg/decimal_representation.svg"
+                    width="25px"
+                    height="25px"
+                />
+            </button>
+            <button
+                type="button"
+                id="button_hexa_representation_id"
+                class="button_switch_representation"
+                title="show hexadecimal representation"
+            >
+                <img
+                    src="svg/hexadecimal_representation.svg"
+                    width="25px"
+                    height="25px"
+                />
+            </button>
+        </nav>
+        <main id="webapp_main_id">
+            <div id="gui_base_div_id">
+                <div class="editor">
+                    <div id="line_numbers" class="line_numbers">
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <textarea id="input" rows="20"></textarea>
+                </div>
+                <div id="gui_cmd_div_id">
+                    <table id="gui_cmd_table_id">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th title="address">Address</th>
+                                <th title="command">Command</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gui_cmd_table_body_id"></tbody>
+                    </table>
+                </div>
+                <div id="gui_registers_div_id">
+                    <table id="gui_registers_table_id">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th title="abi_name">Register</th>
+                                <th title="register"></th>
+                                <th title="register value">Value</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gui_registers_table_body_id"></tbody>
+                    </table>
+                </div>
+                <div id="gui_memory_div_id">
+                    <table id="gui_memory_table_id">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th title="memory address">Address</th>
+                                <th title="memory value">Value</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gui_memory_table_body_id"></tbody>
+                    </table>
+                </div>
+                <textarea
+                    id="output"
+                    style="width: 20%"
+                    rows="20"
+                    disabled
+                ></textarea>
+                <br />
+            </div>
+        </main>
+        <footer id="webapp_footer_id"></footer>
 
-    </main>
-	<footer id="webapp_footer_id">
-	</footer>
-
-	<dialog id="webapp_dialog_AppHelpID" >
-	</dialog>
-	<script type="text/javascript" 							src="https://cdn.jsdelivr.net/pyodide/v0.22.1/full/pyodide.js"></script>
-  <script type="text/javascript" 							src="js/archsim.js"></script>
-</body>
+        <dialog id="webapp_dialog_AppHelpID"></dialog>
+        <script
+            type="text/javascript"
+            src="https://cdn.jsdelivr.net/pyodide/v0.22.1/full/pyodide.js"
+        ></script>
+        <script type="text/javascript" src="js/archsim.js"></script>
+    </body>
 </html>
