@@ -4,6 +4,7 @@
         "ms-vscode.live-server",
         "firefox-devtools.vscode-firefox-debug",
         "ms-python.black-formatter",
-        "matangover.mypy"
+        "matangover.mypy",
+        "esbenp.prettier-vscode"
     ]
 }
