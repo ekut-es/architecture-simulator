@@ -4,8 +4,6 @@
 
 /* ************************************************************************* */
 
-
-
 /* ************************************************************************* */
 
 /* Variablen                                                                 */
@@ -13,125 +11,110 @@
 /* ************************************************************************* */
 
 :root {
+    --app_width: 100%;
 
-  --app_width:					100%;
+    --app_height: 37.5em;
 
-  --app_height:					37.5em;
+    --app_margin: 0;
 
-  --app_margin:					0;
+    --app_padding: 0;
 
-  --app_padding:				0;
+    --app_border: 0.625em;
 
-  --app_border:					0.625em;
+    --app_border_color: #e6e6e6;
 
-  --app_border_color:			#E6E6E6;
+    --app_valid_input_bg_color: #d8f6ce;
 
-  --app_valid_input_bg_color:	#D8F6CE;
+    --app_invalid_input_bg_color: #f8e0e0;
 
-  --app_invalid_input_bg_color:	#F8E0E0;
+    --app_header_width: var(--app_width);
 
-  --app_header_width:			var(--app_width);
+    --app_header_height: 2.5em;
 
-  --app_header_height:			2.5em;
+    --app_header_bg_color: #0066aa;
 
-  --app_header_bg_color:		#0066AA;
+    --app_header_title_color: #e0e0e0;
 
-  --app_header_title_color:		#E0E0E0;
+    --app_header_font_family: "Times New Roman", Garamond, serif;
 
-  --app_header_font_family: 	"Times New Roman", Garamond, serif;
+    --app_header_icons_width: 1.25em;
 
-  --app_header_icons_width:		1.25em;
+    --app_header_title_width: calc(
+        var(--app_header_width) - calc(var(--app_header_icons_width) * 3)
+    );
 
-  --app_header_title_width:		calc(var(--app_header_width) - calc(var(--app_header_icons_width) * 3));
+    --app_nav_width: var(--app_header_width);
 
-  --app_nav_width:				var(--app_header_width);
+    --app_nav_height: 3.5em;
 
-  --app_nav_height:				3.5em;
+    --app_nav_bg_color: #d8d8d8;
 
-  --app_nav_bg_color:			#D8D8D8;
+    --app_nav_text_color: #585858;
 
-  --app_nav_text_color:			#585858;
+    --button_text_color: var(--app_nav_text_color);
 
-  --button_text_color:			var(--app_nav_text_color);
+    --button_green_color: #a9f5a9;
 
-  --button_green_color:			#A9F5A9;
+    --button_blue_color: #a9d0f5;
 
-  --button_blue_color:			#A9D0F5;
+    --button_red_color: #f78181;
 
-  --button_red_color:			#F78181;
+    --button_disabled_color: #aaaaaa;
 
-  --button_disabled_color:			#AAAAAA;
+    --app_footer_width: var(--app_header_width);
 
-  --app_footer_width:			var(--app_header_width);
+    --app_footer_height: 1.875em;
 
-  --app_footer_height:			1.875em;
+    --app_footer_bg_color: #d8d8d8;
 
-  --app_footer_bg_color:		#D8D8D8;
+    --app_footer_text_color: #585858;
 
-  --app_footer_text_color:		#585858;
+    --app_main_width: var(--app_header_width);
 
-  --app_main_width:				var(--app_header_width);
+    --app_main_height: calc(
+        var(--app_height) - var(--app_header_height) - var(--app_footer_height)
+    );
 
-  --app_main_height:			calc(var(--app_height) - var(--app_header_height) - var(--app_footer_height));
+    --app_main_bg_color: #f2f2f2;
 
-  --app_main_bg_color:			#F2F2F2;
+    --app_main_text_color: #585858;
 
-  --app_main_text_color:		#585858;
+    --input_valid_color: var(--button_green_color);
 
-  --input_valid_color:			var(--button_green_color);
-
-  --input_invalid_color:		var(--button_red_color);
-
+    --input_invalid_color: var(--button_red_color);
 }
 
 /*add is empty to valid and invalid, empty = grey */
 
 input:valid {
-
-	 background:var(--input_valid_color);
-
- }
+    background: var(--input_valid_color);
+}
 
 input:invalid {
+    background: var(--input_invalid_color);
+}
 
-	 background:var(--input_invalid_color);
-
- }
-
-
- input:in-range {
-
+input:in-range {
     background-color: var(--input_valid_color);
-
 }
 
 input:out-of-range {
-
     background-color: var(--input_invalid_color);
 
     border: 0.125em solid red;
-
 }
 
 input:in-range + ::after {
-
-    content:' ✔';
-
+    content: " ✔";
 }
 
 input:out-of-range + ::after {
-
-    content:' !';
-
+    content: " !";
 }
 
-
-
-:is(:link, :visited) { color: red }
-
-
-
-
+:is(:link, :visited) {
+    color: red;
+}
 
 /* ************************************************************************* */
 
@@ -173,785 +156,670 @@ input:out-of-range + ::after {
 
 /* ************************************************************************* */
 
-html{
+html {
+    box-sizing: border-box;
 
-	box-sizing: 		border-box;
+    width: var(--app_width);
 
-	width: 				var(--app_width);
+    height: var(--app_height);
 
-	height:				var(--app_height);
+    margin: 0 auto; /* horizontal zentriert */
 
-	margin:				0 auto;					     /* horizontal zentriert */
+    padding: var(--app_padding);
 
-	padding:			var(--app_padding);
-
-	border:				0.625em;
-
+    border: 0.625em;
 }
-
-
 
 body header {
+    box-sizing: border-box;
 
-	box-sizing: 		border-box;
+    width: var(--app_header_width);
 
-	width: 				var(--app_header_width);
+    height: var(--app_header_height);
 
-	height:				var(--app_header_height);
+    margin: 0 auto; /* horizontal zentriert */
 
-	margin:				0 auto;					     /* horizontal zentriert */
+    padding: 0;
 
-	padding:			0;
+    color: var(--app_header_title_color);
 
-	color: 				var(--app_header_title_color);
+    border-radius: 0.25em;
 
-	border-radius: 		0.25em;
+    background-color: var(--app_header_bg_color);
 
-	background-color: 	var(--app_header_bg_color);
+    font-family: var(--app_header_font_family);
 
-	font-family:		var(--app_header_font_family);
+    font-style: normal;
 
-	font-style:			normal;
+    font-weight: bold;
 
-	font-weight:		bold;
-
-	display: 			flex;						/* Flex Container */
-
+    display: flex; /* Flex Container */
 }
 
+body header img {
+    width: var(--app_header_icons_width);
 
+    height: var(--app_header_icons_width);
 
-body header img{
+    padding-top: 0.625em;
 
-	width:				var(--app_header_icons_width);
-
-	height:				var(--app_header_icons_width);
-
-	padding-top:		0.625em;
-
-	padding-left:		0.625em;
-
+    padding-left: 0.625em;
 }
 
+body header #webapp_header_app_name_id {
+    padding-top: 0.3125em;
 
+    padding-left: 0.9375em;
 
-body header #webapp_header_app_name_id{
+    font-size: 1.5625em;
 
-	padding-top:		0.3125em;
-
-	padding-left:		0.9375em;
-
-	font-size: 			1.5625em;
-
-	width: 				var(--app_header_title_width);
-
+    width: var(--app_header_title_width);
 }
 
-
-
-body header #webapp_header_help_image_id{
-
-	cursor: pointer;
-
+body header #webapp_header_help_image_id {
+    cursor: pointer;
 }
-
-
 
 body nav {
+    box-sizing: border-box;
 
-	box-sizing: 		border-box;
+    width: var(--app_nav_width);
 
-	width: 				var(--app_nav_width);
+    height: var(--app_nav_height);
 
-	height:				var(--app_nav_height);
+    margin: 0 auto; /* horizontal zentriert */
 
-	margin:				0 auto;					     /* horizontal zentriert */
+    padding: 0;
 
-	padding:			0;
+    color: var(--app_nav_text_color);
 
-	color: 				var(--app_nav_text_color);
+    background-color: var(--app_nav_bg_color);
 
-	background-color: 	var(--app_nav_bg_color);
+    border: var(--app_border);
 
-	border:				var(--app_border);
+    border-color: var(--app_border_color);
 
-	border-color:		var(--app_border_color);
+    border-style: solid;
 
-	border-style: 	 	solid;
-
-	border-radius: 		0.25em;
-
+    border-radius: 0.25em;
 }
-
-
 
 body main {
+    box-sizing: border-box;
 
-	box-sizing: 		border-box;
+    width: var(--app_main_width);
 
-	width: 				var(--app_main_width);
+    height: 100%;
 
-	height:				100%;
+    margin: 0 auto; /* horizontal zentriert */
 
-	margin:				0 auto;					     /* horizontal zentriert */
+    padding: 0;
 
-	padding:			0;
+    color: var(--app_main_text_color);
 
-	color: 				var(--app_main_text_color);
+    background-color: var(--app_main_bg_color);
 
-	background-color: 	var(--app_main_bg_color);
+    border: var(--app_border);
 
-	border:				var(--app_border);
+    border-color: var(--app_border_color);
 
-	border-color:		var(--app_border_color);
+    border-style: solid;
 
-	border-style: 	 	solid;
+    border-radius: 0.25em;
 
-	border-radius: 		0.25em;
-
-	display: 			flex;
-
+    display: flex;
 }
 
-
-
 body footer {
+    box-sizing: border-box;
 
-	box-sizing: 		border-box;
+    width: var(--app_footer_width);
 
-	width: 				var(--app_footer_width);
+    height: var(--app_footer_height);
 
-	height:				var(--app_footer_height);
+    margin: 0 auto; /* horizontal zentriert */
 
-	margin:				0 auto;					     /* horizontal zentriert */
+    padding: 0;
 
-	padding:			0;
+    color: var(--app_footer_text_color);
 
-	color: 				var(--app_footer_text_color);
+    background-color: var(--app_footer_bg_color);
 
-	background-color: 	var(--app_footer_bg_color);
+    border: var(--app_border);
 
-	border:				var(--app_border);
+    border-color: var(--app_border_color);
 
-	border-color:		var(--app_border_color);
+    border-style: solid;
 
-	border-style: 	 	solid;
-
-	border-radius: 		0.25em;
-
+    border-radius: 0.25em;
 }
 
 .button_start_simulation {
+    color: var(--button_text_color);
 
-	color: 				var(--button_text_color);
+    font-size: 0.9375em;
 
-	font-size: 			0.9375em;
+    background-color: var(--button_green_color);
 
-	background-color: 	var(--button_green_color);
+    border-radius: 0.25em;
 
-	border-radius: 		0.25em;
+    padding: 0.0625em;
 
-	padding: 			0.0625em;
+    padding-right: 0.0625em;
 
-	padding-right: 		0.0625em;
+    text-decoration: none;
 
-    text-decoration: 	none;
+    margin: 0.3125em;
 
-    margin: 			0.3125em;
+    cursor: pointer;
 
-    cursor: 			pointer;
+    height: 1.8125em;
 
-	height: 			1.8125em;
-
-	width: 				1.8125em;
-
+    width: 1.8125em;
 }
 
 .button_refresh_simulation {
+    color: var(--button_text_color);
 
-	color: 				var(--button_text_color);
+    stroke: #25253b;
 
-	stroke:				#25253b;
+    font-size: 0.9375em;
 
-	font-size: 			0.9375em;
+    background-color: var(--button_red_color);
 
-	background-color: 	var(--button_red_color);
+    border-radius: 0.25em;
 
-	border-radius: 		0.25em;
+    padding: 0.0625em;
 
-	padding: 			0.0625em;
+    padding-right: 0.0625em;
 
-	padding-right: 		0.0625em;
+    text-decoration: none;
 
-    text-decoration: 	none;
+    margin: 0.3125em;
 
-    margin: 			0.3125em;
+    cursor: pointer;
 
-    cursor: 			pointer;
+    height: 1.8125em;
 
-	height: 			1.8125em;
-
-	width: 				1.8125em;
-
+    width: 1.8125em;
 }
 
 .button_pause_simulation {
+    color: var(--button_text_color);
 
-	color: 				var(--button_text_color);
+    font-size: 0.9375em;
 
-	font-size: 			0.9375em;
+    background-color: var(--button_disabled_color);
 
-	background-color: 	var(--button_disabled_color);
+    border-radius: 0.25em;
 
-	border-radius: 		0.25em;
+    padding: 0.0625em;
 
-	padding: 			0.0625em;
+    padding-right: 0.0625em;
 
-	padding-right: 		0.0625em;
+    text-decoration: none;
 
-    text-decoration: 	none;
+    margin: 0.3125em;
 
-    margin: 			0.3125em;
+    cursor: pointer;
 
-    cursor: 			pointer;
+    height: 1.8125em;
 
-	height: 			1.8125em;
-
-	width: 				1.8125em;
-
+    width: 1.8125em;
 }
-
 
 .button_next_step_simulation {
+    color: var(--button_text_color);
 
-	color: 				var(--button_text_color);
+    font-size: 0.9375em;
 
-	font-size: 			0.9375em;
+    background-color: var(--button_blue_color);
 
-	background-color: 	var(--button_blue_color);
+    border-radius: 0.25em;
 
-	border-radius: 		0.25em;
+    padding: 0.0625em;
 
-	padding: 			0.0625em;
+    padding-right: 0.0625em;
 
-	padding-right: 		0.0625em;
+    text-decoration: none;
 
-    text-decoration: 	none;
+    margin: 0.3125em;
 
-    margin: 			0.3125em;
+    cursor: pointer;
 
-    cursor: 			pointer;
+    height: 1.8125em;
 
-	height: 			1.8125em;
-
-	width: 				1.8125em;
-
+    width: 1.8125em;
 }
 
-.loading{
-	padding-bottom: 0.11em;
+.loading {
+    padding-bottom: 0.11em;
 }
 
 .button_switch_representation {
+    color: #8b008b;
 
-	color: 				#8B008B;
+    font-size: 0.9375em;
 
-	font-size: 			0.9375em;
+    background-color: #da70d6;
 
-	background-color: 	#DA70D6;
+    border-radius: 0.25em;
 
-	border-radius: 		0.25em;
+    padding: 0.0625em;
 
-	padding: 			0.0625em;
+    padding-right: 0.0625em;
 
-	padding-right: 		0.0625em;
+    text-decoration: none;
 
-    text-decoration: 	none;
+    margin: 0.3125em;
 
-    margin: 			0.3125em;
+    cursor: pointer;
 
-    cursor: 			pointer;
+    height: 1.8125em;
 
-	height: 			1.8125em;
+    width: 1.8125em;
 
-	width: 				1.8125em;
-
-	float:				right;
-
+    float: right;
 }
 
-
-
 body main #gui_base_div_id {
+    display: flex;
 
-	display: 			flex;
+    flex-wrap: wrap;
 
-	flex-wrap: 			wrap;
+    justify-content: space-evenly;
 
-	justify-content: 	space-evenly;
+    align-items: flex-start;
 
-	align-items: 		flex-start;
+    width: 100%;
 
-	width: 				100%;
+    height: 100%;
 
-	height: 			100%;
-
-	overflow: 			auto;
-
+    overflow: auto;
 }
 
 body main #input {
-	width: 				25em;
-	line-height: 1.5em;
-	padding: 0;
-	border: 0;
-	resize: none;
-	overflow: auto;
+    width: 25em;
+    line-height: 1.5em;
+    padding: 0;
+    border: 0;
+    resize: none;
+    overflow: auto;
 }
-
-
 
 body main #gui_cmd_div_id {
+    /*background-color: 	DodgerBlue;*/
 
-	/*background-color: 	DodgerBlue;*/
+    margin-top: 0.625em;
 
-	margin-top: 		0.625em;
+    margin-bottom: 1.875em;
 
-	margin-bottom: 		1.875em;
+    width: 14.375em;
 
-	width: 				14.375em;
+    overflow-x: auto;
 
-	overflow-x: 		auto;
-
-	overflow-y: 		auto;
-
+    overflow-y: auto;
 }
-
-
-
-
 
 body main #gui_cmd_table_id {
+    table-layout: auto;
 
-	table-layout: 		auto;
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
 
-	font-family: 		"Trebuchet MS", Arial, Helvetica, sans-serif;
+    font-size: 11px;
 
-	font-size: 			11px;
+    border-collapse: collapse;
 
-	border-collapse: 	collapse;
+    margin: 0.0625em auto;
 
-	margin: 			0.0625em auto;
+    padding-top: 2.5em;
 
-	padding-top: 		2.5em;
-
-	width: 				100%;
-
+    width: 100%;
 }
 
-body main #gui_cmd_table_id th 	{
+body main #gui_cmd_table_id th {
+    padding-top: 0.0625em;
 
-	padding-top: 		0.0625em;
+    padding-bottom: 0.0625em;
 
-	padding-bottom: 	0.0625em;
+    padding-left: 0.625em;
 
-	padding-left: 		0.625em;
+    text-align: right;
 
-	text-align: 		right;
+    font-weight: bold;
 
-	font-weight: 		bold;
+    font-family: monospace;
 
-	font-family: 		monospace;
+    font-size: 12px;
 
-	font-size: 			12px;
+    vertical-align: middle;
 
-	vertical-align: 	middle;
+    border: 0.0625em solid #848484;
 
-	border: 			0.0625em solid #848484;
+    background-color: #848484;
 
-	background-color: 	#848484;
+    color: white;
 
-	color: 				white;
-
-	height: 			1.5625em;
-
+    height: 1.5625em;
 }
 
 body main #gui_cmd_table_id th:nth-child(1) {
+    width: 1.875em;
+    border: 0em solid #9a9393;
 
-	width: 				1.875em;
-	border: 			0em solid #9a9393;
-
-	background-color: var(--app_main_bg_color);
-
+    background-color: var(--app_main_bg_color);
 }
 
 body main #gui_cmd_table_id th:nth-child(2) {
-
-	width: 				3.75em;
-
+    width: 3.75em;
 }
 
-body main #gui_cmd_table_id td 	{
+body main #gui_cmd_table_id td {
+    padding-top: 0.0625em;
 
-	padding-top: 		0.0625em;
+    padding-bottom: 0.0625em;
 
-	padding-bottom: 	0.0625em;
+    padding-left: 0.3125em;
 
-	padding-left: 		0.3125em;
+    text-align: left;
 
-	text-align: 		left;
+    font-family: monospace;
 
-	font-family: 		monospace;
+    font-size: 12px;
 
-	font-size: 			12px;
+    vertical-align: middle;
 
-	vertical-align: 	middle;
+    border: 0.0625em solid #9a9393;
 
-	border: 			0.0625em solid #9a9393;
+    color: #585858;
 
-	color: 				#585858;
+    background-color: white;
 
-	background-color: 	white;
-
-	height: 			1.5625em;
-
+    height: 1.5625em;
 }
 
 body main #gui_cmd_table_id td:nth-child(1) {
+    border: 0em solid #9a9393;
 
-	border: 			0em solid #9a9393;
+    background-color: var(--app_main_bg_color);
 
-	background-color: var(--app_main_bg_color);
-
-	width: 				1.875em;
-
+    width: 1.875em;
 }
 
 body main #gui_cmd_table_id td:nth-child(2) {
-
-	width: 				3.75em;
-
+    width: 3.75em;
 }
-
-
-
 
 body main #gui_memory_div_id {
+    /*background-color: 	DodgerBlue;*/
 
-	/*background-color: 	DodgerBlue;*/
+    margin-top: 0.625em;
 
-	margin-top: 		0.625em;
+    margin-bottom: 1.875em;
 
-	margin-bottom: 		1.875em;
+    width: 14.375em;
 
-	width: 				14.375em;
+    overflow-x: auto;
 
-	overflow-x: 		auto;
-
-	overflow-y: 		auto;
-
+    overflow-y: auto;
 }
-
-
 
 body main #gui_memory_table_id {
+    table-layout: auto;
 
-	table-layout: 		auto;
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
 
-	font-family: 		"Trebuchet MS", Arial, Helvetica, sans-serif;
+    font-size: 11px;
 
-	font-size: 			11px;
+    font-family: monospace;
 
-	font-family: 		monospace;
+    border-collapse: collapse;
 
-	border-collapse: 	collapse;
+    margin: 0.0625em auto;
 
-	margin: 			0.0625em auto;
+    padding-top: 2.5em;
 
-	padding-top: 		2.5em;
+    width: 100%;
 
-	width: 				100%;
-
-	text-align: 		right;
-
+    text-align: right;
 }
 
-body main #gui_memory_table_id th 	{
+body main #gui_memory_table_id th {
+    padding-top: 0.0625em;
 
-	padding-top: 		0.0625em;
+    padding-bottom: 0.0625em;
 
-	padding-bottom: 	0.0625em;
+    padding-left: 0.625em;
 
-	padding-left: 		0.625em;
+    text-align: right;
 
-	text-align: 		right;
+    font-weight: bold;
 
-	font-weight: 		bold;
+    font-size: 12px;
 
-	font-size: 			12px;
+    font-family: monospace;
 
-	font-family: 		monospace;
+    vertical-align: middle;
 
-	vertical-align: 	middle;
+    border: 0.0625em solid #848484;
 
-	border: 			0.0625em solid #848484;
+    background-color: #848484;
 
-	background-color: 	#848484;
+    color: white;
 
-	color: 				white;
-
-	height: 			2em;
-
+    height: 2em;
 }
 
 body main #gui_memory_table_id th:nth-child(1) {
+    width: 1.875em;
 
-	width: 				1.875em;
+    border: 0em solid #9a9393;
 
-	border: 			0em solid #9a9393;
-
-	background-color: var(--app_main_bg_color);
-
+    background-color: var(--app_main_bg_color);
 }
 
 body main #gui_memory_table_id th:nth-child(2) {
-
-	width: 				3.75em;
-
+    width: 3.75em;
 }
 
-body main #gui_memory_table_id td 	{
+body main #gui_memory_table_id td {
+    padding-top: 0.0625em;
 
-	padding-top: 		0.0625em;
+    padding-bottom: 0.0625em;
 
-	padding-bottom: 	0.0625em;
+    padding-left: 0.3125em;
 
-	padding-left: 		0.3125em;
+    text-align: right;
 
-	text-align: 		right;
+    font-size: 12px;
 
-	font-size: 			12px;
+    font-family: monospace;
 
-	font-family: 		monospace;
+    vertical-align: middle;
 
-	vertical-align: 	middle;
+    border: 0.0625em solid #9a9393;
 
-	border: 			0.0625em solid #9a9393;
+    color: #585858;
 
-	color: 				#585858;
+    background-color: white;
 
-	background-color: 	white;
-
-	height: 			2em;
-
+    height: 2em;
 }
 
 body main #gui_memory_table_id td:nth-child(1) {
+    border: 0px solid #9a9393;
 
-	border: 			0px solid #9a9393;
+    background-color: var(--app_main_bg_color);
 
-	background-color: var(--app_main_bg_color);
-
-	width: 				1.875em;
-
+    width: 1.875em;
 }
 
 body main #gui_memory_table_id td:nth-child(2) {
-
-	width: 				3.75em;
-
+    width: 3.75em;
 }
 
 body main #gui_memory_table_id select {
+    padding: 0.0625em;
 
-	padding: 			0.0625em;
+    width: 5em;
 
-	width: 				5em;
+    height: 1.5625em;
 
-	height: 			1.5625em;
-
-	margin-top: 		0em;
-
+    margin-top: 0em;
 }
 
 body main #gui_memory_table_id option:disabled {
-
-	color: 				#F78181;
-
+    color: #f78181;
 }
 
 body main #gui_registers_div_id {
+    /*background-color: 	DodgerBlue;*/
 
-	/*background-color: 	DodgerBlue;*/
+    margin-top: 0.625em;
 
-	margin-top: 		0.625em;
+    margin-bottom: 1.875em;
 
-	margin-bottom: 		1.875em;
+    width: 14.375em;
 
-	width: 				14.375em;
+    overflow-x: auto;
 
-	overflow-x: 		auto;
-
-	overflow-y: 		auto;
-
+    overflow-y: auto;
 }
-
-
 
 body main #gui_registers_table_id {
+    table-layout: auto;
 
-	table-layout: 		auto;
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
 
-	font-family: 		"Trebuchet MS", Arial, Helvetica, sans-serif;
+    font-size: 11px;
 
-	font-size: 			11px;
+    font-family: monospace;
 
-	font-family: 		monospace;
+    border-collapse: collapse;
 
-	border-collapse: 	collapse;
+    margin: 0.0625em auto;
 
-	margin: 			0.0625em auto;
+    padding-top: 2.5em;
 
-	padding-top: 		2.5em;
+    width: 100%;
 
-	width: 				100%;
-
-	text-align: 		right;
-
+    text-align: right;
 }
 
-body main #gui_registers_table_id th 	{
+body main #gui_registers_table_id th {
+    padding-top: 0.0625em;
 
-	padding-top: 		0.0625em;
+    padding-bottom: 0.0625em;
 
-	padding-bottom: 	0.0625em;
+    padding-left: 0.625em;
 
-	padding-left: 		0.625em;
+    text-align: right;
 
-	text-align: 		right;
+    font-weight: bold;
 
-	font-weight: 		bold;
+    font-size: 12px;
 
-	font-size: 			12px;
+    font-family: monospace;
 
-	font-family: 		monospace;
+    vertical-align: middle;
 
-	vertical-align: 	middle;
+    border: 0.0625em solid #848484;
 
-	border: 			0.0625em solid #848484;
+    background-color: #848484;
 
-	background-color: 	#848484;
+    color: white;
 
-	color: 				white;
-
-	height: 			2em;
-
+    height: 2em;
 }
 
 body main #gui_registers_table_id th:nth-child(1) {
+    width: 1.875em;
 
-	width: 				1.875em;
+    border: 0em solid #9a9393;
 
-	border: 			0em solid #9a9393;
-
-	background-color: var(--app_main_bg_color);
-
+    background-color: var(--app_main_bg_color);
 }
 
 body main #gui_registers_table_id th:nth-child(2) {
-
-	width: 				3.75em;
-
+    width: 3.75em;
 }
 
-body main #gui_registers_table_id td 	{
+body main #gui_registers_table_id td {
+    padding-top: 0.0625em;
 
-	padding-top: 		0.0625em;
+    padding-bottom: 0.0625em;
 
-	padding-bottom: 	0.0625em;
+    padding-left: 0.3125em;
 
-	padding-left: 		0.3125em;
+    text-align: right;
 
-	text-align: 		right;
+    font-size: 12px;
 
-	font-size: 			12px;
+    font-family: monospace;
 
-	font-family: 		monospace;
+    vertical-align: middle;
 
-	vertical-align: 	middle;
+    border: 0.0625em solid #9a9393;
 
-	border: 			0.0625em solid #9a9393;
+    color: #585858;
 
-	color: 				#585858;
+    background-color: white;
 
-	background-color: 	white;
-
-	height: 			2em;
-
+    height: 2em;
 }
 
 body main #gui_registers_table_id td:nth-child(1) {
+    border: 0em solid #9a9393;
 
-	border: 			0em solid #9a9393;
+    background-color: var(--app_main_bg_color);
 
-	background-color: var(--app_main_bg_color);
-
-	width: 				1.875em;
-
+    width: 1.875em;
 }
 
 body main #gui_registers_table_id td:nth-child(2) {
-
-	width: 				3.75em;
-
+    width: 3.75em;
 }
 
 body main #gui_registers_table_id select {
+    padding: 0.0625em;
 
-	padding: 			0.0625em;
+    width: 5em;
 
-	width: 				5em;
+    height: 1.5625em;
 
-	height: 			1.5625em;
-
-	margin-top: 		0em;
-
+    margin-top: 0em;
 }
 
 body main #gui_registers_table_id option:disabled {
-
-	color: 				#F78181;
-
+    color: #f78181;
 }
 
-body main #output{
-	width: 				25em;
-	margin-left: 		2.5em;
-
+body main #output {
+    width: 25em;
+    margin-left: 2.5em;
 }
 
 .editor {
-	display: inline-flex;
-	gap: 10px;
-	font-family: monospace;
-	line-height: 21px;
-	overflow: auto;
-  }
+    display: inline-flex;
+    gap: 10px;
+    font-family: monospace;
+    line-height: 21px;
+    overflow: auto;
+}
 
 .line_numbers {
-  width: 20px;
-  line-height: 1.5em;
-  text-align: right;
-  overflow:auto;
+    width: 20px;
+    line-height: 1.5em;
+    text-align: right;
+    overflow: auto;
 }
 
 .line_numbers span {
-  counter-increment: linenumber;
+    counter-increment: linenumber;
 }
 
 .line_numbers span::before {
-  content: counter(linenumber);
-  display: block;
-  color: #506882;
+    content: counter(linenumber);
+    display: block;
+    color: #506882;
 }
