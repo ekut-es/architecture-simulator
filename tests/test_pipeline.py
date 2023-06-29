@@ -14,8 +14,8 @@ from architecture_simulator.isa.parser import RiscvParser
 
 
 class TestPipeline(unittest.TestCase):
-    def test_bla(self):
-        program = """add x1, x1, x2p
+    def test_rtypes(self):
+        program = """add x1, x1, x2
         add x4, x5, x6
         sub x7, x8, x9"""
         pipeline = Pipeline(
