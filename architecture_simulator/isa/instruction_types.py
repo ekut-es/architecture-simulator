@@ -120,7 +120,11 @@ class RTypeInstruction(Instruction):
     def __repr__(self) -> str:
         return f"{self.mnemonic} x{self.rd}, x{self.rs1}, x{self.rs2}"
 
-    def access_register_file(self, architectural_state: ArchitecturalState):
+    def access_register_file(
+        self, architectural_state: ArchitecturalState
+    ) -> tuple[
+        Optional[int], Optional[int], Optional[int], Optional[int], Optional[int]
+    ]:
         return (
             self.rs1,
             self.rs2,
@@ -129,7 +133,7 @@ class RTypeInstruction(Instruction):
             None,
         )
 
-    def control_unit_signals(self):
+    def control_unit_signals(self) -> "ControlUnitSignals":
         from ..uarch.pipeline import ControlUnitSignals
 
         # jump, alu_op
@@ -144,7 +148,7 @@ class RTypeInstruction(Instruction):
             alu_op=2,
         )
 
-    def get_write_register(self):
+    def get_write_register(self) -> Optional[int]:
         return self.rd
 
     def memory_access(
@@ -152,7 +156,7 @@ class RTypeInstruction(Instruction):
         memory_address: Optional[int],
         memory_write_data: Optional[int],
         architectural_state: ArchitecturalState,
-    ):
+    ) -> Optional[int]:
         return None
 
     def write_back(
@@ -224,16 +228,20 @@ class BTypeInstruction(Instruction):
     def __repr__(self) -> str:
         return f"{self.mnemonic} x{self.rs1}, x{self.rs2}, {self.imm*2}"
 
-    def access_register_file(self, architectural_state: ArchitecturalState):
+    def access_register_file(
+        self, architectural_state: ArchitecturalState
+    ) -> tuple[
+        Optional[int], Optional[int], Optional[int], Optional[int], Optional[int]
+    ]:
         return (
             self.rs1,
             self.rs2,
-            architectural_state.register_file.registers[self.rs1],
-            architectural_state.register_file.registers[self.rs2],
+            int(architectural_state.register_file.registers[self.rs1]),
+            int(architectural_state.register_file.registers[self.rs2]),
             self.imm,
         )
 
-    def control_unit_signals(self):
+    def control_unit_signals(self) -> "ControlUnitSignals":
         from ..uarch.pipeline import ControlUnitSignals
 
         return ControlUnitSignals(
@@ -247,7 +255,7 @@ class BTypeInstruction(Instruction):
             alu_op=1,
         )
 
-    def get_write_register(self):
+    def get_write_register(self) -> Optional[int]:
         return None
 
 
@@ -269,39 +277,18 @@ class STypeInstruction(Instruction):
     def __repr__(self) -> str:
         return f"{self.mnemonic} x{self.rs2}, {self.imm}(x{self.rs1})"
 
-    def access_register_file(self, architectural_state: ArchitecturalState):
+    def access_register_file(
+        self, architectural_state: ArchitecturalState
+    ) -> tuple[
+        Optional[int], Optional[int], Optional[int], Optional[int], Optional[int]
+    ]:
         return (
             self.rs1,
             self.rs2,
-            architectural_state.register_file.registers[self.rs1],
-            architectural_state.register_file.registers[self.rs2],
+            int(architectural_state.register_file.registers[self.rs1]),
+            int(architectural_state.register_file.registers[self.rs2]),
             self.imm,
         )
-
-    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
-        pass
-
-    def control_unit_signals(self):
-        pass
-
-    def get_write_register(self):
-        pass
-
-    def memory_access(
-        self,
-        memory_address: Optional[int],
-        memory_write_data: Optional[int],
-        architectural_state: ArchitecturalState,
-    ):
-        pass
-
-    def write_back(
-        self,
-        write_register: Optional[int],
-        register_write_data: Optional[int],
-        architectural_state: ArchitecturalState,
-    ):
-        pass
 
 
 class UTypeInstruction(Instruction):
@@ -388,18 +375,24 @@ class EmptyInstruction(Instruction):
     def __init__(self, **kwargs):
         super().__init__(mnemonic="Empty")
 
-    def access_register_file(self, architectural_state: ArchitecturalState):
+    def access_register_file(
+        self, architectural_state: ArchitecturalState
+    ) -> tuple[
+        Optional[int], Optional[int], Optional[int], Optional[int], Optional[int]
+    ]:
         return (None, None, None, None, None)
 
-    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+    def alu_compute(
+        self, alu_in_1: Optional[int], alu_in_2: Optional[int]
+    ) -> tuple[Optional[bool], Optional[int]]:
         return (None, None)
 
-    def control_unit_signals(self):
+    def control_unit_signals(self) -> "ControlUnitSignals":
         from ..uarch.pipeline import ControlUnitSignals
 
         return ControlUnitSignals()
 
-    def get_write_register(self):
+    def get_write_register(self) -> Optional[int]:
         return None
 
     def memory_access(
@@ -407,7 +400,7 @@ class EmptyInstruction(Instruction):
         memory_address: Optional[int],
         memory_write_data: Optional[int],
         architectural_state: ArchitecturalState,
-    ):
+    ) -> Optional[int]:
         return None
 
     def write_back(
