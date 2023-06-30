@@ -3,6 +3,10 @@ from dataclasses import dataclass
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 from typing import Optional
 import fixedint
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from architecture_simulator.uarch.pipeline import ControlUnitSignals
 
 
 @dataclass
@@ -18,11 +22,34 @@ class Instruction:
     def behavior(self, architectural_state: ArchitecturalState):
         pass
 
-    def access_register_file(self, architectural_state: ArchitecturalState):
-        pass
+    def access_register_file(
+        self, architectural_state: ArchitecturalState
+    ) -> tuple[
+        Optional[int], Optional[int], Optional[int], Optional[int], Optional[int]
+    ]:
+        """Get the addresses and the data and the immediate the instruction needs from the register file.
 
-    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
-        pass
+        Args:
+            architectural_state (ArchitecturalState): architectural state
+
+        Returns:
+            tuple[Optional[int], Optional[int], Optional[int], Optional[int], Optional[int]]: Tuple of register_read_addr_1, register_read_addr_2, register_read_data_1, register_read_data_2, imm
+        """
+        return None, None, None, None, None
+
+    def alu_compute(
+        self, alu_in_1: Optional[int], alu_in_2: Optional[int]
+    ) -> tuple[Optional[bool], Optional[int]]:
+        """Compute the results of the ALU.
+
+        Args:
+            alu_in_1 (Optional[int]): ALU input 1
+            alu_in_2 (Optional[int]): ALU input 2
+
+        Returns:
+            tuple[Optional[bool], Optional[int]]: Tuple of Zero flag (whether the result is zero)) and result of the computation
+        """
+        return None, None
 
     def control_unit_signals(self):
         pass
@@ -32,8 +59,8 @@ class Instruction:
 
     def memory_access(
         self,
-        address: Optional[int],
-        write_data: Optional[int],
+        memory_address: Optional[int],
+        memory_write_data: Optional[int],
         architectural_state: ArchitecturalState,
     ):
         pass
@@ -41,7 +68,7 @@ class Instruction:
     def write_back(
         self,
         write_register: Optional[int],
-        write_data: Optional[int],
+        register_write_data: Optional[int],
         architectural_state: ArchitecturalState,
     ):
         pass
@@ -94,8 +121,8 @@ class RTypeInstruction(Instruction):
 
     def memory_access(
         self,
-        address: Optional[int],
-        write_data: Optional[int],
+        memory_address: Optional[int],
+        memory_write_data: Optional[int],
         architectural_state: ArchitecturalState,
     ):
         return None
@@ -103,14 +130,14 @@ class RTypeInstruction(Instruction):
     def write_back(
         self,
         write_register: Optional[int],
-        write_data: Optional[int],
+        register_write_data: Optional[int],
         architectural_state: ArchitecturalState,
     ):
         assert write_register is not None
-        assert write_data is not None
+        assert register_write_data is not None
         architectural_state.register_file.registers[
             write_register
-        ] = fixedint.MutableUInt32(write_data)
+        ] = fixedint.MutableUInt32(register_write_data)
 
 
 class CSRTypeInstruction(Instruction):
@@ -195,8 +222,6 @@ class BTypeInstruction(Instruction):
     def get_write_register(self):
         return None
 
-    # TODO: no longer sub by 4. This no longer happens.
-
 
 class STypeInstruction(Instruction):
     """Create an S-Type instruction
@@ -236,8 +261,8 @@ class STypeInstruction(Instruction):
 
     def memory_access(
         self,
-        address: Optional[int],
-        write_data: Optional[int],
+        memory_address: Optional[int],
+        memory_write_data: Optional[int],
         architectural_state: ArchitecturalState,
     ):
         pass
@@ -245,7 +270,7 @@ class STypeInstruction(Instruction):
     def write_back(
         self,
         write_register: Optional[int],
-        write_data: Optional[int],
+        register_write_data: Optional[int],
         architectural_state: ArchitecturalState,
     ):
         pass
@@ -351,8 +376,8 @@ class EmptyInstruction(Instruction):
 
     def memory_access(
         self,
-        address: Optional[int],
-        write_data: Optional[int],
+        memory_address: Optional[int],
+        memory_write_data: Optional[int],
         architectural_state: ArchitecturalState,
     ):
         return None
@@ -360,7 +385,7 @@ class EmptyInstruction(Instruction):
     def write_back(
         self,
         write_register: Optional[int],
-        write_data: Optional[int],
+        register_write_data: Optional[int],
         architectural_state: ArchitecturalState,
     ):
         pass
