@@ -7,9 +7,6 @@
         <!--	****************************************************************************************************************************** -->
         <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
         <!--	****************************************************************************************************************************** -->
-        <link rel="stylesheet" type="text/css" href="WEB_APP_BASIC.css" />
-        <!--	****************************************************************************************************************************** -->
-        <script type="text/javascript" src="js/scripts.js"></script>
         <!--codemirror-->
         <script
             type="text/javascript"
@@ -21,6 +18,10 @@
             src="codemirror/mode/markdown/markdown.js"
         ></script>
         <link rel="stylesheet" href="codemirror/theme/darcula.css" />
+        <!--	****************************************************************************************************************************** -->
+        <link rel="stylesheet" type="text/css" href="WEB_APP_BASIC.css" />
+        <!--	****************************************************************************************************************************** -->
+        <script type="text/javascript" src="js/scripts.js"></script>
     </head>
     <body id="webapp_body_id">
         <!-- ************  Tool Title  ****************************************************-->
@@ -116,6 +117,18 @@
         <main id="webapp_main_id">
             <div id="gui_base_div_id">
                 <textarea id="input" rows="20"></textarea>
+                <script>
+                    // initialize codemirror textarea
+                    const editor = CodeMirror.fromTextArea(
+                        document.getElementById("input"),
+                        {
+                            lineNumbers: true,
+                            styleActiveLine: true,
+                            mode: "markdown",
+                            theme: "darcula",
+                        }
+                    );
+                </script>
                 <div id="gui_cmd_div_id">
                     <table id="gui_cmd_table_id">
                         <thead>

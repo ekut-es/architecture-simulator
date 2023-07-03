@@ -91,6 +91,17 @@ const archsim_js = {
     set_output: function (str) {
         output.value = str;
     },
+    highlight: function (position) {
+        //editor.removeLineClass(position-1, "background", "highlight")
+        editor.addLineClass(position - 1, "background", "highlight");
+        editor.refresh();
+    },
+    remove_all_highlights: function () {
+        for (let i = 0; i < editor.lineCount(); i++) {
+            editor.removeLineClass(i, "background", "highlight");
+        }
+        editor.refresh();
+    },
 };
 
 output.value = "Output \n\nInitializing... ";

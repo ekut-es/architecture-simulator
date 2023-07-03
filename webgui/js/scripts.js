@@ -10,19 +10,11 @@ const parse_sim_after_not_typing_for_n_ms = 500;
 var input_timer;
 let representation_mode = decimal_representation; //change this to set another default repr.
 var run;
-
 let waiting_for_pyodide_flag = true;
 window.addEventListener("DOMContentLoaded", function () {
     // initialize codemirror textarea
-    var editor = CodeMirror.fromTextArea(document.getElementById("input"), {
-        lineNumbers: true,
-        styleActiveLine: true,
-        mode: "markdown",
-        theme: "darcula",
-    });
-    // this is how you highlight text
-    editor.addLineClass(2, "background", "highlight");
 
+    // this is how you highlight text
     clearTimeout(input_timer);
     input_timer = setTimeout(
         finished_typing,
