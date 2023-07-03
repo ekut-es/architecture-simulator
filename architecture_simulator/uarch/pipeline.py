@@ -4,6 +4,7 @@ from ..isa.instruction_types import Instruction, EmptyInstruction
 from typing import Optional
 from dataclasses import dataclass, field
 
+
 #
 # Classes for a 5 Stage Pipeline:
 #
@@ -24,33 +25,48 @@ class ControlUnitSignals:
 
 
 @dataclass
+class FlushSignal:
+    """A signal that all previous pipeline registers should be flushed and that the program counter should be set back"""
+
+    # whether the pipeline register that holds this signal should be flushed too or not
+    inclusive: bool
+    # address to return to
+    address: int
+
+
+@dataclass
 class PipelineRegister:
     """The PipelineRegister superclass!
     Every PipelineRegister needs to save the instruction that is currently in this part of the pipeline!
     """
 
     instruction: Instruction = field(default_factory=EmptyInstruction)
+    flush_signal: Optional[FlushSignal] = None
 
 
 @dataclass
 class InstructionFetchPipelineRegister(PipelineRegister):
-    pass
+    pc: Optional[int] = None
+    branch_prediction: Optional[bool] = None
 
 
 @dataclass
 class InstructionDecodePipelineRegister(PipelineRegister):
     control_unit_signals: ControlUnitSignals = field(default_factory=ControlUnitSignals)
+    pc: Optional[int] = None
     register_read_addr_1: Optional[int] = None
     register_read_addr_2: Optional[int] = None
     register_read_data_1: Optional[int] = None
     register_read_data_2: Optional[int] = None
     imm: Optional[int] = None
     write_register: Optional[int] = None
+    branch_prediction: Optional[bool] = None
 
 
 @dataclass
 class ExecutePipelineRegister(PipelineRegister):
     control_unit_signals: ControlUnitSignals = field(default_factory=ControlUnitSignals)
+    pc: Optional[int] = None
     alu_in_1: Optional[int] = None
     alu_in_2: Optional[int] = None
     # alu_in_2 is one of read_data_2 and imm
@@ -59,7 +75,9 @@ class ExecutePipelineRegister(PipelineRegister):
     result: Optional[int] = None
     write_register: Optional[int] = None
     # control signals
-    zero: Optional[bool] = None
+    branch_taken: Optional[bool] = None
+    pc_plus_imm: Optional[int] = None
+    branch_prediction: Optional[bool] = None
 
 
 @dataclass
@@ -71,9 +89,9 @@ class MemoryAccessPipelineRegister(PipelineRegister):
     memory_read_data: Optional[int] = None
     write_register: Optional[int] = None
     # control signals
-    zero: Optional[bool] = None
-    zero_and_branch: Optional[bool] = None
+    branch_taken: Optional[bool] = None
     pc_src: Optional[bool] = None
+    pc_plus_imm: Optional[int] = None
 
 
 @dataclass
@@ -122,17 +140,28 @@ class InstructionFetchStage(Stage):
             PipelineRegister: returns the InstructionFetchPipelineRegister class with all information from the
             IF stage
         """
-        return InstructionFetchPipelineRegister(
-            # loads the instruction at the current program counter
-            instruction=state.instruction_memory.load_instruction(state.program_counter)
-            if state.instruction_at_pc()
-            else EmptyInstruction()
-        )
+        if state.instruction_at_pc():
+            # NOTE: PC gets incremented here. This means that branch prediction also happens here. Currently, we just statically predict not taken.
+            pc = state.program_counter
+            instruction = instruction = state.instruction_memory.load_instruction(pc)
+            state.program_counter += instruction.length
+            return InstructionFetchPipelineRegister(
+                instruction=instruction, pc=pc, branch_prediction=False
+            )
+        else:
+            return InstructionFetchPipelineRegister()
 
 
 class InstructionDecodeStage(Stage):
+    def __init__(self, stages_until_writeback=2) -> None:
+        self.stages_until_writeback = stages_until_writeback
+        self.write_register_cache = [0 for _ in range(stages_until_writeback)]
+        super().__init__()
+
     def behavior(
-        self, pipeline_register: PipelineRegister, state: ArchitecturalState
+        self,
+        pipeline_register: PipelineRegister,
+        state: ArchitecturalState,
     ) -> PipelineRegister:
         """behavior of the ID Stage
         Should the pipeline_register not be InstructionFetchPipelineRegister it returns an
@@ -161,6 +190,33 @@ class InstructionDecodeStage(Stage):
             # gets the write register, used in the WB stage to find the register to write data to
             write_register = pipeline_register.instruction.get_write_register()
 
+            # Data Hazard Detection
+            flush_signal = None
+            if True:
+                # Check if there is a data hazard
+                for register in self.write_register_cache:
+                    if register == 0:
+                        continue
+                    if (
+                        register_read_addr_1 == register
+                        or register_read_addr_2 == register
+                    ):
+                        assert pipeline_register.pc is not None
+                        flush_signal = FlushSignal(
+                            inclusive=True, address=pipeline_register.pc
+                        )
+                        break
+
+                # Update the register cache
+
+                if write_register is None or flush_signal is not None:
+                    self.write_register_cache.insert(0, 0)
+                else:
+                    self.write_register_cache.insert(0, write_register)
+                self.write_register_cache = self.write_register_cache[
+                    : self.stages_until_writeback
+                ]
+
             # gets the control unit signals that are generated in the ID stage
             control_unit_signals = pipeline_register.instruction.control_unit_signals()
             return InstructionDecodePipelineRegister(
@@ -172,14 +228,23 @@ class InstructionDecodeStage(Stage):
                 imm=imm,
                 write_register=write_register,
                 control_unit_signals=control_unit_signals,
+                pc=pipeline_register.pc,
+                branch_prediction=pipeline_register.branch_prediction,
+                flush_signal=flush_signal,
             )
         else:
+            self.write_register_cache.insert(0, 0)
+            self.write_register_cache = self.write_register_cache[
+                : self.stages_until_writeback
+            ]
             return InstructionDecodePipelineRegister()
 
 
 class ExecuteStage(Stage):
     def behavior(
-        self, pipeline_register: PipelineRegister, state: ArchitecturalState
+        self,
+        pipeline_register: PipelineRegister,
+        state: ArchitecturalState,
     ) -> PipelineRegister:
         """behavior of the EX stage
         Should the pipeline_register not be InstructionDecodePipelineRegister it returns an
@@ -200,8 +265,14 @@ class ExecuteStage(Stage):
                 if pipeline_register.control_unit_signals.alu_src
                 else pipeline_register.register_read_data_2
             )
-            zero, result = pipeline_register.instruction.alu_compute(
+            branch_taken, result = pipeline_register.instruction.alu_compute(
                 alu_in_1=alu_in_1, alu_in_2=alu_in_2
+            )
+            pc_plus_imm = (
+                pipeline_register.imm + pipeline_register.pc
+                if pipeline_register.imm is not None
+                and pipeline_register.pc is not None
+                else None
             )
             return ExecutePipelineRegister(
                 instruction=pipeline_register.instruction,
@@ -210,9 +281,12 @@ class ExecuteStage(Stage):
                 register_read_data_2=pipeline_register.register_read_data_2,
                 imm=pipeline_register.imm,
                 result=result,
-                zero=zero,
+                branch_taken=branch_taken,
                 write_register=pipeline_register.write_register,
                 control_unit_signals=pipeline_register.control_unit_signals,
+                pc=pipeline_register.pc,
+                pc_plus_imm=pc_plus_imm,
+                branch_prediction=pipeline_register.branch_prediction,
             )
         else:
             return ExecutePipelineRegister()
@@ -220,7 +294,9 @@ class ExecuteStage(Stage):
 
 class MemoryAccessStage(Stage):
     def behavior(
-        self, pipeline_register: PipelineRegister, state: ArchitecturalState
+        self,
+        pipeline_register: PipelineRegister,
+        state: ArchitecturalState,
     ) -> PipelineRegister:
         """behavior of MA stage
         Should the pipeline_register not be ExecutePipelineRegister it returns an MemoryAccessPipelineRegister
@@ -242,37 +318,45 @@ class MemoryAccessStage(Stage):
                 memory_write_data=memory_write_data,
                 architectural_state=state,
             )
-            zero_and_branch = (
-                pipeline_register.zero and pipeline_register.control_unit_signals.branch
+            pc_src = (
+                pipeline_register.control_unit_signals.jump
+                or pipeline_register.branch_taken
             )
-            pc_src = pipeline_register.control_unit_signals.jump or zero_and_branch
-            if pc_src:
-                assert pipeline_register.imm is not None
-                state.program_counter += pipeline_register.imm
+
+            # if this is a branch instuction, we need to flush if we made an incorrect prediction
+            if (
+                pipeline_register.control_unit_signals.branch
+                and pc_src != pipeline_register.branch_prediction
+            ):
+                assert pipeline_register.pc_plus_imm is not None
+                flush_signal = FlushSignal(
+                    inclusive=False, address=pipeline_register.pc_plus_imm
+                )
             else:
-                # FIXME: Do not use fixed length for the instruction length
-                state.program_counter += 4
+                flush_signal = None
+
             return MemoryAccessPipelineRegister(
                 instruction=pipeline_register.instruction,
                 memory_address=memory_address,
                 result=pipeline_register.result,
                 memory_write_data=memory_write_data,
                 memory_read_data=memory_read_data,
-                zero=pipeline_register.zero,
-                zero_and_branch=zero_and_branch,
+                branch_taken=pipeline_register.branch_taken,
                 pc_src=pc_src,
                 write_register=pipeline_register.write_register,
                 control_unit_signals=pipeline_register.control_unit_signals,
+                pc_plus_imm=pipeline_register.pc_plus_imm,
+                flush_signal=flush_signal,
             )
         else:
-            # FIXME: Do not use fixed length for the instruction length
-            state.program_counter += 4
             return MemoryAccessPipelineRegister()
 
 
 class RegisterWritebackStage(Stage):
     def behavior(
-        self, pipeline_register: PipelineRegister, state: ArchitecturalState
+        self,
+        pipeline_register: PipelineRegister,
+        state: ArchitecturalState,
     ) -> PipelineRegister:
         """behavior of WB stage
         Should the pipeline_register not be MemoryAccessPipelineRegister it returns an
@@ -316,7 +400,9 @@ class RegisterWritebackStage(Stage):
 #
 class SingleStage(Stage):
     def behavior(
-        self, pipeline_register: PipelineRegister, state: ArchitecturalState
+        self,
+        pipeline_register: PipelineRegister,
+        state: ArchitecturalState,
     ) -> PipelineRegister:
         """behavior of the single stage pipeline
 
@@ -359,38 +445,63 @@ class Pipeline:
         self.num_stages = len(stages)
         self.execution_ordering = execution_ordering
         self.state = state
-        self.pipeline_register: list[PipelineRegister] = [
-            PipelineRegister(instruction=EmptyInstruction())
+        self.pipeline_registers: list[PipelineRegister] = [
+            PipelineRegister()
         ] * self.num_stages
 
     def step(self):
         """the pipeline step method, this is the central part of the pipeline! Every time it is called, it does one
         whole step of the pipeline, and every stage gets executed once in their ececution ordering
         """
-        next_pipeline_register = [None] * self.num_stages
+        next_pipeline_registers = [None] * self.num_stages
         for index in self.execution_ordering:
             # first stage in pipeline does not consume any PipelineRegister
             if index == 0:
-                next_pipeline_register[0] = self.stages[0].behavior(
-                    pipeline_register=PipelineRegister(instruction=EmptyInstruction()),
-                    state=self.state,
-                )
-            # last stage in pipeline comsumes PipelineRegister, but the PipelineRegister it returns is not used
-            elif index == self.num_stages - 1:
-                self.stages[index].behavior(
-                    pipeline_register=self.pipeline_register[index - 1],
+                next_pipeline_registers[0] = self.stages[0].behavior(
+                    pipeline_register=PipelineRegister(),
                     state=self.state,
                 )
             # all other pipeline stages consume PipelineRegister and return PipelineRegister
             else:
-                next_pipeline_register[index] = self.stages[index].behavior(
-                    pipeline_register=self.pipeline_register[index - 1],
+                next_pipeline_registers[index] = self.stages[index].behavior(
+                    pipeline_register=self.pipeline_registers[index - 1],
                     state=self.state,
                 )
-        self.pipeline_register = next_pipeline_register
+        self.pipeline_registers = next_pipeline_registers
+
+        # if one of the stages wants to flush, do so (starting from the back makes sense)
+        for index, pipeline_register in reversed(
+            list(enumerate(self.pipeline_registers))
+        ):
+            flush_signal = pipeline_register.flush_signal
+            if flush_signal is not None:
+                # This works because int(True) = 1, int(False) = 0
+                # This is good code, trust me
+                num_to_flush = index + flush_signal.inclusive
+                self.pipeline_registers[:num_to_flush] = [
+                    PipelineRegister()
+                ] * num_to_flush
+                self.state.program_counter = flush_signal.address
+                break  # break since we don't care about the previous stages
 
     def stall(self):
         ...
 
-    def flush(self):
-        ...
+    def is_empty(self) -> bool:
+        """Return True if all pipeline registers are empty (determined by whether the instruction in the pipeline register is empty)
+
+        Returns:
+            bool: whether all pipeline registers are empty
+        """
+        return all(
+            type(pipeline_register.instruction) == EmptyInstruction
+            for pipeline_register in self.pipeline_registers
+        )
+
+    def is_done(self) -> bool:
+        """Return True if the pipeline is empty and there is no instruction at the program counter, so nothing will happen anymore
+
+        Returns:
+            bool: if the pipeline has finished
+        """
+        return self.is_empty() and not self.state.instruction_at_pc()

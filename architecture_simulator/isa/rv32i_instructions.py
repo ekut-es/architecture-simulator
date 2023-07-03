@@ -49,7 +49,7 @@ class ADD(RTypeInstruction):
         left = fixedint.MutableUInt32(alu_in_1)
         right = fixedint.MutableUInt32(alu_in_2)
         result = int(left + right)
-        return (result == 0, result)
+        return (None, result)
 
 
 class SUB(RTypeInstruction):
@@ -80,7 +80,7 @@ class SUB(RTypeInstruction):
         left = fixedint.MutableUInt32(alu_in_1)
         right = fixedint.MutableUInt32(alu_in_2)
         result = int(fixedint.Int32(int(left)) - fixedint.Int32(int(right)))
-        return (result == 0, result)
+        return (None, result)
 
 
 class SLL(RTypeInstruction):
@@ -113,7 +113,7 @@ class SLL(RTypeInstruction):
         left = fixedint.MutableUInt32(alu_in_1)
         right = fixedint.MutableUInt32(alu_in_2) % fixedint.MutableUInt32(32)
         result = int(left << right)
-        return (result == 0, result)
+        return (None, result)
 
 
 class SLT(RTypeInstruction):
@@ -146,7 +146,7 @@ class SLT(RTypeInstruction):
         left = fixedint.Int32(alu_in_1)
         right = fixedint.Int32(alu_in_2)
         result = 1 if left < right else 0
-        return (result == 0, result)
+        return (None, result)
 
 
 class SLTU(RTypeInstruction):
@@ -179,7 +179,7 @@ class SLTU(RTypeInstruction):
         left = fixedint.UInt32(alu_in_1)
         right = fixedint.UInt32(alu_in_2)
         result = 1 if left < right else 0
-        return (result == 0, result)
+        return (None, result)
 
 
 class XOR(RTypeInstruction):
@@ -210,7 +210,7 @@ class XOR(RTypeInstruction):
         left = fixedint.MutableUInt32(alu_in_1)
         right = fixedint.MutableUInt32(alu_in_2)
         result = int(left ^ right)
-        return (result == 0, result)
+        return (None, result)
 
 
 class SRL(RTypeInstruction):
@@ -243,7 +243,7 @@ class SRL(RTypeInstruction):
         left = fixedint.MutableUInt32(alu_in_1)
         right = fixedint.MutableUInt32(alu_in_2) % fixedint.MutableUInt32(32)
         result = int(left >> right)
-        return (result == 0, result)
+        return (None, result)
 
 
 class SRA(RTypeInstruction):
@@ -283,7 +283,7 @@ class SRA(RTypeInstruction):
             int(fixedint.UInt32(alu_in_2) % fixedint.MutableUInt32(32))
         )
         result = int(left >> right)
-        return (result == 0, result)
+        return (None, result)
 
 
 class OR(RTypeInstruction):
@@ -314,7 +314,7 @@ class OR(RTypeInstruction):
         left = fixedint.MutableUInt32(alu_in_1)
         right = fixedint.MutableUInt32(alu_in_2)
         result = int(left | right)
-        return (result == 0, result)
+        return (None, result)
 
 
 class AND(RTypeInstruction):
@@ -345,7 +345,7 @@ class AND(RTypeInstruction):
         left = fixedint.MutableUInt32(alu_in_1)
         right = fixedint.MutableUInt32(alu_in_2)
         result = int(left & right)
-        return (result == 0, result)
+        return (None, result)
 
 
 class BEQ(BTypeInstruction):
@@ -361,6 +361,13 @@ class BEQ(BTypeInstruction):
             architectural_state.performance_metrics.branch_count += 1
         return architectural_state
 
+    def alu_compute(
+        self, alu_in_1: int | None, alu_in_2: int | None
+    ) -> tuple[bool | None, int | None]:
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        return (alu_in_1 == alu_in_2), None
+
 
 class BNE(BTypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
@@ -374,6 +381,13 @@ class BNE(BTypeInstruction):
             architectural_state.program_counter += self.imm * 2 - self.length
             architectural_state.performance_metrics.branch_count += 1
         return architectural_state
+
+    def alu_compute(
+        self, alu_in_1: int | None, alu_in_2: int | None
+    ) -> tuple[bool | None, int | None]:
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        return (alu_in_1 != alu_in_2), None
 
 
 class BLT(BTypeInstruction):
@@ -389,6 +403,14 @@ class BLT(BTypeInstruction):
             architectural_state.performance_metrics.branch_count += 1
         return architectural_state
 
+    def alu_compute(
+        self, alu_in_1: int | None, alu_in_2: int | None
+    ) -> tuple[bool | None, int | None]:
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        # casting for signed comparison (inputs are unsigned)
+        return (fixedint.Int32(alu_in_1) < fixedint.Int32(alu_in_2)), None
+
 
 class BGE(BTypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
@@ -402,6 +424,14 @@ class BGE(BTypeInstruction):
             architectural_state.program_counter += self.imm * 2 - self.length
             architectural_state.performance_metrics.branch_count += 1
         return architectural_state
+
+    def alu_compute(
+        self, alu_in_1: int | None, alu_in_2: int | None
+    ) -> tuple[bool | None, int | None]:
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        # casting for signed comparison (inputs are unsigned)
+        return (fixedint.Int32(alu_in_1) >= fixedint.Int32(alu_in_2)), None
 
 
 class BLTU(BTypeInstruction):
@@ -417,6 +447,13 @@ class BLTU(BTypeInstruction):
             architectural_state.performance_metrics.branch_count += 1
         return architectural_state
 
+    def alu_compute(
+        self, alu_in_1: int | None, alu_in_2: int | None
+    ) -> tuple[bool | None, int | None]:
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        return (alu_in_1 < alu_in_2), None
+
 
 class BGEU(BTypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
@@ -430,6 +467,13 @@ class BGEU(BTypeInstruction):
             architectural_state.program_counter += self.imm * 2 - self.length
             architectural_state.performance_metrics.branch_count += 1
         return architectural_state
+
+    def alu_compute(
+        self, alu_in_1: int | None, alu_in_2: int | None
+    ) -> tuple[bool | None, int | None]:
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        return (alu_in_1 >= alu_in_2), None
 
 
 class CSRRW(CSRTypeInstruction):
@@ -585,6 +629,31 @@ class SB(STypeInstruction):
         )
         return architectural_state
 
+    def memory_access(
+        self,
+        memory_address: Optional[int],
+        memory_write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ) -> Optional[int]:
+        if memory_address is not None and memory_write_data is not None:
+            architectural_state.memory.store_byte(
+                memory_address, fixedint.MutableUInt8(memory_write_data)
+            )
+        return None
+
+    def access_register_file(
+        self, architectural_state: ArchitecturalState
+    ) -> tuple[
+        Optional[int], Optional[int], Optional[int], Optional[int], Optional[int]
+    ]:
+        return (
+            self.rs1,
+            self.rs2,
+            int(architectural_state.register_file.registers[self.rs1]),
+            int(architectural_state.register_file.registers[self.rs2][:8]),
+            self.imm,
+        )
+
 
 class SH(STypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
@@ -600,6 +669,31 @@ class SH(STypeInstruction):
         )
         return architectural_state
 
+    def access_register_file(
+        self, architectural_state: ArchitecturalState
+    ) -> tuple[
+        Optional[int], Optional[int], Optional[int], Optional[int], Optional[int]
+    ]:
+        return (
+            self.rs1,
+            self.rs2,
+            int(architectural_state.register_file.registers[self.rs1]),
+            int(architectural_state.register_file.registers[self.rs2][:16]),
+            self.imm,
+        )
+
+    def memory_access(
+        self,
+        memory_address: Optional[int],
+        memory_write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ) -> Optional[int]:
+        if memory_address is not None and memory_write_data is not None:
+            architectural_state.memory.store_halfword(
+                memory_address, fixedint.MutableUInt16(memory_write_data)
+            )
+        return None
+
 
 class SW(STypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
@@ -613,6 +707,31 @@ class SW(STypeInstruction):
             int(rs1 + fixedint.MutableUInt32(self.imm)), rs2
         )
         return architectural_state
+
+    def access_register_file(
+        self, architectural_state: ArchitecturalState
+    ) -> tuple[
+        Optional[int], Optional[int], Optional[int], Optional[int], Optional[int]
+    ]:
+        return (
+            self.rs1,
+            self.rs2,
+            int(architectural_state.register_file.registers[self.rs1]),
+            int(architectural_state.register_file.registers[self.rs2]),
+            self.imm,
+        )
+
+    def memory_access(
+        self,
+        memory_address: Optional[int],
+        memory_write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ) -> Optional[int]:
+        if memory_address is not None and memory_write_data is not None:
+            architectural_state.memory.store_word(
+                memory_address, fixedint.MutableUInt32(memory_write_data)
+            )
+        return None
 
 
 class ADDI(ITypeInstruction):
