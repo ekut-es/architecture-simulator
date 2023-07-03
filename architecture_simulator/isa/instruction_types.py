@@ -47,7 +47,7 @@ class Instruction:
             alu_in_2 (Optional[int]): ALU input 2
 
         Returns:
-            tuple[Optional[bool], Optional[int]]: Tuple of Zero flag (whether the result is zero)) and result of the computation
+            tuple[Optional[bool], Optional[int]]: Tuple of branch taken flag (whether the branch condition is true, if it is a branch instruction) and result of the computation
         """
         return None, None
 
@@ -238,7 +238,7 @@ class BTypeInstruction(Instruction):
             self.rs2,
             int(architectural_state.register_file.registers[self.rs1]),
             int(architectural_state.register_file.registers[self.rs2]),
-            self.imm,
+            self.imm * 2,
         )
 
     def control_unit_signals(self) -> "ControlUnitSignals":
@@ -254,9 +254,6 @@ class BTypeInstruction(Instruction):
             jump=False,
             alu_op=1,
         )
-
-    def get_write_register(self) -> Optional[int]:
-        return None
 
 
 class STypeInstruction(Instruction):
@@ -277,17 +274,28 @@ class STypeInstruction(Instruction):
     def __repr__(self) -> str:
         return f"{self.mnemonic} x{self.rs2}, {self.imm}(x{self.rs1})"
 
-    def access_register_file(
-        self, architectural_state: ArchitecturalState
-    ) -> tuple[
-        Optional[int], Optional[int], Optional[int], Optional[int], Optional[int]
-    ]:
-        return (
-            self.rs1,
-            self.rs2,
-            int(architectural_state.register_file.registers[self.rs1]),
-            int(architectural_state.register_file.registers[self.rs2]),
-            self.imm,
+    def alu_compute(
+        self, alu_in_1: Optional[int], alu_in_2: Optional[int]
+    ) -> tuple[Optional[bool], Optional[int]]:
+        if alu_in_1 is not None and alu_in_2 is not None:
+            res = alu_in_1 + alu_in_2
+            return (None, res)
+        else:
+            return (None, None)
+
+    def control_unit_signals(self) -> "ControlUnitSignals":
+        from ..uarch.pipeline import ControlUnitSignals
+
+        # jump, alu_op
+        return ControlUnitSignals(
+            alu_src=True,
+            mem_to_reg=None,
+            reg_write=False,
+            mem_read=False,
+            mem_write=True,
+            branch=False,
+            jump=False,
+            alu_op=0,
         )
 
 
