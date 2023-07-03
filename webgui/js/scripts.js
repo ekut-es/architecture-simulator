@@ -6,7 +6,7 @@ const hexa_representation = 2;
 const steps_per_interval = 100;
 //set use_more_than_one_step_per_10ms to false if you only want to call up evaluatePython_step_sim() more than once per interval (10ms)
 const use_more_than_one_step_per_10ms = true;
-const parse_sim_after_not_typing_for_n_ms = 2000;
+const parse_sim_after_not_typing_for_n_ms = 500;
 var input_timer;
 let representation_mode = decimal_representation; //change this to set another default repr.
 var run;
