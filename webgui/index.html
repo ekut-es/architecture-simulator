@@ -7,163 +7,255 @@
         <!--	****************************************************************************************************************************** -->
         <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
         <!--	****************************************************************************************************************************** -->
+        <link
+            rel="stylesheet"
+            href="../node_modules/bootstrap/dist/css/bootstrap.min.css"
+        />
         <link rel="stylesheet" type="text/css" href="WEB_APP_BASIC.css" />
         <!--	****************************************************************************************************************************** -->
         <script type="text/javascript" src="js/scripts.js"></script>
     </head>
     <body id="webapp_body_id">
-        <!-- ************  Tool Title  ****************************************************-->
-        <header id="webapp_header_id">
-            <div id="webapp_header_app_name_id">RISC-V Simulator</div>
-            <img
-                id="webapp_header_help_image_id"
-                src="svg/WEB_APP_BASIC_Help.svg"
-            />
-            <img id="webapp_header_icon_image_id" src="favicon.ico" />
-        </header>
-        <nav id="webapp_nav_id">
-            <button
-                type="button"
-                id="button_simulation_start_id"
-                class="button_start_simulation"
-                title="start simulation"
-            >
-                <img src="svg/start.svg" width="25px" height="25px" />
-            </button>
-            <button
-                type="button"
-                id="button_simulation_pause_id"
-                class="button_pause_simulation"
-                title="pause simulation"
-                disabled
-            >
-                <img src="svg/pause.svg" width="25px" height="25px" />
-            </button>
-            <button
-                type="button"
-                id="button_simulation_next_id"
-                class="button_next_step_simulation"
-                title="next step"
-            >
-                <img src="svg/next.svg" width="25px" height="25px" />
-            </button>
-            <button
-                type="button"
-                id="button_simulation_refresh_id"
-                class="button_refresh_simulation"
-                title="reset"
-            >
-                <img src="svg/refresh.svg" width="25px" height="25px" />
-            </button>
-            <img
-                type="button"
-                id="loading_id"
-                title="loading"
-                disabled
-                style="visibility: hidden"
-                src="loading.gif"
-                width="25px"
-                height="25px"
-            />
-            <button
-                type="button"
-                id="button_binary_representation_id"
-                class="button_switch_representation"
-                title="show binary representation"
-            >
-                <img
-                    src="svg/binary_representation.svg"
-                    width="25px"
-                    height="25px"
-                />
-            </button>
-            <button
-                type="button"
-                id="button_decimal_representation_id"
-                class="button_switch_representation"
-                title="show decimal representation"
-            >
-                <img
-                    src="svg/decimal_representation.svg"
-                    width="25px"
-                    height="25px"
-                />
-            </button>
-            <button
-                type="button"
-                id="button_hexa_representation_id"
-                class="button_switch_representation"
-                title="show hexadecimal representation"
-            >
-                <img
-                    src="svg/hexadecimal_representation.svg"
-                    width="25px"
-                    height="25px"
-                />
-            </button>
-        </nav>
-        <main id="webapp_main_id">
-            <div id="gui_base_div_id">
-                <div class="editor">
-                    <div id="line_numbers" class="line_numbers">
-                        <span></span>
-                        <span></span>
+        <div class="container-fluid">
+            <!-- ************  Tool Title  ****************************************************-->
+            <div class="container-fluid">
+                <header
+                    id="webapp_header_id"
+                    class="bg-blue text-light overflow-hidden"
+                >
+                    <div class="container-fluid">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <div
+                                    id="webapp_header_app_name_id"
+                                    class="h text-truncate"
+                                >
+                                    RISC-V Simulator
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <div class="header-icons">
+                                    <img
+                                        id="webapp_header_help_image_id"
+                                        src="svg/WEB_APP_BASIC_Help.svg"
+                                        class="mr-3"
+                                    />
+                                    <img
+                                        id="webapp_header_icon_image_id"
+                                        src="favicon.ico"
+                                    />
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <textarea id="input" rows="20"></textarea>
-                </div>
-                <div id="gui_cmd_div_id">
-                    <table id="gui_cmd_table_id">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th title="address">Address</th>
-                                <th title="command">Command</th>
-                            </tr>
-                        </thead>
-                        <tbody id="gui_cmd_table_body_id"></tbody>
-                    </table>
-                </div>
-                <div id="gui_registers_div_id">
-                    <table id="gui_registers_table_id">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th title="abi_name">Register</th>
-                                <th title="register"></th>
-                                <th title="register value">Value</th>
-                            </tr>
-                        </thead>
-                        <tbody id="gui_registers_table_body_id"></tbody>
-                    </table>
-                </div>
-                <div id="gui_memory_div_id">
-                    <table id="gui_memory_table_id">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th title="memory address">Address</th>
-                                <th title="memory value">Value</th>
-                            </tr>
-                        </thead>
-                        <tbody id="gui_memory_table_body_id"></tbody>
-                    </table>
-                </div>
-                <textarea
-                    id="output"
-                    style="width: 20%"
-                    rows="20"
-                    disabled
-                ></textarea>
-                <br />
+                </header>
             </div>
-        </main>
-        <footer id="webapp_footer_id"></footer>
 
-        <dialog id="webapp_dialog_AppHelpID"></dialog>
+            <div class="container-fluid">
+                <nav
+                    id="webapp_nav_id"
+                    class="no-margin-bottom d-inline-flex flex-wrap"
+                >
+                    <div class="container-fluid">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <button
+                                    class="btn btn-primary btn-sm button_start_simulation"
+                                    id="button_simulation_start_id"
+                                    title="start simulation"
+                                >
+                                    <img
+                                        src="svg/start.svg"
+                                        width="25px"
+                                        height="25px"
+                                    />
+                                </button>
+                                <button
+                                    class="btn btn-secondary btn-sm button_pause_simulation"
+                                    id="button_simulation_pause_id"
+                                    title="pause simulation"
+                                    disabled
+                                >
+                                    <img
+                                        src="svg/pause.svg"
+                                        width="25px"
+                                        height="25px"
+                                    />
+                                </button>
+                                <button
+                                    class="btn btn-primary btn-sm button_next_step_simulation"
+                                    id="button_simulation_next_id"
+                                    title="next step"
+                                >
+                                    <img
+                                        src="svg/next.svg"
+                                        width="25px"
+                                        height="25px"
+                                    />
+                                </button>
+                                <button
+                                    class="btn btn-danger btn-sm button_refresh_simulation"
+                                    id="button_simulation_refresh_id"
+                                    title="reset"
+                                >
+                                    <img
+                                        src="svg/refresh.svg"
+                                        width="25px"
+                                        height="25px"
+                                    />
+                                </button>
+                                <img
+                                    src="loading.gif"
+                                    width="25px"
+                                    height="25px"
+                                    id="loading_id"
+                                    title="loading"
+                                    disabled
+                                    style="visibility: hidden"
+                                />
+                            </div>
+                            <div class="col-auto">
+                                <div
+                                    class="btn-group btn-group-toggle mt-1 mb-1"
+                                    data-toggle="buttons"
+                                >
+                                    <button
+                                        class="btn btn-primary btn-sm button_switch_representation"
+                                        id="button_binary_representation_id"
+                                        title="show binary representation"
+                                    >
+                                        <img
+                                            src="svg/binary_representation.svg"
+                                            width="25px"
+                                            height="25px"
+                                        />
+                                    </button>
+                                    <button
+                                        class="btn btn-primary btn-sm button_switch_representation active"
+                                        id="button_decimal_representation_id"
+                                        title="show decimal representation"
+                                    >
+                                        <img
+                                            src="svg/decimal_representation.svg"
+                                            width="25px"
+                                            height="25px"
+                                        />
+                                    </button>
+                                    <button
+                                        class="btn btn-primary btn-sm button_switch_representation"
+                                        id="button_hexa_representation_id"
+                                        title="show hexadecimal representation"
+                                    >
+                                        <img
+                                            src="svg/hexadecimal_representation.svg"
+                                            width="25px"
+                                            height="25px"
+                                        />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+                <main id="webapp_main_id">
+                    <div class="container-fluid">
+                        <div id="gui_base_div_id" class="table-responsive">
+                            <div class="editor my-2">
+                                <div id="line_numbers" class="line_numbers">
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                                <textarea
+                                    id="input"
+                                    class="form-control"
+                                    rows="20"
+                                ></textarea>
+                            </div>
+                            <div
+                                id="gui_cmd_div_id"
+                                class="table-responsive my-2"
+                            >
+                                <table
+                                    id="gui_cmd_table_id"
+                                    class="table table-hover"
+                                >
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th title="address">Address</th>
+                                            <th title="command">Command</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gui_cmd_table_body_id"></tbody>
+                                </table>
+                            </div>
+                            <div
+                                id="gui_registers_div_id"
+                                class="table-responsive my-2"
+                            >
+                                <table
+                                    id="gui_registers_table_id"
+                                    class="table table-hover"
+                                >
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th title="abi_name">Register</th>
+                                            <th title="register"></th>
+                                            <th title="register value">
+                                                Value
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody
+                                        id="gui_registers_table_body_id"
+                                    ></tbody>
+                                </table>
+                            </div>
+                            <div
+                                id="gui_memory_div_id"
+                                class="table-responsive my-2"
+                            >
+                                <table
+                                    id="gui_memory_table_id"
+                                    class="table table-hover"
+                                >
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th title="memory address">
+                                                Address
+                                            </th>
+                                            <th title="memory value">Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody
+                                        id="gui_memory_table_body_id"
+                                    ></tbody>
+                                </table>
+                            </div>
+                            <div class="overflow-hidden my-2">
+                                <textarea
+                                    id="output"
+                                    class="form-control"
+                                    rows="20"
+                                    disabled
+                                ></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+            <div class="container-fluid">
+                <footer id="webapp_footer_id"></footer>
+            </div>
+            <dialog id="webapp_dialog_AppHelpID"></dialog>
+        </div>
         <script
             type="text/javascript"
             src="https://cdn.jsdelivr.net/pyodide/v0.22.1/full/pyodide.js"
         ></script>
         <script type="text/javascript" src="js/archsim.js"></script>
+        <script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
     </body>
 </html>

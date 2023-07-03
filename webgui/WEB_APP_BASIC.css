@@ -37,7 +37,7 @@
 
     --app_header_font_family: "Times New Roman", Garamond, serif;
 
-    --app_header_icons_width: 1.25em;
+    --app_header_icons_width: 2em;
 
     --app_header_title_width: calc(
         var(--app_header_width) - calc(var(--app_header_icons_width) * 3)
@@ -201,15 +201,17 @@ body header img {
 
     height: var(--app_header_icons_width);
 
-    padding-top: 0.625em;
+    padding-top: 0.1em;
 
-    padding-left: 0.625em;
+    padding-left: 0.1em;
+
+    padding-bottom: 0.1em;
 }
 
 body header #webapp_header_app_name_id {
-    padding-top: 0.3125em;
+    padding-top: 0.1em;
 
-    padding-left: 0.9375em;
+    padding-left: 0.0625em;
 
     font-size: 1.5625em;
 
@@ -225,7 +227,7 @@ body nav {
 
     width: var(--app_nav_width);
 
-    height: var(--app_nav_height);
+    height: var(--app_nav_icons_height);
 
     margin: 0 auto; /* horizontal zentriert */
 
@@ -419,7 +421,7 @@ body footer {
 
     width: 1.8125em;
 
-    float: right;
+    float: inline-end;
 }
 
 body main #gui_base_div_id {
@@ -440,6 +442,7 @@ body main #gui_base_div_id {
 
 body main #input {
     width: 25em;
+    margin-top: 0.0625em;
     line-height: 1.5em;
     padding: 0;
     border: 0;
@@ -454,7 +457,7 @@ body main #gui_cmd_div_id {
 
     margin-bottom: 1.875em;
 
-    width: 14.375em;
+    width: 15em;
 
     overflow-x: auto;
 
@@ -468,6 +471,8 @@ body main #gui_cmd_table_id {
 
     font-size: 11px;
 
+    font-family: monospace;
+
     border-collapse: collapse;
 
     margin: 0.0625em auto;
@@ -475,6 +480,8 @@ body main #gui_cmd_table_id {
     padding-top: 2.5em;
 
     width: 100%;
+
+    text-align: right;
 }
 
 body main #gui_cmd_table_id th {
@@ -500,11 +507,11 @@ body main #gui_cmd_table_id th {
 
     color: white;
 
-    height: 1.5625em;
+    height: 2em;
 }
 
 body main #gui_cmd_table_id th:nth-child(1) {
-    width: 1.875em;
+    width: 0em;
     border: 0em solid #9a9393;
 
     background-color: var(--app_main_bg_color);
@@ -535,7 +542,7 @@ body main #gui_cmd_table_id td {
 
     background-color: white;
 
-    height: 1.5625em;
+    height: 2em;
 }
 
 body main #gui_cmd_table_id td:nth-child(1) {
@@ -543,7 +550,7 @@ body main #gui_cmd_table_id td:nth-child(1) {
 
     background-color: var(--app_main_bg_color);
 
-    width: 1.875em;
+    width: 0em;
 }
 
 body main #gui_cmd_table_id td:nth-child(2) {
@@ -557,7 +564,7 @@ body main #gui_memory_div_id {
 
     margin-bottom: 1.875em;
 
-    width: 14.375em;
+    width: 15em;
 
     overflow-x: auto;
 
@@ -611,7 +618,7 @@ body main #gui_memory_table_id th {
 }
 
 body main #gui_memory_table_id th:nth-child(1) {
-    width: 1.875em;
+    width: 0em;
 
     border: 0em solid #9a9393;
 
@@ -647,11 +654,11 @@ body main #gui_memory_table_id td {
 }
 
 body main #gui_memory_table_id td:nth-child(1) {
-    border: 0px solid #9a9393;
+    border: 0em solid #9a9393;
 
     background-color: var(--app_main_bg_color);
 
-    width: 1.875em;
+    width: 0em;
 }
 
 body main #gui_memory_table_id td:nth-child(2) {
@@ -679,7 +686,7 @@ body main #gui_registers_div_id {
 
     margin-bottom: 1.875em;
 
-    width: 14.375em;
+    width: 15em;
 
     overflow-x: auto;
 
@@ -733,7 +740,7 @@ body main #gui_registers_table_id th {
 }
 
 body main #gui_registers_table_id th:nth-child(1) {
-    width: 1.875em;
+    width: 0em;
 
     border: 0em solid #9a9393;
 
@@ -773,7 +780,7 @@ body main #gui_registers_table_id td:nth-child(1) {
 
     background-color: var(--app_main_bg_color);
 
-    width: 1.875em;
+    width: 0em;
 }
 
 body main #gui_registers_table_id td:nth-child(2) {
@@ -796,7 +803,7 @@ body main #gui_registers_table_id option:disabled {
 
 body main #output {
     width: 25em;
-    margin-left: 2.5em;
+    margin-top: 0.0625em;
 }
 
 .editor {
@@ -808,6 +815,7 @@ body main #output {
 }
 
 .line_numbers {
+    padding-top: 0.0625em;
     width: 20px;
     line-height: 1.5em;
     text-align: right;
