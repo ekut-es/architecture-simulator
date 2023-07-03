@@ -823,3 +823,12 @@ body main #output {
     display: block;
     color: #506882;
 }
+
+.CodeMirror {
+    width: 20em;
+    overflow-x: auto;
+}
+
+.highlight {
+    background-color: red;
+}
