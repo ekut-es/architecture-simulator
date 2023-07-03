@@ -31,6 +31,8 @@ window.addEventListener("DOMContentLoaded", function () {
     document
         .getElementById("button_simulation_start_id")
         .addEventListener("click", () => {
+            editor.save();
+            finished_typing();
             document.getElementById("input").disabled = true;
             if (run) {
                 stop_loading_animation();
@@ -64,6 +66,8 @@ window.addEventListener("DOMContentLoaded", function () {
     document
         .getElementById("button_simulation_next_id")
         .addEventListener("click", () => {
+            editor.save();
+            finished_typing();
             document.getElementById("input").disabled = true;
             document.getElementById("input").disabled = true;
             resume_timer();
@@ -119,14 +123,19 @@ window.addEventListener("DOMContentLoaded", function () {
             evaluatePython_update_tables();
         });
 
-    document.getElementById("input").addEventListener("keyup", () => {
-        // line numbers:
-        const numberOfLines = input.value.split("\n").length;
-        lineNumbers = this.document.getElementById("line_numbers");
-        lineNumbers.innerHTML = Array(numberOfLines)
-            .fill("<span></span>")
-            .join("");
+    editor.on("change", function () {
+        editor.save();
+        // autoparse
+        clearTimeout(input_timer);
+        input_timer = setTimeout(
+            finished_typing,
+            parse_sim_after_not_typing_for_n_ms
+        );
+    });
 
+    /*document.getElementById("input").addEventListener("keyup", () => {
+        editor.save();
+        editor.change()
         // autoparse
         clearTimeout(input_timer);
         input_timer = setTimeout(
@@ -137,7 +146,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
     document.getElementById("input").addEventListener("keydown", () => {
         clearTimeout(input_timer);
-    });
+    });*/
 
     function finished_typing() {
         evaluatePython_parse_input();
