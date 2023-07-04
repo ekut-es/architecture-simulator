@@ -799,34 +799,9 @@ body main #output {
     margin-left: 2.5em;
 }
 
-.editor {
-    display: inline-flex;
-    gap: 10px;
-    font-family: monospace;
-    line-height: 21px;
-    overflow: auto;
-}
-
-.line_numbers {
-    width: 20px;
-    line-height: 1.5em;
-    text-align: right;
-    overflow: auto;
-}
-
-.line_numbers span {
-    counter-increment: linenumber;
-}
-
-.line_numbers span::before {
-    content: counter(linenumber);
-    display: block;
-    color: #506882;
-}
-
 .CodeMirror {
-    width: 20em;
-    overflow-x: auto;
+    width: 25em;
+    height: auto;
 }
 
 .highlight {
