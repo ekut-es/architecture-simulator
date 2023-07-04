@@ -6,13 +6,15 @@ const hexa_representation = 2;
 const steps_per_interval = 100;
 //set use_more_than_one_step_per_10ms to false if you only want to call up evaluatePython_step_sim() more than once per interval (10ms)
 const use_more_than_one_step_per_10ms = true;
-const parse_sim_after_not_typing_for_n_ms = 2000;
+const parse_sim_after_not_typing_for_n_ms = 500;
 var input_timer;
 let representation_mode = decimal_representation; //change this to set another default repr.
 var run;
-
 let waiting_for_pyodide_flag = true;
 window.addEventListener("DOMContentLoaded", function () {
+    // initialize codemirror textarea
+
+    // this is how you highlight text
     clearTimeout(input_timer);
     input_timer = setTimeout(
         finished_typing,
@@ -21,6 +23,8 @@ window.addEventListener("DOMContentLoaded", function () {
     document
         .getElementById("button_simulation_start_id")
         .addEventListener("click", () => {
+            editor.save();
+            finished_typing();
             document.getElementById("input").disabled = true;
             if (run) {
                 stop_loading_animation();
@@ -54,6 +58,8 @@ window.addEventListener("DOMContentLoaded", function () {
     document
         .getElementById("button_simulation_next_id")
         .addEventListener("click", () => {
+            editor.save();
+            finished_typing();
             document.getElementById("input").disabled = true;
             document.getElementById("input").disabled = true;
             resume_timer();
@@ -109,14 +115,19 @@ window.addEventListener("DOMContentLoaded", function () {
             evaluatePython_update_tables();
         });
 
-    document.getElementById("input").addEventListener("keyup", () => {
-        // line numbers:
-        const numberOfLines = input.value.split("\n").length;
-        lineNumbers = this.document.getElementById("line_numbers");
-        lineNumbers.innerHTML = Array(numberOfLines)
-            .fill("<span></span>")
-            .join("");
+    editor.on("change", function () {
+        editor.save();
+        // autoparse
+        clearTimeout(input_timer);
+        input_timer = setTimeout(
+            finished_typing,
+            parse_sim_after_not_typing_for_n_ms
+        );
+    });
 
+    /*document.getElementById("input").addEventListener("keyup", () => {
+        editor.save();
+        editor.change()
         // autoparse
         clearTimeout(input_timer);
         input_timer = setTimeout(
@@ -127,7 +138,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
     document.getElementById("input").addEventListener("keydown", () => {
         clearTimeout(input_timer);
-    });
+    });*/
 
     function finished_typing() {
         evaluatePython_parse_input();

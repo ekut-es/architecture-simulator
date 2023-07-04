@@ -7,6 +7,18 @@
         <!--	****************************************************************************************************************************** -->
         <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
         <!--	****************************************************************************************************************************** -->
+        <!--codemirror-->
+        <script
+            type="text/javascript"
+            src="codemirror/lib/codemirror.js"
+        ></script>
+        <link rel="stylesheet" href="codemirror/lib/codemirror.css" />
+        <script
+            type="text/javascript"
+            src="codemirror/mode/markdown/markdown.js"
+        ></script>
+        <link rel="stylesheet" href="codemirror/theme/darcula.css" />
+        <!--	****************************************************************************************************************************** -->
         <link rel="stylesheet" type="text/css" href="WEB_APP_BASIC.css" />
         <!--	****************************************************************************************************************************** -->
         <script type="text/javascript" src="js/scripts.js"></script>
@@ -104,13 +116,19 @@
         </nav>
         <main id="webapp_main_id">
             <div id="gui_base_div_id">
-                <div class="editor">
-                    <div id="line_numbers" class="line_numbers">
-                        <span></span>
-                        <span></span>
-                    </div>
-                    <textarea id="input" rows="20"></textarea>
-                </div>
+                <textarea id="input" rows="20"></textarea>
+                <script>
+                    // initialize codemirror textarea
+                    const editor = CodeMirror.fromTextArea(
+                        document.getElementById("input"),
+                        {
+                            lineNumbers: true,
+                            styleActiveLine: true,
+                            mode: "markdown",
+                        }
+                    );
+                    editor.setSize(null, window.innerHeight);
+                </script>
                 <div id="gui_cmd_div_id">
                     <table id="gui_cmd_table_id">
                         <thead>
