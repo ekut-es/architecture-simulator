@@ -491,7 +491,7 @@ body main #gui_cmd_table_id th {
 
     padding-left: 0.625em;
 
-    text-align: right;
+    text-align: center;
 
     font-weight: bold;
 
@@ -508,17 +508,6 @@ body main #gui_cmd_table_id th {
     color: white;
 
     height: 2em;
-}
-
-body main #gui_cmd_table_id th:nth-child(1) {
-    width: 0em;
-    border: 0em solid #9a9393;
-
-    background-color: var(--app_main_bg_color);
-}
-
-body main #gui_cmd_table_id th:nth-child(2) {
-    width: 3.75em;
 }
 
 body main #gui_cmd_table_id td {
@@ -543,18 +532,6 @@ body main #gui_cmd_table_id td {
     background-color: white;
 
     height: 2em;
-}
-
-body main #gui_cmd_table_id td:nth-child(1) {
-    border: 0em solid #9a9393;
-
-    background-color: var(--app_main_bg_color);
-
-    width: 0em;
-}
-
-body main #gui_cmd_table_id td:nth-child(2) {
-    width: 3.75em;
 }
 
 body main #gui_memory_div_id {
@@ -598,7 +575,7 @@ body main #gui_memory_table_id th {
 
     padding-left: 0.625em;
 
-    text-align: right;
+    text-align: center;
 
     font-weight: bold;
 
@@ -615,18 +592,6 @@ body main #gui_memory_table_id th {
     color: white;
 
     height: 2em;
-}
-
-body main #gui_memory_table_id th:nth-child(1) {
-    width: 0em;
-
-    border: 0em solid #9a9393;
-
-    background-color: var(--app_main_bg_color);
-}
-
-body main #gui_memory_table_id th:nth-child(2) {
-    width: 3.75em;
 }
 
 body main #gui_memory_table_id td {
@@ -651,18 +616,6 @@ body main #gui_memory_table_id td {
     background-color: white;
 
     height: 2em;
-}
-
-body main #gui_memory_table_id td:nth-child(1) {
-    border: 0em solid #9a9393;
-
-    background-color: var(--app_main_bg_color);
-
-    width: 0em;
-}
-
-body main #gui_memory_table_id td:nth-child(2) {
-    width: 3.75em;
 }
 
 body main #gui_memory_table_id select {
@@ -720,7 +673,7 @@ body main #gui_registers_table_id th {
 
     padding-left: 0.625em;
 
-    text-align: right;
+    text-align: center;
 
     font-weight: bold;
 
@@ -737,18 +690,6 @@ body main #gui_registers_table_id th {
     color: white;
 
     height: 2em;
-}
-
-body main #gui_registers_table_id th:nth-child(1) {
-    width: 0em;
-
-    border: 0em solid #9a9393;
-
-    background-color: var(--app_main_bg_color);
-}
-
-body main #gui_registers_table_id th:nth-child(2) {
-    width: 3.75em;
 }
 
 body main #gui_registers_table_id td {
@@ -773,18 +714,6 @@ body main #gui_registers_table_id td {
     background-color: white;
 
     height: 2em;
-}
-
-body main #gui_registers_table_id td:nth-child(1) {
-    border: 0em solid #9a9393;
-
-    background-color: var(--app_main_bg_color);
-
-    width: 0em;
-}
-
-body main #gui_registers_table_id td:nth-child(2) {
-    width: 3.75em;
 }
 
 body main #gui_registers_table_id select {
