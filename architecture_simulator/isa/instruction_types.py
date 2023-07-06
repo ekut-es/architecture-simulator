@@ -330,7 +330,7 @@ class fence(Instruction):
 
 class ITypeInstruction(Instruction):
     def __init__(self, rd: int, rs1: int, imm: int, **args):
-        """Create a I-Type instruction
+        """Create an I-Type instruction
 
         Args:
             imm (int): offset to be further progressed by the instruction
@@ -361,6 +361,85 @@ class ITypeInstruction(Instruction):
             return f"{self.mnemonic}"
         else:
             return f"{self.mnemonic} x{self.rd}, x{self.rs1}, {self.imm}"
+
+    def access_register_file(
+        self, architectural_state: ArchitecturalState
+    ) -> tuple[
+        Optional[int], Optional[int], Optional[int], Optional[int], Optional[int]
+    ]:
+        return (
+            self.rs1,
+            None,
+            int(architectural_state.register_file.registers[self.rs1]),
+            None,
+            self.imm,
+        )
+
+    def control_unit_signals(self) -> "ControlUnitSignals":
+        from ..uarch.pipeline import ControlUnitSignals
+
+        return ControlUnitSignals(
+            alu_src=True,
+            mem_to_reg=False,
+            reg_write=True,
+            mem_read=False,
+            mem_write=False,
+            branch=False,
+            jump=False,
+            alu_op=2,
+        )
+
+    def get_write_register(self) -> Optional[int]:
+        return self.rd
+
+    def memory_access(
+        self,
+        memory_address: Optional[int],
+        memory_write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ) -> Optional[int]:
+        return None
+
+    def write_back(
+        self,
+        write_register: Optional[int],
+        register_write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ):
+        assert write_register is not None
+        assert register_write_data is not None
+        architectural_state.register_file.registers[
+            write_register
+        ] = fixedint.MutableUInt32(register_write_data)
+
+
+class MemoryITypeInstruction(ITypeInstruction):
+    def __init__(self, rd: int, rs1: int, imm: int, **args):
+        """Create an I-Type instruction that requires memory access
+
+        Args:
+            imm (int): offset to be further progressed by the instruction
+            rs1 (int): source register 1
+            rd (int): destination register
+        """
+        super().__init__(rd, rs1, imm, **args)
+
+    def __repr__(self) -> str:
+        return f"{self.mnemonic} x{self.rd}, {self.imm}(x{self.rs1})"
+
+    def control_unit_signals(self) -> "ControlUnitSignals":
+        from ..uarch.pipeline import ControlUnitSignals
+
+        return ControlUnitSignals(
+            alu_src=True,
+            mem_to_reg=True,
+            reg_write=True,
+            mem_read=True,
+            mem_write=False,
+            branch=False,
+            jump=False,
+            alu_op=0,
+        )
 
 
 class ShiftITypeInstruction(ITypeInstruction):
