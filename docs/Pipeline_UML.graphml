@@ -420,7 +420,7 @@
 		<node id="n7">
 			<data key="d0">9</data>
 			<data key="d5">
-				<y:RectD X="0" Y="236.5" Width="250" Height="124"/>
+				<y:RectD X="0" Y="236.5" Width="250" Height="140"/>
 			</data>
 			<data key="d7">
 				<uml:UMLNodeStyle fill="{y:GraphMLReference 1}" highlightFill="{y:GraphMLReference 2}">
@@ -430,6 +430,7 @@
 								<x:Array Type="sys:Object">
 									<sys:String><![CDATA[+ pc]]></sys:String>
 									<sys:String><![CDATA[+ branch_prediction]]></sys:String>
+									<sys:String><![CDATA[+ pc_plus_instruction_length]]></sys:String>
 								</x:Array>
 							</uml:UMLClassModel.attributes>
 							<uml:UMLClassModel.operations>
@@ -451,7 +452,7 @@
 		<node id="n8">
 			<data key="d0">10</data>
 			<data key="d5">
-				<y:RectD X="270" Y="180.5" Width="252.57069961891753" Height="236"/>
+				<y:RectD X="270" Y="180.5" Width="252.57069961891753" Height="252"/>
 			</data>
 			<data key="d7">
 				<uml:UMLNodeStyle fill="{y:GraphMLReference 1}" highlightFill="{y:GraphMLReference 2}">
@@ -468,6 +469,7 @@
 									<sys:String><![CDATA[+ imm]]></sys:String>
 									<sys:String><![CDATA[+ write_register]]></sys:String>
 									<sys:String><![CDATA[+ branch_prediction]]></sys:String>
+									<sys:String><![CDATA[+ pc_plus_instruction_length]]></sys:String>
 								</x:Array>
 							</uml:UMLClassModel.attributes>
 							<uml:UMLClassModel.operations>
@@ -497,7 +499,7 @@
 		<node id="n9">
 			<data key="d0">11</data>
 			<data key="d5">
-				<y:RectD X="542.5706996189176" Y="164.5" Width="252.57069961891753" Height="268"/>
+				<y:RectD X="542.5706996189176" Y="164.5" Width="252.57069961891753" Height="284"/>
 			</data>
 			<data key="d7">
 				<uml:UMLNodeStyle fill="{y:GraphMLReference 1}" highlightFill="{y:GraphMLReference 2}">
@@ -516,6 +518,7 @@
 									<sys:String><![CDATA[+ branch_taken]]></sys:String>
 									<sys:String><![CDATA[+ pc_plus_imm]]></sys:String>
 									<sys:String><![CDATA[+ branch_prediction]]></sys:String>
+									<sys:String><![CDATA[+ pc_plus_instruction_length]]></sys:String>
 								</x:Array>
 							</uml:UMLClassModel.attributes>
 							<uml:UMLClassModel.operations>
@@ -546,7 +549,7 @@
 		<node id="n10">
 			<data key="d0">12</data>
 			<data key="d5">
-				<y:RectD X="815.1413992378351" Y="180.5" Width="252.57069961891753" Height="236"/>
+				<y:RectD X="815.1413992378351" Y="180.5" Width="252.57069961891753" Height="252"/>
 			</data>
 			<data key="d7">
 				<uml:UMLNodeStyle fill="{y:GraphMLReference 1}" highlightFill="{y:GraphMLReference 2}">
@@ -562,6 +565,8 @@
 									<sys:String><![CDATA[+ write_register]]></sys:String>
 									<sys:String><![CDATA[+ pc_src]]></sys:String>
 									<sys:String><![CDATA[+ pc_plus_imm]]></sys:String>
+									<sys:String><![CDATA[+ imm]]></sys:String>
+									<sys:String><![CDATA[+ pc_plus_instruction_length]]></sys:String>
 								</x:Array>
 							</uml:UMLClassModel.attributes>
 							<uml:UMLClassModel.operations>
@@ -592,7 +597,7 @@
 		<node id="n11">
 			<data key="d0">13</data>
 			<data key="d5">
-				<y:RectD X="1087.7120988567526" Y="212.5" Width="252.57069961891753" Height="172"/>
+				<y:RectD X="1087.7120988567526" Y="212.5" Width="252.57069961891753" Height="204"/>
 			</data>
 			<data key="d7">
 				<uml:UMLNodeStyle fill="{y:GraphMLReference 1}" highlightFill="{y:GraphMLReference 2}">
@@ -605,6 +610,8 @@
 									<sys:String><![CDATA[+ write_register]]></sys:String>
 									<sys:String><![CDATA[+ memory_read_data]]></sys:String>
 									<sys:String><![CDATA[+ alu_result]]></sys:String>
+									<sys:String><![CDATA[+ imm]]></sys:String>
+									<sys:String><![CDATA[+ pc_plus_instruction_length]]></sys:String>
 								</x:Array>
 							</uml:UMLClassModel.attributes>
 							<uml:UMLClassModel.operations>

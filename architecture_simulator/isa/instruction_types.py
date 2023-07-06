@@ -138,14 +138,16 @@ class RTypeInstruction(Instruction):
 
         # jump, alu_op
         return ControlUnitSignals(
-            alu_src=False,
-            mem_to_reg=False,
+            alu_src_1=True,
+            alu_src_2=False,
+            wb_src=2,
             reg_write=True,
             mem_read=False,
             mem_write=False,
             branch=False,
             jump=False,
             alu_op=2,
+            alu_to_pc=False,
         )
 
     def get_write_register(self) -> Optional[int]:
@@ -245,14 +247,16 @@ class BTypeInstruction(Instruction):
         from ..uarch.pipeline import ControlUnitSignals
 
         return ControlUnitSignals(
-            alu_src=False,
-            mem_to_reg=None,
+            alu_src_1=True,
+            alu_src_2=False,
+            wb_src=None,
             reg_write=False,
             mem_read=False,
             mem_write=False,
             branch=True,
             jump=False,
             alu_op=1,
+            alu_to_pc=False,
         )
 
 
@@ -288,14 +292,16 @@ class STypeInstruction(Instruction):
 
         # jump, alu_op
         return ControlUnitSignals(
-            alu_src=True,
-            mem_to_reg=None,
+            alu_src_1=True,
+            alu_src_2=True,
+            wb_src=None,
             reg_write=False,
             mem_read=False,
             mem_write=True,
             branch=False,
             jump=False,
             alu_op=0,
+            alu_to_pc=False,
         )
 
 
@@ -379,14 +385,16 @@ class ITypeInstruction(Instruction):
         from ..uarch.pipeline import ControlUnitSignals
 
         return ControlUnitSignals(
-            alu_src=True,
-            mem_to_reg=False,
+            alu_src_1=True,
+            alu_src_2=True,
+            wb_src=2,
             reg_write=True,
             mem_read=False,
             mem_write=False,
             branch=False,
             jump=False,
             alu_op=2,
+            alu_to_pc=False,
         )
 
     def get_write_register(self) -> Optional[int]:
@@ -431,14 +439,16 @@ class MemoryITypeInstruction(ITypeInstruction):
         from ..uarch.pipeline import ControlUnitSignals
 
         return ControlUnitSignals(
-            alu_src=True,
-            mem_to_reg=True,
+            alu_src_1=True,
+            alu_src_2=True,
+            wb_src=1,
             reg_write=True,
             mem_read=True,
             mem_write=False,
             branch=False,
             jump=False,
             alu_op=0,
+            alu_to_pc=False,
         )
 
 
