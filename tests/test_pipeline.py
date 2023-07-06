@@ -63,6 +63,672 @@ class TestPipeline(unittest.TestCase):
             pipeline.state.register_file.registers[7], fixedint.MutableUInt32(12)
         )
 
+    def test_add(self):
+        program = """add x1, x1, x2
+        add x4, x5, x6
+        add x7, x8, x9"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(),
+        )
+        pipeline.state.instruction_memory.append_instructions(program)
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(5)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(8)
+        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(32)
+        pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(20)
+        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(-10)
+        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(20)
+        for _ in range(10):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(13)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(52)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(10)
+        )
+
+    def test_sub(self):
+        program = """sub x1, x1, x2
+        sub x4, x5, x6
+        sub x7, x8, x9"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(),
+        )
+        pipeline.state.instruction_memory.append_instructions(program)
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(5)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(8)
+        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(32)
+        pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(20)
+        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(-10)
+        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(20)
+        for _ in range(10):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(-3)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(12)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(-30)
+        )
+
+    def test_sll(self):
+        program = """sll x1, x1, x2
+        sll x4, x5, x6
+        sll x7, x8, x9"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(),
+        )
+        pipeline.state.instruction_memory.append_instructions(program)
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(5)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(8)
+        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(-1)
+        pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(31)
+        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(20)
+        for _ in range(10):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[1],
+            fixedint.MutableUInt32(5 * 2**8),
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[4],
+            fixedint.MutableUInt32(2147483648),
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(2**20)
+        )
+
+    def test_slt(self):
+        program = """slt x1, x1, x2
+        slt x4, x5, x6
+        slt x7, x8, x9"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(),
+        )
+        pipeline.state.instruction_memory.append_instructions(program)
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(5)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(8)
+        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(32)
+        pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(20)
+        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(-10)
+        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(20)
+        for _ in range(10):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(1)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(0)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(1)
+        )
+
+    def test_sltu(self):
+        program = """sltu x1, x1, x2
+        sltu x4, x5, x6
+        sltu x7, x8, x9"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(),
+        )
+        pipeline.state.instruction_memory.append_instructions(program)
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(5)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(8)
+        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(32)
+        pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(20)
+        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(-10)
+        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(20)
+        for _ in range(10):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(1)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(0)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(0)
+        )
+
+    def test_xor(self):
+        program = """xor x1, x1, x2
+        xor x4, x5, x6
+        xor x7, x8, x9"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(),
+        )
+        pipeline.state.instruction_memory.append_instructions(program)
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(0)
+        pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(-1)
+        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(0)
+        for _ in range(10):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(0)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(1)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(-1)
+        )
+
+    def test_srl(self):
+        program = """srl x1, x1, x2
+        srl x4, x5, x6
+        srl x7, x8, x9"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(),
+        )
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(-1)
+        pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(-1)
+        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(16)
+        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(2)
+        pipeline.state.instruction_memory.append_instructions(program)
+        for _ in range(10):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(0)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(1)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(4)
+        )
+
+    def test_sra(self):
+        program = """sra x1, x1, x2
+        sra x4, x5, x6
+        sra x7, x8, x9"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(),
+        )
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(16)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(2)
+        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(-1)
+        pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(-1)
+        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(100)
+        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(20)
+        pipeline.state.instruction_memory.append_instructions(program)
+        for _ in range(10):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(4)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(-1)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(0)
+        )
+
+    def test_or(self):
+        program = """or x1, x1, x2
+        or x4, x5, x6
+        or x7, x8, x9"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(),
+        )
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(0)
+        pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(-1)
+        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(0)
+        pipeline.state.instruction_memory.append_instructions(program)
+        for _ in range(10):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(1)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(1)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(-1)
+        )
+
+    def test_and(self):
+        program = """and x1, x1, x2
+        and x4, x5, x6
+        and x7, x8, x9"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(),
+        )
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(0)
+        pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(-1)
+        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(2)
+        pipeline.state.instruction_memory.append_instructions(program)
+        for _ in range(7):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(1)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(0)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(2)
+        )
+
+    def test_addi(self):
+        program = """addi x1, x1, 1
+        addi x2, x2, -1
+        addi x3, x3, 1234
+        addi x4, x4, 20"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(),
+        )
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(-1)
+        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(0)
+        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(-100)
+        pipeline.state.instruction_memory.append_instructions(program)
+        for _ in range(8):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(2)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[2], fixedint.MutableUInt32(-2)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[3], fixedint.MutableUInt32(1234)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(-80)
+        )
+
+    def test_andi(self):
+        program = """andi x1, x1, 1
+        andi x2, x2, -1
+        andi x3, x3, 1234
+        andi x4, x4, 20"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(),
+        )
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(-1)
+        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(0)
+        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(-100)
+        pipeline.state.instruction_memory.append_instructions(program)
+        for _ in range(10):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(1)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[2], fixedint.MutableUInt32(-1)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[3], fixedint.MutableUInt32(0)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(20)
+        )
+
+    def test_ori(self):
+        program = """ori x1, x1, 1
+        ori x2, x2, -1
+        ori x3, x3, 0
+        ori x4, x4, 2"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(),
+        )
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(0)
+        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(0)
+        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(1)
+        pipeline.state.instruction_memory.append_instructions(program)
+        for _ in range(10):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(1)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[2], fixedint.MutableUInt32(-1)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[3], fixedint.MutableUInt32(0)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(3)
+        )
+
+    def test_xori(self):
+        program = """xori x1, x1, 1
+        xori x2, x2, -1
+        xori x3, x3, 0
+        xori x4, x4, -1"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(),
+        )
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(0)
+        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(0)
+        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(-1)
+        pipeline.state.instruction_memory.append_instructions(program)
+        for _ in range(10):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(0)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[2], fixedint.MutableUInt32(-1)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[3], fixedint.MutableUInt32(0)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(0)
+        )
+
+    def test_slli(self):
+        program = """slli x1, x1, 1
+        slli x2, x2, 20
+        slli x3, x3, 31
+        slli x4, x4, 1"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(),
+        )
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(0)
+        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
+        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(8)
+        pipeline.state.instruction_memory.append_instructions(program)
+        for _ in range(10):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(2)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[2], fixedint.MutableUInt32(0)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[3], fixedint.MutableUInt32(2**31)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(16)
+        )
+
+    def test_srli(self):
+        program = """srli x1, x1, 1
+        srli x2, x2, 20
+        srli x3, x3, 31
+        srli x4, x4, 1"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(),
+        )
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(2)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(100)
+        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
+        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(16)
+        pipeline.state.instruction_memory.append_instructions(program)
+        for _ in range(10):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(1)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[2], fixedint.MutableUInt32(0)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[3], fixedint.MutableUInt32(1)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(8)
+        )
+
+    def test_srai(self):
+        program = """srai x1, x1, 1
+        srai x2, x2, 20
+        srai x3, x3, 31
+        srai x4, x4, 1"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(),
+        )
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(2)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(100)
+        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
+        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(16)
+        pipeline.state.instruction_memory.append_instructions(program)
+        for _ in range(10):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(1)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[2], fixedint.MutableUInt32(0)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[3], fixedint.MutableUInt32(-1)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(8)
+        )
+
+    def test_slti(self):
+        program = """slti x1, x1, 1
+        slti x2, x2, 0
+        slti x3, x3, 20
+        slti x4, x4, -1"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(),
+        )
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(-1)
+        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(10)
+        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(-3)
+        pipeline.state.instruction_memory.append_instructions(program)
+        for _ in range(10):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(0)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[2], fixedint.MutableUInt32(1)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[3], fixedint.MutableUInt32(1)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(1)
+        )
+
+    def test_sltiu(self):
+        program = """sltiu x1, x1, 1
+        sltiu x2, x2, 0
+        sltiu x3, x3, 20
+        sltiu x4, x4, -1"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(),
+        )
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(-1)
+        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(10)
+        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(3)
+        pipeline.state.instruction_memory.append_instructions(program)
+        for _ in range(10):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(0)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[2], fixedint.MutableUInt32(0)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[3], fixedint.MutableUInt32(1)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(1)
+        )
+
     def test_data_hazard(self):
         program = """add x1, x0, x2
         add x0, x0, x0
