@@ -899,7 +899,7 @@ class SLTI(ITypeInstruction):
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = fixedint.MutableUInt32(alu_in_1)
+        left = fixedint.Int32(alu_in_1)
         right = fixedint.Int32(alu_in_2)
         result = 1 if left < right else 0
         return (None, result)
@@ -922,8 +922,8 @@ class SLTIU(ITypeInstruction):
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = fixedint.MutableUInt32(alu_in_1)
-        right = fixedint.MutableUInt32(alu_in_2)
+        left = fixedint.UInt32(alu_in_1)
+        right = fixedint.UInt32(alu_in_2)
         result = 1 if left < right else 0
         return (None, result)
 

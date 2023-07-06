@@ -432,13 +432,13 @@ class MemoryITypeInstruction(ITypeInstruction):
 
         return ControlUnitSignals(
             alu_src=True,
-            mem_to_reg=False,
+            mem_to_reg=True,
             reg_write=True,
             mem_read=True,
             mem_write=False,
             branch=False,
             jump=False,
-            alu_op=2,
+            alu_op=0,
         )
 
 
