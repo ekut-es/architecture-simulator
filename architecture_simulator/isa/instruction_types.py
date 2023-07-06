@@ -1,5 +1,3 @@
-# INSTRUCTION TYPES
-
 from dataclasses import dataclass
 
 from architecture_simulator.uarch.architectural_state import ArchitecturalState

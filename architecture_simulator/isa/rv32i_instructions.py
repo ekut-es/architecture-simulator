@@ -3,6 +3,7 @@
 from .instruction_types import RTypeInstruction, CSRTypeInstruction, CSRITypeInstruction
 from .instruction_types import ITypeInstruction
 from .instruction_types import ShiftITypeInstruction
+from .instruction_types import MemoryITypeInstruction
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 from .instruction_types import BTypeInstruction
 from architecture_simulator.isa.instruction_types import STypeInstruction
@@ -746,6 +747,14 @@ class ADDI(ITypeInstruction):
         ] = rs1 + fixedint.MutableUInt32(self.imm)
         return architectural_state
 
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.MutableUInt32(alu_in_1)
+        right = fixedint.MutableUInt32(alu_in_2)
+        result = int(left + right)
+        return (None, result)
+
 
 class ANDI(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
@@ -758,6 +767,14 @@ class ANDI(ITypeInstruction):
             self.rd
         ] = rs1 & fixedint.MutableUInt32(self.imm)
         return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.MutableUInt32(alu_in_1)
+        right = fixedint.MutableUInt32(alu_in_2)
+        result = int(left & right)
+        return (None, result)
 
 
 class ORI(ITypeInstruction):
@@ -772,6 +789,14 @@ class ORI(ITypeInstruction):
         ] = rs1 | fixedint.MutableUInt32(self.imm)
         return architectural_state
 
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.MutableUInt32(alu_in_1)
+        right = fixedint.MutableUInt32(alu_in_2)
+        result = int(left | right)
+        return (None, result)
+
 
 class XORI(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
@@ -784,6 +809,14 @@ class XORI(ITypeInstruction):
             self.rd
         ] = rs1 ^ fixedint.MutableUInt32(self.imm)
         return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.MutableUInt32(alu_in_1)
+        right = fixedint.MutableUInt32(alu_in_2)
+        result = int(left ^ right)
+        return (None, result)
 
 
 class SLLI(ShiftITypeInstruction):
@@ -798,6 +831,14 @@ class SLLI(ShiftITypeInstruction):
         ] = rs1 << fixedint.MutableUInt32(self.imm)
         return architectural_state
 
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.MutableUInt32(alu_in_1)
+        right = fixedint.MutableUInt32(alu_in_2)
+        result = int(left << right)
+        return (None, result)
+
 
 class SRLI(ShiftITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
@@ -811,6 +852,14 @@ class SRLI(ShiftITypeInstruction):
         ] = rs1 >> fixedint.MutableUInt32(self.imm)
         return architectural_state
 
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.MutableUInt32(alu_in_1)
+        right = fixedint.MutableUInt32(alu_in_2)
+        result = int(left >> right)
+        return (None, result)
+
 
 class SRAI(ShiftITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
@@ -823,6 +872,14 @@ class SRAI(ShiftITypeInstruction):
             rs1 >> int(fixedint.UInt16(self.imm))
         )
         return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.Int32(alu_in_1)
+        right = alu_in_2
+        result = int(left >> right)
+        return (None, result)
 
 
 class SLTI(ITypeInstruction):
@@ -839,6 +896,14 @@ class SLTI(ITypeInstruction):
         )
         return architectural_state
 
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.MutableUInt32(alu_in_1)
+        right = fixedint.Int32(alu_in_2)
+        result = 1 if left < right else 0
+        return (None, result)
+
 
 class SLTIU(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
@@ -853,6 +918,14 @@ class SLTIU(ITypeInstruction):
             else fixedint.MutableUInt32(0)
         )
         return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.MutableUInt32(alu_in_1)
+        right = fixedint.MutableUInt32(alu_in_2)
+        result = 1 if left < right else 0
+        return (None, result)
 
 
 class LUI(UTypeInstruction):
@@ -904,7 +977,7 @@ class FENCE(fence):
         raise InstructionNotImplemented(mnemonic=self.mnemonic)
 
 
-class LB(ITypeInstruction):
+class LB(MemoryITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="lb")
 
@@ -921,8 +994,27 @@ class LB(ITypeInstruction):
         )
         return architectural_state
 
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.MutableUInt32(alu_in_1)
+        right = alu_in_2
+        result = int(left) + right
+        return (None, result)
 
-class LH(ITypeInstruction):
+    def memory_access(
+        self,
+        memory_address: Optional[int],
+        memory_write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ) -> Optional[int]:
+        assert memory_address is not None
+        return int(
+            fixedint.Int8(int(architectural_state.memory.load_byte(memory_address)))
+        )
+
+
+class LH(MemoryITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="lh")
 
@@ -938,8 +1030,29 @@ class LH(ITypeInstruction):
         )
         return architectural_state
 
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.MutableUInt32(alu_in_1)
+        right = alu_in_2
+        result = int(left) + right
+        return (None, result)
 
-class LW(ITypeInstruction):
+    def memory_access(
+        self,
+        memory_address: Optional[int],
+        memory_write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ) -> Optional[int]:
+        assert memory_address is not None
+        return int(
+            fixedint.Int16(
+                int(architectural_state.memory.load_halfword(memory_address))
+            )
+        )
+
+
+class LW(MemoryITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="lw")
 
@@ -951,8 +1064,25 @@ class LW(ITypeInstruction):
         ] = architectural_state.memory.load_word(int(rs1) + self.imm)
         return architectural_state
 
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.MutableUInt32(alu_in_1)
+        right = alu_in_2
+        result = int(left) + right
+        return (None, result)
 
-class LBU(ITypeInstruction):
+    def memory_access(
+        self,
+        memory_address: Optional[int],
+        memory_write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ) -> Optional[int]:
+        assert memory_address is not None
+        return int(architectural_state.memory.load_word(memory_address))
+
+
+class LBU(MemoryITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="lbu")
 
@@ -964,8 +1094,25 @@ class LBU(ITypeInstruction):
         )
         return architectural_state
 
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.MutableUInt32(alu_in_1)
+        right = alu_in_2
+        result = int(left) + right
+        return (None, result)
 
-class LHU(ITypeInstruction):
+    def memory_access(
+        self,
+        memory_address: Optional[int],
+        memory_write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ) -> Optional[int]:
+        assert memory_address is not None
+        return int(architectural_state.memory.load_byte(memory_address))
+
+
+class LHU(MemoryITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="lhu")
 
@@ -976,6 +1123,23 @@ class LHU(ITypeInstruction):
             int(architectural_state.memory.load_halfword(int(rs1) + self.imm))
         )
         return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.MutableUInt32(alu_in_1)
+        right = alu_in_2
+        result = int(left) + right
+        return (None, result)
+
+    def memory_access(
+        self,
+        memory_address: Optional[int],
+        memory_write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ) -> Optional[int]:
+        assert memory_address is not None
+        return int(architectural_state.memory.load_halfword(memory_address))
 
 
 class JALR(ITypeInstruction):
