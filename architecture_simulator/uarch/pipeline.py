@@ -154,8 +154,12 @@ class InstructionFetchStage(Stage):
             pc = state.program_counter
             instruction = instruction = state.instruction_memory.load_instruction(pc)
             state.program_counter += instruction.length
+            pc_plus_instruction_length = pc + instruction.length
             return InstructionFetchPipelineRegister(
-                instruction=instruction, pc=pc, branch_prediction=False
+                instruction=instruction,
+                pc=pc,
+                branch_prediction=False,
+                pc_plus_instruction_length=pc_plus_instruction_length,
             )
         else:
             return InstructionFetchPipelineRegister()
@@ -240,6 +244,7 @@ class InstructionDecodeStage(Stage):
                 pc=pipeline_register.pc,
                 branch_prediction=pipeline_register.branch_prediction,
                 flush_signal=flush_signal,
+                pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
             )
         else:
             self.write_register_cache.insert(0, 0)
@@ -301,6 +306,7 @@ class ExecuteStage(Stage):
                 pc=pipeline_register.pc,
                 pc_plus_imm=pc_plus_imm,
                 branch_prediction=pipeline_register.branch_prediction,
+                pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
             )
         else:
             return ExecutePipelineRegister()
@@ -373,6 +379,8 @@ class MemoryAccessStage(Stage):
                 control_unit_signals=pipeline_register.control_unit_signals,
                 pc_plus_imm=pipeline_register.pc_plus_imm,
                 flush_signal=flush_signal,
+                pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
+                imm=pipeline_register.imm,
             )
         else:
             return MemoryAccessPipelineRegister()
@@ -425,6 +433,8 @@ class RegisterWritebackStage(Stage):
                 memory_read_data=pipeline_register.memory_read_data,
                 alu_result=pipeline_register.result,
                 control_unit_signals=pipeline_register.control_unit_signals,
+                pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
+                imm=pipeline_register.imm,
             )
         else:
             return RegisterWritebackPipelineRegister()

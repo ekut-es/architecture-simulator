@@ -982,6 +982,13 @@ class AUIPC(UTypeInstruction):
             alu_to_pc=False,
         )
 
+    def alu_compute(
+        self, alu_in_1: int | None, alu_in_2: int | None
+    ) -> tuple[bool | None, int | None]:
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        return None, (alu_in_1 + alu_in_2)
+
 
 class JAL(JTypeInstruction):
     def __init__(self, rd: int, imm: int):

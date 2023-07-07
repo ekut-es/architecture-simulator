@@ -329,6 +329,11 @@ class UTypeInstruction(Instruction):
             write_register
         ] = fixedint.MutableUInt32(register_write_data)
 
+    def access_register_file(
+        self, architectural_state: ArchitecturalState
+    ) -> tuple[int | None, int | None, int | None, int | None, int | None]:
+        return None, None, None, None, self.imm << 12
+
 
 class JTypeInstruction(Instruction):
     def __init__(self, rd: int, imm: int, **args):
@@ -373,7 +378,7 @@ class JTypeInstruction(Instruction):
     def access_register_file(
         self, architectural_state: ArchitecturalState
     ) -> tuple[int | None, int | None, int | None, int | None, int | None]:
-        return None, None, None, None, self.imm
+        return None, None, None, None, self.imm << 1
 
 
 class fence(Instruction):
