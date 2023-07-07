@@ -11,47 +11,7 @@
 /* ************************************************************************* */
 
 :root {
-    --app_width: 100%;
-
-    --app_height: 37.5em;
-
-    --app_margin: 0;
-
-    --app_padding: 0;
-
-    --app_border: 0.625em;
-
-    --app_border_color: #e6e6e6;
-
-    --app_valid_input_bg_color: #d8f6ce;
-
-    --app_invalid_input_bg_color: #f8e0e0;
-
-    --app_header_width: var(--app_width);
-
-    --app_header_height: 2.5em;
-
-    --app_header_bg_color: #0066aa;
-
-    --app_header_title_color: #e0e0e0;
-
-    --app_header_font_family: "Times New Roman", Garamond, serif;
-
-    --app_header_icons_width: 1.25em;
-
-    --app_header_title_width: calc(
-        var(--app_header_width) - calc(var(--app_header_icons_width) * 3)
-    );
-
-    --app_nav_width: var(--app_header_width);
-
-    --app_nav_height: 3.5em;
-
-    --app_nav_bg_color: #d8d8d8;
-
-    --app_nav_text_color: #585858;
-
-    --button_text_color: var(--app_nav_text_color);
+    --app_header_bg_color: #252d73;
 
     --button_green_color: #a9f5a9;
 
@@ -61,23 +21,7 @@
 
     --button_disabled_color: #aaaaaa;
 
-    --app_footer_width: var(--app_header_width);
-
-    --app_footer_height: 1.875em;
-
-    --app_footer_bg_color: #d8d8d8;
-
-    --app_footer_text_color: #585858;
-
-    --app_main_width: var(--app_header_width);
-
-    --app_main_height: calc(
-        var(--app_height) - var(--app_header_height) - var(--app_footer_height)
-    );
-
-    --app_main_bg_color: #f2f2f2;
-
-    --app_main_text_color: #585858;
+    --app_main_bg_color: #f5f5f5;
 
     --input_valid_color: var(--button_green_color);
 
@@ -157,63 +101,12 @@ input:out-of-range + ::after {
 /* ************************************************************************* */
 
 html {
-    box-sizing: border-box;
-
-    width: var(--app_width);
-
-    height: var(--app_height);
-
-    margin: 0 auto; /* horizontal zentriert */
-
-    padding: var(--app_padding);
-
-    border: 0.625em;
 }
 
 body header {
-    box-sizing: border-box;
-
-    width: var(--app_header_width);
-
-    height: var(--app_header_height);
-
-    margin: 0 auto; /* horizontal zentriert */
-
-    padding: 0;
-
-    color: var(--app_header_title_color);
-
-    border-radius: 0.25em;
-
     background-color: var(--app_header_bg_color);
 
     font-family: var(--app_header_font_family);
-
-    font-style: normal;
-
-    font-weight: bold;
-
-    display: flex; /* Flex Container */
-}
-
-body header img {
-    width: var(--app_header_icons_width);
-
-    height: var(--app_header_icons_width);
-
-    padding-top: 0.625em;
-
-    padding-left: 0.625em;
-}
-
-body header #webapp_header_app_name_id {
-    padding-top: 0.3125em;
-
-    padding-left: 0.9375em;
-
-    font-size: 1.5625em;
-
-    width: var(--app_header_title_width);
 }
 
 body header #webapp_header_help_image_id {
@@ -221,451 +114,94 @@ body header #webapp_header_help_image_id {
 }
 
 body nav {
-    box-sizing: border-box;
-
-    width: var(--app_nav_width);
-
-    height: var(--app_nav_height);
-
-    margin: 0 auto; /* horizontal zentriert */
-
-    padding: 0;
-
-    color: var(--app_nav_text_color);
-
-    background-color: var(--app_nav_bg_color);
-
-    border: var(--app_border);
-
-    border-color: var(--app_border_color);
-
-    border-style: solid;
-
-    border-radius: 0.25em;
+    background-color: #f1f2f9;
 }
 
 body main {
-    box-sizing: border-box;
-
-    width: var(--app_main_width);
-
-    height: 100%;
-
-    margin: 0 auto; /* horizontal zentriert */
-
-    padding: 0;
-
-    color: var(--app_main_text_color);
-
     background-color: var(--app_main_bg_color);
 
-    border: var(--app_border);
-
-    border-color: var(--app_border_color);
-
-    border-style: solid;
-
-    border-radius: 0.25em;
-
-    display: flex;
+    height: 100%;
 }
 
 body footer {
-    box-sizing: border-box;
-
-    width: var(--app_footer_width);
-
-    height: var(--app_footer_height);
-
-    margin: 0 auto; /* horizontal zentriert */
-
-    padding: 0;
-
-    color: var(--app_footer_text_color);
-
-    background-color: var(--app_footer_bg_color);
-
-    border: var(--app_border);
-
-    border-color: var(--app_border_color);
-
-    border-style: solid;
-
-    border-radius: 0.25em;
+    background-color: var(--app_main_bg_color);
 }
 
 .button_start_simulation {
-    color: var(--button_text_color);
-
-    font-size: 0.9375em;
-
     background-color: var(--button_green_color);
-
-    border-radius: 0.25em;
-
-    padding: 0.0625em;
-
-    padding-right: 0.0625em;
-
-    text-decoration: none;
-
-    margin: 0.3125em;
-
-    cursor: pointer;
-
-    height: 1.8125em;
-
-    width: 1.8125em;
 }
 
 .button_refresh_simulation {
-    color: var(--button_text_color);
-
-    stroke: #25253b;
-
-    font-size: 0.9375em;
-
     background-color: var(--button_red_color);
-
-    border-radius: 0.25em;
-
-    padding: 0.0625em;
-
-    padding-right: 0.0625em;
-
-    text-decoration: none;
-
-    margin: 0.3125em;
-
-    cursor: pointer;
-
-    height: 1.8125em;
-
-    width: 1.8125em;
 }
 
 .button_pause_simulation {
-    color: var(--button_text_color);
-
-    font-size: 0.9375em;
-
     background-color: var(--button_disabled_color);
-
-    border-radius: 0.25em;
-
-    padding: 0.0625em;
-
-    padding-right: 0.0625em;
-
-    text-decoration: none;
-
-    margin: 0.3125em;
-
-    cursor: pointer;
-
-    height: 1.8125em;
-
-    width: 1.8125em;
 }
 
 .button_next_step_simulation {
-    color: var(--button_text_color);
-
-    font-size: 0.9375em;
-
     background-color: var(--button_blue_color);
-
-    border-radius: 0.25em;
-
-    padding: 0.0625em;
-
-    padding-right: 0.0625em;
-
-    text-decoration: none;
-
-    margin: 0.3125em;
-
-    cursor: pointer;
-
-    height: 1.8125em;
-
-    width: 1.8125em;
 }
 
 .loading {
-    padding-bottom: 0.11em;
 }
 
 .button_switch_representation {
-    color: #8b008b;
-
-    font-size: 0.9375em;
-
-    background-color: #da70d6;
-
-    border-radius: 0.25em;
-
-    padding: 0.0625em;
-
-    padding-right: 0.0625em;
-
-    text-decoration: none;
-
-    margin: 0.3125em;
-
-    cursor: pointer;
-
-    height: 1.8125em;
-
-    width: 1.8125em;
-
-    float: right;
+    background-color: #5647875d;
 }
 
 body main #gui_base_div_id {
-    display: flex;
-
-    flex-wrap: wrap;
-
-    justify-content: space-evenly;
-
-    align-items: flex-start;
-
-    width: 100%;
-
-    height: 100%;
-
-    overflow: auto;
 }
 
 body main #input {
-    width: 25em;
     line-height: 1.5em;
     padding: 0;
     border: 0;
-    resize: none;
-    overflow: auto;
 }
 
 body main #gui_cmd_div_id {
-    /*background-color: 	DodgerBlue;*/
-
-    margin-top: 0.625em;
-
-    margin-bottom: 1.875em;
-
-    width: 14.375em;
-
-    overflow-x: auto;
-
-    overflow-y: auto;
 }
 
 body main #gui_cmd_table_id {
-    table-layout: auto;
+    font-family: monospace;
 
-    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-
-    font-size: 11px;
-
-    border-collapse: collapse;
-
-    margin: 0.0625em auto;
-
-    padding-top: 2.5em;
-
-    width: 100%;
+    text-align: right;
 }
 
 body main #gui_cmd_table_id th {
-    padding-top: 0.0625em;
-
-    padding-bottom: 0.0625em;
-
-    padding-left: 0.625em;
-
-    text-align: right;
-
-    font-weight: bold;
+    text-align: center;
 
     font-family: monospace;
-
-    font-size: 12px;
-
-    vertical-align: middle;
-
-    border: 0.0625em solid #848484;
-
-    background-color: #848484;
-
-    color: white;
-
-    height: 1.5625em;
-}
-
-body main #gui_cmd_table_id th:nth-child(1) {
-    width: 1.875em;
-    border: 0em solid #9a9393;
-
-    background-color: var(--app_main_bg_color);
-}
-
-body main #gui_cmd_table_id th:nth-child(2) {
-    width: 3.75em;
 }
 
 body main #gui_cmd_table_id td {
-    padding-top: 0.0625em;
-
-    padding-bottom: 0.0625em;
-
-    padding-left: 0.3125em;
-
     text-align: left;
 
     font-family: monospace;
-
-    font-size: 12px;
-
-    vertical-align: middle;
-
-    border: 0.0625em solid #9a9393;
-
-    color: #585858;
-
-    background-color: white;
-
-    height: 1.5625em;
-}
-
-body main #gui_cmd_table_id td:nth-child(1) {
-    border: 0em solid #9a9393;
-
-    background-color: var(--app_main_bg_color);
-
-    width: 1.875em;
-}
-
-body main #gui_cmd_table_id td:nth-child(2) {
-    width: 3.75em;
 }
 
 body main #gui_memory_div_id {
-    /*background-color: 	DodgerBlue;*/
-
-    margin-top: 0.625em;
-
-    margin-bottom: 1.875em;
-
-    width: 14.375em;
-
-    overflow-x: auto;
-
-    overflow-y: auto;
 }
 
 body main #gui_memory_table_id {
-    table-layout: auto;
-
-    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-
-    font-size: 11px;
-
     font-family: monospace;
-
-    border-collapse: collapse;
-
-    margin: 0.0625em auto;
-
-    padding-top: 2.5em;
-
-    width: 100%;
 
     text-align: right;
 }
 
 body main #gui_memory_table_id th {
-    padding-top: 0.0625em;
-
-    padding-bottom: 0.0625em;
-
-    padding-left: 0.625em;
-
-    text-align: right;
-
-    font-weight: bold;
-
-    font-size: 12px;
+    text-align: center;
 
     font-family: monospace;
-
-    vertical-align: middle;
-
-    border: 0.0625em solid #848484;
-
-    background-color: #848484;
-
-    color: white;
-
-    height: 2em;
-}
-
-body main #gui_memory_table_id th:nth-child(1) {
-    width: 1.875em;
-
-    border: 0em solid #9a9393;
-
-    background-color: var(--app_main_bg_color);
-}
-
-body main #gui_memory_table_id th:nth-child(2) {
-    width: 3.75em;
 }
 
 body main #gui_memory_table_id td {
-    padding-top: 0.0625em;
-
-    padding-bottom: 0.0625em;
-
-    padding-left: 0.3125em;
-
     text-align: right;
 
-    font-size: 12px;
-
     font-family: monospace;
-
-    vertical-align: middle;
-
-    border: 0.0625em solid #9a9393;
-
-    color: #585858;
-
-    background-color: white;
-
-    height: 2em;
-}
-
-body main #gui_memory_table_id td:nth-child(1) {
-    border: 0px solid #9a9393;
-
-    background-color: var(--app_main_bg_color);
-
-    width: 1.875em;
-}
-
-body main #gui_memory_table_id td:nth-child(2) {
-    width: 3.75em;
 }
 
 body main #gui_memory_table_id select {
-    padding: 0.0625em;
-
-    width: 5em;
-
-    height: 1.5625em;
-
-    margin-top: 0em;
 }
 
 body main #gui_memory_table_id option:disabled {
@@ -673,121 +209,27 @@ body main #gui_memory_table_id option:disabled {
 }
 
 body main #gui_registers_div_id {
-    /*background-color: 	DodgerBlue;*/
-
-    margin-top: 0.625em;
-
-    margin-bottom: 1.875em;
-
-    width: 14.375em;
-
-    overflow-x: auto;
-
-    overflow-y: auto;
 }
 
 body main #gui_registers_table_id {
-    table-layout: auto;
-
-    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-
-    font-size: 11px;
-
     font-family: monospace;
-
-    border-collapse: collapse;
-
-    margin: 0.0625em auto;
-
-    padding-top: 2.5em;
-
-    width: 100%;
 
     text-align: right;
 }
 
 body main #gui_registers_table_id th {
-    padding-top: 0.0625em;
-
-    padding-bottom: 0.0625em;
-
-    padding-left: 0.625em;
-
-    text-align: right;
-
-    font-weight: bold;
-
-    font-size: 12px;
+    text-align: center;
 
     font-family: monospace;
-
-    vertical-align: middle;
-
-    border: 0.0625em solid #848484;
-
-    background-color: #848484;
-
-    color: white;
-
-    height: 2em;
-}
-
-body main #gui_registers_table_id th:nth-child(1) {
-    width: 1.875em;
-
-    border: 0em solid #9a9393;
-
-    background-color: var(--app_main_bg_color);
-}
-
-body main #gui_registers_table_id th:nth-child(2) {
-    width: 3.75em;
 }
 
 body main #gui_registers_table_id td {
-    padding-top: 0.0625em;
-
-    padding-bottom: 0.0625em;
-
-    padding-left: 0.3125em;
-
     text-align: right;
 
-    font-size: 12px;
-
     font-family: monospace;
-
-    vertical-align: middle;
-
-    border: 0.0625em solid #9a9393;
-
-    color: #585858;
-
-    background-color: white;
-
-    height: 2em;
-}
-
-body main #gui_registers_table_id td:nth-child(1) {
-    border: 0em solid #9a9393;
-
-    background-color: var(--app_main_bg_color);
-
-    width: 1.875em;
-}
-
-body main #gui_registers_table_id td:nth-child(2) {
-    width: 3.75em;
 }
 
 body main #gui_registers_table_id select {
-    padding: 0.0625em;
-
-    width: 5em;
-
-    height: 1.5625em;
-
-    margin-top: 0em;
 }
 
 body main #gui_registers_table_id option:disabled {
@@ -795,8 +237,6 @@ body main #gui_registers_table_id option:disabled {
 }
 
 body main #output {
-    width: 25em;
-    margin-left: 2.5em;
 }
 
 .CodeMirror {

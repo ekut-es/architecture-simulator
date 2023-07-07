@@ -99,6 +99,15 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             representation_mode = binary_representation;
             evaluatePython_update_tables();
+            document
+                .getElementById("button_binary_representation_id")
+                .classList.add("active");
+            document
+                .getElementById("button_decimal_representation_id")
+                .classList.remove("active");
+            document
+                .getElementById("button_hexa_representation_id")
+                .classList.remove("active");
         });
 
     document
@@ -106,6 +115,15 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             representation_mode = decimal_representation;
             evaluatePython_update_tables();
+            document
+                .getElementById("button_decimal_representation_id")
+                .classList.add("active");
+            document
+                .getElementById("button_binary_representation_id")
+                .classList.remove("active");
+            document
+                .getElementById("button_hexa_representation_id")
+                .classList.remove("active");
         });
 
     document
@@ -113,6 +131,15 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             representation_mode = hexa_representation;
             evaluatePython_update_tables();
+            document
+                .getElementById("button_hexa_representation_id")
+                .classList.add("active");
+            document
+                .getElementById("button_decimal_representation_id")
+                .classList.remove("active");
+            document
+                .getElementById("button_binary_representation_id")
+                .classList.remove("active");
         });
 
     editor.on("change", function () {
