@@ -314,6 +314,21 @@ class UTypeInstruction(Instruction):
     def __repr__(self) -> str:
         return f"{self.mnemonic} x{self.rd}, {self.imm}"
 
+    def get_write_register(self) -> int | None:
+        return self.rd
+
+    def write_back(
+        self,
+        write_register: Optional[int],
+        register_write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ):
+        assert write_register is not None
+        assert register_write_data is not None
+        architectural_state.register_file.registers[
+            write_register
+        ] = fixedint.MutableUInt32(register_write_data)
+
 
 class JTypeInstruction(Instruction):
     def __init__(self, rd: int, imm: int, **args):
@@ -323,6 +338,42 @@ class JTypeInstruction(Instruction):
 
     def __repr__(self) -> str:
         return f"{self.mnemonic} x{self.rd}, {self.imm*2}"
+
+    def control_unit_signals(self) -> "ControlUnitSignals":
+        from ..uarch.pipeline import ControlUnitSignals
+
+        return ControlUnitSignals(
+            alu_src_1=None,
+            alu_src_2=None,
+            wb_src=0,
+            reg_write=True,
+            mem_read=False,
+            mem_write=False,
+            branch=False,
+            jump=True,
+            alu_op=None,
+            alu_to_pc=False,
+        )
+
+    def get_write_register(self) -> int | None:
+        return self.rd
+
+    def write_back(
+        self,
+        write_register: Optional[int],
+        register_write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ):
+        assert write_register is not None
+        assert register_write_data is not None
+        architectural_state.register_file.registers[
+            write_register
+        ] = fixedint.MutableUInt32(register_write_data)
+
+    def access_register_file(
+        self, architectural_state: ArchitecturalState
+    ) -> tuple[int | None, int | None, int | None, int | None, int | None]:
+        return None, None, None, None, self.imm
 
 
 class fence(Instruction):
