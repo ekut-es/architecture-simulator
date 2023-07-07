@@ -13,19 +13,21 @@
         <script type="text/javascript" src="js/scripts.js"></script>
     </head>
     <body id="webapp_body_id">
-        <div class="container-fluid">
+        <div class="container-fluid p-0 m-0">
             <!-- ************  Tool Title  ****************************************************-->
-            <div class="container-fluid">
+            <div class="container-fluid p-0 m-0">
                 <header
                     id="webapp_header_id"
-                    class="bg-blue text-light overflow-hidden"
+                    class="text-light overflow-hidden no-margin"
                 >
                     <div class="container-fluid">
-                        <div class="row align-items-center">
-                            <div class="col">
+                        <div
+                            class="row align-items-center justify-content-between"
+                        >
+                            <div class="col-auto">
                                 <div
                                     id="webapp_header_app_name_id"
-                                    class="h text-truncate"
+                                    class="h1 text-truncate"
                                 >
                                     RISC-V Simulator
                                 </div>
@@ -36,10 +38,8 @@
                                         id="webapp_header_help_image_id"
                                         src="svg/WEB_APP_BASIC_Help.svg"
                                         class="mr-3"
-                                    />
-                                    <img
-                                        id="webapp_header_icon_image_id"
-                                        src="favicon.ico"
+                                        width="35px"
+                                        height="35px"
                                     />
                                 </div>
                             </div>
@@ -48,16 +48,15 @@
                 </header>
             </div>
 
-            <div class="container-fluid">
-                <nav
-                    id="webapp_nav_id"
-                    class="no-margin-bottom d-inline-flex flex-wrap"
-                >
+            <div class="container-fluid p-0 m-0">
+                <nav id="webapp_nav_id" class="no-margin-bottom bg-light">
                     <div class="container-fluid">
-                        <div class="row align-items-center">
-                            <div class="col">
+                        <div
+                            class="row align-items-center justify-content-between"
+                        >
+                            <div class="col-auto mt-1 mb-1">
                                 <button
-                                    class="btn btn-primary btn-sm button_start_simulation"
+                                    class="btn btn-success btn-sm button_start_simulation"
                                     id="button_simulation_start_id"
                                     title="start simulation"
                                 >
@@ -111,13 +110,14 @@
                                     style="visibility: hidden"
                                 />
                             </div>
+
                             <div class="col-auto">
                                 <div
-                                    class="btn-group btn-group-toggle mt-1 mb-1"
+                                    class="btn-group-toggle mt-1 mb-1"
                                     data-toggle="buttons"
                                 >
                                     <button
-                                        class="btn btn-primary btn-sm button_switch_representation"
+                                        class="btn btn-secondary btn-sm button_switch_representation"
                                         id="button_binary_representation_id"
                                         title="show binary representation"
                                     >
@@ -128,7 +128,7 @@
                                         />
                                     </button>
                                     <button
-                                        class="btn btn-primary btn-sm button_switch_representation active"
+                                        class="btn btn-secondary btn-sm button_switch_representation active"
                                         id="button_decimal_representation_id"
                                         title="show decimal representation"
                                     >
@@ -139,7 +139,7 @@
                                         />
                                     </button>
                                     <button
-                                        class="btn btn-primary btn-sm button_switch_representation"
+                                        class="btn btn-secondary btn-sm button_switch_representation"
                                         id="button_hexa_representation_id"
                                         title="show hexadecimal representation"
                                     >
@@ -155,93 +155,141 @@
                     </div>
                 </nav>
                 <main id="webapp_main_id">
-                    <div class="container-fluid">
-                        <div id="gui_base_div_id" class="table-responsive">
-                            <div class="editor my-2">
-                                <div id="line_numbers" class="line_numbers">
-                                    <span></span>
-                                    <span></span>
+                    <div class="full-screen container-fluid bg-transparent">
+                        <div
+                            id="gui_base_div_id"
+                            class="table-responsive justify-content-around"
+                        >
+                            <div class="row">
+                                <div class="col-md-3 col-12">
+                                    <div
+                                        class="editor my-2"
+                                        style="max-height: 50%"
+                                    >
+                                        <div class="row">
+                                            <div class="col-sm-1">
+                                                <div
+                                                    id="line_numbers"
+                                                    class="line_numbers"
+                                                >
+                                                    <span></span>
+                                                    <span></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-11">
+                                                <textarea
+                                                    id="input"
+                                                    class="form-control"
+                                                    rows="20"
+                                                ></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <textarea
-                                    id="input"
-                                    class="form-control"
-                                    rows="20"
-                                ></textarea>
-                            </div>
-                            <div
-                                id="gui_cmd_div_id"
-                                class="table-responsive my-2"
-                            >
-                                <table
-                                    id="gui_cmd_table_id"
-                                    class="table table-hover"
-                                >
-                                    <thead>
-                                        <tr>
-                                            <th title="address">Address</th>
-                                            <th title="command">Command</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="gui_cmd_table_body_id"></tbody>
-                                </table>
-                            </div>
-                            <div
-                                id="gui_registers_div_id"
-                                class="table-responsive my-2"
-                            >
-                                <table
-                                    id="gui_registers_table_id"
-                                    class="table table-hover"
-                                >
-                                    <thead>
-                                        <tr>
-                                            <th colspan="2" title="abi_name">
-                                                Register
-                                            </th>
-                                            <th title="register value">
-                                                Value
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody
-                                        id="gui_registers_table_body_id"
-                                    ></tbody>
-                                </table>
-                            </div>
-                            <div
-                                id="gui_memory_div_id"
-                                class="table-responsive my-2"
-                            >
-                                <table
-                                    id="gui_memory_table_id"
-                                    class="table table-hover"
-                                >
-                                    <thead>
-                                        <tr>
-                                            <th title="memory address">
-                                                Address
-                                            </th>
-                                            <th title="memory value">Value</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody
-                                        id="gui_memory_table_body_id"
-                                    ></tbody>
-                                </table>
-                            </div>
-                            <div class="overflow-hidden my-2">
-                                <textarea
-                                    id="output"
-                                    class="form-control"
-                                    rows="20"
-                                    disabled
-                                ></textarea>
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div
+                                                id="gui_cmd_div_id"
+                                                class="table-responsive my-2"
+                                            >
+                                                <table
+                                                    id="gui_cmd_table_id"
+                                                    class="table table-hover table-bordered"
+                                                >
+                                                    <thead>
+                                                        <tr>
+                                                            <th title="address">
+                                                                Address
+                                                            </th>
+                                                            <th title="command">
+                                                                Command
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody
+                                                        id="gui_cmd_table_body_id"
+                                                    ></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div
+                                                id="gui_registers_div_id"
+                                                class="table-responsive my-2"
+                                            >
+                                                <table
+                                                    id="gui_registers_table_id"
+                                                    class="table table-hover table-bordered"
+                                                >
+                                                    <thead>
+                                                        <tr>
+                                                            <th
+                                                                colspan="2"
+                                                                title="abi_name"
+                                                            >
+                                                                Register
+                                                            </th>
+                                                            <th
+                                                                title="register value"
+                                                            >
+                                                                Value
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody
+                                                        id="gui_registers_table_body_id"
+                                                    ></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div
+                                                id="gui_memory_div_id"
+                                                class="table-responsive my-2"
+                                            >
+                                                <table
+                                                    id="gui_memory_table_id"
+                                                    class="table table-hover table-bordered"
+                                                >
+                                                    <thead>
+                                                        <tr>
+                                                            <th
+                                                                title="memory address"
+                                                            >
+                                                                Address
+                                                            </th>
+                                                            <th
+                                                                title="memory value"
+                                                            >
+                                                                Value
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody
+                                                        id="gui_memory_table_body_id"
+                                                    ></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="overflow-hidden my-2">
+                                        <textarea
+                                            id="output"
+                                            class="form-control"
+                                            rows="20"
+                                            disabled
+                                        ></textarea>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </main>
             </div>
-            <div class="container-fluid">
+            <div class="container-fluid p-0 m-0">
                 <footer id="webapp_footer_id"></footer>
             </div>
             <dialog id="webapp_dialog_AppHelpID"></dialog>
