@@ -14,14 +14,16 @@ class ControlUnitSignals:
     which input gets used, but are mostly asthetic and constructed for the webui!
     """
 
-    alu_src: Optional[bool] = None
-    mem_to_reg: Optional[bool] = None
+    alu_src_1: Optional[bool] = None
+    alu_src_2: Optional[bool] = None
+    wb_src: Optional[int] = None
     reg_write: Optional[bool] = None
     mem_read: Optional[bool] = None
     mem_write: Optional[bool] = None
     branch: Optional[bool] = None
     jump: Optional[bool] = None
     alu_op: Optional[int] = None
+    alu_to_pc: Optional[int] = None
 
 
 @dataclass
@@ -48,6 +50,7 @@ class PipelineRegister:
 class InstructionFetchPipelineRegister(PipelineRegister):
     pc: Optional[int] = None
     branch_prediction: Optional[bool] = None
+    pc_plus_instruction_length: Optional[int] = None
 
 
 @dataclass
@@ -61,6 +64,7 @@ class InstructionDecodePipelineRegister(PipelineRegister):
     imm: Optional[int] = None
     write_register: Optional[int] = None
     branch_prediction: Optional[bool] = None
+    pc_plus_instruction_length: Optional[int] = None
 
 
 @dataclass
@@ -75,9 +79,10 @@ class ExecutePipelineRegister(PipelineRegister):
     result: Optional[int] = None
     write_register: Optional[int] = None
     # control signals
-    branch_taken: Optional[bool] = None
+    comparison: Optional[bool] = None
     pc_plus_imm: Optional[int] = None
     branch_prediction: Optional[bool] = None
+    pc_plus_instruction_length: Optional[int] = None
 
 
 @dataclass
@@ -92,6 +97,8 @@ class MemoryAccessPipelineRegister(PipelineRegister):
     branch_taken: Optional[bool] = None
     pc_src: Optional[bool] = None
     pc_plus_imm: Optional[int] = None
+    pc_plus_instruction_length: Optional[int] = None
+    imm: Optional[int] = None
 
 
 @dataclass
@@ -101,6 +108,8 @@ class RegisterWritebackPipelineRegister(PipelineRegister):
     write_register: Optional[int] = None
     memory_read_data: Optional[int] = None
     alu_result: Optional[int] = None
+    pc_plus_instruction_length: Optional[int] = None
+    imm: Optional[int] = None
 
 
 # Stage superclass, every stage need to implement a behaviour method
@@ -145,8 +154,12 @@ class InstructionFetchStage(Stage):
             pc = state.program_counter
             instruction = instruction = state.instruction_memory.load_instruction(pc)
             state.program_counter += instruction.length
+            pc_plus_instruction_length = pc + instruction.length
             return InstructionFetchPipelineRegister(
-                instruction=instruction, pc=pc, branch_prediction=False
+                instruction=instruction,
+                pc=pc,
+                branch_prediction=False,
+                pc_plus_instruction_length=pc_plus_instruction_length,
             )
         else:
             return InstructionFetchPipelineRegister()
@@ -231,6 +244,7 @@ class InstructionDecodeStage(Stage):
                 pc=pipeline_register.pc,
                 branch_prediction=pipeline_register.branch_prediction,
                 flush_signal=flush_signal,
+                pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
             )
         else:
             self.write_register_cache.insert(0, 0)
@@ -259,10 +273,14 @@ class ExecuteStage(Stage):
             used in the EX stage, as well as all controll signals
         """
         if isinstance(pipeline_register, InstructionDecodePipelineRegister):
-            alu_in_1 = pipeline_register.register_read_data_1
+            alu_in_1 = (
+                pipeline_register.register_read_data_1
+                if pipeline_register.control_unit_signals.alu_src_1
+                else pipeline_register.pc
+            )
             alu_in_2 = (
                 pipeline_register.imm
-                if pipeline_register.control_unit_signals.alu_src
+                if pipeline_register.control_unit_signals.alu_src_2
                 else pipeline_register.register_read_data_2
             )
             branch_taken, result = pipeline_register.instruction.alu_compute(
@@ -274,6 +292,7 @@ class ExecuteStage(Stage):
                 and pipeline_register.pc is not None
                 else None
             )
+
             return ExecutePipelineRegister(
                 instruction=pipeline_register.instruction,
                 alu_in_1=alu_in_1,
@@ -281,12 +300,13 @@ class ExecuteStage(Stage):
                 register_read_data_2=pipeline_register.register_read_data_2,
                 imm=pipeline_register.imm,
                 result=result,
-                branch_taken=branch_taken,
+                comparison=branch_taken,
                 write_register=pipeline_register.write_register,
                 control_unit_signals=pipeline_register.control_unit_signals,
                 pc=pipeline_register.pc,
                 pc_plus_imm=pc_plus_imm,
                 branch_prediction=pipeline_register.branch_prediction,
+                pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
             )
         else:
             return ExecutePipelineRegister()
@@ -318,19 +338,31 @@ class MemoryAccessStage(Stage):
                 memory_write_data=memory_write_data,
                 architectural_state=state,
             )
-            pc_src = (
+            pc_src = not (
                 pipeline_register.control_unit_signals.jump
-                or pipeline_register.branch_taken
+                or pipeline_register.comparison
             )
 
-            # if this is a branch instuction, we need to flush if we made an incorrect prediction
-            if (
+            # NOTE: pc_src = 0 -> select (pc+imm), pc_src = 1 -> select (pc+i_length)
+            incorrect_branch_prediction = (
                 pipeline_register.control_unit_signals.branch
-                and pc_src != pipeline_register.branch_prediction
+                and pc_src == pipeline_register.branch_prediction
+            )
+
+            if (
+                incorrect_branch_prediction
+                or pipeline_register.control_unit_signals.jump
             ):
+                # flush if (pc+imm) should have been written to the pc
                 assert pipeline_register.pc_plus_imm is not None
                 flush_signal = FlushSignal(
                     inclusive=False, address=pipeline_register.pc_plus_imm
+                )
+            elif pipeline_register.control_unit_signals.alu_to_pc:
+                # flush if result should have been written to pc
+                assert pipeline_register.result is not None
+                flush_signal = FlushSignal(
+                    inclusive=False, address=pipeline_register.result
                 )
             else:
                 flush_signal = None
@@ -341,12 +373,14 @@ class MemoryAccessStage(Stage):
                 result=pipeline_register.result,
                 memory_write_data=memory_write_data,
                 memory_read_data=memory_read_data,
-                branch_taken=pipeline_register.branch_taken,
+                branch_taken=pipeline_register.comparison,
                 pc_src=pc_src,
                 write_register=pipeline_register.write_register,
                 control_unit_signals=pipeline_register.control_unit_signals,
                 pc_plus_imm=pipeline_register.pc_plus_imm,
                 flush_signal=flush_signal,
+                pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
+                imm=pipeline_register.imm,
             )
         else:
             return MemoryAccessPipelineRegister()
@@ -373,16 +407,25 @@ class RegisterWritebackStage(Stage):
             the last stage!
         """
         if isinstance(pipeline_register, MemoryAccessPipelineRegister):
-            register_write_data = (
-                pipeline_register.memory_read_data
-                if pipeline_register.control_unit_signals.mem_to_reg
-                else pipeline_register.result
-            )
+            # select the correct data for write back
+            wb_src = pipeline_register.control_unit_signals.wb_src
+            if wb_src == 0:
+                register_write_data = pipeline_register.pc_plus_instruction_length
+            elif wb_src == 1:
+                register_write_data = pipeline_register.memory_read_data
+            elif wb_src == 2:
+                register_write_data = pipeline_register.result
+            elif wb_src == 3:
+                register_write_data = pipeline_register.imm
+            else:
+                register_write_data = None
+
             pipeline_register.instruction.write_back(
                 write_register=pipeline_register.write_register,
                 register_write_data=register_write_data,
                 architectural_state=state,
             )
+
             return RegisterWritebackPipelineRegister(
                 instruction=pipeline_register.instruction,
                 register_write_data=register_write_data,
@@ -390,6 +433,8 @@ class RegisterWritebackStage(Stage):
                 memory_read_data=pipeline_register.memory_read_data,
                 alu_result=pipeline_register.result,
                 control_unit_signals=pipeline_register.control_unit_signals,
+                pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
+                imm=pipeline_register.imm,
             )
         else:
             return RegisterWritebackPipelineRegister()

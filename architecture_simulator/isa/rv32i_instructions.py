@@ -1,5 +1,6 @@
 # from ctypes import c_int32, c_uint32, c_int8, c_int16, c_uint8, c_uint16
 
+from architecture_simulator.uarch.pipeline import ControlUnitSignals
 from .instruction_types import RTypeInstruction, CSRTypeInstruction, CSRITypeInstruction
 from .instruction_types import ITypeInstruction
 from .instruction_types import ShiftITypeInstruction
@@ -940,6 +941,20 @@ class LUI(UTypeInstruction):
         )
         return architectural_state
 
+    def control_unit_signals(self) -> ControlUnitSignals:
+        return ControlUnitSignals(
+            alu_src_1=None,
+            alu_src_2=None,
+            wb_src=3,
+            reg_write=True,
+            mem_read=False,
+            mem_write=False,
+            branch=False,
+            jump=False,
+            alu_op=None,
+            alu_to_pc=False,
+        )
+
 
 class AUIPC(UTypeInstruction):
     def __init__(self, rd: int, imm: int):
@@ -952,6 +967,27 @@ class AUIPC(UTypeInstruction):
             architectural_state.program_counter + imm
         )
         return architectural_state
+
+    def control_unit_signals(self) -> ControlUnitSignals:
+        return ControlUnitSignals(
+            alu_src_1=False,
+            alu_src_2=True,
+            wb_src=2,
+            reg_write=True,
+            mem_read=False,
+            mem_write=False,
+            branch=False,
+            jump=False,
+            alu_op=None,
+            alu_to_pc=False,
+        )
+
+    def alu_compute(
+        self, alu_in_1: int | None, alu_in_2: int | None
+    ) -> tuple[bool | None, int | None]:
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        return None, (alu_in_1 + alu_in_2)
 
 
 class JAL(JTypeInstruction):
@@ -1156,6 +1192,27 @@ class JALR(ITypeInstruction):
             int((rs1 + fixedint.Int16(self.imm))) & (pow(2, 32) - 2)
         ) - self.length
         return architectural_state
+
+    def control_unit_signals(self) -> ControlUnitSignals:
+        return ControlUnitSignals(
+            alu_src_1=True,
+            alu_src_2=True,
+            wb_src=0,
+            reg_write=True,
+            mem_read=False,
+            mem_write=False,
+            branch=False,
+            jump=False,
+            alu_op=None,
+            alu_to_pc=True,
+        )
+
+    def alu_compute(
+        self, alu_in_1: int | None, alu_in_2: int | None
+    ) -> tuple[bool | None, int | None]:
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        return None, ((alu_in_1 + alu_in_2) & (~1))
 
 
 class ECALL(ITypeInstruction):

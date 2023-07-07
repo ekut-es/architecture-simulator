@@ -138,14 +138,16 @@ class RTypeInstruction(Instruction):
 
         # jump, alu_op
         return ControlUnitSignals(
-            alu_src=False,
-            mem_to_reg=False,
+            alu_src_1=True,
+            alu_src_2=False,
+            wb_src=2,
             reg_write=True,
             mem_read=False,
             mem_write=False,
             branch=False,
             jump=False,
             alu_op=2,
+            alu_to_pc=False,
         )
 
     def get_write_register(self) -> Optional[int]:
@@ -245,14 +247,16 @@ class BTypeInstruction(Instruction):
         from ..uarch.pipeline import ControlUnitSignals
 
         return ControlUnitSignals(
-            alu_src=False,
-            mem_to_reg=None,
+            alu_src_1=True,
+            alu_src_2=False,
+            wb_src=None,
             reg_write=False,
             mem_read=False,
             mem_write=False,
             branch=True,
             jump=False,
             alu_op=1,
+            alu_to_pc=False,
         )
 
 
@@ -288,14 +292,16 @@ class STypeInstruction(Instruction):
 
         # jump, alu_op
         return ControlUnitSignals(
-            alu_src=True,
-            mem_to_reg=None,
+            alu_src_1=True,
+            alu_src_2=True,
+            wb_src=None,
             reg_write=False,
             mem_read=False,
             mem_write=True,
             branch=False,
             jump=False,
             alu_op=0,
+            alu_to_pc=False,
         )
 
 
@@ -308,6 +314,26 @@ class UTypeInstruction(Instruction):
     def __repr__(self) -> str:
         return f"{self.mnemonic} x{self.rd}, {self.imm}"
 
+    def get_write_register(self) -> int | None:
+        return self.rd
+
+    def write_back(
+        self,
+        write_register: Optional[int],
+        register_write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ):
+        assert write_register is not None
+        assert register_write_data is not None
+        architectural_state.register_file.registers[
+            write_register
+        ] = fixedint.MutableUInt32(register_write_data)
+
+    def access_register_file(
+        self, architectural_state: ArchitecturalState
+    ) -> tuple[int | None, int | None, int | None, int | None, int | None]:
+        return None, None, None, None, self.imm << 12
+
 
 class JTypeInstruction(Instruction):
     def __init__(self, rd: int, imm: int, **args):
@@ -317,6 +343,42 @@ class JTypeInstruction(Instruction):
 
     def __repr__(self) -> str:
         return f"{self.mnemonic} x{self.rd}, {self.imm*2}"
+
+    def control_unit_signals(self) -> "ControlUnitSignals":
+        from ..uarch.pipeline import ControlUnitSignals
+
+        return ControlUnitSignals(
+            alu_src_1=None,
+            alu_src_2=None,
+            wb_src=0,
+            reg_write=True,
+            mem_read=False,
+            mem_write=False,
+            branch=False,
+            jump=True,
+            alu_op=None,
+            alu_to_pc=False,
+        )
+
+    def get_write_register(self) -> int | None:
+        return self.rd
+
+    def write_back(
+        self,
+        write_register: Optional[int],
+        register_write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ):
+        assert write_register is not None
+        assert register_write_data is not None
+        architectural_state.register_file.registers[
+            write_register
+        ] = fixedint.MutableUInt32(register_write_data)
+
+    def access_register_file(
+        self, architectural_state: ArchitecturalState
+    ) -> tuple[int | None, int | None, int | None, int | None, int | None]:
+        return None, None, None, None, self.imm << 1
 
 
 class fence(Instruction):
@@ -379,14 +441,16 @@ class ITypeInstruction(Instruction):
         from ..uarch.pipeline import ControlUnitSignals
 
         return ControlUnitSignals(
-            alu_src=True,
-            mem_to_reg=False,
+            alu_src_1=True,
+            alu_src_2=True,
+            wb_src=2,
             reg_write=True,
             mem_read=False,
             mem_write=False,
             branch=False,
             jump=False,
             alu_op=2,
+            alu_to_pc=False,
         )
 
     def get_write_register(self) -> Optional[int]:
@@ -431,14 +495,16 @@ class MemoryITypeInstruction(ITypeInstruction):
         from ..uarch.pipeline import ControlUnitSignals
 
         return ControlUnitSignals(
-            alu_src=True,
-            mem_to_reg=True,
+            alu_src_1=True,
+            alu_src_2=True,
+            wb_src=1,
             reg_write=True,
             mem_read=True,
             mem_write=False,
             branch=False,
             jump=False,
             alu_op=0,
+            alu_to_pc=False,
         )
 
 
