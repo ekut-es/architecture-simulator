@@ -1,6 +1,6 @@
 import unittest
 import fixedint
-from architecture_simulator.uarch.architectural_state import ArchitecturalState
+from architecture_simulator.uarch.architectural_state import ArchitecturalState, Memory
 from architecture_simulator.uarch.pipeline import (
     Pipeline,
     InstructionFetchStage,
@@ -727,6 +727,264 @@ class TestPipeline(unittest.TestCase):
         )
         self.assertEqual(
             pipeline.state.register_file.registers[4], fixedint.MutableUInt32(1)
+        )
+
+    def test_lb(self):
+        program = """lb x6, 0(x0)
+        lb x7, 1(x1)
+        lb x8, 0(x3)
+        lb x9, 47(x4)"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(
+                memory=Memory(
+                    memory_file=dict(
+                        [
+                            (0, fixedint.MutableUInt8(1)),
+                            (1, fixedint.MutableUInt8(2)),
+                            (2, fixedint.MutableUInt8(3)),
+                            (3, fixedint.MutableUInt8(-1)),
+                            (2**32 - 1, fixedint.MutableUInt8(4)),
+                            (2047, fixedint.MutableUInt8(5)),
+                        ]
+                    ),
+                    min_bytes=0,
+                ),
+            ),
+        )
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(20)
+        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
+        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(2000)
+        pipeline.state.instruction_memory.append_instructions(program)
+        for _ in range(10):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[6], fixedint.MutableUInt32(1)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(3)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[8], fixedint.MutableUInt32(4)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[9], fixedint.MutableUInt32(5)
+        )
+
+    def test_lh(self):
+        program = """lh x6, 0(x0)
+        lh x7, 1(x1)
+        lh x8, 0(x3)
+        lh x9, 48(x4)"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(
+                memory=Memory(
+                    memory_file=dict(
+                        [
+                            (0, fixedint.MutableUInt8(1)),
+                            (1, fixedint.MutableUInt8(1)),
+                            (2, fixedint.MutableUInt8(0)),
+                            (3, fixedint.MutableUInt8(-1)),
+                            (2**32 - 1, fixedint.MutableUInt8(0)),
+                            (2048, fixedint.MutableUInt8(5)),
+                        ]
+                    ),
+                    min_bytes=0,
+                ),
+            ),
+        )
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(20)
+        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
+        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(2000)
+        pipeline.state.instruction_memory.append_instructions(program)
+        for _ in range(10):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[6], fixedint.MutableUInt32(257)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[7],
+            fixedint.MutableUInt32((2**32 - 1) - 255),
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[8],
+            fixedint.MutableUInt32(256),  # circular memory
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[9], fixedint.MutableUInt32(5)
+        )
+
+    def test_lw(self):
+        program = """lw x6, 0(x0)
+        lw x7, 2(x1)
+        lw x8, 0(x3)
+        lw x9, 48(x4)"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(
+                memory=Memory(
+                    memory_file=dict(
+                        [
+                            (0, fixedint.MutableUInt8(1)),
+                            (1, fixedint.MutableUInt8(1)),
+                            (2, fixedint.MutableUInt8(1)),
+                            (3, fixedint.MutableUInt8(1)),
+                            (2**32 - 1, fixedint.MutableUInt8(0)),
+                            (2048, fixedint.MutableUInt8(5)),
+                        ]
+                    ),
+                    min_bytes=0,
+                ),
+            ),
+        )
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(20)
+        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
+        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(2000)
+        pipeline.state.instruction_memory.append_instructions(program)
+        for _ in range(10):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[6],
+            fixedint.MutableUInt32(1 + 2**8 + 2**16 + 2**24),
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(1)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[8],
+            fixedint.MutableUInt32(2**8 + 2**16 + 2**24),  # circular memory
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[9], fixedint.MutableUInt32(5)
+        )
+
+    def test_lbu(self):
+        program = """lbu x6, 0(x0)
+        lbu x7, 2(x1)
+        lbu x8, 0(x3)
+        lbu x9, 48(x4)"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(
+                memory=Memory(
+                    memory_file=dict(
+                        [
+                            (0, fixedint.MutableUInt8(1)),
+                            (1, fixedint.MutableUInt8(1)),
+                            (2, fixedint.MutableUInt8(5)),
+                            (3, fixedint.MutableUInt8(-1)),
+                            (2**32 - 1, fixedint.MutableUInt8(5)),
+                            (2048, fixedint.MutableUInt8(5)),
+                        ]
+                    ),
+                    min_bytes=0,
+                ),
+            ),
+        )
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(20)
+        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
+        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(2000)
+        pipeline.state.instruction_memory.append_instructions(program)
+        for _ in range(10):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[6], fixedint.MutableUInt32(1)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[7],
+            fixedint.MutableUInt32(0b11111111),
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[8],
+            fixedint.MutableUInt32(5),  # no circular memory
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[9], fixedint.MutableUInt32(5)
+        )
+
+    def test_lhu(self):
+        program = """lhu x6, 0(x0)
+        lhu x7, 1(x1)
+        lhu x8, 0(x3)
+        lhu x9, 48(x4)"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(
+                memory=Memory(
+                    memory_file=dict(
+                        [
+                            (0, fixedint.MutableUInt8(1)),
+                            (1, fixedint.MutableUInt8(1)),
+                            (2, fixedint.MutableUInt8(0)),
+                            (3, fixedint.MutableUInt8(-1)),
+                            (2**32 - 1, fixedint.MutableUInt8(5)),
+                            (2048, fixedint.MutableUInt8(5)),
+                        ]
+                    ),
+                    min_bytes=0,
+                ),
+            ),
+        )
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(20)
+        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
+        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(2000)
+        pipeline.state.instruction_memory.append_instructions(program)
+        for _ in range(10):
+            pipeline.step()
+        self.assertEqual(
+            pipeline.state.register_file.registers[6], fixedint.MutableUInt32(257)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[7],
+            fixedint.MutableUInt32(0b1111111100000000),
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[8],
+            fixedint.MutableUInt32(261),  # circular memory
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[9], fixedint.MutableUInt32(5)
         )
 
     def test_data_hazard(self):
