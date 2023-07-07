@@ -268,7 +268,11 @@ class ExecuteStage(Stage):
             used in the EX stage, as well as all controll signals
         """
         if isinstance(pipeline_register, InstructionDecodePipelineRegister):
-            alu_in_1 = pipeline_register.register_read_data_1
+            alu_in_1 = (
+                pipeline_register.register_read_data_1
+                if pipeline_register.control_unit_signals.alu_src_1
+                else pipeline_register.pc
+            )
             alu_in_2 = (
                 pipeline_register.imm
                 if pipeline_register.control_unit_signals.alu_src_2
@@ -283,6 +287,7 @@ class ExecuteStage(Stage):
                 and pipeline_register.pc is not None
                 else None
             )
+
             return ExecutePipelineRegister(
                 instruction=pipeline_register.instruction,
                 alu_in_1=alu_in_1,
