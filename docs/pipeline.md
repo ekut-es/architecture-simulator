@@ -5,19 +5,27 @@ The **pipeline** class is a framework that can be used to create your own custom
 ## The pipeline class
 ### Arguments
 > **stages**: a list of instances of child classes of the Stage class. The behavior() methods of these classes will be called during each call of step()
+
 > **execution_ordering**: a list of indices. They provide the ordering, in which the behavior methods of the stages will be called.
+
 > **state**:  an instance of the class ArchitecturalState on which the pipeline operates.
+
 ### Methods
 > **step()**: the pipeline will do one execution cycle.
+
 > **is_empty() -> bool**: returns true, if there are no instructions in the pipeline stages.
+
 > **is_done()->bool**: returns true, if the pipeline is empty and there are no instructions at the current program counter.
+
 ### Functionality
 The pipeline does one execution cycle whenever step() is called.
 This means, that the behavior methods of the **stages** are called in the ordering provided by **execution_ordering**.
 The behavior methods are called with the entire list of pipeline registers and index_of_own_input_register is set to the index of the pipeline register, that was created by the stage that is in front of the current one.
+
 **Note**, that at any time a pipeline register in the list of pipeline registers may be just a default PipelineRegister, so the behavior methods of the stages need to be able to handle that.
 This means, that the first stage does not receive a valid index (-1), since it does not have a stage the comes before it. Also the pipeline register of the last stage is not provided as direct input to any other stage.
 Additionally, the pipeline will check with each step call, if a pipeline registers flush signal is set. If so, the pipeline will flush the stored pipeline registers according to the set signal.
+
 **Note**, that if multiple flush signals are set, the one from the stage furthest back supersedes all other signals.
 ## The Stage class
 ### Methods
@@ -26,7 +34,9 @@ Additionally, the pipeline will check with each step call, if a pipeline registe
 ## The PipelineRegister class
 ### Attributes
 > **instruction** the instruction, that is currently in this register. Default value is the EmptyInstruction, which just means, that there is no actual instruction in the register.
+
 > **flush_signal** an instance of the class flush signal or None. Default value None.
+
 ### Functionality
 This child classes of PipelineRegister hold the values / information of the stages. In general these should be Optionals, since some instructions may never produce some of the values .
 ## But how do I actually make my own pipeline
