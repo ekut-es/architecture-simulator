@@ -963,3 +963,29 @@ End:"""
         self.assertEqual(pipeline.state.register_file.registers[1], 4096 + 12)
         self.assertEqual(pipeline.state.register_file.registers[2], 8192 + 16)
         self.assertEqual(pipeline.state.register_file.registers[3], 2**31 + 20)
+
+    def test_fix_too_many_flushes(self):
+        program = """
+        beq x0, x0, label
+        add x1, x0, x0
+        add x1, x0, x0
+        label:
+        add x2, x1, x1
+        """
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(),
+        )
+        pipeline.state.instruction_memory.append_instructions(program)
+
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+
+        self.assert_steps(pipeline=pipeline, steps=9)
+        self.assertEqual(pipeline.state.register_file.registers[2], 2)
