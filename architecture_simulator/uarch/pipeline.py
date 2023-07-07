@@ -79,7 +79,7 @@ class ExecutePipelineRegister(PipelineRegister):
     result: Optional[int] = None
     write_register: Optional[int] = None
     # control signals
-    branch_taken: Optional[bool] = None
+    comparison: Optional[bool] = None
     pc_plus_imm: Optional[int] = None
     branch_prediction: Optional[bool] = None
     pc_plus_instruction_length: Optional[int] = None
@@ -295,7 +295,7 @@ class ExecuteStage(Stage):
                 register_read_data_2=pipeline_register.register_read_data_2,
                 imm=pipeline_register.imm,
                 result=result,
-                branch_taken=branch_taken,
+                comparison=branch_taken,
                 write_register=pipeline_register.write_register,
                 control_unit_signals=pipeline_register.control_unit_signals,
                 pc=pipeline_register.pc,
@@ -332,19 +332,31 @@ class MemoryAccessStage(Stage):
                 memory_write_data=memory_write_data,
                 architectural_state=state,
             )
-            pc_src = (
+            pc_src = not (
                 pipeline_register.control_unit_signals.jump
-                or pipeline_register.branch_taken
+                or pipeline_register.comparison
             )
 
-            # if this is a branch instuction, we need to flush if we made an incorrect prediction
-            if (
+            # NOTE: pc_src = 0 -> select (pc+imm), pc_src = 1 -> select (pc+i_length)
+            incorrect_branch_prediction = (
                 pipeline_register.control_unit_signals.branch
-                and pc_src != pipeline_register.branch_prediction
+                and pc_src == pipeline_register.branch_prediction
+            )
+
+            if (
+                incorrect_branch_prediction
+                or pipeline_register.control_unit_signals.jump
             ):
+                # flush if (pc+imm) should have been written to the pc
                 assert pipeline_register.pc_plus_imm is not None
                 flush_signal = FlushSignal(
                     inclusive=False, address=pipeline_register.pc_plus_imm
+                )
+            elif pipeline_register.control_unit_signals.alu_to_pc:
+                # flush if result should have been written to pc
+                assert pipeline_register.result is not None
+                flush_signal = FlushSignal(
+                    inclusive=False, address=pipeline_register.result
                 )
             else:
                 flush_signal = None
@@ -355,7 +367,7 @@ class MemoryAccessStage(Stage):
                 result=pipeline_register.result,
                 memory_write_data=memory_write_data,
                 memory_read_data=memory_read_data,
-                branch_taken=pipeline_register.branch_taken,
+                branch_taken=pipeline_register.comparison,
                 pc_src=pc_src,
                 write_register=pipeline_register.write_register,
                 control_unit_signals=pipeline_register.control_unit_signals,
