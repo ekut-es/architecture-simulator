@@ -796,35 +796,34 @@ End:"""
         self.assertEqual(pipeline.state.register_file.registers[5], 2)
         self.assertEqual(pipeline.state.register_file.registers[6], 0)
 
-        # FIXME: Fix Flushing
-        # program = """add x8, x0, x0
-        # add x9, x0, x0
-        # jal x2, Bananenbrot
-        # jal x3, Kaesekuchen
-        # add x1, x1, x1
-        # Bananenbrot:
-        # add x4, x1, x1
-        # Kaesekuchen:
-        # add x5, x1, x1"""
-        # pipeline = Pipeline(
-        #     [
-        #         InstructionFetchStage(),
-        #         InstructionDecodeStage(),
-        #         ExecuteStage(),
-        #         MemoryAccessStage(),
-        #         RegisterWritebackStage(),
-        #     ],
-        #     [0, 4, 1, 2, 3],
-        #     state=ArchitecturalState(),
-        # )
-        # pipeline.state.instruction_memory.append_instructions(program)
-        # pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        # self.assert_steps(pipeline=pipeline, steps=12)
-        # self.assertEqual(pipeline.state.register_file.registers[1], 1)
-        # self.assertEqual(pipeline.state.register_file.registers[2], 12)
-        # self.assertEqual(pipeline.state.register_file.registers[3], 0)
-        # self.assertEqual(pipeline.state.register_file.registers[4], 2)
-        # self.assertEqual(pipeline.state.register_file.registers[5], 2)
+        program = """add x8, x0, x0
+        add x9, x0, x0
+        jal x2, Bananenbrot
+        jal x3, Kaesekuchen
+        add x1, x1, x1
+        Bananenbrot:
+        add x4, x1, x1
+        Kaesekuchen:
+        add x5, x1, x1"""
+        pipeline = Pipeline(
+            [
+                InstructionFetchStage(),
+                InstructionDecodeStage(),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ],
+            [0, 4, 1, 2, 3],
+            state=ArchitecturalState(),
+        )
+        pipeline.state.instruction_memory.append_instructions(program)
+        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        self.assert_steps(pipeline=pipeline, steps=12)
+        self.assertEqual(pipeline.state.register_file.registers[1], 1)
+        self.assertEqual(pipeline.state.register_file.registers[2], 12)
+        self.assertEqual(pipeline.state.register_file.registers[3], 0)
+        self.assertEqual(pipeline.state.register_file.registers[4], 2)
+        self.assertEqual(pipeline.state.register_file.registers[5], 2)
 
     def test_jalr(self):
         program = """jalr x2, x1, 20"""
