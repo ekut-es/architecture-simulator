@@ -84,7 +84,7 @@ class TestPipeline(unittest.TestCase):
         pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(32)
         pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(20)
         pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(-10)
-        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(20)
+        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(10)
         for _ in range(10):
             pipeline.step()
         self.assertEqual(
@@ -94,7 +94,7 @@ class TestPipeline(unittest.TestCase):
             pipeline.state.register_file.registers[4], fixedint.MutableUInt32(52)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(10)
+            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(0)
         )
 
     def test_sub(self):
@@ -118,7 +118,7 @@ class TestPipeline(unittest.TestCase):
         pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(32)
         pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(20)
         pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(-10)
-        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(20)
+        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(-10)
         for _ in range(10):
             pipeline.step()
         self.assertEqual(
@@ -128,7 +128,7 @@ class TestPipeline(unittest.TestCase):
             pipeline.state.register_file.registers[4], fixedint.MutableUInt32(12)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(-30)
+            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(0)
         )
 
     def test_sll(self):
@@ -152,7 +152,7 @@ class TestPipeline(unittest.TestCase):
         pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(-1)
         pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(31)
         pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(20)
+        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(31 + 32)
         for _ in range(10):
             pipeline.step()
         self.assertEqual(
@@ -164,7 +164,7 @@ class TestPipeline(unittest.TestCase):
             fixedint.MutableUInt32(2147483648),
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(2**20)
+            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(2**31)
         )
 
     def test_slt(self):
@@ -187,7 +187,7 @@ class TestPipeline(unittest.TestCase):
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(8)
         pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(32)
         pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(20)
-        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(-10)
+        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(-1)
         pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(20)
         for _ in range(10):
             pipeline.step()
@@ -221,7 +221,7 @@ class TestPipeline(unittest.TestCase):
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(8)
         pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(32)
         pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(20)
-        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(-10)
+        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(-1)
         pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(20)
         for _ in range(10):
             pipeline.step()
@@ -288,8 +288,8 @@ class TestPipeline(unittest.TestCase):
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(1)
         pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(-1)
         pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(16)
-        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(2)
+        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(2**31)
+        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(31)
         pipeline.state.instruction_memory.append_instructions(program)
         for _ in range(10):
             pipeline.step()
@@ -300,7 +300,7 @@ class TestPipeline(unittest.TestCase):
             pipeline.state.register_file.registers[4], fixedint.MutableUInt32(1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(4)
+            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(1)
         )
 
     def test_sra(self):
@@ -322,8 +322,8 @@ class TestPipeline(unittest.TestCase):
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(2)
         pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(-1)
         pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(100)
-        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(20)
+        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(2**31)
+        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(31)
         pipeline.state.instruction_memory.append_instructions(program)
         for _ in range(10):
             pipeline.step()
@@ -334,7 +334,8 @@ class TestPipeline(unittest.TestCase):
             pipeline.state.register_file.registers[4], fixedint.MutableUInt32(-1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(0)
+            pipeline.state.register_file.registers[7],
+            fixedint.MutableUInt32(2**32 - 1),
         )
 
     def test_or(self):
@@ -661,7 +662,7 @@ class TestPipeline(unittest.TestCase):
         program = """slti x1, x1, 1
         slti x2, x2, 0
         slti x3, x3, 20
-        slti x4, x4, -1"""
+        slti x4, x4, 1"""
         pipeline = Pipeline(
             [
                 InstructionFetchStage(),
@@ -676,7 +677,7 @@ class TestPipeline(unittest.TestCase):
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(-1)
         pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(10)
-        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(-3)
+        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(-1)
         pipeline.state.instruction_memory.append_instructions(program)
         for _ in range(10):
             pipeline.step()
@@ -697,7 +698,7 @@ class TestPipeline(unittest.TestCase):
         program = """sltiu x1, x1, 1
         sltiu x2, x2, 0
         sltiu x3, x3, 20
-        sltiu x4, x4, -1"""
+        sltiu x4, x4, 1"""
         pipeline = Pipeline(
             [
                 InstructionFetchStage(),
@@ -712,7 +713,7 @@ class TestPipeline(unittest.TestCase):
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(-1)
         pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(10)
-        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(3)
+        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(-1)
         pipeline.state.instruction_memory.append_instructions(program)
         for _ in range(10):
             pipeline.step()
@@ -726,13 +727,14 @@ class TestPipeline(unittest.TestCase):
             pipeline.state.register_file.registers[3], fixedint.MutableUInt32(1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(1)
+            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(0)
         )
 
     def test_lb(self):
         program = """lb x6, 0(x0)
         lb x7, 1(x1)
         lb x8, 0(x3)
+        lb x10, 4(x0)
         lb x9, 47(x4)"""
         pipeline = Pipeline(
             [
@@ -751,6 +753,7 @@ class TestPipeline(unittest.TestCase):
                             (1, fixedint.MutableUInt8(2)),
                             (2, fixedint.MutableUInt8(3)),
                             (3, fixedint.MutableUInt8(-1)),
+                            (4, fixedint.MutableUInt8(255)),
                             (2**32 - 1, fixedint.MutableUInt8(4)),
                             (2047, fixedint.MutableUInt8(5)),
                         ]
@@ -778,12 +781,17 @@ class TestPipeline(unittest.TestCase):
         self.assertEqual(
             pipeline.state.register_file.registers[9], fixedint.MutableUInt32(5)
         )
+        self.assertEqual(
+            pipeline.state.register_file.registers[10], fixedint.MutableUInt32(-1)
+        )
 
     def test_lh(self):
         program = """lh x6, 0(x0)
         lh x7, 1(x1)
         lh x8, 0(x3)
-        lh x9, 48(x4)"""
+        lh x9, 48(x4)
+        lh x10, 12(x0)
+        """
         pipeline = Pipeline(
             [
                 InstructionFetchStage(),
@@ -801,6 +809,8 @@ class TestPipeline(unittest.TestCase):
                             (1, fixedint.MutableUInt8(1)),
                             (2, fixedint.MutableUInt8(0)),
                             (3, fixedint.MutableUInt8(-1)),
+                            (12, fixedint.MutableUInt8(255)),
+                            (13, fixedint.MutableUInt8(255)),
                             (2**32 - 1, fixedint.MutableUInt8(0)),
                             (2048, fixedint.MutableUInt8(5)),
                         ]
@@ -829,6 +839,9 @@ class TestPipeline(unittest.TestCase):
         )
         self.assertEqual(
             pipeline.state.register_file.registers[9], fixedint.MutableUInt32(5)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[10], fixedint.MutableUInt32(-1)
         )
 
     def test_lw(self):
@@ -887,7 +900,9 @@ class TestPipeline(unittest.TestCase):
         program = """lbu x6, 0(x0)
         lbu x7, 2(x1)
         lbu x8, 0(x3)
-        lbu x9, 48(x4)"""
+        lbu x9, 48(x4)
+        lbu x10, 4(x0)
+        """
         pipeline = Pipeline(
             [
                 InstructionFetchStage(),
@@ -905,6 +920,7 @@ class TestPipeline(unittest.TestCase):
                             (1, fixedint.MutableUInt8(1)),
                             (2, fixedint.MutableUInt8(5)),
                             (3, fixedint.MutableUInt8(-1)),
+                            (4, fixedint.MutableUInt8(255)),
                             (2**32 - 1, fixedint.MutableUInt8(5)),
                             (2048, fixedint.MutableUInt8(5)),
                         ]
@@ -934,12 +950,17 @@ class TestPipeline(unittest.TestCase):
         self.assertEqual(
             pipeline.state.register_file.registers[9], fixedint.MutableUInt32(5)
         )
+        self.assertEqual(
+            pipeline.state.register_file.registers[10], fixedint.MutableUInt32(255)
+        )
 
     def test_lhu(self):
         program = """lhu x6, 0(x0)
         lhu x7, 1(x1)
         lhu x8, 0(x3)
-        lhu x9, 48(x4)"""
+        lhu x9, 48(x4)
+        lhu x10, 4(x0)
+        """
         pipeline = Pipeline(
             [
                 InstructionFetchStage(),
@@ -957,6 +978,8 @@ class TestPipeline(unittest.TestCase):
                             (1, fixedint.MutableUInt8(1)),
                             (2, fixedint.MutableUInt8(0)),
                             (3, fixedint.MutableUInt8(-1)),
+                            (4, fixedint.MutableUInt8(255)),
+                            (5, fixedint.MutableUInt8(255)),
                             (2**32 - 1, fixedint.MutableUInt8(5)),
                             (2048, fixedint.MutableUInt8(5)),
                         ]
@@ -985,6 +1008,10 @@ class TestPipeline(unittest.TestCase):
         )
         self.assertEqual(
             pipeline.state.register_file.registers[9], fixedint.MutableUInt32(5)
+        )
+        self.assertEqual(
+            pipeline.state.register_file.registers[10],
+            fixedint.MutableUInt32(2**16 - 1),
         )
 
     def test_data_hazard(self):
