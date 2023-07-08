@@ -116,7 +116,8 @@ class RegisterWritebackPipelineRegister(PipelineRegister):
 class Stage:
     def behavior(
         self,
-        pipeline_register: PipelineRegister,
+        pipeline_registers: list[PipelineRegister],
+        index_of_own_input_register: int,
         state: ArchitecturalState,
     ) -> PipelineRegister:
         """general behavior method
@@ -134,7 +135,8 @@ class Stage:
 class InstructionFetchStage(Stage):
     def behavior(
         self,
-        pipeline_register: PipelineRegister,
+        pipeline_registers: list[PipelineRegister],
+        index_of_own_input_register: int,
         state: ArchitecturalState,
     ) -> PipelineRegister:
         """behavior of the IF Stage
@@ -166,14 +168,15 @@ class InstructionFetchStage(Stage):
 
 
 class InstructionDecodeStage(Stage):
-    def __init__(self, stages_until_writeback=2) -> None:
+    def __init__(self, stages_until_writeback=2, detect_data_hazards=True) -> None:
         self.stages_until_writeback = stages_until_writeback
-        self.write_register_cache = [0 for _ in range(stages_until_writeback)]
+        self.detect_data_hazards = detect_data_hazards
         super().__init__()
 
     def behavior(
         self,
-        pipeline_register: PipelineRegister,
+        pipeline_registers: list[PipelineRegister],
+        index_of_own_input_register: int,
         state: ArchitecturalState,
     ) -> PipelineRegister:
         """behavior of the ID Stage
@@ -188,6 +191,7 @@ class InstructionDecodeStage(Stage):
             PipelineRegister: returns InstructionDecodePipelineRegister with all information from
             the ID stage and all results of computations done in this step, as well as all controll signals
         """
+        pipeline_register = pipeline_registers[index_of_own_input_register]
         if isinstance(pipeline_register, InstructionFetchPipelineRegister):
             # uses the access_register_file method of the instruction saved in the InstructionFetchPipelineRegister
             # to get the data from the register files
@@ -205,10 +209,17 @@ class InstructionDecodeStage(Stage):
 
             # Data Hazard Detection
             flush_signal = None
-            if True:
+            if self.detect_data_hazards:
+                # Put all the write registers of later stages, that are not done ahead of this stage into a list
+                write_registers_of_later_stages = [
+                    pipeline_registers[
+                        index_of_own_input_register + i + 1
+                    ].instruction.get_write_register()
+                    for i in range(self.stages_until_writeback)
+                ]
                 # Check if there is a data hazard
-                for register in self.write_register_cache:
-                    if register == 0:
+                for register in write_registers_of_later_stages:
+                    if register is None or register == 0:
                         continue
                     if (
                         register_read_addr_1 == register
@@ -219,16 +230,6 @@ class InstructionDecodeStage(Stage):
                             inclusive=True, address=pipeline_register.pc
                         )
                         break
-
-                # Update the register cache
-
-                if write_register is None or flush_signal is not None:
-                    self.write_register_cache.insert(0, 0)
-                else:
-                    self.write_register_cache.insert(0, write_register)
-                self.write_register_cache = self.write_register_cache[
-                    : self.stages_until_writeback
-                ]
 
             # gets the control unit signals that are generated in the ID stage
             control_unit_signals = pipeline_register.instruction.control_unit_signals()
@@ -247,17 +248,14 @@ class InstructionDecodeStage(Stage):
                 pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
             )
         else:
-            self.write_register_cache.insert(0, 0)
-            self.write_register_cache = self.write_register_cache[
-                : self.stages_until_writeback
-            ]
             return InstructionDecodePipelineRegister()
 
 
 class ExecuteStage(Stage):
     def behavior(
         self,
-        pipeline_register: PipelineRegister,
+        pipeline_registers: list[PipelineRegister],
+        index_of_own_input_register: int,
         state: ArchitecturalState,
     ) -> PipelineRegister:
         """behavior of the EX stage
@@ -272,6 +270,7 @@ class ExecuteStage(Stage):
             PipelineRegister: returns the ExecutePipelineRegister with all necessary information produced or
             used in the EX stage, as well as all controll signals
         """
+        pipeline_register = pipeline_registers[index_of_own_input_register]
         if isinstance(pipeline_register, InstructionDecodePipelineRegister):
             alu_in_1 = (
                 pipeline_register.register_read_data_1
@@ -315,7 +314,8 @@ class ExecuteStage(Stage):
 class MemoryAccessStage(Stage):
     def behavior(
         self,
-        pipeline_register: PipelineRegister,
+        pipeline_registers: list[PipelineRegister],
+        index_of_own_input_register: int,
         state: ArchitecturalState,
     ) -> PipelineRegister:
         """behavior of MA stage
@@ -330,6 +330,7 @@ class MemoryAccessStage(Stage):
             PipelineRegister: returns MemoryAccessPipelineRegister with all necessary information produced or
             used in the MA stage, as well as all controll signals
         """
+        pipeline_register = pipeline_registers[index_of_own_input_register]
         if isinstance(pipeline_register, ExecutePipelineRegister):
             memory_address = pipeline_register.result
             memory_write_data = pipeline_register.register_read_data_2
@@ -389,7 +390,8 @@ class MemoryAccessStage(Stage):
 class RegisterWritebackStage(Stage):
     def behavior(
         self,
-        pipeline_register: PipelineRegister,
+        pipeline_registers: list[PipelineRegister],
+        index_of_own_input_register: int,
         state: ArchitecturalState,
     ) -> PipelineRegister:
         """behavior of WB stage
@@ -406,6 +408,7 @@ class RegisterWritebackStage(Stage):
             Note: this information is not taken as an input by any other stage, because the WB stage is
             the last stage!
         """
+        pipeline_register = pipeline_registers[index_of_own_input_register]
         if isinstance(pipeline_register, MemoryAccessPipelineRegister):
             # select the correct data for write back
             wb_src = pipeline_register.control_unit_signals.wb_src
@@ -446,7 +449,8 @@ class RegisterWritebackStage(Stage):
 class SingleStage(Stage):
     def behavior(
         self,
-        pipeline_register: PipelineRegister,
+        pipeline_registers: list[PipelineRegister],
+        index_of_own_input_register: int,
         state: ArchitecturalState,
     ) -> PipelineRegister:
         """behavior of the single stage pipeline
@@ -500,18 +504,11 @@ class Pipeline:
         """
         next_pipeline_registers = [None] * self.num_stages
         for index in self.execution_ordering:
-            # first stage in pipeline does not consume any PipelineRegister
-            if index == 0:
-                next_pipeline_registers[0] = self.stages[0].behavior(
-                    pipeline_register=PipelineRegister(),
-                    state=self.state,
-                )
-            # all other pipeline stages consume PipelineRegister and return PipelineRegister
-            else:
-                next_pipeline_registers[index] = self.stages[index].behavior(
-                    pipeline_register=self.pipeline_registers[index - 1],
-                    state=self.state,
-                )
+            next_pipeline_registers[index] = self.stages[index].behavior(
+                pipeline_registers=self.pipeline_registers,
+                index_of_own_input_register=(index - 1),
+                state=self.state,
+            )
         self.pipeline_registers = next_pipeline_registers
 
         # if one of the stages wants to flush, do so (starting from the back makes sense)
