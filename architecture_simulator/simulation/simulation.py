@@ -43,7 +43,8 @@ class Simulation:
         self.mode = mode
 
     def step_simulation(self) -> bool:
-        self.pipeline.step()
+        if not self.pipeline.is_done():
+            self.pipeline.step()
         return not self.pipeline.is_done()
 
     def run_simulation(self):
