@@ -45,8 +45,8 @@ class PerformanceMetrics:
         representation += f"procedure count: {self.procedure_count}\n"
         representation += f"cycles: {self.cycles}\n"
         representation += f"flushes: {self.flushes}\n"
-        if not self.cycles == 0:
-            representation += f"instructions per cycle: {round(self.instruction_count / self.cycles)}\n"
+        if not self.instruction_count == 0:
+            representation += f"cycles per instruction: {round(self.cycles / self.instruction_count)}\n"
         return representation
 
 

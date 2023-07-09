@@ -49,7 +49,6 @@ class PipelineRegister:
 
 @dataclass
 class InstructionFetchPipelineRegister(PipelineRegister):
-    pc: Optional[int] = None
     branch_prediction: Optional[bool] = None
     pc_plus_instruction_length: Optional[int] = None
 
@@ -57,7 +56,6 @@ class InstructionFetchPipelineRegister(PipelineRegister):
 @dataclass
 class InstructionDecodePipelineRegister(PipelineRegister):
     control_unit_signals: ControlUnitSignals = field(default_factory=ControlUnitSignals)
-    pc: Optional[int] = None
     register_read_addr_1: Optional[int] = None
     register_read_addr_2: Optional[int] = None
     register_read_data_1: Optional[int] = None
@@ -71,7 +69,6 @@ class InstructionDecodePipelineRegister(PipelineRegister):
 @dataclass
 class ExecutePipelineRegister(PipelineRegister):
     control_unit_signals: ControlUnitSignals = field(default_factory=ControlUnitSignals)
-    pc: Optional[int] = None
     alu_in_1: Optional[int] = None
     alu_in_2: Optional[int] = None
     # alu_in_2 is one of read_data_2 and imm
@@ -154,16 +151,16 @@ class InstructionFetchStage(Stage):
         """
         if state.instruction_at_pc():
             # NOTE: PC gets incremented here. This means that branch prediction also happens here. Currently, we just statically predict not taken.
-            pc = state.program_counter
-            address_of_instruction = pc
-            instruction = state.instruction_memory.load_instruction(pc)
+            address_of_instruction = state.program_counter
+            instruction = state.instruction_memory.load_instruction(
+                address_of_instruction
+            )
             try:
                 state.program_counter += instruction.length
-                pc_plus_instruction_length = pc + instruction.length
+                pc_plus_instruction_length = address_of_instruction + instruction.length
                 return InstructionFetchPipelineRegister(
                     instruction=instruction,
                     address_of_instruction=address_of_instruction,
-                    pc=pc,
                     branch_prediction=False,
                     pc_plus_instruction_length=pc_plus_instruction_length,
                 )
@@ -235,9 +232,10 @@ class InstructionDecodeStage(Stage):
                         register_read_addr_1 == register
                         or register_read_addr_2 == register
                     ):
-                        assert pipeline_register.pc is not None
+                        assert pipeline_register.address_of_instruction is not None
                         flush_signal = FlushSignal(
-                            inclusive=True, address=pipeline_register.pc
+                            inclusive=True,
+                            address=pipeline_register.address_of_instruction,
                         )
                         break
 
@@ -252,7 +250,6 @@ class InstructionDecodeStage(Stage):
                 imm=imm,
                 write_register=write_register,
                 control_unit_signals=control_unit_signals,
-                pc=pipeline_register.pc,
                 branch_prediction=pipeline_register.branch_prediction,
                 flush_signal=flush_signal,
                 pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
@@ -286,7 +283,7 @@ class ExecuteStage(Stage):
             alu_in_1 = (
                 pipeline_register.register_read_data_1
                 if pipeline_register.control_unit_signals.alu_src_1
-                else pipeline_register.pc
+                else pipeline_register.address_of_instruction
             )
             alu_in_2 = (
                 pipeline_register.imm
@@ -297,9 +294,9 @@ class ExecuteStage(Stage):
                 alu_in_1=alu_in_1, alu_in_2=alu_in_2
             )
             pc_plus_imm = (
-                pipeline_register.imm + pipeline_register.pc
+                pipeline_register.imm + pipeline_register.address_of_instruction
                 if pipeline_register.imm is not None
-                and pipeline_register.pc is not None
+                and pipeline_register.address_of_instruction is not None
                 else None
             )
 
@@ -313,7 +310,6 @@ class ExecuteStage(Stage):
                 comparison=branch_taken,
                 write_register=pipeline_register.write_register,
                 control_unit_signals=pipeline_register.control_unit_signals,
-                pc=pipeline_register.pc,
                 pc_plus_imm=pc_plus_imm,
                 branch_prediction=pipeline_register.branch_prediction,
                 pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
