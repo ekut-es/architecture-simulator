@@ -1,6 +1,6 @@
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 from .architectural_state import ArchitecturalState
-from ..isa.instruction_types import Instruction, EmptyInstruction
+from ..isa.instruction_types import Instruction, EmptyInstruction, BTypeInstruction
 from typing import Optional
 from dataclasses import dataclass, field
 
@@ -43,6 +43,7 @@ class PipelineRegister:
     """
 
     instruction: Instruction = field(default_factory=EmptyInstruction)
+    address_of_instruction: Optional[int] = None
     flush_signal: Optional[FlushSignal] = None
 
 
@@ -154,15 +155,24 @@ class InstructionFetchStage(Stage):
         if state.instruction_at_pc():
             # NOTE: PC gets incremented here. This means that branch prediction also happens here. Currently, we just statically predict not taken.
             pc = state.program_counter
-            instruction = instruction = state.instruction_memory.load_instruction(pc)
-            state.program_counter += instruction.length
-            pc_plus_instruction_length = pc + instruction.length
-            return InstructionFetchPipelineRegister(
-                instruction=instruction,
-                pc=pc,
-                branch_prediction=False,
-                pc_plus_instruction_length=pc_plus_instruction_length,
-            )
+            address_of_instruction = pc
+            instruction = state.instruction_memory.load_instruction(pc)
+            try:
+                state.program_counter += instruction.length
+                pc_plus_instruction_length = pc + instruction.length
+                return InstructionFetchPipelineRegister(
+                    instruction=instruction,
+                    address_of_instruction=address_of_instruction,
+                    pc=pc,
+                    branch_prediction=False,
+                    pc_plus_instruction_length=pc_plus_instruction_length,
+                )
+            except Exception as e:
+                raise InstructionExecutionException(
+                    address=address_of_instruction,
+                    instruction_repr=instruction.__repr__(),
+                    error_message=e.__repr__(),
+                )
         else:
             return InstructionFetchPipelineRegister()
 
@@ -246,6 +256,7 @@ class InstructionDecodeStage(Stage):
                 branch_prediction=pipeline_register.branch_prediction,
                 flush_signal=flush_signal,
                 pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
+                address_of_instruction=pipeline_register.address_of_instruction,
             )
         else:
             return InstructionDecodePipelineRegister()
@@ -306,6 +317,7 @@ class ExecuteStage(Stage):
                 pc_plus_imm=pc_plus_imm,
                 branch_prediction=pipeline_register.branch_prediction,
                 pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
+                address_of_instruction=pipeline_register.address_of_instruction,
             )
         else:
             return ExecutePipelineRegister()
@@ -368,6 +380,14 @@ class MemoryAccessStage(Stage):
             else:
                 flush_signal = None
 
+            if flush_signal is not None:
+                from ..isa.rv32i_instructions import JAL
+
+                if isinstance(pipeline_register.instruction, BTypeInstruction):
+                    state.performance_metrics.branch_count += 1
+                elif isinstance(pipeline_register.instruction, JAL):
+                    state.performance_metrics.procedure_count += 1
+
             return MemoryAccessPipelineRegister(
                 instruction=pipeline_register.instruction,
                 memory_address=memory_address,
@@ -382,6 +402,7 @@ class MemoryAccessStage(Stage):
                 flush_signal=flush_signal,
                 pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
                 imm=pipeline_register.imm,
+                address_of_instruction=pipeline_register.address_of_instruction,
             )
         else:
             return MemoryAccessPipelineRegister()
@@ -410,6 +431,8 @@ class RegisterWritebackStage(Stage):
         """
         pipeline_register = pipeline_registers[index_of_own_input_register]
         if isinstance(pipeline_register, MemoryAccessPipelineRegister):
+            if not isinstance(pipeline_register.instruction, EmptyInstruction):
+                state.performance_metrics.instruction_count += 1
             # select the correct data for write back
             wb_src = pipeline_register.control_unit_signals.wb_src
             if wb_src == 0:
@@ -438,6 +461,7 @@ class RegisterWritebackStage(Stage):
                 control_unit_signals=pipeline_register.control_unit_signals,
                 pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
                 imm=pipeline_register.imm,
+                address_of_instruction=pipeline_register.address_of_instruction,
             )
         else:
             return RegisterWritebackPipelineRegister()
@@ -463,9 +487,19 @@ class SingleStage(Stage):
             PipelineRegister: returns an PipelineRegister with default values
         """
         if state.instruction_at_pc():
+            pc_before_increment = state.program_counter
             instr = state.instruction_memory.load_instruction(state.program_counter)
-            state.program_counter += instr.length
-            instr.behavior(state)
+
+            state.performance_metrics.instruction_count += 1
+            try:
+                instr.behavior(state)
+                state.program_counter += instr.length
+            except Exception as e:
+                raise InstructionExecutionException(
+                    address=pc_before_increment,
+                    instruction_repr=instr.__repr__(),
+                    error_message=e.__repr__(),
+                )
         return PipelineRegister()
 
 
@@ -502,13 +536,28 @@ class Pipeline:
         """the pipeline step method, this is the central part of the pipeline! Every time it is called, it does one
         whole step of the pipeline, and every stage gets executed once in their ececution ordering
         """
+        self.state.performance_metrics.cycles += 1
         next_pipeline_registers = [None] * self.num_stages
         for index in self.execution_ordering:
-            next_pipeline_registers[index] = self.stages[index].behavior(
-                pipeline_registers=self.pipeline_registers,
-                index_of_own_input_register=(index - 1),
-                state=self.state,
-            )
+            try:
+                next_pipeline_registers[index] = self.stages[index].behavior(
+                    pipeline_registers=self.pipeline_registers,
+                    index_of_own_input_register=(index - 1),
+                    state=self.state,
+                )
+            except Exception as e:
+                if index - 1 >= 0:
+                    raise InstructionExecutionException(
+                        address=self.pipeline_registers[
+                            index - 1
+                        ].address_of_instruction,
+                        instruction_repr=self.pipeline_registers[
+                            index - 1
+                        ].instruction.__repr__(),
+                        error_message=e.__repr__(),
+                    )
+                else:
+                    raise
         self.pipeline_registers = next_pipeline_registers
 
         # if one of the stages wants to flush, do so (starting from the back makes sense)
@@ -517,6 +566,7 @@ class Pipeline:
         ):
             flush_signal = pipeline_register.flush_signal
             if flush_signal is not None:
+                self.state.performance_metrics.flushes += 1
                 # This works because int(True) = 1, int(False) = 0
                 # This is good code, trust me
                 num_to_flush = index + flush_signal.inclusive
@@ -547,3 +597,13 @@ class Pipeline:
             bool: if the pipeline has finished
         """
         return self.is_empty() and not self.state.instruction_at_pc()
+
+
+@dataclass
+class InstructionExecutionException(RuntimeError):
+    address: int
+    instruction_repr: str
+    error_message: str
+
+    def __repr__(self):
+        return f"There was an error executing the instruction at address '{self.address}': '{self.instruction_repr}':\n{self.error_message}"

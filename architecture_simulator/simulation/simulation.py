@@ -1,41 +1,55 @@
 from ..uarch.architectural_state import ArchitecturalState
-from dataclasses import dataclass, field
+from ..uarch.pipeline import (
+    Pipeline,
+    SingleStage,
+    InstructionFetchStage,
+    InstructionDecodeStage,
+    ExecuteStage,
+    MemoryAccessStage,
+    RegisterWritebackStage,
+)
+from typing import Optional
 
-
-@dataclass
+# Does currently support single_stage_pipeline and five_stage_pipeline
 class Simulation:
-    state: ArchitecturalState = field(default_factory=ArchitecturalState)
+    """
+    Args:
+        mode : "single_stage_pipeline" (=default) | "five_stage_pipeline"
+    """
+
+    def __init__(
+        self,
+        state: Optional[ArchitecturalState] = None,
+        mode: str = "single_stage_pipeline",
+    ) -> None:
+        self.state = ArchitecturalState() if state is None else state
+        self.pipeline = (
+            Pipeline(
+                stages=[
+                    InstructionFetchStage(),
+                    InstructionDecodeStage(),
+                    ExecuteStage(),
+                    MemoryAccessStage(),
+                    RegisterWritebackStage(),
+                ],
+                execution_ordering=[0, 4, 1, 2, 3],
+                state=self.state,
+            )
+            if mode == "five_stage_pipeline"
+            else Pipeline(
+                stages=[SingleStage()], execution_ordering=[0], state=self.state
+            )
+        )
+        self.mode = mode
 
     def step_simulation(self) -> bool:
-        current_instruction = self.state.instruction_memory.load_instruction(
-            self.state.program_counter
-        )
-        try:
-            self.state = current_instruction.behavior(self.state)
-        except Exception as e:
-            raise InstructionExecutionException(
-                address=self.state.program_counter,
-                instruction_repr=current_instruction.__repr__(),
-                error_message=e.__repr__(),
-            )
-        self.state.program_counter += current_instruction.length
-        self.state.performance_metrics.instruction_count += 1
-        return self.state.instruction_at_pc()
+        self.pipeline.step()
+        return not self.pipeline.is_done()
 
     def run_simulation(self):
         """run the current simulation until no more instructions are left (pc stepped over last instruction)"""
         self.state.performance_metrics.resume_timer()
         if self.state.instruction_memory.instructions:
-            while self.state.instruction_at_pc():
+            while not self.pipeline.is_done():
                 self.step_simulation()
         self.state.performance_metrics.stop_timer()
-
-
-@dataclass
-class InstructionExecutionException(RuntimeError):
-    address: int
-    instruction_repr: str
-    error_message: str
-
-    def __repr__(self):
-        return f"There was an error executing the instruction at address '{self.address}': '{self.instruction_repr}':\n{self.error_message}"
