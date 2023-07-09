@@ -10,9 +10,9 @@ from architecture_simulator.uarch.architectural_state import (
 )
 from architecture_simulator.simulation.simulation import (
     Simulation,
-    InstructionExecutionException,
 )
 from architecture_simulator.isa.rv32i_instructions import ADDI, BNE, BEQ, JAL, LW
+from architecture_simulator.uarch.pipeline import InstructionExecutionException
 
 
 class TestSimulation(unittest.TestCase):
@@ -237,3 +237,72 @@ class TestSimulation(unittest.TestCase):
                 ).__repr__(),
             ).__repr__(),
         )
+
+    def test_five_stage_simulation(self):
+        program = f"""lui a0, 0
+        addi a0, a0, 10 # load n
+        addi s0, zero, 1 # load 1 for comparison
+        addi sp, zero, 1024 # adjust sp
+        jal ra, Fib # fib(n)
+        beq zero, zero, End # go to end
+        Fib:
+        bgeu s0, a0, FibReturn # n <= 1
+        addi sp, sp, -8 # adjust sp for ra and n
+        sw ra, 4(sp) # store ra
+        sw a0, 0(sp) # store n
+        addi a0, a0, -1 # a0 = n - 1
+        jal ra, Fib
+        lw t0, 0(sp) # restore argument
+        sw a0, 0(sp) # store return value (fib(n-1))
+        addi a0, t0, -2 # a0 = n - 2
+        jal ra, Fib
+        lw t0, 0(sp) # t0 = fib(n-1)
+        lw ra, 4(sp) # restore ra
+        addi sp, sp, 8 # return sp to original size
+        add a0, a0, t0 # a0 = fib(n-2) + fib(n-1)
+        FibReturn:
+        jalr zero, ra, 0
+        End:"""
+
+        simulation = Simulation(
+            state=ArchitecturalState(
+                register_file=RegisterFile(), memory=Memory(min_bytes=0)
+            ),
+            mode="five_stage_pipeline",
+        )
+        simulation.state.instruction_memory.append_instructions(program)
+        simulation.run_simulation()
+        self.assertEqual(simulation.state.register_file.registers[10], 55)
+
+    def test_five_stage_performance_metrics_1(self):
+        simulation = Simulation(mode="five_stage_pipeline")
+        programm = """
+        addi x1, x0, 4
+        label:
+        addi x1, x1, -1
+        bne x0, x1, label
+        jal x0, test
+        test:
+        """
+        simulation.state.instruction_memory.append_instructions(program=programm)
+        simulation.run_simulation()
+        self.assertGreater(simulation.state.performance_metrics.execution_time_s, 0)
+        self.assertEqual(simulation.state.performance_metrics.instruction_count, 10)
+        self.assertEqual(simulation.state.performance_metrics.branch_count, 3)
+        self.assertEqual(simulation.state.performance_metrics.procedure_count, 1)
+
+    def test_five_stage_performance_metrics_2(self):
+        simulation = Simulation(mode="five_stage_pipeline")
+        programm = """
+        add x0, x0, x0
+        addi x1, x1, 1
+        add x1, x1, x1
+        add x0, x0, x0
+        add x0, x0, x0
+        beq x0, x0, label
+        label:
+        """
+        simulation.state.instruction_memory.append_instructions(program=programm)
+        simulation.run_simulation()
+        self.assertEqual(simulation.state.performance_metrics.flushes, 2)
+        self.assertEqual(simulation.state.performance_metrics.cycles, 13)
