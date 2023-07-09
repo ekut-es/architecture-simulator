@@ -10,7 +10,7 @@ from .instruction_types import BTypeInstruction
 from architecture_simulator.isa.instruction_types import STypeInstruction
 from architecture_simulator.isa.instruction_types import UTypeInstruction
 from architecture_simulator.isa.instruction_types import JTypeInstruction
-from architecture_simulator.isa.instruction_types import fence
+from architecture_simulator.isa.instruction_types import FenceTypeInstruction
 from architecture_simulator.isa.instruction_types import Instruction
 from typing import Optional, Type
 from dataclasses import dataclass
@@ -1004,7 +1004,7 @@ class JAL(JTypeInstruction):
         return architectural_state
 
 
-class FENCE(fence):
+class FENCE(FenceTypeInstruction):
     def __init__(self):
         super().__init__(mnemonic="fence")
 
