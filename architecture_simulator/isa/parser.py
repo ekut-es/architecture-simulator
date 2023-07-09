@@ -429,7 +429,7 @@ class RiscvParser:
                         uimm=int(instruction_parsed.uimm, base=0),
                     )
                 )
-            elif issubclass(instruction_class, instruction_types.fence):
+            elif issubclass(instruction_class, instruction_types.FenceTypeInstruction):
                 # TODO: Change me, if Fence gets implemented
                 instructions.append(FENCE())
             address_count += instruction_map[instruction_parsed.mnemonic.lower()].length

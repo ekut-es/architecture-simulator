@@ -174,222 +174,6 @@ class RTypeInstruction(Instruction):
         ] = fixedint.MutableUInt32(register_write_data)
 
 
-class CSRTypeInstruction(Instruction):
-    """Create a CSR-Type instruction
-
-    Args:
-        rd (int): register destination
-        csr (int): the control/status register's index
-        rs1 (int): source register 1
-    """
-
-    def __init__(self, rd: int, csr: int, rs1: int, **args):
-        super().__init__(**args)
-        self.rd = rd
-        self.csr = csr
-        self.rs1 = rs1
-
-    def __repr__(self) -> str:
-        return f"{self.mnemonic} x{self.rd}, {hex(self.csr)}, x{self.rs1}"
-
-
-class CSRITypeInstruction(Instruction):
-    """Create a CSRI-Type instruction
-
-    Args:
-        rd (int): register destination
-        csr (int): the control/status register's index
-        uimm (int): immediate
-    """
-
-    def __init__(self, rd: int, csr: int, uimm: int, **args):
-        super().__init__(**args)
-        self.rd = rd
-        self.csr = csr
-        self.uimm = uimm & (2**5) - 1  # [0:5]
-
-    def __repr__(self) -> str:
-        return f"{self.mnemonic} x{self.rd}, {hex(self.csr)}, {self.uimm}"
-
-
-class BTypeInstruction(Instruction):
-    def __init__(self, rs1: int, rs2: int, imm: int, **args):
-        """Create a B-Type instruction
-        Note: These B-Type-Instructions will actually set the pc to 2*imm-4, because the simulator will always add 4 to the pc.
-
-        Args:
-            rs1 (int): source register 1
-            rs2 (int): source register 2
-            imm (int): offset to be added to the pc. Needs to be a 12 bit signed integer. Interpreted as multiple of 2 bytes.
-        """
-        super().__init__(**args)
-        self.rs1 = rs1
-        self.rs2 = rs2
-        self.imm = (imm & 2047) - (imm & 2048)  # 12-bit sext
-
-    def __repr__(self) -> str:
-        return f"{self.mnemonic} x{self.rs1}, x{self.rs2}, {self.imm*2}"
-
-    def access_register_file(
-        self, architectural_state: ArchitecturalState
-    ) -> tuple[
-        Optional[int], Optional[int], Optional[int], Optional[int], Optional[int]
-    ]:
-        return (
-            self.rs1,
-            self.rs2,
-            int(architectural_state.register_file.registers[self.rs1]),
-            int(architectural_state.register_file.registers[self.rs2]),
-            self.imm * 2,
-        )
-
-    def control_unit_signals(self) -> "ControlUnitSignals":
-        from ..uarch.pipeline import ControlUnitSignals
-
-        return ControlUnitSignals(
-            alu_src_1=True,
-            alu_src_2=False,
-            wb_src=None,
-            reg_write=False,
-            mem_read=False,
-            mem_write=False,
-            branch=True,
-            jump=False,
-            alu_op=1,
-            alu_to_pc=False,
-        )
-
-
-class STypeInstruction(Instruction):
-    """Create an S-Type instruction
-
-    Args:
-        rs1 (int): source register 1
-        rs2 (int): source register 2
-        imm (int): offset to be added to the rs1
-    """
-
-    def __init__(self, rs1: int, rs2: int, imm: int, **args):
-        super().__init__(**args)
-        self.rs1 = rs1
-        self.rs2 = rs2
-        self.imm = (imm & 2047) - (imm & 2048)  # 12-bit sext
-
-    def __repr__(self) -> str:
-        return f"{self.mnemonic} x{self.rs2}, {self.imm}(x{self.rs1})"
-
-    def alu_compute(
-        self, alu_in_1: Optional[int], alu_in_2: Optional[int]
-    ) -> tuple[Optional[bool], Optional[int]]:
-        if alu_in_1 is not None and alu_in_2 is not None:
-            res = alu_in_1 + alu_in_2
-            return (None, res)
-        else:
-            return (None, None)
-
-    def control_unit_signals(self) -> "ControlUnitSignals":
-        from ..uarch.pipeline import ControlUnitSignals
-
-        # jump, alu_op
-        return ControlUnitSignals(
-            alu_src_1=True,
-            alu_src_2=True,
-            wb_src=None,
-            reg_write=False,
-            mem_read=False,
-            mem_write=True,
-            branch=False,
-            jump=False,
-            alu_op=0,
-            alu_to_pc=False,
-        )
-
-
-class UTypeInstruction(Instruction):
-    def __init__(self, rd: int, imm: int, **args):
-        super().__init__(**args)
-        self.rd = rd
-        self.imm = (imm & (2**19) - 1) - (imm & 2**19)  # 20-bit sext
-
-    def __repr__(self) -> str:
-        return f"{self.mnemonic} x{self.rd}, {self.imm}"
-
-    def get_write_register(self) -> int | None:
-        return self.rd
-
-    def write_back(
-        self,
-        write_register: Optional[int],
-        register_write_data: Optional[int],
-        architectural_state: ArchitecturalState,
-    ):
-        assert write_register is not None
-        assert register_write_data is not None
-        architectural_state.register_file.registers[
-            write_register
-        ] = fixedint.MutableUInt32(register_write_data)
-
-    def access_register_file(
-        self, architectural_state: ArchitecturalState
-    ) -> tuple[int | None, int | None, int | None, int | None, int | None]:
-        return None, None, None, None, self.imm << 12
-
-
-class JTypeInstruction(Instruction):
-    def __init__(self, rd: int, imm: int, **args):
-        super().__init__(**args)
-        self.rd = rd
-        self.imm = (imm & (2**19) - 1) - (imm & 2**19)  # 20-bit sext
-
-    def __repr__(self) -> str:
-        return f"{self.mnemonic} x{self.rd}, {self.imm*2}"
-
-    def control_unit_signals(self) -> "ControlUnitSignals":
-        from ..uarch.pipeline import ControlUnitSignals
-
-        return ControlUnitSignals(
-            alu_src_1=None,
-            alu_src_2=None,
-            wb_src=0,
-            reg_write=True,
-            mem_read=False,
-            mem_write=False,
-            branch=False,
-            jump=True,
-            alu_op=None,
-            alu_to_pc=False,
-        )
-
-    def get_write_register(self) -> int | None:
-        return self.rd
-
-    def write_back(
-        self,
-        write_register: Optional[int],
-        register_write_data: Optional[int],
-        architectural_state: ArchitecturalState,
-    ):
-        assert write_register is not None
-        assert register_write_data is not None
-        architectural_state.register_file.registers[
-            write_register
-        ] = fixedint.MutableUInt32(register_write_data)
-
-    def access_register_file(
-        self, architectural_state: ArchitecturalState
-    ) -> tuple[int | None, int | None, int | None, int | None, int | None]:
-        return None, None, None, None, self.imm << 1
-
-
-class fence(Instruction):
-    def __init__(self, **args):
-        super().__init__(**args)
-
-    # TODO: Change me, if Fence gets implemented
-    # def __repr__(self) -> str:
-    #    return f"{self.mnemonic}"
-
-
 class ITypeInstruction(Instruction):
     def __init__(self, rd: int, rs1: int, imm: int, **args):
         """Create an I-Type instruction
@@ -522,6 +306,222 @@ class ShiftITypeInstruction(ITypeInstruction):
 
     def __repr__(self) -> str:
         return f"{self.mnemonic} x{self.rd}, x{self.rs1}, {self.imm}"
+
+
+class STypeInstruction(Instruction):
+    """Create an S-Type instruction
+
+    Args:
+        rs1 (int): source register 1
+        rs2 (int): source register 2
+        imm (int): offset to be added to the rs1
+    """
+
+    def __init__(self, rs1: int, rs2: int, imm: int, **args):
+        super().__init__(**args)
+        self.rs1 = rs1
+        self.rs2 = rs2
+        self.imm = (imm & 2047) - (imm & 2048)  # 12-bit sext
+
+    def __repr__(self) -> str:
+        return f"{self.mnemonic} x{self.rs2}, {self.imm}(x{self.rs1})"
+
+    def alu_compute(
+        self, alu_in_1: Optional[int], alu_in_2: Optional[int]
+    ) -> tuple[Optional[bool], Optional[int]]:
+        if alu_in_1 is not None and alu_in_2 is not None:
+            res = alu_in_1 + alu_in_2
+            return (None, res)
+        else:
+            return (None, None)
+
+    def control_unit_signals(self) -> "ControlUnitSignals":
+        from ..uarch.pipeline import ControlUnitSignals
+
+        # jump, alu_op
+        return ControlUnitSignals(
+            alu_src_1=True,
+            alu_src_2=True,
+            wb_src=None,
+            reg_write=False,
+            mem_read=False,
+            mem_write=True,
+            branch=False,
+            jump=False,
+            alu_op=0,
+            alu_to_pc=False,
+        )
+
+
+class BTypeInstruction(Instruction):
+    def __init__(self, rs1: int, rs2: int, imm: int, **args):
+        """Create a B-Type instruction
+        Note: These B-Type-Instructions will actually set the pc to 2*imm-4, because the simulator will always add 4 to the pc.
+
+        Args:
+            rs1 (int): source register 1
+            rs2 (int): source register 2
+            imm (int): offset to be added to the pc. Needs to be a 12 bit signed integer. Interpreted as multiple of 2 bytes.
+        """
+        super().__init__(**args)
+        self.rs1 = rs1
+        self.rs2 = rs2
+        self.imm = (imm & 2047) - (imm & 2048)  # 12-bit sext
+
+    def __repr__(self) -> str:
+        return f"{self.mnemonic} x{self.rs1}, x{self.rs2}, {self.imm*2}"
+
+    def access_register_file(
+        self, architectural_state: ArchitecturalState
+    ) -> tuple[
+        Optional[int], Optional[int], Optional[int], Optional[int], Optional[int]
+    ]:
+        return (
+            self.rs1,
+            self.rs2,
+            int(architectural_state.register_file.registers[self.rs1]),
+            int(architectural_state.register_file.registers[self.rs2]),
+            self.imm * 2,
+        )
+
+    def control_unit_signals(self) -> "ControlUnitSignals":
+        from ..uarch.pipeline import ControlUnitSignals
+
+        return ControlUnitSignals(
+            alu_src_1=True,
+            alu_src_2=False,
+            wb_src=None,
+            reg_write=False,
+            mem_read=False,
+            mem_write=False,
+            branch=True,
+            jump=False,
+            alu_op=1,
+            alu_to_pc=False,
+        )
+
+
+class UTypeInstruction(Instruction):
+    def __init__(self, rd: int, imm: int, **args):
+        super().__init__(**args)
+        self.rd = rd
+        self.imm = (imm & (2**19) - 1) - (imm & 2**19)  # 20-bit sext
+
+    def __repr__(self) -> str:
+        return f"{self.mnemonic} x{self.rd}, {self.imm}"
+
+    def get_write_register(self) -> int | None:
+        return self.rd
+
+    def write_back(
+        self,
+        write_register: Optional[int],
+        register_write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ):
+        assert write_register is not None
+        assert register_write_data is not None
+        architectural_state.register_file.registers[
+            write_register
+        ] = fixedint.MutableUInt32(register_write_data)
+
+    def access_register_file(
+        self, architectural_state: ArchitecturalState
+    ) -> tuple[int | None, int | None, int | None, int | None, int | None]:
+        return None, None, None, None, self.imm << 12
+
+
+class JTypeInstruction(Instruction):
+    def __init__(self, rd: int, imm: int, **args):
+        super().__init__(**args)
+        self.rd = rd
+        self.imm = (imm & (2**19) - 1) - (imm & 2**19)  # 20-bit sext
+
+    def __repr__(self) -> str:
+        return f"{self.mnemonic} x{self.rd}, {self.imm*2}"
+
+    def control_unit_signals(self) -> "ControlUnitSignals":
+        from ..uarch.pipeline import ControlUnitSignals
+
+        return ControlUnitSignals(
+            alu_src_1=None,
+            alu_src_2=None,
+            wb_src=0,
+            reg_write=True,
+            mem_read=False,
+            mem_write=False,
+            branch=False,
+            jump=True,
+            alu_op=None,
+            alu_to_pc=False,
+        )
+
+    def get_write_register(self) -> int | None:
+        return self.rd
+
+    def write_back(
+        self,
+        write_register: Optional[int],
+        register_write_data: Optional[int],
+        architectural_state: ArchitecturalState,
+    ):
+        assert write_register is not None
+        assert register_write_data is not None
+        architectural_state.register_file.registers[
+            write_register
+        ] = fixedint.MutableUInt32(register_write_data)
+
+    def access_register_file(
+        self, architectural_state: ArchitecturalState
+    ) -> tuple[int | None, int | None, int | None, int | None, int | None]:
+        return None, None, None, None, self.imm << 1
+
+
+class FenceTypeInstruction(Instruction):
+    def __init__(self, **args):
+        super().__init__(**args)
+
+    # TODO: Change me, if Fence gets implemented
+    # def __repr__(self) -> str:
+    #    return f"{self.mnemonic}"
+
+
+class CSRTypeInstruction(Instruction):
+    """Create a CSR-Type instruction
+
+    Args:
+        rd (int): register destination
+        csr (int): the control/status register's index
+        rs1 (int): source register 1
+    """
+
+    def __init__(self, rd: int, csr: int, rs1: int, **args):
+        super().__init__(**args)
+        self.rd = rd
+        self.csr = csr
+        self.rs1 = rs1
+
+    def __repr__(self) -> str:
+        return f"{self.mnemonic} x{self.rd}, {hex(self.csr)}, x{self.rs1}"
+
+
+class CSRITypeInstruction(Instruction):
+    """Create a CSRI-Type instruction
+
+    Args:
+        rd (int): register destination
+        csr (int): the control/status register's index
+        uimm (int): immediate
+    """
+
+    def __init__(self, rd: int, csr: int, uimm: int, **args):
+        super().__init__(**args)
+        self.rd = rd
+        self.csr = csr
+        self.uimm = uimm & (2**5) - 1  # [0:5]
+
+    def __repr__(self) -> str:
+        return f"{self.mnemonic} x{self.rd}, {hex(self.csr)}, {self.uimm}"
 
 
 class EmptyInstruction(Instruction):
