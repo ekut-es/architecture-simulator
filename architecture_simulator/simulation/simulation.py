@@ -21,13 +21,14 @@ class Simulation:
         self,
         state: Optional[ArchitecturalState] = None,
         mode: str = "single_stage_pipeline",
+        detect_data_hazards: bool = True,
     ) -> None:
         self.state = ArchitecturalState() if state is None else state
         self.pipeline = (
             Pipeline(
                 stages=[
                     InstructionFetchStage(),
-                    InstructionDecodeStage(),
+                    InstructionDecodeStage(detect_data_hazards=detect_data_hazards),
                     ExecuteStage(),
                     MemoryAccessStage(),
                     RegisterWritebackStage(),
