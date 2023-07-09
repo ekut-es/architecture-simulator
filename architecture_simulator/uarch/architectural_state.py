@@ -12,6 +12,8 @@ class PerformanceMetrics:
     branch_count: int = 0
     procedure_count: int = 0
     _start: Optional[float] = None
+    cycles: int = 0
+    flushes: int = 0
 
     def resume_timer(self):
         if self._start is None:
@@ -40,7 +42,11 @@ class PerformanceMetrics:
             )
         representation += f"instruction count: {self.instruction_count} \n"
         representation += f"branch count: {self.branch_count}\n"
-        representation += f"procedure count: {self.procedure_count}"
+        representation += f"procedure count: {self.procedure_count}\n"
+        representation += f"cycles: {self.cycles}\n"
+        representation += f"flushes: {self.flushes}\n"
+        if not self.cycles == 0:
+            representation += f"instructions per cycle: {round(self.instruction_count / self.cycles)}\n"
         return representation
 
 
@@ -458,6 +464,7 @@ class ArchitecturalState:
     csr_registers: CsrRegisterFile = field(default_factory=CsrRegisterFile)
     program_counter: int = 0
     performance_metrics: PerformanceMetrics = field(default_factory=PerformanceMetrics)
+    # pipeline: Pipeline
 
     def change_privilege_level(self, level: int):
         if not level < 0 and not level > 3:
