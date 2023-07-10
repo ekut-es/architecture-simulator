@@ -247,3 +247,7 @@ body main #output {
 .highlight {
     background-color: red;
 }
+
+.CodeMirror-hints {
+    pointer-events: none;
+}
