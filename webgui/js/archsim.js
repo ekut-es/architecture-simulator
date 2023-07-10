@@ -9,6 +9,12 @@ function addToOutput(s) {
     output.scrollTop = output.scrollHeight;
 }
 
+CodeMirror.on(editor, "mouseover", function (cm, event) {
+    alert("hover");
+    var output = "test";
+    cm.showTooltip(event, output);
+});
+
 // Object containing functions to be exported to python
 const archsim_js = {
     update_register_table: function (reg, representations, abi_name) {

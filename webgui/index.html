@@ -212,11 +212,55 @@
                                                                 lineNumbers: true,
                                                                 styleActiveLine: true,
                                                                 mode: "markdown",
+                                                                tooltip: {
+                                                                    hoverDelay: 300,
+                                                                    callback:
+                                                                        function (
+                                                                            update
+                                                                        ) {
+                                                                            var pos =
+                                                                                update.coords;
+                                                                            var token =
+                                                                                editor.getTokenAt(
+                                                                                    pos
+                                                                                );
+                                                                            if (
+                                                                                token.string ==
+                                                                                "function"
+                                                                            ) {
+                                                                                update.show(
+                                                                                    "<b>Function:</b> " +
+                                                                                        token.string
+                                                                                );
+                                                                            }
+                                                                        },
+                                                                },
                                                             }
                                                         );
                                                     editor.setSize(
                                                         null,
                                                         window.innerHeight
+                                                    );
+                                                    editor.on(
+                                                        "mouseover",
+                                                        function (cm, event) {
+                                                            alert("hover");
+                                                            var word =
+                                                                cm.getTokenAt(
+                                                                    event
+                                                                );
+                                                            if (
+                                                                word.string
+                                                                    .length > 2
+                                                            ) {
+                                                                cm.showTooltip(
+                                                                    event,
+                                                                    "<strong>" +
+                                                                        word.string +
+                                                                        "</strong>"
+                                                                );
+                                                            }
+                                                        }
                                                     );
                                                 </script>
                                             </div>
