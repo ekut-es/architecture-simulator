@@ -479,6 +479,9 @@ class SingleStage(Stage):
             try:
                 instr.behavior(state)
                 state.program_counter += instr.length
+                return PipelineRegister(
+                    address_of_instruction=pc_before_increment,
+                )
             except Exception as e:
                 raise InstructionExecutionException(
                     address=pc_before_increment,

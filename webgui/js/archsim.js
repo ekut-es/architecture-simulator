@@ -59,15 +59,44 @@ const archsim_js = {
     //     }
     // },
     //ids und inner texts have to be changed then delete this comment
-    update_instruction_table: function (address, val) {
+    update_instruction_table: function (address, val, stage) {
         tr = document.createElement("tr");
+        tr.id = address;
         td1 = document.createElement("td");
         td1.innerText = address;
         td2 = document.createElement("td");
         td2.innerText = val;
         td2.id = "instr" + address;
+        td3 = document.createElement("td");
+        td3.innerText = stage;
+        if (stage == "Single") {
+            td1.style.backgroundColor = "blue";
+            td2.style.backgroundColor = "blue";
+            td3.style.backgroundColor = "blue";
+        } else if (stage == "IF") {
+            td1.style.backgroundColor = "orange";
+            td2.style.backgroundColor = "orange";
+            td3.style.backgroundColor = "orange";
+        } else if (stage == "ID") {
+            td1.style.backgroundColor = "yellow";
+            td2.style.backgroundColor = "yellow";
+            td3.style.backgroundColor = "yellow";
+        } else if (stage == "EX") {
+            td1.style.backgroundColor = "green";
+            td2.style.backgroundColor = "green";
+            td3.style.backgroundColor = "green";
+        } else if (stage == "MA") {
+            td1.style.backgroundColor = "purple";
+            td2.style.backgroundColor = "purple";
+            td3.style.backgroundColor = "purple";
+        } else if (stage == "WB") {
+            td1.style.backgroundColor = "teal";
+            td2.style.backgroundColor = "teal";
+            td3.style.backgroundColor = "teal";
+        }
         tr.appendChild(td1);
         tr.appendChild(td2);
+        tr.appendChild(td3);
         instructions.appendChild(tr);
     },
     clear_memory_table: function () {
@@ -199,13 +228,13 @@ async function update_performance_metrics() {
 //     }
 // }
 
-async function evaluatePython_reset_sim() {
+async function evaluatePython_reset_sim(pipeline_mode) {
     start_loading_animation();
     let pyodide = await pyodideReadyPromise;
     stop_loading_animation();
     try {
         reset_sim = pyodide.globals.get("reset_sim");
-        reset_sim();
+        reset_sim(pipeline_mode);
         output.value = "";
     } catch (err) {
         addToOutput(err);

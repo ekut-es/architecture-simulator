@@ -12,6 +12,14 @@ from architecture_simulator.uarch.architectural_state import ArchitecturalState
 from architecture_simulator.simulation.simulation import Simulation
 import fixedint
 from dataclasses import dataclass
+from architecture_simulator.uarch.pipeline import (
+    PipelineRegister,
+    InstructionFetchPipelineRegister,
+    InstructionDecodePipelineRegister,
+    ExecutePipelineRegister,
+    MemoryAccessPipelineRegister,
+    RegisterWritebackPipelineRegister,
+)
 
 simulation = None
 
@@ -92,11 +100,11 @@ def get_performance_metrics():
 
 
 # resets the entire simulation
-def reset_sim():
+def reset_sim(pipeline_mode):
     global simulation
     if simulation is None:
         raise StateNotInitializedError()
-    simulation = Simulation()
+    simulation = Simulation(mode=pipeline_mode)
     update_ui()
     return simulation
 
@@ -145,12 +153,34 @@ def update_tables():
         archsim_js.update_memory_table(hex(address), address_value)
 
     # appends all the instructions one at a time
+    stage_mapping = {
+        PipelineRegister: "Single",
+        InstructionFetchPipelineRegister: "IF",
+        InstructionDecodePipelineRegister: "ID",
+        ExecutePipelineRegister: "EX",
+        MemoryAccessPipelineRegister: "MA",
+        RegisterWritebackPipelineRegister: "WB",
+    }
+    pipeline_stages_addresses = dict()
+    for pipeline_register in simulation.pipeline.pipeline_registers:
+        if pipeline_register.address_of_instruction is not None:
+            pipeline_stages_addresses[
+                pipeline_register.address_of_instruction
+            ] = pipeline_register
+
     archsim_js.clear_instruction_table()
     for address, cmd in sorted(
         simulation.state.instruction_memory.instructions.items(),
         key=lambda item: item[0],
     ):
-        archsim_js.update_instruction_table(hex(address), cmd.__repr__())
+        if address in pipeline_stages_addresses.keys():
+            archsim_js.update_instruction_table(
+                hex(address),
+                cmd.__repr__(),
+                stage_mapping[pipeline_stages_addresses[address].__class__],
+            )
+        else:
+            archsim_js.update_instruction_table(hex(address), cmd.__repr__(), "")
 
 
 # #actual comment: output = performance metric repr but if parser produces error, overwrite output with error

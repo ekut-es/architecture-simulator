@@ -10,11 +10,8 @@ const parse_sim_after_not_typing_for_n_ms = 500;
 var input_timer;
 let representation_mode = decimal_representation; //change this to set another default repr.
 var run;
-let waiting_for_pyodide_flag = true;
+var pipeline_mode = "single_stage_pipeline";
 window.addEventListener("DOMContentLoaded", function () {
-    // initialize codemirror textarea
-
-    // this is how you highlight text
     clearTimeout(input_timer);
     input_timer = setTimeout(
         finished_typing,
@@ -76,7 +73,7 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             document.getElementById("input").disabled = true;
             clearInterval(run);
-            evaluatePython_reset_sim();
+            evaluatePython_reset_sim(pipeline_mode);
             document.getElementById("input").disabled = false;
             enable_run();
             disable_pause();
@@ -142,12 +139,12 @@ window.addEventListener("DOMContentLoaded", function () {
                 .classList.remove("active");
         });
 
-    document.getElementById("test").addEventListener("click", () => {
-        var table = document.getElementById("gui_cmd_table_id");
-        var rows = table.rows;
-        rows[1].classList.add("highlight");
-        console.log(rows[2].classList);
-        console.log(table.innerHTML);
+    document.getElementById("SingleStage").addEventListener("click", () => {
+        pipeline_mode = "single_stage_pipeline";
+    });
+
+    document.getElementById("5-Stage").addEventListener("click", () => {
+        pipeline_mode = "five_stage_pipeline";
     });
 
     editor.on("change", function () {
