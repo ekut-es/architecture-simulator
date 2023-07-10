@@ -92,7 +92,7 @@ class MemoryAccessPipelineRegister(PipelineRegister):
     memory_read_data: Optional[int] = None
     write_register: Optional[int] = None
     # control signals
-    branch_taken: Optional[bool] = None
+    comparison: Optional[bool] = None
     pc_src: Optional[bool] = None
     pc_plus_imm: Optional[int] = None
     pc_plus_instruction_length: Optional[int] = None
@@ -379,7 +379,7 @@ class MemoryAccessStage(Stage):
             result=pipeline_register.result,
             memory_write_data=memory_write_data,
             memory_read_data=memory_read_data,
-            branch_taken=pipeline_register.comparison,
+            comparison=pipeline_register.comparison,
             pc_src=pc_src,
             write_register=pipeline_register.write_register,
             control_unit_signals=pipeline_register.control_unit_signals,
