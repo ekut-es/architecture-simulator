@@ -154,21 +154,15 @@ class InstructionFetchStage(Stage):
         # NOTE: PC gets incremented here. This means that branch prediction also happens here. Currently, we just statically predict not taken.
         address_of_instruction = state.program_counter
         instruction = state.instruction_memory.load_instruction(address_of_instruction)
-        try:
-            state.program_counter += instruction.length
-            pc_plus_instruction_length = address_of_instruction + instruction.length
-            return InstructionFetchPipelineRegister(
-                instruction=instruction,
-                address_of_instruction=address_of_instruction,
-                branch_prediction=False,
-                pc_plus_instruction_length=pc_plus_instruction_length,
-            )
-        except Exception as e:
-            raise InstructionExecutionException(
-                address=address_of_instruction,
-                instruction_repr=instruction.__repr__(),
-                error_message=e.__repr__(),
-            )
+        state.program_counter += instruction.length
+        pc_plus_instruction_length = address_of_instruction + instruction.length
+
+        return InstructionFetchPipelineRegister(
+            instruction=instruction,
+            address_of_instruction=address_of_instruction,
+            branch_prediction=False,
+            pc_plus_instruction_length=pc_plus_instruction_length,
+        )
 
 
 class InstructionDecodeStage(Stage):
