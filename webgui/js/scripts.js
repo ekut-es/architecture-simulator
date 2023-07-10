@@ -142,6 +142,14 @@ window.addEventListener("DOMContentLoaded", function () {
                 .classList.remove("active");
         });
 
+    document.getElementById("test").addEventListener("click", () => {
+        var table = document.getElementById("gui_cmd_table_id");
+        var rows = table.rows;
+        rows[1].classList.add("highlight");
+        console.log(rows[2].classList);
+        console.log(table.innerHTML);
+    });
+
     editor.on("change", function () {
         editor.save();
         // autoparse

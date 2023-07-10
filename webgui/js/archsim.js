@@ -217,6 +217,11 @@ async function evaluatePython_update_tables() {
     try {
         update_tables = pyodide.globals.get("update_tables");
         let output = update_tables();
+        var table = document.getElementById("gui_cmd_table_id");
+        var rows = table.rows;
+        rows[0].classList.add("highlight");
+        console.log(rows[2].classList);
+        console.log(table.innerHTML);
     } catch (err) {
         addToOutput(err);
     }
