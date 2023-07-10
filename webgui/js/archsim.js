@@ -70,13 +70,13 @@ const archsim_js = {
         td3 = document.createElement("td");
         td3.innerText = stage;
         if (stage == "Single") {
-            td1.style.backgroundColor = "blue";
-            td2.style.backgroundColor = "blue";
-            td3.style.backgroundColor = "blue";
+            td1.style.backgroundColor = "purple";
+            td2.style.backgroundColor = "purple";
+            td3.style.backgroundColor = "purple";
         } else if (stage == "IF") {
-            td1.style.backgroundColor = "orange";
-            td2.style.backgroundColor = "orange";
-            td3.style.backgroundColor = "orange";
+            td1.style.backgroundColor = "red";
+            td2.style.backgroundColor = "red";
+            td3.style.backgroundColor = "red";
         } else if (stage == "ID") {
             td1.style.backgroundColor = "yellow";
             td2.style.backgroundColor = "yellow";
@@ -86,13 +86,13 @@ const archsim_js = {
             td2.style.backgroundColor = "green";
             td3.style.backgroundColor = "green";
         } else if (stage == "MA") {
-            td1.style.backgroundColor = "purple";
-            td2.style.backgroundColor = "purple";
-            td3.style.backgroundColor = "purple";
+            td1.style.backgroundColor = "aqua";
+            td2.style.backgroundColor = "aqua";
+            td3.style.backgroundColor = "aqua";
         } else if (stage == "WB") {
-            td1.style.backgroundColor = "teal";
-            td2.style.backgroundColor = "teal";
-            td3.style.backgroundColor = "teal";
+            td1.style.backgroundColor = "blue";
+            td2.style.backgroundColor = "blue";
+            td3.style.backgroundColor = "blue";
         }
         tr.appendChild(td1);
         tr.appendChild(td2);
@@ -125,9 +125,7 @@ const archsim_js = {
         }
         editor.refresh();
     },
-    update_IF_Stage: function (instruction, address_of_instruction) {
-        pass;
-    },
+    update_IF_Stage: function (instruction, address_of_instruction) {},
     update_ID_Stage: function (
         register_read_addr_1,
         register_read_addr_2,
@@ -135,9 +133,7 @@ const archsim_js = {
         register_read_data_2,
         imm,
         control_unit_signals
-    ) {
-        pass;
-    },
+    ) {},
     update_EX_Stage: function (
         alu_in_1,
         alu_in_2,
@@ -147,9 +143,7 @@ const archsim_js = {
         comparison,
         pc_plus_imm,
         control_unit_signals
-    ) {
-        pass;
-    },
+    ) {},
     update_MA_Stage: function (
         memory_address,
         result,
@@ -159,18 +153,14 @@ const archsim_js = {
         pc_src,
         pc_plus_imm,
         control_unit_signals
-    ) {
-        pass;
-    },
+    ) {},
     update_WB_Stage: function (
         register_write_data,
         write_register,
         memory_read_data,
         alu_result,
         control_unit_signals
-    ) {
-        pass;
-    },
+    ) {},
 };
 
 output.value = "Output \n\nInitializing... ";
