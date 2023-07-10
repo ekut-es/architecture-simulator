@@ -1,5 +1,6 @@
 import archsim_js
 from architecture_simulator.isa.parser import ParserException
+from architecture_simulator.simulation.simulation import InstructionExecutionException
 
 from architecture_simulator.uarch.architectural_state import (
     RegisterFile,
@@ -150,7 +151,11 @@ def update_tables():
         simulation.state.instruction_memory.instructions.items(),
         key=lambda item: item[0],
     ):
-        archsim_js.update_instruction_table(hex(address), cmd.__repr__())
+        try:
+            archsim_js.update_instruction_table(hex(address), cmd.__repr__())
+            archsim_js.remove_cmd_table_highlights()
+        except InstructionExecutionException as e:
+            archsim_js.highlight_cmd_table(e.address)
 
 
 # #actual comment: output = performance metric repr but if parser produces error, overwrite output with error

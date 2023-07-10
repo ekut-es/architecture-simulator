@@ -96,6 +96,21 @@ const archsim_js = {
         }
         editor.refresh();
     },
+    highlight_cmd_table: function (position) {
+        var rows = document.querySelectorAll("#gui_cmd_table_body_id tr");
+        for (var i = 0; i < rows.length; i++) {
+            var address = rows[i].querySelector("td:first-child").innerText;
+            if (address === position) {
+                rows[i].classList.add("highlighted");
+            }
+        }
+    },
+    remove_cmd_table_highlights: function () {
+        var rows = document.querySelectorAll("#gui_cmd_table_body_id tr");
+        for (var i = 0; i < rows.length; i++) {
+            rows[i].classList.remove("highlighted");
+        }
+    },
 };
 
 output.value = "Output \n\nInitializing... ";

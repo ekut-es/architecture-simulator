@@ -160,6 +160,8 @@ body main #input {
 }
 
 body main #gui_cmd_div_id {
+    max-height: 35%;
+    overflow-y: scroll;
 }
 
 body main #gui_cmd_table_id {
@@ -169,6 +171,9 @@ body main #gui_cmd_table_id {
 }
 
 body main #gui_cmd_table_id th {
+    position: sticky;
+    top: 0;
+
     text-align: center;
 
     font-family: monospace;
@@ -181,6 +186,8 @@ body main #gui_cmd_table_id td {
 }
 
 body main #gui_memory_div_id {
+    max-height: 35%;
+    overflow-y: scroll;
 }
 
 body main #gui_memory_table_id {
@@ -190,6 +197,10 @@ body main #gui_memory_table_id {
 }
 
 body main #gui_memory_table_id th {
+    position: sticky;
+
+    top: 0;
+
     text-align: center;
 
     font-family: monospace;
@@ -209,6 +220,8 @@ body main #gui_memory_table_id option:disabled {
 }
 
 body main #gui_registers_div_id {
+    max-height: 35%;
+    overflow-y: scroll;
 }
 
 body main #gui_registers_table_id {
@@ -218,6 +231,10 @@ body main #gui_registers_table_id {
 }
 
 body main #gui_registers_table_id th {
+    position: sticky;
+
+    top: 0;
+
     text-align: center;
 
     font-family: monospace;
@@ -240,10 +257,14 @@ body main #output {
 }
 
 .CodeMirror {
-    width: 25em;
-    height: auto;
+    /*width: 25em;
+    height: auto;*/
 }
 
 .highlight {
     background-color: red;
+}
+
+.highlighted {
+    background-color: yellow;
 }
