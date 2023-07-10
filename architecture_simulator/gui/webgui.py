@@ -182,6 +182,125 @@ def update_tables():
         else:
             archsim_js.update_instruction_table(hex(address), cmd.__repr__(), "")
 
+    # Update IF Stage
+    IF_pipeline_register = simulation.pipeline.pipeline_registers[0]
+    if isinstance(IF_pipeline_register, InstructionFetchPipelineRegister):
+        archsim_js.update_IF_Stage(
+            instruction=IF_pipeline_register.instruction,
+            address_of_instruction=IF_pipeline_register.instruction,
+        )
+
+    # Update ID Stage
+    try:
+        ID_pipeline_register = simulation.pipeline.pipeline_registers[1]
+        if isinstance(ID_pipeline_register, InstructionDecodePipelineRegister):
+            control_unit_signals = [
+                ID_pipeline_register.control_unit_signals.alu_src_1,
+                ID_pipeline_register.control_unit_signals.alu_src_2,
+                ID_pipeline_register.control_unit_signals.wb_src,
+                ID_pipeline_register.control_unit_signals.reg_write,
+                ID_pipeline_register.control_unit_signals.mem_read,
+                ID_pipeline_register.control_unit_signals.mem_write,
+                ID_pipeline_register.control_unit_signals.branch,
+                ID_pipeline_register.control_unit_signals.jump,
+                ID_pipeline_register.control_unit_signals.alu_op,
+                ID_pipeline_register.control_unit_signals.alu_to_pc,
+            ]
+            archsim_js.update_ID_Stage(
+                register_read_addr_1=ID_pipeline_register.register_read_addr_1,
+                register_read_addr_2=ID_pipeline_register.register_read_addr_2,
+                register_read_data_1=ID_pipeline_register.register_read_data_1,
+                register_read_data_2=ID_pipeline_register.register_read_data_2,
+                imm=ID_pipeline_register.imm,
+                control_unit_signals=control_unit_signals,
+            )
+    except:
+        ...
+
+    # Update EX Stage
+    try:
+        EX_pipeline_register = simulation.pipeline.pipeline_registers[2]
+        if isinstance(EX_pipeline_register, ExecutePipelineRegister):
+            control_unit_signals = [
+                EX_pipeline_register.control_unit_signals.alu_src_1,
+                EX_pipeline_register.control_unit_signals.alu_src_2,
+                EX_pipeline_register.control_unit_signals.wb_src,
+                EX_pipeline_register.control_unit_signals.reg_write,
+                EX_pipeline_register.control_unit_signals.mem_read,
+                EX_pipeline_register.control_unit_signals.mem_write,
+                EX_pipeline_register.control_unit_signals.branch,
+                EX_pipeline_register.control_unit_signals.jump,
+                EX_pipeline_register.control_unit_signals.alu_op,
+                EX_pipeline_register.control_unit_signals.alu_to_pc,
+            ]
+            archsim_js.update_EX_Stage(
+                alu_in_1=EX_pipeline_register.alu_in_1,
+                alu_in_2=EX_pipeline_register.alu_in_2,
+                register_read_data_2=EX_pipeline_register.register_read_data_2,
+                imm=EX_pipeline_register.imm,
+                result=EX_pipeline_register.result,
+                comparison=EX_pipeline_register.comparison,
+                pc_plus_imm=EX_pipeline_register.pc_plus_imm,
+                control_unit_signals=control_unit_signals,
+            )
+    except:
+        ...
+
+    # Update MA Stage
+    try:
+        MA_pipeline_register = simulation.pipeline.pipeline_registers[3]
+        if isinstance(MA_pipeline_register, MemoryAccessPipelineRegister):
+            control_unit_signals = [
+                MA_pipeline_register.control_unit_signals.alu_src_1,
+                MA_pipeline_register.control_unit_signals.alu_src_2,
+                MA_pipeline_register.control_unit_signals.wb_src,
+                MA_pipeline_register.control_unit_signals.reg_write,
+                MA_pipeline_register.control_unit_signals.mem_read,
+                MA_pipeline_register.control_unit_signals.mem_write,
+                MA_pipeline_register.control_unit_signals.branch,
+                MA_pipeline_register.control_unit_signals.jump,
+                MA_pipeline_register.control_unit_signals.alu_op,
+                MA_pipeline_register.control_unit_signals.alu_to_pc,
+            ]
+            archsim_js.update_MA_Stage(
+                memory_address=MA_pipeline_register.memory_address,
+                result=MA_pipeline_register.result,
+                memory_write_data=MA_pipeline_register.memory_write_data,
+                memory_read_data=MA_pipeline_register.memory_read_data,
+                comparison=MA_pipeline_register.comparison,
+                pc_src=MA_pipeline_register.pc_src,
+                pc_plus_imm=MA_pipeline_register.pc_plus_imm,
+                control_unit_signals=control_unit_signals,
+            )
+    except:
+        ...
+
+    # Update WB Stage
+    try:
+        WB_pipeline_register = simulation.pipeline.pipeline_registers[4]
+        if isinstance(WB_pipeline_register, RegisterWritebackPipelineRegister):
+            control_unit_signals = [
+                WB_pipeline_register.control_unit_signals.alu_src_1,
+                WB_pipeline_register.control_unit_signals.alu_src_2,
+                WB_pipeline_register.control_unit_signals.wb_src,
+                WB_pipeline_register.control_unit_signals.reg_write,
+                WB_pipeline_register.control_unit_signals.mem_read,
+                WB_pipeline_register.control_unit_signals.mem_write,
+                WB_pipeline_register.control_unit_signals.branch,
+                WB_pipeline_register.control_unit_signals.jump,
+                WB_pipeline_register.control_unit_signals.alu_op,
+                WB_pipeline_register.control_unit_signals.alu_to_pc,
+            ]
+            archsim_js.update_WB_Stage(
+                register_write_data=WB_pipeline_register.register_write_data,
+                write_register=WB_pipeline_register.write_register,
+                memory_read_data=WB_pipeline_register.memory_read_data,
+                alu_result=WB_pipeline_register.alu_result,
+                control_unit_signals=control_unit_signals,
+            )
+    except:
+        ...
+
 
 # #actual comment: output = performance metric repr but if parser produces error, overwrite output with error
 # def update_output():

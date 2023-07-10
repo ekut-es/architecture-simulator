@@ -8,6 +8,42 @@ def update_instruction_table(address, val, stage) -> None: ...
 def clear_memory_table() -> None: ...
 def highlight(position: int) -> None: ...
 def remove_all_highlights() -> None: ...
+def update_IF_Stage(instruction, address_of_instruction) -> None: ...
+def update_ID_Stage(
+    register_read_addr_1,
+    register_read_addr_2,
+    register_read_data_1,
+    register_read_data_2,
+    imm,
+    control_unit_signals,
+) -> None: ...
+def update_EX_Stage(
+    alu_in_1,
+    alu_in_2,
+    register_read_data_2,
+    imm,
+    result,
+    comparison,
+    pc_plus_imm,
+    control_unit_signals,
+) -> None: ...
+def update_MA_Stage(
+    memory_address,
+    result,
+    memory_write_data,
+    memory_read_data,
+    comparison,
+    pc_src,
+    pc_plus_imm,
+    control_unit_signals,
+) -> None: ...
+def update_WB_Stage(
+    register_write_data,
+    write_register,
+    memory_read_data,
+    alu_result,
+    control_unit_signals,
+) -> None: ...
 
 # def update_output(output_string: str) -> None: ...
 def clear_register_table() -> None: ...

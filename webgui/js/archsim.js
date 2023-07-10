@@ -125,6 +125,52 @@ const archsim_js = {
         }
         editor.refresh();
     },
+    update_IF_Stage: function (instruction, address_of_instruction) {
+        pass;
+    },
+    update_ID_Stage: function (
+        register_read_addr_1,
+        register_read_addr_2,
+        register_read_data_1,
+        register_read_data_2,
+        imm,
+        control_unit_signals
+    ) {
+        pass;
+    },
+    update_EX_Stage: function (
+        alu_in_1,
+        alu_in_2,
+        register_read_data_2,
+        imm,
+        result,
+        comparison,
+        pc_plus_imm,
+        control_unit_signals
+    ) {
+        pass;
+    },
+    update_MA_Stage: function (
+        memory_address,
+        result,
+        memory_write_data,
+        memory_read_data,
+        comparison,
+        pc_src,
+        pc_plus_imm,
+        control_unit_signals
+    ) {
+        pass;
+    },
+    update_WB_Stage: function (
+        register_write_data,
+        write_register,
+        memory_read_data,
+        alu_result,
+        control_unit_signals
+    ) {
+        pass;
+    },
 };
 
 output.value = "Output \n\nInitializing... ";
