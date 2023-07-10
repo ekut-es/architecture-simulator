@@ -143,6 +143,7 @@ window.addEventListener("DOMContentLoaded", function () {
         });
 
     editor.on("change", function () {
+        console.log("change");
         editor.save();
         // autoparse
         clearTimeout(input_timer);
@@ -150,6 +151,18 @@ window.addEventListener("DOMContentLoaded", function () {
             finished_typing,
             parse_sim_after_not_typing_for_n_ms
         );
+    });
+
+    editor.on("mouseover", function () {
+        console.log("Mouse is over the editor");
+    });
+
+    editor.on("mouseover", function (cm, event) {
+        alert("hover");
+        var word = cm.getTokenAt(event);
+        if (word.string.length > 2) {
+            cm.showTooltip(event, "<strong>" + word.string + "</strong>");
+        }
     });
 
     /*document.getElementById("input").addEventListener("keyup", () => {
