@@ -101,14 +101,16 @@ const archsim_js = {
         for (var i = 0; i < rows.length; i++) {
             var address = rows[i].querySelector("td:first-child").innerText;
             if (address == position) {
-                rows[i].classList.add("highlighted");
+                //rows[i].classList.add("highlighted");
+                rows[i].style.backgroundColor = "yellow";
             }
         }
     },
     remove_cmd_table_highlights: function () {
         var rows = document.querySelectorAll("#gui_cmd_table_body_id tr");
         for (var i = 0; i < rows.length; i++) {
-            rows[i].classList.remove("highlighted");
+            //rows[i].classList.remove("highlighted");
+            rows[i].style.backgroundColor = "none";
         }
     },
 };

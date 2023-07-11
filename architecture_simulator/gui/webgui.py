@@ -43,12 +43,13 @@ def step_sim(instr: str):
             archsim_js.set_output(Parser_Exception.__repr__())
 
     # step the simulation
-    # if InstructionExecutionException occurs highlight cmd table line with according address
+    simulation_ended_flag = False
     try:
         simulation_ended_flag = simulation.step_simulation()
         archsim_js.remove_cmd_table_highlights()
     except InstructionExecutionException as e:
         archsim_js.highlight_cmd_table(e.address)
+        simulation_ended_flag = True
 
     update_ui()
 
