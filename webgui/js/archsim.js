@@ -59,15 +59,44 @@ const archsim_js = {
     //     }
     // },
     //ids und inner texts have to be changed then delete this comment
-    update_instruction_table: function (address, val) {
+    update_instruction_table: function (address, val, stage) {
         tr = document.createElement("tr");
+        tr.id = address;
         td1 = document.createElement("td");
         td1.innerText = address;
         td2 = document.createElement("td");
         td2.innerText = val;
         td2.id = "instr" + address;
+        td3 = document.createElement("td");
+        td3.innerText = stage;
+        if (stage == "Single") {
+            td1.style.backgroundColor = "purple";
+            td2.style.backgroundColor = "purple";
+            td3.style.backgroundColor = "purple";
+        } else if (stage == "IF") {
+            td1.style.backgroundColor = "red";
+            td2.style.backgroundColor = "red";
+            td3.style.backgroundColor = "red";
+        } else if (stage == "ID") {
+            td1.style.backgroundColor = "yellow";
+            td2.style.backgroundColor = "yellow";
+            td3.style.backgroundColor = "yellow";
+        } else if (stage == "EX") {
+            td1.style.backgroundColor = "green";
+            td2.style.backgroundColor = "green";
+            td3.style.backgroundColor = "green";
+        } else if (stage == "MA") {
+            td1.style.backgroundColor = "aqua";
+            td2.style.backgroundColor = "aqua";
+            td3.style.backgroundColor = "aqua";
+        } else if (stage == "WB") {
+            td1.style.backgroundColor = "blue";
+            td2.style.backgroundColor = "blue";
+            td3.style.backgroundColor = "blue";
+        }
         tr.appendChild(td1);
         tr.appendChild(td2);
+        tr.appendChild(td3);
         instructions.appendChild(tr);
     },
     clear_memory_table: function () {
@@ -96,6 +125,42 @@ const archsim_js = {
         }
         editor.refresh();
     },
+    update_IF_Stage: function (instruction, address_of_instruction) {},
+    update_ID_Stage: function (
+        register_read_addr_1,
+        register_read_addr_2,
+        register_read_data_1,
+        register_read_data_2,
+        imm,
+        control_unit_signals
+    ) {},
+    update_EX_Stage: function (
+        alu_in_1,
+        alu_in_2,
+        register_read_data_2,
+        imm,
+        result,
+        comparison,
+        pc_plus_imm,
+        control_unit_signals
+    ) {},
+    update_MA_Stage: function (
+        memory_address,
+        result,
+        memory_write_data,
+        memory_read_data,
+        comparison,
+        pc_src,
+        pc_plus_imm,
+        control_unit_signals
+    ) {},
+    update_WB_Stage: function (
+        register_write_data,
+        write_register,
+        memory_read_data,
+        alu_result,
+        control_unit_signals
+    ) {},
 };
 
 output.value = "Output \n\nInitializing... ";
@@ -199,13 +264,13 @@ async function update_performance_metrics() {
 //     }
 // }
 
-async function evaluatePython_reset_sim() {
+async function evaluatePython_reset_sim(pipeline_mode) {
     start_loading_animation();
     let pyodide = await pyodideReadyPromise;
     stop_loading_animation();
     try {
         reset_sim = pyodide.globals.get("reset_sim");
-        reset_sim();
+        reset_sim(pipeline_mode);
         output.value = "";
     } catch (err) {
         addToOutput(err);
@@ -217,6 +282,11 @@ async function evaluatePython_update_tables() {
     try {
         update_tables = pyodide.globals.get("update_tables");
         let output = update_tables();
+        var table = document.getElementById("gui_cmd_table_id");
+        var rows = table.rows;
+        rows[0].classList.add("highlight");
+        console.log(rows[2].classList);
+        console.log(table.innerHTML);
     } catch (err) {
         addToOutput(err);
     }

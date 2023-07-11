@@ -143,6 +143,10 @@ body footer {
     background-color: var(--button_blue_color);
 }
 
+.button_switch_stage {
+    background-color: #11101073;
+}
+
 .loading {
 }
 
