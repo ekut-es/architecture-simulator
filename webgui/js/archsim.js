@@ -100,7 +100,7 @@ const archsim_js = {
         var rows = document.querySelectorAll("#gui_cmd_table_body_id tr");
         for (var i = 0; i < rows.length; i++) {
             var address = rows[i].querySelector("td:first-child").innerText;
-            if (address === position) {
+            if (address == position) {
                 rows[i].classList.add("highlighted");
             }
         }
