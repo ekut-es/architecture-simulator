@@ -16,12 +16,11 @@ from architecture_simulator.isa.parser import RiscvParser
 class TestPipeline(unittest.TestCase):
     def assert_steps(self, pipeline: Pipeline, steps: int):
         """Execute the given amount of steps on the pipeline and assert the pipeline is finished after exactly that amount of steps and not earlier or later.
-            Note: Internally, it does (n+1) steps because it takes one more step to clear the last pipeline register. This doesn't change the behavior of the method.
         Args:
             pipeline (Pipeline): pipeline to test.
             steps (int): number of steps needed to finish the pipeline.
         """
-        for step in range(steps):
+        for step in range(steps - 1):
             pipeline.step()
             self.assert_(
                 not pipeline.is_done(), f"Pipeline already finished after {step} steps."
