@@ -562,14 +562,15 @@ class Pipeline:
                 break  # break since we don't care about the previous stages
 
     def is_empty(self) -> bool:
-        """Return True if all pipeline registers are empty (determined by whether the instruction in the pipeline register is empty)
+        """Return True if all pipeline registers (exluding the last) are empty (determined by whether the instruction in the pipeline register is empty).
+            Note, that the last pipeline register is not considerd, because it will not be used as input for an other stage.
 
         Returns:
             bool: whether all pipeline registers are empty
         """
         return all(
             type(pipeline_register.instruction) == EmptyInstruction
-            for pipeline_register in self.pipeline_registers
+            for pipeline_register in self.pipeline_registers[:-1]
         )
 
     def is_done(self) -> bool:

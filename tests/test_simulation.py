@@ -305,4 +305,22 @@ class TestSimulation(unittest.TestCase):
         simulation.state.instruction_memory.append_instructions(program=programm)
         simulation.run_simulation()
         self.assertEqual(simulation.state.performance_metrics.flushes, 2)
-        self.assertEqual(simulation.state.performance_metrics.cycles, 13)
+        self.assertEqual(simulation.state.performance_metrics.cycles, 12)
+
+    def test_off_by_one_fix(self):
+        simulation = Simulation(mode="five_stage_pipeline")
+        programm = """
+        add x0, x0, x0
+        """
+        simulation.state.instruction_memory.append_instructions(program=programm)
+        simulation.run_simulation()
+        self.assertEqual(simulation.state.performance_metrics.cycles, 5)
+
+    def test_singele_stage_cycles(self):
+        simulation = Simulation()
+        programm = """
+        add x0, x0, x0
+        """
+        simulation.state.instruction_memory.append_instructions(program=programm)
+        simulation.run_simulation()
+        self.assertEqual(simulation.state.performance_metrics.cycles, 1)
