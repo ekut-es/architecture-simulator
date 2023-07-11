@@ -101,6 +101,16 @@ const archsim_js = {
                     list: [output_str, ""],
                 };
             },
+            customKeys: {
+                Up: function (cm, handle) {
+                    CodeMirror.commands.goLineUp(cm);
+                    handle.close();
+                },
+                Down: function (cm, handle) {
+                    CodeMirror.commands.goLineDown(cm);
+                    handle.close();
+                },
+            },
         };
         editor.showHint(error_description);
     },

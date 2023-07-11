@@ -110,6 +110,7 @@ def parse_input(instr: str):
         simulation.state.instruction_memory.append_instructions(instr)
         archsim_js.remove_all_highlights()
     except ParserException as Parser_Exception:
+        archsim_js.remove_all_highlights()
         archsim_js.set_output(Parser_Exception.__repr__())
         archsim_js.highlight(
             Parser_Exception.line_number, str=Parser_Exception.__repr__()
