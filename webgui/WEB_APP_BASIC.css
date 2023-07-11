@@ -249,5 +249,9 @@ body main #output {
 }
 
 .highlight {
-    background-color: red;
+    background-color: yellow;
+}
+
+.CodeMirror-hints {
+    pointer-events: none;
 }

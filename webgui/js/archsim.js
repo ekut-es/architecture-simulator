@@ -114,16 +114,41 @@ const archsim_js = {
     set_output: function (str) {
         output.value = str;
     },
-    highlight: function (position) {
+    highlight: function (position, str) {
         //editor.removeLineClass(position-1, "background", "highlight")
         editor.addLineClass(position - 1, "background", "highlight");
         editor.refresh();
+        str.toString = function () {
+            return this.str;
+        };
+        output_str = str.toString();
+        var error_description = {
+            hint: function () {
+                return {
+                    from: position,
+                    to: position,
+                    list: [output_str, ""],
+                };
+            },
+            customKeys: {
+                Up: function (cm, handle) {
+                    CodeMirror.commands.goLineUp(cm);
+                    handle.close();
+                },
+                Down: function (cm, handle) {
+                    CodeMirror.commands.goLineDown(cm);
+                    handle.close();
+                },
+            },
+        };
+        editor.showHint(error_description);
     },
     remove_all_highlights: function () {
         for (let i = 0; i < editor.lineCount(); i++) {
             editor.removeLineClass(i, "background", "highlight");
         }
         editor.refresh();
+        editor.closeHint();
     },
     update_IF_Stage: function (instruction, address_of_instruction) {},
     update_ID_Stage: function (
