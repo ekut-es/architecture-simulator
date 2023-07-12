@@ -97,29 +97,10 @@ const archsim_js = {
         editor.refresh();
     },
     highlight_cmd_table: function (position) {
-        var rows = document.querySelectorAll("#gui_cmd_table_body_id tr");
-        for (var i = 0; i < rows.length; i++) {
-            var address = rows[i].querySelector("td:first-child").innerText;
-            if (address == position) {
-                var cells = rows[i].querySelectorAll("td");
-                for (var j = 0; j < cells.length; j++) {
-                    cells[j].classList.add("highlighted");
-                }
-                //rows[i].classList.add("highlighted");
-                //rows[i].style.backgroundColor = "yellow";
-            }
-        }
-    },
-    remove_cmd_table_highlights: function () {
-        var rows = document.querySelectorAll("#gui_cmd_table_body_id tr");
-        for (var i = 0; i < rows.length; i++) {
-            var cells = rows[i].querySelectorAll("td");
-            for (var j = 0; j < cells.length; j++) {
-                cells[j].classList.remove("highlighted");
-            }
-            //rows[i].classList.remove("highlighted");
-            //rows[i].style.backgroundColor = "none";
-        }
+        table = document.getElementById("gui_cmd_table_id");
+        table.rows[position + 1].cells[0].style.backgroundColor = "yellow";
+        table.rows[position + 1].cells[1].style.backgroundColor = "yellow";
+        console.log(table.innerHTML);
     },
 };
 
