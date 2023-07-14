@@ -99,8 +99,8 @@ class TestSimulation(unittest.TestCase):
                     instructions={
                         0: ADDI(rd=2, rs1=0, imm=5),
                         4: ADDI(rd=1, rs1=1, imm=1),
-                        8: BNE(rs1=1, rs2=2, imm=-2),
-                        12: BEQ(rs1=0, rs2=0, imm=4),
+                        8: BNE(rs1=1, rs2=2, imm=-4),
+                        12: BEQ(rs1=0, rs2=0, imm=8),
                         16: ADDI(rd=0, rs1=0, imm=0),
                         20: ADDI(rd=3, rs1=0, imm=64),
                     },
@@ -126,7 +126,7 @@ class TestSimulation(unittest.TestCase):
                         4: ADDI(rd=1, rs1=1, imm=1),
                         8: ADDI(rd=1, rs1=1, imm=1),
                         12: ADDI(rd=1, rs1=1, imm=1),
-                        16: BNE(rs1=1, rs2=2, imm=-6),
+                        16: BNE(rs1=1, rs2=2, imm=-12),
                     },
                 ),
             ),
@@ -147,10 +147,10 @@ class TestSimulation(unittest.TestCase):
                 instruction_memory=InstructionMemory(
                     instructions={
                         0: ADDI(rd=3, rs1=0, imm=8),
-                        4: JAL(rd=2, imm=4),
+                        4: JAL(rd=2, imm=8),
                         8: ADDI(rd=1, rs1=1, imm=1),
-                        12: BEQ(rs1=0, rs2=0, imm=2),
-                        16: JAL(rd=2, imm=2),
+                        12: BEQ(rs1=0, rs2=0, imm=4),
+                        16: JAL(rd=2, imm=4),
                         20: ADDI(rd=1, rs1=1, imm=-10),
                     },
                 ),

@@ -30,21 +30,21 @@ def fibonacci_recursive_simulation(n: int) -> Simulation:
                     0: LUI(rd=10, imm=0),  # loading n
                     4: ADDI(rd=10, rs1=10, imm=n),
                     8: ADDI(rd=2, rs1=0, imm=1024),  # setting initial stack pointer
-                    12: JAL(rd=1, imm=4),  # call fib(n)
-                    16: BEQ(rs1=0, rs2=0, imm=44),  # jump to end
+                    12: JAL(rd=1, imm=8),  # call fib(n)
+                    16: BEQ(rs1=0, rs2=0, imm=88),  # jump to end
                     # Start of fib(n) procedure
-                    20: BGE(rs1=0, rs2=10, imm=34),  # branch if n <= 0
+                    20: BGE(rs1=0, rs2=10, imm=68),  # branch if n <= 0
                     24: ADDI(rd=5, rs1=0, imm=1),
-                    28: BEQ(rs1=5, rs2=10, imm=34),  # branch if n == 1
+                    28: BEQ(rs1=5, rs2=10, imm=68),  # branch if n == 1
                     32: ADDI(rd=2, rs1=2, imm=-8),  # adjust sp for 2 items
                     36: SW(rs1=2, rs2=1, imm=4),  # store stack pointer
                     40: SW(rs1=2, rs2=10, imm=0),  # store n
                     44: ADDI(rd=10, rs1=10, imm=-1),  # x10 = n-1
-                    48: JAL(rd=1, imm=-14),  # call fib(n-1)
+                    48: JAL(rd=1, imm=-28),  # call fib(n-1)
                     52: LW(rd=5, rs1=2, imm=0),  # restore n
                     56: SW(rs1=2, rs2=10, imm=0),  # store return value (fib(n-1))
                     60: ADDI(rd=10, rs1=5, imm=-2),  # x10 = n-2
-                    64: JAL(rd=1, imm=-22),  # call fib(n-2)
+                    64: JAL(rd=1, imm=-44),  # call fib(n-2)
                     68: LW(rd=5, rs1=2, imm=0),  # load from memory: x5 = fib(n-1)
                     72: LW(rd=1, rs1=2, imm=4),  # restore return address
                     76: ADDI(rd=2, rs1=2, imm=8),  # decrease stack pointer for 2 items
