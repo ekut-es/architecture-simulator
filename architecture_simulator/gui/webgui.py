@@ -47,7 +47,7 @@ def step_sim(instr: str):
         simulation_ended_flag = simulation.step_simulation()
         update_ui()
     except InstructionExecutionException as e:
-        archsim_js.highlight_cmd_table((e.address) / 4)
+        archsim_js.highlight_cmd_table(int(e.address / 4))
         simulation_ended_flag = False
 
     return (simulation.state.performance_metrics.__repr__(), simulation_ended_flag)

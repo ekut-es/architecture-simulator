@@ -160,7 +160,7 @@ body main #input {
 }
 
 body main #gui_cmd_div_id {
-    max-height: 35%;
+    max-height: 57%;
     overflow-y: scroll;
 }
 
@@ -186,7 +186,7 @@ body main #gui_cmd_table_id td {
 }
 
 body main #gui_memory_div_id {
-    max-height: 35%;
+    max-height: 57%;
     overflow-y: scroll;
 }
 
@@ -220,7 +220,7 @@ body main #gui_memory_table_id option:disabled {
 }
 
 body main #gui_registers_div_id {
-    max-height: 35%;
+    max-height: 57%;
     overflow-y: scroll;
 }
 
