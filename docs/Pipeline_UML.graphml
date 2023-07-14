@@ -553,7 +553,7 @@
 									<sys:String><![CDATA[+ memory_read_data]]></sys:String>
 									<sys:String><![CDATA[+ write_register]]></sys:String>
 									<sys:String><![CDATA[+ comparison]]></sys:String>
-									<sys:String><![CDATA[+ pc_src]]></sys:String>
+									<sys:String><![CDATA[+ comparison_or_jump]]></sys:String>
 									<sys:String><![CDATA[+ pc_plus_imm]]></sys:String>
 									<sys:String><![CDATA[+ pc_plus_instruction_length]]></sys:String>
 									<sys:String><![CDATA[+ imm]]></sys:String>
