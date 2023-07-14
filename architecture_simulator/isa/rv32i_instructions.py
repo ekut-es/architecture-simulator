@@ -892,7 +892,7 @@ class BEQ(BTypeInstruction):
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
         if rs1 == rs2:
-            architectural_state.program_counter += self.imm * 2 - self.length
+            architectural_state.program_counter += self.imm - self.length
             architectural_state.performance_metrics.branch_count += 1
         return architectural_state
 
@@ -913,7 +913,7 @@ class BNE(BTypeInstruction):
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
         if rs1 != rs2:
-            architectural_state.program_counter += self.imm * 2 - self.length
+            architectural_state.program_counter += self.imm - self.length
             architectural_state.performance_metrics.branch_count += 1
         return architectural_state
 
@@ -934,7 +934,7 @@ class BLT(BTypeInstruction):
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         rs2 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs2]))
         if rs1 < rs2:
-            architectural_state.program_counter += self.imm * 2 - self.length
+            architectural_state.program_counter += self.imm - self.length
             architectural_state.performance_metrics.branch_count += 1
         return architectural_state
 
@@ -956,7 +956,7 @@ class BGE(BTypeInstruction):
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         rs2 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs2]))
         if rs1 >= rs2:
-            architectural_state.program_counter += self.imm * 2 - self.length
+            architectural_state.program_counter += self.imm - self.length
             architectural_state.performance_metrics.branch_count += 1
         return architectural_state
 
@@ -978,7 +978,7 @@ class BLTU(BTypeInstruction):
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
         if rs1 < rs2:
-            architectural_state.program_counter += self.imm * 2 - self.length
+            architectural_state.program_counter += self.imm - self.length
             architectural_state.performance_metrics.branch_count += 1
         return architectural_state
 
@@ -999,7 +999,7 @@ class BGEU(BTypeInstruction):
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
         if rs1 >= rs2:
-            architectural_state.program_counter += self.imm * 2 - self.length
+            architectural_state.program_counter += self.imm - self.length
             architectural_state.performance_metrics.branch_count += 1
         return architectural_state
 
@@ -1077,11 +1077,12 @@ class JAL(JTypeInstruction):
         super().__init__(rd, imm, mnemonic="jal")
 
     def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+        # NOTE: Actually sets the pc to (pc+imm-4) because the simulation always increases the pc by 4 after execution
         """x[rd]=pc+4; pc+=sext(imm)"""
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             architectural_state.program_counter + 4
         )
-        architectural_state.program_counter += self.imm * 2 - self.length
+        architectural_state.program_counter += self.imm - self.length
         architectural_state.performance_metrics.procedure_count += 1
         return architectural_state
 

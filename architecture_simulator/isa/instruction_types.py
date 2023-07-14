@@ -356,20 +356,20 @@ class STypeInstruction(Instruction):
 class BTypeInstruction(Instruction):
     def __init__(self, rs1: int, rs2: int, imm: int, **args):
         """Create a B-Type instruction
-        Note: These B-Type-Instructions will actually set the pc to 2*imm-4, because the simulator will always add 4 to the pc.
+        Note: These B-Type-Instructions will actually set the pc to imm-length, because the simulator will always add the instruction length in bytes to the pc.
 
         Args:
             rs1 (int): source register 1
             rs2 (int): source register 2
-            imm (int): offset to be added to the pc. Needs to be a 12 bit signed integer. Interpreted as multiple of 2 bytes.
+            imm (int): offset to be added to the pc. Needs to be a 13 bit signed integer. Interpreted as number of bytes.
         """
         super().__init__(**args)
         self.rs1 = rs1
         self.rs2 = rs2
-        self.imm = (imm & 2047) - (imm & 2048)  # 12-bit sext
+        self.imm = (imm & 4095) - (imm & 4096)  # 13-bit sext
 
     def __repr__(self) -> str:
-        return f"{self.mnemonic} x{self.rs1}, x{self.rs2}, {self.imm*2}"
+        return f"{self.mnemonic} x{self.rs1}, x{self.rs2}, {self.imm}"
 
     def access_register_file(
         self, architectural_state: ArchitecturalState
@@ -381,7 +381,7 @@ class BTypeInstruction(Instruction):
             self.rs2,
             int(architectural_state.register_file.registers[self.rs1]),
             int(architectural_state.register_file.registers[self.rs2]),
-            self.imm * 2,
+            self.imm,
         )
 
     def control_unit_signals(self) -> "ControlUnitSignals":
@@ -435,10 +435,10 @@ class JTypeInstruction(Instruction):
     def __init__(self, rd: int, imm: int, **args):
         super().__init__(**args)
         self.rd = rd
-        self.imm = (imm & (2**19) - 1) - (imm & 2**19)  # 20-bit sext
+        self.imm = (imm & (2**20) - 1) - (imm & 2**20)  # 21-bit sext
 
     def __repr__(self) -> str:
-        return f"{self.mnemonic} x{self.rd}, {self.imm*2}"
+        return f"{self.mnemonic} x{self.rd}, {self.imm}"
 
     def control_unit_signals(self) -> "ControlUnitSignals":
         from ..uarch.pipeline import ControlUnitSignals
@@ -474,7 +474,7 @@ class JTypeInstruction(Instruction):
     def access_register_file(
         self, architectural_state: ArchitecturalState
     ) -> tuple[int | None, int | None, int | None, int | None, int | None]:
-        return None, None, None, None, self.imm << 1
+        return None, None, None, None, self.imm
 
 
 class FenceTypeInstruction(Instruction):
