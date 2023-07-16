@@ -10,11 +10,8 @@ const parse_sim_after_not_typing_for_n_ms = 500;
 var input_timer;
 let representation_mode = decimal_representation; //change this to set another default repr.
 var run;
-let waiting_for_pyodide_flag = true;
+var pipeline_mode = "single_stage_pipeline";
 window.addEventListener("DOMContentLoaded", function () {
-    // initialize codemirror textarea
-
-    // this is how you highlight text
     clearTimeout(input_timer);
     input_timer = setTimeout(
         finished_typing,
@@ -40,6 +37,7 @@ window.addEventListener("DOMContentLoaded", function () {
             disable_run();
             enable_pause();
             disable_step();
+            disable_pipeline_switch();
         });
 
     document
@@ -53,6 +51,7 @@ window.addEventListener("DOMContentLoaded", function () {
             disable_pause();
             enable_step();
             stop_loading_animation();
+            disable_pipeline_switch();
         });
 
     document
@@ -69,6 +68,7 @@ window.addEventListener("DOMContentLoaded", function () {
             enable_run();
             disable_pause();
             enable_step();
+            disable_pipeline_switch();
         });
 
     document
@@ -76,11 +76,12 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             document.getElementById("input").disabled = true;
             clearInterval(run);
-            evaluatePython_reset_sim();
+            evaluatePython_reset_sim(pipeline_mode);
             document.getElementById("input").disabled = false;
             enable_run();
             disable_pause();
             enable_step();
+            enable_pipeline_switch();
             clearTimeout(input_timer);
             input_timer = setTimeout(
                 finished_typing,
@@ -142,6 +143,36 @@ window.addEventListener("DOMContentLoaded", function () {
                 .classList.remove("active");
         });
 
+    document
+        .getElementById("button_SingleStage")
+        .addEventListener("click", () => {
+            pipeline_mode = "single_stage_pipeline";
+            evaluatePython_reset_sim(pipeline_mode);
+            input_timer = setTimeout(
+                finished_typing,
+                parse_sim_after_not_typing_for_n_ms
+            );
+            document
+                .getElementById("button_SingleStage")
+                .classList.add("active");
+            document
+                .getElementById("button_5-Stage")
+                .classList.remove("active");
+        });
+
+    document.getElementById("button_5-Stage").addEventListener("click", () => {
+        pipeline_mode = "five_stage_pipeline";
+        evaluatePython_reset_sim(pipeline_mode);
+        input_timer = setTimeout(
+            finished_typing,
+            parse_sim_after_not_typing_for_n_ms
+        );
+        document.getElementById("button_5-Stage").classList.add("active");
+        document
+            .getElementById("button_SingleStage")
+            .classList.remove("active");
+    });
+
     editor.on("change", function () {
         editor.save();
         // autoparse
@@ -175,6 +206,32 @@ window.addEventListener("DOMContentLoaded", function () {
 window.onbeforeunload = function () {
     return true;
 };
+
+function disable_pipeline_switch() {
+    document.getElementById("button_SingleStage").disabled = true;
+    document.getElementById("button_SingleStage").style.backgroundColor =
+        getComputedStyle(document.documentElement).getPropertyValue(
+            "--button_disabled_color"
+        );
+    document.getElementById("button_5-Stage").disabled = true;
+    document.getElementById("button_5-Stage").style.backgroundColor =
+        getComputedStyle(document.documentElement).getPropertyValue(
+            "--button_disabled_color"
+        );
+}
+
+function enable_pipeline_switch() {
+    document.getElementById("button_SingleStage").disabled = false;
+    document.getElementById("button_SingleStage").style.backgroundColor =
+        getComputedStyle(document.documentElement).getPropertyValue(
+            "button_switch_stage"
+        );
+    document.getElementById("button_5-Stage").disabled = false;
+    document.getElementById("button_5-Stage").style.backgroundColor =
+        getComputedStyle(document.documentElement).getPropertyValue(
+            "button_switch_stage"
+        );
+}
 
 function disable_run() {
     document.getElementById("button_simulation_start_id").disabled = true;

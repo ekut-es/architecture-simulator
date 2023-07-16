@@ -495,391 +495,6 @@ class TestInstructions(unittest.TestCase):
         state = and_inst.behavior(state)
         self.assertEqual(state.register_file.registers, [num_a, num_b, num_c])
 
-    def test_csrrw_privilege_level_too_low(self):
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
-        state.csr_registers.privilege_level = 0
-        with self.assertRaises(CSRError) as context:
-            state.csr_registers.store_word(3000, fixedint.MutableUInt32(3))
-        self.assertTrue(
-            "illegal action: privilege level too low to access this csr register"
-            in str(context.exception)
-        )
-
-    def test_csrrw_attempting_to_write_to_read_only(self):
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
-        with self.assertRaises(CSRError) as context:
-            state.csr_registers.store_word(3072, fixedint.MutableUInt32(3))
-        self.assertTrue(
-            "illegal action: attempting to write into read-only csr register"
-            in str(context.exception)
-        )
-
-    def test_csrrw_invalid_address(self):
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
-        state.csr_registers.privilege_level = 4
-        with self.assertRaises(CSRError) as context:
-            state.csr_registers.store_word(7000, fixedint.MutableUInt32(3))
-        self.assertTrue(
-            "illegal action: csr register does not exist" in str(context.exception)
-        )
-
-    def test_csrrw(self):
-        fixedint.MutableUInt32(0)
-        fixedint.MutableUInt32(1)
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
-        cssrw_1 = CSRRW(csr=0, rs1=1, rd=0)
-        state.csr_registers.store_word(0, fixedint.MutableUInt32(3))
-        state.csr_registers.privilege_level = 4
-        state = cssrw_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [3, 2])
-        self.assertEqual(state.csr_registers.load_word(cssrw_1.csr), 2)
-
-    def test_csrrs(self):
-        max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
-        test_number_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
-        test_mask_1 = fixedint.MutableUInt32(0x00_00_00_01)
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[0, test_mask_1])
-        )
-        state.csr_registers.store_word(0, test_number_1)
-        cssrs_1 = CSRRS(csr=0, rs1=1, rd=0)
-        state = cssrs_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [test_number_1, test_mask_1])
-        self.assertEqual(state.csr_registers.load_word(cssrs_1.csr), max_number)
-
-    def test_csrrc(self):
-        max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
-        test_result_1 = fixedint.MutableUInt32(0x00_00_00_01)
-        test_mask_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[0, test_mask_1])
-        )
-        state.csr_registers.store_word(0, max_number)
-        cssrc_1 = CSRRC(csr=0, rs1=1, rd=0)
-        state = cssrc_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [max_number, test_mask_1])
-        self.assertEqual(state.csr_registers.load_word(cssrc_1.csr), test_result_1)
-
-    def test_csritype(self):
-        cssrwi_1 = CSRRWI(csr=0, rd=0, uimm=0)
-        self.assertEqual(cssrwi_1.uimm, 0)
-        cssrwi_1 = CSRRWI(csr=0, rd=0, uimm=1)
-        self.assertEqual(cssrwi_1.uimm, 1)
-        cssrwi_1 = CSRRWI(csr=0, rd=0, uimm=31)
-        self.assertEqual(cssrwi_1.uimm, 31)
-        cssrwi_1 = CSRRWI(csr=0, rd=0, uimm=32)
-        self.assertEqual(cssrwi_1.uimm, 0)
-        cssrwi_1 = CSRRWI(csr=0, rd=0, uimm=-1)
-        self.assertEqual(cssrwi_1.uimm, 31)
-
-    def test_csrrwi(self):
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0]))
-        state.csr_registers.store_word(0, 3)
-        cssrwi_1 = CSRRWI(csr=0, uimm=4, rd=0)
-        state = cssrwi_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [3])
-        self.assertEqual(state.csr_registers.load_word(cssrwi_1.csr), 4)
-
-    def test_csrrsi(self):
-        max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
-        test_number_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
-        test_mask_1 = 1
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0]))
-        cssrsi_1 = CSRRSI(csr=0, uimm=test_mask_1, rd=0)
-        state.csr_registers.store_word(0, test_number_1)
-        state = cssrsi_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [test_number_1])
-        self.assertEqual(state.csr_registers.load_word(cssrsi_1.csr), max_number)
-
-    def test_csrrci(self):
-        max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
-        test_result_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
-        test_mask_1 = 1
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0]))
-        state.csr_registers.store_word(0, max_number)
-        cssrci_1 = CSRRCI(csr=0, uimm=test_mask_1, rd=0)
-        state = cssrci_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [max_number])
-        self.assertEqual(state.csr_registers.load_word(cssrci_1.csr), test_result_1)
-
-    def test_btype(self):
-        btype = BEQ(rs1=0, rs2=0, imm=0)
-        self.assertEqual(btype.imm, 0)
-        btype = BEQ(rs1=0, rs2=0, imm=1)
-        self.assertEqual(btype.imm, 1)
-        btype = BEQ(rs1=0, rs2=0, imm=2047)
-        self.assertEqual(btype.imm, 2047)
-        btype = BEQ(rs1=0, rs2=0, imm=2048)
-        self.assertEqual(btype.imm, -2048)
-        btype = BEQ(rs1=0, rs2=0, imm=-2049)
-        self.assertEqual(btype.imm, 2047)
-
-    def test_beq(self):
-        state = ArchitecturalState(
-            register_file=RegisterFile(
-                registers=[
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(1),
-                ]
-            )
-        )
-
-        # 0, 0
-        state.program_counter = 0
-        instruction = BEQ(rs1=0, rs2=1, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 8)
-
-        # 0, 1
-        state.program_counter = 0
-        instruction = BEQ(rs1=0, rs2=2, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 0)
-
-        # 0, 0 - negative immediate
-        state.program_counter = 32
-        instruction = BEQ(rs1=0, rs2=1, imm=-6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 16)
-
-    def test_bne(self):
-        state = ArchitecturalState(
-            register_file=RegisterFile(
-                registers=[
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(1),
-                ]
-            )
-        )
-
-        # 0, 0
-        state.program_counter = 0
-        instruction = BNE(rs1=0, rs2=1, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 0)
-
-        # 0, 1
-        state.program_counter = 0
-        instruction = BNE(rs1=0, rs2=2, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 8)
-
-        # 0, 1 - negative immediate
-        state.program_counter = 32
-        instruction = BNE(rs1=0, rs2=2, imm=-6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 16)
-
-    def test_blt(self):
-        state = ArchitecturalState(
-            register_file=RegisterFile(
-                registers=[
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(1),
-                    fixedint.MutableUInt32(pow(2, 32) - 1),
-                    fixedint.MutableUInt32(pow(2, 31)),
-                ]
-            )
-        )
-
-        # 0, 0
-        state.program_counter = 0
-        instruction = BLT(rs1=0, rs2=1, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 0)
-
-        # 1, 0
-        state.program_counter = 0
-        instruction = BLT(rs1=2, rs2=0, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 0)
-
-        # 0, 1
-        state.program_counter = 0
-        instruction = BLT(rs1=0, rs2=2, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 8)
-
-        # 0, 1 - negative immediate
-        state.program_counter = 32
-        instruction = BLT(rs1=0, rs2=2, imm=-6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 16)
-
-        # 0, -1
-        state.program_counter = 0
-        instruction = BLT(rs1=0, rs2=3, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 0)
-
-        # -1, 0
-        state.program_counter = 0
-        instruction = BLT(rs1=3, rs2=0, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 8)
-
-        # -2^31, -1
-        state.program_counter = 0
-        instruction = BLT(rs1=4, rs2=3, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 8)
-
-    def test_bge(self):
-        state = ArchitecturalState(
-            register_file=RegisterFile(
-                registers=[
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(1),
-                    fixedint.MutableUInt32(pow(2, 32) - 1),
-                    fixedint.MutableUInt32(pow(2, 31)),
-                ]
-            )
-        )
-
-        # 0, 0
-        state.program_counter = 0
-        instruction = BGE(rs1=0, rs2=1, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 8)
-
-        # 0, 1
-        state.program_counter = 0
-        instruction = BGE(rs1=0, rs2=2, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 0)
-
-        # 1, 0
-        state.program_counter = 0
-        instruction = BGE(rs1=2, rs2=0, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 8)
-
-        # 1, 0 - negative immediate
-        state.program_counter = 32
-        instruction = BGE(rs1=2, rs2=0, imm=-6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 16)
-
-        # 0, -1
-        state.program_counter = 0
-        instruction = BGE(rs1=0, rs2=3, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 8)
-
-        # -2^31, -1
-        state.program_counter = 0
-        instruction = BGE(rs1=4, rs2=3, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 0)
-
-    def test_bltu(self):
-        state = ArchitecturalState(
-            register_file=RegisterFile(
-                registers=[
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(1),
-                    fixedint.MutableUInt32(pow(2, 32) - 1),
-                    fixedint.MutableUInt32(pow(2, 31)),
-                ]
-            )
-        )
-
-        # 0, 0
-        state.program_counter = 0
-        instruction = BLTU(rs1=0, rs2=1, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 0)
-
-        # 1, 0
-        state.program_counter = 0
-        instruction = BLTU(rs1=2, rs2=0, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 0)
-
-        # 0, 1
-        state.program_counter = 0
-        instruction = BLTU(rs1=0, rs2=2, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 8)
-
-        # 0, 1 - negative immediate
-        state.program_counter = 32
-        instruction = BLTU(rs1=0, rs2=2, imm=-6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 16)
-
-        # 0, (2^32 - 1)
-        state.program_counter = 0
-        instruction = BLTU(rs1=0, rs2=3, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 8)
-
-        # (2^32 - 1), 0
-        state.program_counter = 0
-        instruction = BLTU(rs1=3, rs2=0, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 0)
-
-        # 2^31, (2^32 - 1)
-        state.program_counter = 0
-        instruction = BLTU(rs1=4, rs2=3, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 8)
-
-    def test_bgeu(self):
-        state = ArchitecturalState(
-            register_file=RegisterFile(
-                registers=[
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(1),
-                    fixedint.MutableUInt32(pow(2, 32) - 1),
-                    fixedint.MutableUInt32(pow(2, 31)),
-                ]
-            )
-        )
-
-        # 0, 0
-        state.program_counter = 0
-        instruction = BGEU(rs1=0, rs2=1, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 8)
-
-        # 0, 1
-        state.program_counter = 0
-        instruction = BGEU(rs1=0, rs2=2, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 0)
-
-        # 1, 0
-        state.program_counter = 0
-        instruction = BGEU(rs1=2, rs2=0, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 8)
-
-        # 1, 0 - negative immediate
-        state.program_counter = 32
-        instruction = BGEU(rs1=2, rs2=0, imm=-6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 16)
-
-        # 0, (2^32 - 1)
-        state.program_counter = 0
-        instruction = BGEU(rs1=0, rs2=3, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 0)
-
-        # 2^31, (2^32 - 1)
-        state.program_counter = 0
-        instruction = BGEU(rs1=4, rs2=3, imm=6)
-        state = instruction.behavior(state)
-        self.assertEqual(state.program_counter, 0)
-
     def test_itype(self):
         itype = LB(rs1=0, rd=0, imm=0)
         self.assertEqual(itype.imm, 0)
@@ -895,6 +510,586 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(itype.imm, -2048)
         itype = LW(rs1=0, rd=0, imm=-2049)
         self.assertEqual(itype.imm, 2047)
+
+    def test_shiftitype(self):
+        shiftitype = SLLI(rd=0, rs1=0, imm=0)
+        self.assertEqual(shiftitype.imm, 0)
+        shiftitype = SLLI(rd=0, rs1=0, imm=1)
+        self.assertEqual(shiftitype.imm, 1)
+        shiftitype = SLLI(rd=0, rs1=0, imm=31)
+        self.assertEqual(shiftitype.imm, 31)
+        shiftitype = SLLI(rd=0, rs1=0, imm=32)
+        self.assertEqual(shiftitype.imm, 0)
+        shiftitype = SLLI(rd=0, rs1=0, imm=-1)
+        self.assertEqual(shiftitype.imm, 31)
+        shiftitype = SLLI(rd=0, rs1=0, imm=-2)
+        self.assertEqual(shiftitype.imm, 30)
+
+    def test_addi(self):
+        b0 = fixedint.MutableUInt32(0)
+        b1 = fixedint.MutableUInt32(1)
+        bmaxint = fixedint.MutableUInt32(pow(2, 31) - 1)
+        bminint = fixedint.MutableUInt32(-pow(2, 31))
+        bmaximm = fixedint.MutableUInt32(2047)
+        bminimm = fixedint.MutableUInt32(-2048)
+        bn1 = fixedint.MutableUInt32(-1)
+        brandom = fixedint.MutableUInt32(3320171255)
+        brandomx = fixedint.MutableUInt32(3320171260)
+
+        # 0 + 0    == 0
+        # 0 + 1    == 1
+        # 1 + 0    == 1
+        # 0 + -1   == -1
+        # 1 + -1   == 0
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[0, 0, 1, 0, 1])
+        )
+        addi_1 = ADDI(rd=0, rs1=0, imm=0)
+        state = addi_1.behavior(state)
+        addi_1 = ADDI(rd=1, rs1=1, imm=1)
+        state = addi_1.behavior(state)
+        addi_1 = ADDI(rd=2, rs1=2, imm=0)
+        state = addi_1.behavior(state)
+        addi_1 = ADDI(rd=3, rs1=3, imm=-1)
+        state = addi_1.behavior(state)
+        addi_1 = ADDI(rd=4, rs1=4, imm=-1)
+        state = addi_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [b0, b1, b1, bn1, b0])
+
+        # bmaxint + 1    == bminint
+        # bminint + -1   == bmaxint
+        # 0 + bmaximm    == 2047
+        # 0 + bminimm    == -2048
+        # brandom + 5
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[bmaxint, bminint, b0, b0, brandom])
+        )
+        addi_1 = ADDI(rd=0, rs1=0, imm=1)
+        state = addi_1.behavior(state)
+        addi_1 = ADDI(rd=1, rs1=1, imm=-1)
+        state = addi_1.behavior(state)
+        addi_1 = ADDI(rd=2, rs1=2, imm=2047)
+        state = addi_1.behavior(state)
+        addi_1 = ADDI(rd=3, rs1=3, imm=-2048)
+        state = addi_1.behavior(state)
+        addi_1 = ADDI(rd=4, rs1=4, imm=5)
+        state = addi_1.behavior(state)
+        self.assertEqual(
+            state.register_file.registers,
+            [bminint, bmaxint, bmaximm, bminimm, brandomx],
+        )
+
+        # overflow
+        # 0 +  2048 == -2048
+        # 0 + -2049 == 2047
+        # 0 +  4095 == -1
+        # 0 + -4096 == 0
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 0, 0, 0]))
+        addi_1 = ADDI(rd=0, rs1=0, imm=2048)
+        state = addi_1.behavior(state)
+        addi_1 = ADDI(rd=1, rs1=1, imm=-2049)
+        state = addi_1.behavior(state)
+        addi_1 = ADDI(rd=2, rs1=2, imm=4095)
+        state = addi_1.behavior(state)
+        addi_1 = ADDI(rd=3, rs1=3, imm=-4096)
+        state = addi_1.behavior(state)
+        self.assertEqual(
+            state.register_file.registers,
+            [bminimm, bmaximm, bn1, b0],
+        )
+
+    def test_slti(self):
+        b0 = fixedint.MutableUInt32(0)
+        b1 = fixedint.MutableUInt32(1)
+        bn1 = fixedint.MutableUInt32(-1)
+        b5 = fixedint.MutableUInt32(5)
+        bn5 = fixedint.MutableUInt32(-5)
+
+        # 0 <s 0   == 0
+        # 0 <s 1   == 1
+        # 0 <s -1  == 0
+        # 1 <s 0   == 0
+        # -1 <s 0  == 1
+        # 1 <s -1  == 0
+        # -1 <s 1  == 1
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[b0, b0, b0, b1, bn1, b1, bn1])
+        )
+        slti_1 = SLTI(rd=0, rs1=0, imm=0)
+        state = slti_1.behavior(state)
+        slti_1 = SLTI(rd=1, rs1=1, imm=1)
+        state = slti_1.behavior(state)
+        slti_1 = SLTI(rd=2, rs1=2, imm=-1)
+        state = slti_1.behavior(state)
+        slti_1 = SLTI(rd=3, rs1=3, imm=0)
+        state = slti_1.behavior(state)
+        slti_1 = SLTI(rd=4, rs1=4, imm=0)
+        state = slti_1.behavior(state)
+        slti_1 = SLTI(rd=5, rs1=5, imm=-1)
+        state = slti_1.behavior(state)
+        slti_1 = SLTI(rd=6, rs1=6, imm=1)
+        state = slti_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [b0, b1, b0, b0, b1, b0, b1])
+
+        # -5 <s -1  == 1
+        # -1 <s -5  == 0
+        # 1 <s 5    == 1
+        # 5 <s 1    == 0
+        # -1 <s -1  == 0
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[bn5, bn1, b1, b5, bn1])
+        )
+        slti_1 = SLTI(rd=0, rs1=0, imm=-1)
+        state = slti_1.behavior(state)
+        slti_1 = SLTI(rd=1, rs1=1, imm=-5)
+        state = slti_1.behavior(state)
+        slti_1 = SLTI(rd=2, rs1=2, imm=5)
+        state = slti_1.behavior(state)
+        slti_1 = SLTI(rd=3, rs1=3, imm=1)
+        state = slti_1.behavior(state)
+        slti_1 = SLTI(rd=4, rs1=4, imm=-1)
+        state = slti_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [b1, b0, b1, b0, b0])
+
+        # overflow
+        # 0 <s 2047  == 1
+        # 0 <s 2048  == 0
+        # 0 <s -2048 == 0
+        # 0 <s -2049 == 1
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[b0, b0, b0, b0])
+        )
+        slti_1 = SLTI(rd=0, rs1=0, imm=2047)
+        state = slti_1.behavior(state)
+        slti_1 = SLTI(rd=1, rs1=1, imm=2048)
+        state = slti_1.behavior(state)
+        slti_1 = SLTI(rd=2, rs1=2, imm=-2048)
+        state = slti_1.behavior(state)
+        slti_1 = SLTI(rd=3, rs1=3, imm=-2049)
+        state = slti_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [b1, b0, b0, b1])
+
+    def test_sltiu(self):
+        b0 = fixedint.MutableUInt32(0)
+        b1 = fixedint.MutableUInt32(1)
+        bn1 = fixedint.MutableUInt32(-1)
+        b5 = fixedint.MutableUInt32(5)
+        bn5 = fixedint.MutableUInt32(-5)
+
+        # 0 <u 0   == 0
+        # 0 <u 1   == 1
+        # 0 <u -1  == 1
+        # 1 <u 0   == 0
+        # -1 <u 0  == 0
+        # 1 <u -1  == 1
+        # -1 <u 1  == 0
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[b0, b0, b0, b1, bn1, b1, bn1])
+        )
+        slti_1 = SLTIU(rd=0, rs1=0, imm=0)
+        state = slti_1.behavior(state)
+        slti_1 = SLTIU(rd=1, rs1=1, imm=1)
+        state = slti_1.behavior(state)
+        slti_1 = SLTIU(rd=2, rs1=2, imm=-1)
+        state = slti_1.behavior(state)
+        slti_1 = SLTIU(rd=3, rs1=3, imm=0)
+        state = slti_1.behavior(state)
+        slti_1 = SLTIU(rd=4, rs1=4, imm=0)
+        state = slti_1.behavior(state)
+        slti_1 = SLTIU(rd=5, rs1=5, imm=-1)
+        state = slti_1.behavior(state)
+        slti_1 = SLTIU(rd=6, rs1=6, imm=1)
+        state = slti_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [b0, b1, b1, b0, b0, b1, b0])
+
+        # -5 <u -1  == 1
+        # -1 <u -5  == 0
+        # 1 <u 5    == 1
+        # 5 <u 1    == 0
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[bn5, bn1, b1, b5])
+        )
+        slti_1 = SLTIU(rd=0, rs1=0, imm=-1)
+        state = slti_1.behavior(state)
+        slti_1 = SLTIU(rd=1, rs1=1, imm=-5)
+        state = slti_1.behavior(state)
+        slti_1 = SLTIU(rd=2, rs1=2, imm=5)
+        state = slti_1.behavior(state)
+        slti_1 = SLTIU(rd=3, rs1=3, imm=1)
+        state = slti_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [b1, b0, b1, b0])
+
+        # overflow
+        # 0 <u 2048  == 1
+        # 0 <u 4095  == 1
+        # 0 <u 4096  == 0
+        # 0 <u 4097  == 1
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[b0, b0, b0, b0])
+        )
+        slti_1 = SLTIU(rd=0, rs1=0, imm=2048)
+        state = slti_1.behavior(state)
+        slti_1 = SLTIU(rd=1, rs1=1, imm=4095)
+        state = slti_1.behavior(state)
+        slti_1 = SLTIU(rd=2, rs1=2, imm=4096)
+        state = slti_1.behavior(state)
+        slti_1 = SLTIU(rd=3, rs1=3, imm=4097)
+        state = slti_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [b1, b1, b0, b1])
+
+    def test_xori(self):
+        b0 = fixedint.MutableUInt32(0)
+        b1 = fixedint.MutableUInt32(1)
+        bmaxint = fixedint.MutableUInt32(pow(2, 31) - 1)
+        bminint = fixedint.MutableUInt32(-pow(2, 31))
+        bmaximm = fixedint.MutableUInt32(2047)
+        bminimm = fixedint.MutableUInt32(-2048)
+        bn1 = fixedint.MutableUInt32(-1)
+        brandom = fixedint.MutableUInt32(3320171255)
+        brandomx = fixedint.MutableUInt32(974796040)
+
+        # 0 ^ 0  == 0
+        # 0 ^ 1  == 1
+        # 1 ^ 0  == 1
+        # 1 ^ 1  == 0
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[b0, b0, b1, b1])
+        )
+        xori_1 = XORI(rd=0, rs1=0, imm=0)
+        state = xori_1.behavior(state)
+        xori_1 = XORI(rd=1, rs1=1, imm=1)
+        state = xori_1.behavior(state)
+        xori_1 = XORI(rd=2, rs1=2, imm=0)
+        state = xori_1.behavior(state)
+        xori_1 = XORI(rd=3, rs1=3, imm=1)
+        state = xori_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [b0, b1, b1, b0])
+
+        # -1 ^ 0        == -1
+        # -1 ^ -1       == 0
+        # bmaxint ^ -1  == bminint
+        # brandom ^ -1  == brandomx
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[bn1, bn1, bmaxint, brandom])
+        )
+        xori_1 = XORI(rd=0, rs1=0, imm=0)
+        state = xori_1.behavior(state)
+        xori_1 = XORI(rd=1, rs1=1, imm=-1)
+        state = xori_1.behavior(state)
+        xori_1 = XORI(rd=2, rs1=2, imm=-1)
+        state = xori_1.behavior(state)
+        xori_1 = XORI(rd=3, rs1=3, imm=-1)
+        state = xori_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [bn1, b0, bminint, brandomx])
+
+        # overflow
+        # 0 ^  2048 == -2048
+        # 0 ^ -2049 == 2047
+        # 0 ^  4095 == -1
+        # 0 ^ -4096 == 0
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[b0, b0, b0, b0])
+        )
+        xori_1 = XORI(rd=0, rs1=0, imm=2048)
+        state = xori_1.behavior(state)
+        xori_1 = XORI(rd=1, rs1=1, imm=-2049)
+        state = xori_1.behavior(state)
+        xori_1 = XORI(rd=2, rs1=2, imm=4095)
+        state = xori_1.behavior(state)
+        xori_1 = XORI(rd=3, rs1=3, imm=-4096)
+        state = xori_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [bminimm, bmaximm, bn1, b0])
+
+    def test_ori(self):
+        b0 = fixedint.MutableUInt32(0)
+        b1 = fixedint.MutableUInt32(1)
+        bmaximm = fixedint.MutableUInt32(2047)
+        bminimm = fixedint.MutableUInt32(-2048)
+        bn1 = fixedint.MutableUInt32(-1)
+        brandom = fixedint.MutableUInt32(3320171255)
+
+        # 0 | 0  == 0
+        # 0 | 1  == 1
+        # 1 | 0  == 1
+        # 1 | 1  == 1
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[b0, b0, b1, b1])
+        )
+        ori_1 = ORI(rd=0, rs1=0, imm=0)
+        state = ori_1.behavior(state)
+        ori_1 = ORI(rd=1, rs1=1, imm=1)
+        state = ori_1.behavior(state)
+        ori_1 = ORI(rd=2, rs1=2, imm=0)
+        state = ori_1.behavior(state)
+        ori_1 = ORI(rd=3, rs1=3, imm=1)
+        state = ori_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [b0, b1, b1, b1])
+
+        # -1 | 0       == -1
+        # -1 | -1      == -1
+        # 0 | bminimm  == bminimm
+        # brandom | 5  == brandom
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[bn1, bn1, b0, brandom])
+        )
+        ori_1 = ORI(rd=0, rs1=0, imm=0)
+        state = ori_1.behavior(state)
+        ori_1 = ORI(rd=1, rs1=1, imm=-1)
+        state = ori_1.behavior(state)
+        ori_1 = ORI(rd=2, rs1=2, imm=-2048)
+        state = ori_1.behavior(state)
+        ori_1 = ORI(rd=3, rs1=3, imm=5)
+        state = ori_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [bn1, bn1, bminimm, brandom])
+
+        # overflow
+        # 0 |  2048 == -2048
+        # 0 | -2049 == 2047
+        # 0 |  4095 == -1
+        # 0 | -4096 == 0
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[b0, b0, b0, b0])
+        )
+        ori_1 = ORI(rd=0, rs1=0, imm=2048)
+        state = ori_1.behavior(state)
+        ori_1 = ORI(rd=1, rs1=1, imm=-2049)
+        state = ori_1.behavior(state)
+        ori_1 = ORI(rd=2, rs1=2, imm=4095)
+        state = ori_1.behavior(state)
+        ori_1 = ORI(rd=3, rs1=3, imm=-4096)
+        state = ori_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [bminimm, bmaximm, bn1, b0])
+
+    def test_andi(self):
+        b0 = fixedint.MutableUInt32(0)
+        b1 = fixedint.MutableUInt32(1)
+        b5 = fixedint.MutableUInt32(5)
+        bmaxint = fixedint.MutableUInt32(pow(2, 31) - 1)
+        bmaximm = fixedint.MutableUInt32(2047)
+        bminimm = fixedint.MutableUInt32(-2048)
+        bn1 = fixedint.MutableUInt32(-1)
+        brandom = fixedint.MutableUInt32(3320171255)
+
+        # 0 & 0    == 0
+        # 0 & 1    == 0
+        # 1 & 0    == 0
+        # 1 & 1    == 1
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[b0, b0, b1, b1])
+        )
+        andi_1 = ANDI(rd=0, rs1=0, imm=0)
+        state = andi_1.behavior(state)
+        andi_1 = ANDI(rd=1, rs1=1, imm=1)
+        state = andi_1.behavior(state)
+        andi_1 = ANDI(rd=2, rs1=2, imm=0)
+        state = andi_1.behavior(state)
+        andi_1 = ANDI(rd=3, rs1=3, imm=1)
+        state = andi_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [b0, b0, b0, b1])
+
+        # -1 & 0             == 0
+        # -1 & 1             == 1
+        # bmaxint & bmaximm  == bmaximm
+        # bmaxint & -1       == bmaxint
+        # brandom & 5        == 5
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[bn1, bn1, bmaxint, bmaxint, brandom])
+        )
+        andi_1 = ANDI(rd=0, rs1=0, imm=0)
+        state = andi_1.behavior(state)
+        andi_1 = ANDI(rd=1, rs1=1, imm=1)
+        state = andi_1.behavior(state)
+        andi_1 = ANDI(rd=2, rs1=2, imm=2047)
+        state = andi_1.behavior(state)
+        andi_1 = ANDI(rd=3, rs1=3, imm=-1)
+        state = andi_1.behavior(state)
+        andi_1 = ANDI(rd=4, rs1=4, imm=5)
+        state = andi_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [b0, b1, bmaximm, bmaxint, b5])
+
+        # overflow
+        # -1 &  2048 == -2048
+        # -1 & -2049 == 2047
+        # -1 &  4095 == -1
+        # -1 & -4096 == 0
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[bn1, bn1, bn1, bn1])
+        )
+        andi_1 = ANDI(rd=0, rs1=0, imm=2048)
+        state = andi_1.behavior(state)
+        andi_1 = ANDI(rd=1, rs1=1, imm=-2049)
+        state = andi_1.behavior(state)
+        andi_1 = ANDI(rd=2, rs1=2, imm=4095)
+        state = andi_1.behavior(state)
+        andi_1 = ANDI(rd=3, rs1=3, imm=-4096)
+        state = andi_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [bminimm, bmaximm, bn1, b0])
+
+    def test_slli(self):
+        b0 = fixedint.MutableUInt32(0)
+        b1 = fixedint.MutableUInt32(1)
+        b2 = fixedint.MutableUInt32(2)
+        b2_20 = fixedint.MutableUInt32(pow(2, 20))
+        b111 = fixedint.MutableUInt32(-1)  # 11111....
+        b110 = fixedint.MutableUInt32(pow(2, 32) - 2)  # 111...110
+        b100 = fixedint.MutableUInt32(pow(2, 31))  # 10000....
+        brandom = fixedint.MutableUInt32(3320171255)
+        brandomx = fixedint.MutableUInt32(395783132)
+
+        # 0 << 0   == 0
+        # 0 << 20  == 0
+        # 1 << 0   == 1
+        # 1 << 1   == 2
+        # 1 << 20  == 2^20
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[b0, b0, b1, b1, b1])
+        )
+        slli_1 = SLLI(rd=0, rs1=0, imm=0)
+        state = slli_1.behavior(state)
+        slli_1 = SLLI(rd=1, rs1=1, imm=20)
+        state = slli_1.behavior(state)
+        slli_1 = SLLI(rd=2, rs1=2, imm=0)
+        state = slli_1.behavior(state)
+        slli_1 = SLLI(rd=3, rs1=3, imm=1)
+        state = slli_1.behavior(state)
+        slli_1 = SLLI(rd=4, rs1=4, imm=20)
+        state = slli_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [b0, b0, b1, b2, b2_20])
+
+        # 111...1 << 1     == 111...10
+        # 111...1 << 31    == 1000....
+        # 111...1 << 127    == 1000....
+        # 1000... << 1     == 0
+        # 3320171255 << 2  == 395783132
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[b111, b111, b111, b100, brandom])
+        )
+        slli_1 = SLLI(rd=0, rs1=0, imm=1)
+        state = slli_1.behavior(state)
+        slli_1 = SLLI(rd=1, rs1=1, imm=31)
+        state = slli_1.behavior(state)
+        slli_1 = SLLI(rd=2, rs1=2, imm=127)
+        state = slli_1.behavior(state)
+        slli_1 = SLLI(rd=3, rs1=3, imm=1)
+        state = slli_1.behavior(state)
+        slli_1 = SLLI(rd=4, rs1=4, imm=2)
+        state = slli_1.behavior(state)
+        self.assertEqual(
+            state.register_file.registers, [b110, b100, b100, b0, brandomx]
+        )
+
+        # -1 << -1  == b100
+        # -1 << 32  == -1
+        # -1 << 33  == 111...10
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[b111, b111, b111, b111])
+        )
+        slli_1 = SLLI(rd=0, rs1=0, imm=-1)
+        state = slli_1.behavior(state)
+        slli_1 = SLLI(rd=1, rs1=1, imm=32)
+        state = slli_1.behavior(state)
+        slli_1 = SLLI(rd=2, rs1=2, imm=33)
+        state = slli_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [b100, b111, b110, b111])
+
+    def test_srli(self):
+        b0 = fixedint.MutableUInt32(0)
+        b1 = fixedint.MutableUInt32(1)
+        b111 = fixedint.MutableUInt32(pow(2, 32) - 1)  # 11111....
+        b011 = fixedint.MutableUInt32(pow(2, 31) - 1)  # 01111....
+        brandom = fixedint.MutableUInt32(3320171255)
+        brandomx = fixedint.MutableUInt32(830042813)
+
+        # 0 >> 0   == 0
+        # 0 >> 20  == 0
+        # 1 >> 0   == 1
+        # 1 >> 1   == 0
+        # 1 >> 20  == 0
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[b0, b0, b1, b1, b1])
+        )
+        srli_1 = SRLI(rd=0, rs1=0, imm=0)
+        state = srli_1.behavior(state)
+        srli_1 = SRLI(rd=1, rs1=1, imm=20)
+        state = srli_1.behavior(state)
+        srli_1 = SRLI(rd=2, rs1=2, imm=0)
+        state = srli_1.behavior(state)
+        srli_1 = SRLI(rd=3, rs1=3, imm=1)
+        state = srli_1.behavior(state)
+        srli_1 = SRLI(rd=4, rs1=4, imm=20)
+        state = srli_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [b0, b0, b1, b0, b0])
+
+        # 111...1 >> 1     == 0111....
+        # 111...1 >> 31    == 1
+        # 111...1 >> 127   == 1
+        # 3320171255 >> 2  == 395783132
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[b111, b111, b111, brandom])
+        )
+        srli_1 = SRLI(rd=0, rs1=0, imm=1)
+        state = srli_1.behavior(state)
+        srli_1 = SRLI(rd=1, rs1=1, imm=31)
+        state = srli_1.behavior(state)
+        srli_1 = SRLI(rd=2, rs1=2, imm=127)
+        state = srli_1.behavior(state)
+        srli_1 = SRLI(rd=3, rs1=3, imm=2)
+        state = srli_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [b011, b1, b1, brandomx])
+
+        # -1 >> -1  == 1
+        # -1 >> 32  == -1
+        # -1 >> 33  == 01111
+        state = ArchitecturalState(
+            register_file=RegisterFile(registers=[b111, b111, b111])
+        )
+        srli_1 = SRLI(rd=0, rs1=0, imm=-1)
+        state = srli_1.behavior(state)
+        srli_1 = SRLI(rd=1, rs1=1, imm=32)
+        state = srli_1.behavior(state)
+        srli_1 = SRLI(rd=2, rs1=2, imm=33)
+        state = srli_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [b1, b111, b011])
+
+    def test_srai(self):
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 1, -128]))
+        # imm=0, rs1=0
+        state.register_file.registers = [0, 1, -128]
+        instr = SRAI(imm=0, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [0, 1, -128])
+
+        # imm=1, rs1=0
+        state.register_file.registers = [0, 1, -128]
+        instr = SRAI(imm=1, rs1=0, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [0, 1, -128])
+
+        # imm=0, rs1=1
+        state.register_file.registers = [0, 1, -128]
+        instr = SRAI(imm=0, rs1=1, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [1, 1, -128])
+
+        # imm=1, rs1=1
+        state.register_file.registers = [0, 1, -128]
+        instr = SRAI(imm=1, rs1=1, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [0, 1, -128])
+
+        # imm=1, rs1=-128
+        state.register_file.registers = [0, 1, -128]
+        instr = SRAI(imm=1, rs1=2, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(
+            state.register_file.registers, [fixedint.MutableUInt32(-64), 1, -128]
+        )
+
+        # imm=95, rs1= 2^30 immediate is max 32
+        state.register_file.registers = [0, 1, -128, pow(2, 30)]
+        instr = SRAI(imm=95, rs1=3, rd=0)
+        state = instr.behavior(state)
+        self.assertEqual(state.register_file.registers, [0, 1, -128, pow(2, 30)])
 
     def test_lb(self):
         state = ArchitecturalState(
@@ -1354,46 +1549,6 @@ class TestInstructions(unittest.TestCase):
         state = instr.behavior(state)
         self.assertEqual(state.register_file.registers, [0, 1, -1, pow(2, 32) - 1])
 
-    def test_srai(self):
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 1, -128]))
-        # imm=0, rs1=0
-        state.register_file.registers = [0, 1, -128]
-        instr = SRAI(imm=0, rs1=0, rd=0)
-        state = instr.behavior(state)
-        self.assertEqual(state.register_file.registers, [0, 1, -128])
-
-        # imm=1, rs1=0
-        state.register_file.registers = [0, 1, -128]
-        instr = SRAI(imm=1, rs1=0, rd=0)
-        state = instr.behavior(state)
-        self.assertEqual(state.register_file.registers, [0, 1, -128])
-
-        # imm=0, rs1=1
-        state.register_file.registers = [0, 1, -128]
-        instr = SRAI(imm=0, rs1=1, rd=0)
-        state = instr.behavior(state)
-        self.assertEqual(state.register_file.registers, [1, 1, -128])
-
-        # imm=1, rs1=1
-        state.register_file.registers = [0, 1, -128]
-        instr = SRAI(imm=1, rs1=1, rd=0)
-        state = instr.behavior(state)
-        self.assertEqual(state.register_file.registers, [0, 1, -128])
-
-        # imm=1, rs1=-128
-        state.register_file.registers = [0, 1, -128]
-        instr = SRAI(imm=1, rs1=2, rd=0)
-        state = instr.behavior(state)
-        self.assertEqual(
-            state.register_file.registers, [fixedint.MutableUInt32(-64), 1, -128]
-        )
-
-        # imm=95, rs1= 2^30 immediate is max 32
-        state.register_file.registers = [0, 1, -128, pow(2, 30)]
-        instr = SRAI(imm=95, rs1=3, rd=0)
-        state = instr.behavior(state)
-        self.assertEqual(state.register_file.registers, [0, 1, -128, pow(2, 30)])
-
     def test_jalr(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=[0, 8]))
         # imm=8, rs1=0
@@ -1433,14 +1588,14 @@ class TestInstructions(unittest.TestCase):
         with self.assertRaises(InstructionNotImplemented) as cm:
             instr = ECALL(imm=0, rs1=0, rd=0)
             state = instr.behavior(state)
-        self.assertEquals(cm.exception, InstructionNotImplemented(mnemonic="ecall"))
+        self.assertEqual(cm.exception, InstructionNotImplemented(mnemonic="ecall"))
 
     def test_ebreak(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=()))
         with self.assertRaises(InstructionNotImplemented) as cm:
             instr = EBREAK(imm=0, rs1=0, rd=0)
             state = instr.behavior(state)
-        self.assertEquals(cm.exception, InstructionNotImplemented(mnemonic="ebreak"))
+        self.assertEqual(cm.exception, InstructionNotImplemented(mnemonic="ebreak"))
 
     def test_stype(self):
         stype = SB(rs1=0, rs2=0, imm=0)
@@ -1599,6 +1754,284 @@ class TestInstructions(unittest.TestCase):
         state = sw_7.behavior(state)
         self.assertEqual(int(state.memory.load_word(8)), 4294967295)
 
+    def test_btype(self):
+        btype = BEQ(rs1=0, rs2=0, imm=0)
+        self.assertEqual(btype.imm, 0)
+        btype = BEQ(rs1=0, rs2=0, imm=2)
+        self.assertEqual(btype.imm, 2)
+        btype = BEQ(rs1=0, rs2=0, imm=4094)
+        self.assertEqual(btype.imm, 4094)
+        btype = BEQ(rs1=0, rs2=0, imm=4096)
+        self.assertEqual(btype.imm, -4096)
+        btype = BEQ(rs1=0, rs2=0, imm=-4098)
+        self.assertEqual(btype.imm, 4094)
+
+    def test_beq(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(
+                registers=[
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(1),
+                ]
+            )
+        )
+
+        # 0, 0
+        state.program_counter = 0
+        instruction = BEQ(rs1=0, rs2=1, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # 0, 1
+        state.program_counter = 0
+        instruction = BEQ(rs1=0, rs2=2, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 0, 0 - negative immediate
+        state.program_counter = 32
+        instruction = BEQ(rs1=0, rs2=1, imm=-12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 16)
+
+    def test_bne(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(
+                registers=[
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(1),
+                ]
+            )
+        )
+
+        # 0, 0
+        state.program_counter = 0
+        instruction = BNE(rs1=0, rs2=1, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 0, 1
+        state.program_counter = 0
+        instruction = BNE(rs1=0, rs2=2, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # 0, 1 - negative immediate
+        state.program_counter = 32
+        instruction = BNE(rs1=0, rs2=2, imm=-12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 16)
+
+    def test_blt(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(
+                registers=[
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(1),
+                    fixedint.MutableUInt32(pow(2, 32) - 1),
+                    fixedint.MutableUInt32(pow(2, 31)),
+                ]
+            )
+        )
+
+        # 0, 0
+        state.program_counter = 0
+        instruction = BLT(rs1=0, rs2=1, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 1, 0
+        state.program_counter = 0
+        instruction = BLT(rs1=2, rs2=0, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 0, 1
+        state.program_counter = 0
+        instruction = BLT(rs1=0, rs2=2, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # 0, 1 - negative immediate
+        state.program_counter = 32
+        instruction = BLT(rs1=0, rs2=2, imm=-12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 16)
+
+        # 0, -1
+        state.program_counter = 0
+        instruction = BLT(rs1=0, rs2=3, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # -1, 0
+        state.program_counter = 0
+        instruction = BLT(rs1=3, rs2=0, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # -2^31, -1
+        state.program_counter = 0
+        instruction = BLT(rs1=4, rs2=3, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+    def test_bge(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(
+                registers=[
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(1),
+                    fixedint.MutableUInt32(pow(2, 32) - 1),
+                    fixedint.MutableUInt32(pow(2, 31)),
+                ]
+            )
+        )
+
+        # 0, 0
+        state.program_counter = 0
+        instruction = BGE(rs1=0, rs2=1, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # 0, 1
+        state.program_counter = 0
+        instruction = BGE(rs1=0, rs2=2, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 1, 0
+        state.program_counter = 0
+        instruction = BGE(rs1=2, rs2=0, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # 1, 0 - negative immediate
+        state.program_counter = 32
+        instruction = BGE(rs1=2, rs2=0, imm=-12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 16)
+
+        # 0, -1
+        state.program_counter = 0
+        instruction = BGE(rs1=0, rs2=3, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # -2^31, -1
+        state.program_counter = 0
+        instruction = BGE(rs1=4, rs2=3, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+    def test_bltu(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(
+                registers=[
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(1),
+                    fixedint.MutableUInt32(pow(2, 32) - 1),
+                    fixedint.MutableUInt32(pow(2, 31)),
+                ]
+            )
+        )
+
+        # 0, 0
+        state.program_counter = 0
+        instruction = BLTU(rs1=0, rs2=1, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 1, 0
+        state.program_counter = 0
+        instruction = BLTU(rs1=2, rs2=0, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 0, 1
+        state.program_counter = 0
+        instruction = BLTU(rs1=0, rs2=2, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # 0, 1 - negative immediate
+        state.program_counter = 32
+        instruction = BLTU(rs1=0, rs2=2, imm=-12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 16)
+
+        # 0, (2^32 - 1)
+        state.program_counter = 0
+        instruction = BLTU(rs1=0, rs2=3, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # (2^32 - 1), 0
+        state.program_counter = 0
+        instruction = BLTU(rs1=3, rs2=0, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 2^31, (2^32 - 1)
+        state.program_counter = 0
+        instruction = BLTU(rs1=4, rs2=3, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+    def test_bgeu(self):
+        state = ArchitecturalState(
+            register_file=RegisterFile(
+                registers=[
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(0),
+                    fixedint.MutableUInt32(1),
+                    fixedint.MutableUInt32(pow(2, 32) - 1),
+                    fixedint.MutableUInt32(pow(2, 31)),
+                ]
+            )
+        )
+
+        # 0, 0
+        state.program_counter = 0
+        instruction = BGEU(rs1=0, rs2=1, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # 0, 1
+        state.program_counter = 0
+        instruction = BGEU(rs1=0, rs2=2, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 1, 0
+        state.program_counter = 0
+        instruction = BGEU(rs1=2, rs2=0, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 8)
+
+        # 1, 0 - negative immediate
+        state.program_counter = 32
+        instruction = BGEU(rs1=2, rs2=0, imm=-12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 16)
+
+        # 0, (2^32 - 1)
+        state.program_counter = 0
+        instruction = BGEU(rs1=0, rs2=3, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
+        # 2^31, (2^32 - 1)
+        state.program_counter = 0
+        instruction = BGEU(rs1=4, rs2=3, imm=12)
+        state = instruction.behavior(state)
+        self.assertEqual(state.program_counter, 0)
+
     def test_utype(self):
         utype = LUI(rd=0, imm=0)
         self.assertEqual(utype.imm, 0)
@@ -1616,7 +2049,6 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(utype.imm, (2**19) - 1)
 
     def test_lui(self):
-
         state = ArchitecturalState(register_file=RegisterFile(registers=[0, 1, 2, 3]))
 
         lui_0 = LUI(rd=0, imm=0)
@@ -1704,590 +2136,157 @@ class TestInstructions(unittest.TestCase):
     def test_jtype(self):
         jtype = JAL(rd=0, imm=0)
         self.assertEqual(jtype.imm, 0)
-        jtype = JAL(rd=0, imm=1)
-        self.assertEqual(jtype.imm, 1)
-        jtype = JAL(rd=0, imm=-1)
-        self.assertEqual(jtype.imm, -1)
-        jtype = JAL(rd=0, imm=(2**19) - 1)
-        self.assertEqual(jtype.imm, (2**19) - 1)
-        jtype = JAL(rd=0, imm=-(2**19))
-        self.assertEqual(jtype.imm, -(2**19))
-        jtype = JAL(rd=0, imm=(2**19))
-        self.assertEqual(jtype.imm, -(2**19))
-        jtype = JAL(rd=0, imm=-(2**19) - 1)
-        self.assertEqual(jtype.imm, (2**19) - 1)
+        jtype = JAL(rd=0, imm=2)
+        self.assertEqual(jtype.imm, 2)
+        jtype = JAL(rd=0, imm=-2)
+        self.assertEqual(jtype.imm, -2)
+        jtype = JAL(rd=0, imm=(2**20) - 2)
+        self.assertEqual(jtype.imm, (2**20) - 2)
+        jtype = JAL(rd=0, imm=-(2**20))
+        self.assertEqual(jtype.imm, -(2**20))
+        jtype = JAL(rd=0, imm=(2**20))
+        self.assertEqual(jtype.imm, -(2**20))
+        jtype = JAL(rd=0, imm=-(2**20) - 2)
+        self.assertEqual(jtype.imm, (2**20) - 2)
 
     def test_jal(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=[1, 1, 1]))
         state.program_counter = 0
-        jal_1 = JAL(rd=0, imm=2)
+        jal_1 = JAL(rd=0, imm=4)
         state = jal_1.behavior(state)
         self.assertEqual(state.program_counter, 0)
         self.assertEqual(int(state.register_file.registers[0]), 4)
 
-        state.program_counter = 1
-        jal_2 = JAL(rd=0, imm=3)
+        state.program_counter = 2
+        jal_2 = JAL(rd=0, imm=10)
         state = jal_2.behavior(state)
-        self.assertEqual(state.program_counter, 3)
-        self.assertEqual(int(state.register_file.registers[0]), 5)
+        self.assertEqual(state.program_counter, 8)
+        self.assertEqual(int(state.register_file.registers[0]), 6)
 
         state.program_counter = 2
-        jal_3 = JAL(rd=0, imm=4)
+        jal_3 = JAL(rd=0, imm=8)
         state = jal_3.behavior(state)
         self.assertEqual(state.program_counter, 6)
         self.assertEqual(int(state.register_file.registers[0]), 6)
 
-        state.program_counter = 3
-        jal_4 = JAL(rd=1, imm=4)
+        state.program_counter = 4
+        jal_4 = JAL(rd=1, imm=8)
         state = jal_4.behavior(state)
-        self.assertEqual(state.program_counter, 7)
-        self.assertEqual(int(state.register_file.registers[1]), 7)
+        self.assertEqual(state.program_counter, 8)
+        self.assertEqual(int(state.register_file.registers[1]), 8)
 
-        state.program_counter = 7
-        jal_5 = JAL(rd=1, imm=5)
+        state.program_counter = 8
+        jal_5 = JAL(rd=1, imm=10)
         state = jal_5.behavior(state)
-        self.assertEqual(state.program_counter, 13)
-        self.assertEqual(int(state.register_file.registers[1]), 11)
+        self.assertEqual(state.program_counter, 14)
+        self.assertEqual(int(state.register_file.registers[1]), 12)
 
-    def test_addi(self):
-        b0 = fixedint.MutableUInt32(0)
-        b1 = fixedint.MutableUInt32(1)
-        bmaxint = fixedint.MutableUInt32(pow(2, 31) - 1)
-        bminint = fixedint.MutableUInt32(-pow(2, 31))
-        bmaximm = fixedint.MutableUInt32(2047)
-        bminimm = fixedint.MutableUInt32(-2048)
-        bn1 = fixedint.MutableUInt32(-1)
-        brandom = fixedint.MutableUInt32(3320171255)
-        brandomx = fixedint.MutableUInt32(3320171260)
+    def test_csrrw_privilege_level_too_low(self):
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
+        state.csr_registers.privilege_level = 0
+        with self.assertRaises(CSRError) as context:
+            state.csr_registers.store_word(3000, fixedint.MutableUInt32(3))
+        self.assertTrue(
+            "illegal action: privilege level too low to access this csr register"
+            in str(context.exception)
+        )
 
-        # 0 + 0    == 0
-        # 0 + 1    == 1
-        # 1 + 0    == 1
-        # 0 + -1   == -1
-        # 1 + -1   == 0
+    def test_csrrw_attempting_to_write_to_read_only(self):
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
+        with self.assertRaises(CSRError) as context:
+            state.csr_registers.store_word(3072, fixedint.MutableUInt32(3))
+        self.assertTrue(
+            "illegal action: attempting to write into read-only csr register"
+            in str(context.exception)
+        )
+
+    def test_csrrw_invalid_address(self):
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
+        state.csr_registers.privilege_level = 4
+        with self.assertRaises(CSRError) as context:
+            state.csr_registers.store_word(7000, fixedint.MutableUInt32(3))
+        self.assertTrue(
+            "illegal action: csr register does not exist" in str(context.exception)
+        )
+
+    def test_csrrw(self):
+        fixedint.MutableUInt32(0)
+        fixedint.MutableUInt32(1)
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
+        cssrw_1 = CSRRW(csr=0, rs1=1, rd=0)
+        state.csr_registers.store_word(0, fixedint.MutableUInt32(3))
+        state.csr_registers.privilege_level = 4
+        state = cssrw_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [3, 2])
+        self.assertEqual(state.csr_registers.load_word(cssrw_1.csr), 2)
+
+    def test_csrrs(self):
+        max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
+        test_number_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
+        test_mask_1 = fixedint.MutableUInt32(0x00_00_00_01)
         state = ArchitecturalState(
-            register_file=RegisterFile(registers=[0, 0, 1, 0, 1])
+            register_file=RegisterFile(registers=[0, test_mask_1])
         )
-        addi_1 = ADDI(rd=0, rs1=0, imm=0)
-        state = addi_1.behavior(state)
-        addi_1 = ADDI(rd=1, rs1=1, imm=1)
-        state = addi_1.behavior(state)
-        addi_1 = ADDI(rd=2, rs1=2, imm=0)
-        state = addi_1.behavior(state)
-        addi_1 = ADDI(rd=3, rs1=3, imm=-1)
-        state = addi_1.behavior(state)
-        addi_1 = ADDI(rd=4, rs1=4, imm=-1)
-        state = addi_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b0, b1, b1, bn1, b0])
+        state.csr_registers.store_word(0, test_number_1)
+        cssrs_1 = CSRRS(csr=0, rs1=1, rd=0)
+        state = cssrs_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [test_number_1, test_mask_1])
+        self.assertEqual(state.csr_registers.load_word(cssrs_1.csr), max_number)
 
-        # bmaxint + 1    == bminint
-        # bminint + -1   == bmaxint
-        # 0 + bmaximm    == 2047
-        # 0 + bminimm    == -2048
-        # brandom + 5
+    def test_csrrc(self):
+        max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
+        test_result_1 = fixedint.MutableUInt32(0x00_00_00_01)
+        test_mask_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
         state = ArchitecturalState(
-            register_file=RegisterFile(registers=[bmaxint, bminint, b0, b0, brandom])
+            register_file=RegisterFile(registers=[0, test_mask_1])
         )
-        addi_1 = ADDI(rd=0, rs1=0, imm=1)
-        state = addi_1.behavior(state)
-        addi_1 = ADDI(rd=1, rs1=1, imm=-1)
-        state = addi_1.behavior(state)
-        addi_1 = ADDI(rd=2, rs1=2, imm=2047)
-        state = addi_1.behavior(state)
-        addi_1 = ADDI(rd=3, rs1=3, imm=-2048)
-        state = addi_1.behavior(state)
-        addi_1 = ADDI(rd=4, rs1=4, imm=5)
-        state = addi_1.behavior(state)
-        self.assertEqual(
-            state.register_file.registers,
-            [bminint, bmaxint, bmaximm, bminimm, brandomx],
-        )
+        state.csr_registers.store_word(0, max_number)
+        cssrc_1 = CSRRC(csr=0, rs1=1, rd=0)
+        state = cssrc_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [max_number, test_mask_1])
+        self.assertEqual(state.csr_registers.load_word(cssrc_1.csr), test_result_1)
 
-        # overflow
-        # 0 +  2048 == -2048
-        # 0 + -2049 == 2047
-        # 0 +  4095 == -1
-        # 0 + -4096 == 0
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 0, 0, 0]))
-        addi_1 = ADDI(rd=0, rs1=0, imm=2048)
-        state = addi_1.behavior(state)
-        addi_1 = ADDI(rd=1, rs1=1, imm=-2049)
-        state = addi_1.behavior(state)
-        addi_1 = ADDI(rd=2, rs1=2, imm=4095)
-        state = addi_1.behavior(state)
-        addi_1 = ADDI(rd=3, rs1=3, imm=-4096)
-        state = addi_1.behavior(state)
-        self.assertEqual(
-            state.register_file.registers,
-            [bminimm, bmaximm, bn1, b0],
-        )
+    def test_csritype(self):
+        cssrwi_1 = CSRRWI(csr=0, rd=0, uimm=0)
+        self.assertEqual(cssrwi_1.uimm, 0)
+        cssrwi_1 = CSRRWI(csr=0, rd=0, uimm=1)
+        self.assertEqual(cssrwi_1.uimm, 1)
+        cssrwi_1 = CSRRWI(csr=0, rd=0, uimm=31)
+        self.assertEqual(cssrwi_1.uimm, 31)
+        cssrwi_1 = CSRRWI(csr=0, rd=0, uimm=32)
+        self.assertEqual(cssrwi_1.uimm, 0)
+        cssrwi_1 = CSRRWI(csr=0, rd=0, uimm=-1)
+        self.assertEqual(cssrwi_1.uimm, 31)
 
-    def test_andi(self):
-        b0 = fixedint.MutableUInt32(0)
-        b1 = fixedint.MutableUInt32(1)
-        b5 = fixedint.MutableUInt32(5)
-        bmaxint = fixedint.MutableUInt32(pow(2, 31) - 1)
-        bmaximm = fixedint.MutableUInt32(2047)
-        bminimm = fixedint.MutableUInt32(-2048)
-        bn1 = fixedint.MutableUInt32(-1)
-        brandom = fixedint.MutableUInt32(3320171255)
+    def test_csrrwi(self):
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0]))
+        state.csr_registers.store_word(0, 3)
+        cssrwi_1 = CSRRWI(csr=0, uimm=4, rd=0)
+        state = cssrwi_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [3])
+        self.assertEqual(state.csr_registers.load_word(cssrwi_1.csr), 4)
 
-        # 0 & 0    == 0
-        # 0 & 1    == 0
-        # 1 & 0    == 0
-        # 1 & 1    == 1
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[b0, b0, b1, b1])
-        )
-        andi_1 = ANDI(rd=0, rs1=0, imm=0)
-        state = andi_1.behavior(state)
-        andi_1 = ANDI(rd=1, rs1=1, imm=1)
-        state = andi_1.behavior(state)
-        andi_1 = ANDI(rd=2, rs1=2, imm=0)
-        state = andi_1.behavior(state)
-        andi_1 = ANDI(rd=3, rs1=3, imm=1)
-        state = andi_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b0, b0, b0, b1])
+    def test_csrrsi(self):
+        max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
+        test_number_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
+        test_mask_1 = 1
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0]))
+        cssrsi_1 = CSRRSI(csr=0, uimm=test_mask_1, rd=0)
+        state.csr_registers.store_word(0, test_number_1)
+        state = cssrsi_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [test_number_1])
+        self.assertEqual(state.csr_registers.load_word(cssrsi_1.csr), max_number)
 
-        # -1 & 0             == 0
-        # -1 & 1             == 1
-        # bmaxint & bmaximm  == bmaximm
-        # bmaxint & -1       == bmaxint
-        # brandom & 5        == 5
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[bn1, bn1, bmaxint, bmaxint, brandom])
-        )
-        andi_1 = ANDI(rd=0, rs1=0, imm=0)
-        state = andi_1.behavior(state)
-        andi_1 = ANDI(rd=1, rs1=1, imm=1)
-        state = andi_1.behavior(state)
-        andi_1 = ANDI(rd=2, rs1=2, imm=2047)
-        state = andi_1.behavior(state)
-        andi_1 = ANDI(rd=3, rs1=3, imm=-1)
-        state = andi_1.behavior(state)
-        andi_1 = ANDI(rd=4, rs1=4, imm=5)
-        state = andi_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b0, b1, bmaximm, bmaxint, b5])
-
-        # overflow
-        # -1 &  2048 == -2048
-        # -1 & -2049 == 2047
-        # -1 &  4095 == -1
-        # -1 & -4096 == 0
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[bn1, bn1, bn1, bn1])
-        )
-        andi_1 = ANDI(rd=0, rs1=0, imm=2048)
-        state = andi_1.behavior(state)
-        andi_1 = ANDI(rd=1, rs1=1, imm=-2049)
-        state = andi_1.behavior(state)
-        andi_1 = ANDI(rd=2, rs1=2, imm=4095)
-        state = andi_1.behavior(state)
-        andi_1 = ANDI(rd=3, rs1=3, imm=-4096)
-        state = andi_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [bminimm, bmaximm, bn1, b0])
-
-    def test_ori(self):
-        b0 = fixedint.MutableUInt32(0)
-        b1 = fixedint.MutableUInt32(1)
-        bmaximm = fixedint.MutableUInt32(2047)
-        bminimm = fixedint.MutableUInt32(-2048)
-        bn1 = fixedint.MutableUInt32(-1)
-        brandom = fixedint.MutableUInt32(3320171255)
-
-        # 0 | 0  == 0
-        # 0 | 1  == 1
-        # 1 | 0  == 1
-        # 1 | 1  == 1
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[b0, b0, b1, b1])
-        )
-        ori_1 = ORI(rd=0, rs1=0, imm=0)
-        state = ori_1.behavior(state)
-        ori_1 = ORI(rd=1, rs1=1, imm=1)
-        state = ori_1.behavior(state)
-        ori_1 = ORI(rd=2, rs1=2, imm=0)
-        state = ori_1.behavior(state)
-        ori_1 = ORI(rd=3, rs1=3, imm=1)
-        state = ori_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b0, b1, b1, b1])
-
-        # -1 | 0       == -1
-        # -1 | -1      == -1
-        # 0 | bminimm  == bminimm
-        # brandom | 5  == brandom
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[bn1, bn1, b0, brandom])
-        )
-        ori_1 = ORI(rd=0, rs1=0, imm=0)
-        state = ori_1.behavior(state)
-        ori_1 = ORI(rd=1, rs1=1, imm=-1)
-        state = ori_1.behavior(state)
-        ori_1 = ORI(rd=2, rs1=2, imm=-2048)
-        state = ori_1.behavior(state)
-        ori_1 = ORI(rd=3, rs1=3, imm=5)
-        state = ori_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [bn1, bn1, bminimm, brandom])
-
-        # overflow
-        # 0 |  2048 == -2048
-        # 0 | -2049 == 2047
-        # 0 |  4095 == -1
-        # 0 | -4096 == 0
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[b0, b0, b0, b0])
-        )
-        ori_1 = ORI(rd=0, rs1=0, imm=2048)
-        state = ori_1.behavior(state)
-        ori_1 = ORI(rd=1, rs1=1, imm=-2049)
-        state = ori_1.behavior(state)
-        ori_1 = ORI(rd=2, rs1=2, imm=4095)
-        state = ori_1.behavior(state)
-        ori_1 = ORI(rd=3, rs1=3, imm=-4096)
-        state = ori_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [bminimm, bmaximm, bn1, b0])
-
-    def test_xori(self):
-        b0 = fixedint.MutableUInt32(0)
-        b1 = fixedint.MutableUInt32(1)
-        bmaxint = fixedint.MutableUInt32(pow(2, 31) - 1)
-        bminint = fixedint.MutableUInt32(-pow(2, 31))
-        bmaximm = fixedint.MutableUInt32(2047)
-        bminimm = fixedint.MutableUInt32(-2048)
-        bn1 = fixedint.MutableUInt32(-1)
-        brandom = fixedint.MutableUInt32(3320171255)
-        brandomx = fixedint.MutableUInt32(974796040)
-
-        # 0 ^ 0  == 0
-        # 0 ^ 1  == 1
-        # 1 ^ 0  == 1
-        # 1 ^ 1  == 0
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[b0, b0, b1, b1])
-        )
-        xori_1 = XORI(rd=0, rs1=0, imm=0)
-        state = xori_1.behavior(state)
-        xori_1 = XORI(rd=1, rs1=1, imm=1)
-        state = xori_1.behavior(state)
-        xori_1 = XORI(rd=2, rs1=2, imm=0)
-        state = xori_1.behavior(state)
-        xori_1 = XORI(rd=3, rs1=3, imm=1)
-        state = xori_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b0, b1, b1, b0])
-
-        # -1 ^ 0        == -1
-        # -1 ^ -1       == 0
-        # bmaxint ^ -1  == bminint
-        # brandom ^ -1  == brandomx
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[bn1, bn1, bmaxint, brandom])
-        )
-        xori_1 = XORI(rd=0, rs1=0, imm=0)
-        state = xori_1.behavior(state)
-        xori_1 = XORI(rd=1, rs1=1, imm=-1)
-        state = xori_1.behavior(state)
-        xori_1 = XORI(rd=2, rs1=2, imm=-1)
-        state = xori_1.behavior(state)
-        xori_1 = XORI(rd=3, rs1=3, imm=-1)
-        state = xori_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [bn1, b0, bminint, brandomx])
-
-        # overflow
-        # 0 ^  2048 == -2048
-        # 0 ^ -2049 == 2047
-        # 0 ^  4095 == -1
-        # 0 ^ -4096 == 0
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[b0, b0, b0, b0])
-        )
-        xori_1 = XORI(rd=0, rs1=0, imm=2048)
-        state = xori_1.behavior(state)
-        xori_1 = XORI(rd=1, rs1=1, imm=-2049)
-        state = xori_1.behavior(state)
-        xori_1 = XORI(rd=2, rs1=2, imm=4095)
-        state = xori_1.behavior(state)
-        xori_1 = XORI(rd=3, rs1=3, imm=-4096)
-        state = xori_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [bminimm, bmaximm, bn1, b0])
-
-    def test_shiftitype(self):
-        shiftitype = SLLI(rd=0, rs1=0, imm=0)
-        self.assertEqual(shiftitype.imm, 0)
-        shiftitype = SLLI(rd=0, rs1=0, imm=1)
-        self.assertEqual(shiftitype.imm, 1)
-        shiftitype = SLLI(rd=0, rs1=0, imm=31)
-        self.assertEqual(shiftitype.imm, 31)
-        shiftitype = SLLI(rd=0, rs1=0, imm=32)
-        self.assertEqual(shiftitype.imm, 0)
-        shiftitype = SLLI(rd=0, rs1=0, imm=-1)
-        self.assertEqual(shiftitype.imm, 31)
-        shiftitype = SLLI(rd=0, rs1=0, imm=-2)
-        self.assertEqual(shiftitype.imm, 30)
-
-    def test_slli(self):
-        b0 = fixedint.MutableUInt32(0)
-        b1 = fixedint.MutableUInt32(1)
-        b2 = fixedint.MutableUInt32(2)
-        b2_20 = fixedint.MutableUInt32(pow(2, 20))
-        b111 = fixedint.MutableUInt32(-1)  # 11111....
-        b110 = fixedint.MutableUInt32(pow(2, 32) - 2)  # 111...110
-        b100 = fixedint.MutableUInt32(pow(2, 31))  # 10000....
-        brandom = fixedint.MutableUInt32(3320171255)
-        brandomx = fixedint.MutableUInt32(395783132)
-
-        # 0 << 0   == 0
-        # 0 << 20  == 0
-        # 1 << 0   == 1
-        # 1 << 1   == 2
-        # 1 << 20  == 2^20
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[b0, b0, b1, b1, b1])
-        )
-        slli_1 = SLLI(rd=0, rs1=0, imm=0)
-        state = slli_1.behavior(state)
-        slli_1 = SLLI(rd=1, rs1=1, imm=20)
-        state = slli_1.behavior(state)
-        slli_1 = SLLI(rd=2, rs1=2, imm=0)
-        state = slli_1.behavior(state)
-        slli_1 = SLLI(rd=3, rs1=3, imm=1)
-        state = slli_1.behavior(state)
-        slli_1 = SLLI(rd=4, rs1=4, imm=20)
-        state = slli_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b0, b0, b1, b2, b2_20])
-
-        # 111...1 << 1     == 111...10
-        # 111...1 << 31    == 1000....
-        # 111...1 << 127    == 1000....
-        # 1000... << 1     == 0
-        # 3320171255 << 2  == 395783132
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[b111, b111, b111, b100, brandom])
-        )
-        slli_1 = SLLI(rd=0, rs1=0, imm=1)
-        state = slli_1.behavior(state)
-        slli_1 = SLLI(rd=1, rs1=1, imm=31)
-        state = slli_1.behavior(state)
-        slli_1 = SLLI(rd=2, rs1=2, imm=127)
-        state = slli_1.behavior(state)
-        slli_1 = SLLI(rd=3, rs1=3, imm=1)
-        state = slli_1.behavior(state)
-        slli_1 = SLLI(rd=4, rs1=4, imm=2)
-        state = slli_1.behavior(state)
-        self.assertEqual(
-            state.register_file.registers, [b110, b100, b100, b0, brandomx]
-        )
-
-        # -1 << -1  == b100
-        # -1 << 32  == -1
-        # -1 << 33  == 111...10
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[b111, b111, b111, b111])
-        )
-        slli_1 = SLLI(rd=0, rs1=0, imm=-1)
-        state = slli_1.behavior(state)
-        slli_1 = SLLI(rd=1, rs1=1, imm=32)
-        state = slli_1.behavior(state)
-        slli_1 = SLLI(rd=2, rs1=2, imm=33)
-        state = slli_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b100, b111, b110, b111])
-
-    def test_srli(self):
-        b0 = fixedint.MutableUInt32(0)
-        b1 = fixedint.MutableUInt32(1)
-        b111 = fixedint.MutableUInt32(pow(2, 32) - 1)  # 11111....
-        b011 = fixedint.MutableUInt32(pow(2, 31) - 1)  # 01111....
-        brandom = fixedint.MutableUInt32(3320171255)
-        brandomx = fixedint.MutableUInt32(830042813)
-
-        # 0 >> 0   == 0
-        # 0 >> 20  == 0
-        # 1 >> 0   == 1
-        # 1 >> 1   == 0
-        # 1 >> 20  == 0
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[b0, b0, b1, b1, b1])
-        )
-        srli_1 = SRLI(rd=0, rs1=0, imm=0)
-        state = srli_1.behavior(state)
-        srli_1 = SRLI(rd=1, rs1=1, imm=20)
-        state = srli_1.behavior(state)
-        srli_1 = SRLI(rd=2, rs1=2, imm=0)
-        state = srli_1.behavior(state)
-        srli_1 = SRLI(rd=3, rs1=3, imm=1)
-        state = srli_1.behavior(state)
-        srli_1 = SRLI(rd=4, rs1=4, imm=20)
-        state = srli_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b0, b0, b1, b0, b0])
-
-        # 111...1 >> 1     == 0111....
-        # 111...1 >> 31    == 1
-        # 111...1 >> 127   == 1
-        # 3320171255 >> 2  == 395783132
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[b111, b111, b111, brandom])
-        )
-        srli_1 = SRLI(rd=0, rs1=0, imm=1)
-        state = srli_1.behavior(state)
-        srli_1 = SRLI(rd=1, rs1=1, imm=31)
-        state = srli_1.behavior(state)
-        srli_1 = SRLI(rd=2, rs1=2, imm=127)
-        state = srli_1.behavior(state)
-        srli_1 = SRLI(rd=3, rs1=3, imm=2)
-        state = srli_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b011, b1, b1, brandomx])
-
-        # -1 >> -1  == 1
-        # -1 >> 32  == -1
-        # -1 >> 33  == 01111
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[b111, b111, b111])
-        )
-        srli_1 = SRLI(rd=0, rs1=0, imm=-1)
-        state = srli_1.behavior(state)
-        srli_1 = SRLI(rd=1, rs1=1, imm=32)
-        state = srli_1.behavior(state)
-        srli_1 = SRLI(rd=2, rs1=2, imm=33)
-        state = srli_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b1, b111, b011])
-
-    def test_slti(self):
-        b0 = fixedint.MutableUInt32(0)
-        b1 = fixedint.MutableUInt32(1)
-        bn1 = fixedint.MutableUInt32(-1)
-        b5 = fixedint.MutableUInt32(5)
-        bn5 = fixedint.MutableUInt32(-5)
-
-        # 0 <s 0   == 0
-        # 0 <s 1   == 1
-        # 0 <s -1  == 0
-        # 1 <s 0   == 0
-        # -1 <s 0  == 1
-        # 1 <s -1  == 0
-        # -1 <s 1  == 1
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[b0, b0, b0, b1, bn1, b1, bn1])
-        )
-        slti_1 = SLTI(rd=0, rs1=0, imm=0)
-        state = slti_1.behavior(state)
-        slti_1 = SLTI(rd=1, rs1=1, imm=1)
-        state = slti_1.behavior(state)
-        slti_1 = SLTI(rd=2, rs1=2, imm=-1)
-        state = slti_1.behavior(state)
-        slti_1 = SLTI(rd=3, rs1=3, imm=0)
-        state = slti_1.behavior(state)
-        slti_1 = SLTI(rd=4, rs1=4, imm=0)
-        state = slti_1.behavior(state)
-        slti_1 = SLTI(rd=5, rs1=5, imm=-1)
-        state = slti_1.behavior(state)
-        slti_1 = SLTI(rd=6, rs1=6, imm=1)
-        state = slti_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b0, b1, b0, b0, b1, b0, b1])
-
-        # -5 <s -1  == 1
-        # -1 <s -5  == 0
-        # 1 <s 5    == 1
-        # 5 <s 1    == 0
-        # -1 <s -1  == 0
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[bn5, bn1, b1, b5, bn1])
-        )
-        slti_1 = SLTI(rd=0, rs1=0, imm=-1)
-        state = slti_1.behavior(state)
-        slti_1 = SLTI(rd=1, rs1=1, imm=-5)
-        state = slti_1.behavior(state)
-        slti_1 = SLTI(rd=2, rs1=2, imm=5)
-        state = slti_1.behavior(state)
-        slti_1 = SLTI(rd=3, rs1=3, imm=1)
-        state = slti_1.behavior(state)
-        slti_1 = SLTI(rd=4, rs1=4, imm=-1)
-        state = slti_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b1, b0, b1, b0, b0])
-
-        # overflow
-        # 0 <s 2047  == 1
-        # 0 <s 2048  == 0
-        # 0 <s -2048 == 0
-        # 0 <s -2049 == 1
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[b0, b0, b0, b0])
-        )
-        slti_1 = SLTI(rd=0, rs1=0, imm=2047)
-        state = slti_1.behavior(state)
-        slti_1 = SLTI(rd=1, rs1=1, imm=2048)
-        state = slti_1.behavior(state)
-        slti_1 = SLTI(rd=2, rs1=2, imm=-2048)
-        state = slti_1.behavior(state)
-        slti_1 = SLTI(rd=3, rs1=3, imm=-2049)
-        state = slti_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b1, b0, b0, b1])
-
-    def test_sltiu(self):
-        b0 = fixedint.MutableUInt32(0)
-        b1 = fixedint.MutableUInt32(1)
-        bn1 = fixedint.MutableUInt32(-1)
-        b5 = fixedint.MutableUInt32(5)
-        bn5 = fixedint.MutableUInt32(-5)
-
-        # 0 <u 0   == 0
-        # 0 <u 1   == 1
-        # 0 <u -1  == 1
-        # 1 <u 0   == 0
-        # -1 <u 0  == 0
-        # 1 <u -1  == 1
-        # -1 <u 1  == 0
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[b0, b0, b0, b1, bn1, b1, bn1])
-        )
-        slti_1 = SLTIU(rd=0, rs1=0, imm=0)
-        state = slti_1.behavior(state)
-        slti_1 = SLTIU(rd=1, rs1=1, imm=1)
-        state = slti_1.behavior(state)
-        slti_1 = SLTIU(rd=2, rs1=2, imm=-1)
-        state = slti_1.behavior(state)
-        slti_1 = SLTIU(rd=3, rs1=3, imm=0)
-        state = slti_1.behavior(state)
-        slti_1 = SLTIU(rd=4, rs1=4, imm=0)
-        state = slti_1.behavior(state)
-        slti_1 = SLTIU(rd=5, rs1=5, imm=-1)
-        state = slti_1.behavior(state)
-        slti_1 = SLTIU(rd=6, rs1=6, imm=1)
-        state = slti_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b0, b1, b1, b0, b0, b1, b0])
-
-        # -5 <u -1  == 1
-        # -1 <u -5  == 0
-        # 1 <u 5    == 1
-        # 5 <u 1    == 0
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[bn5, bn1, b1, b5])
-        )
-        slti_1 = SLTIU(rd=0, rs1=0, imm=-1)
-        state = slti_1.behavior(state)
-        slti_1 = SLTIU(rd=1, rs1=1, imm=-5)
-        state = slti_1.behavior(state)
-        slti_1 = SLTIU(rd=2, rs1=2, imm=5)
-        state = slti_1.behavior(state)
-        slti_1 = SLTIU(rd=3, rs1=3, imm=1)
-        state = slti_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b1, b0, b1, b0])
-
-        # overflow
-        # 0 <u 2048  == 1
-        # 0 <u 4095  == 1
-        # 0 <u 4096  == 0
-        # 0 <u 4097  == 1
-        state = ArchitecturalState(
-            register_file=RegisterFile(registers=[b0, b0, b0, b0])
-        )
-        slti_1 = SLTIU(rd=0, rs1=0, imm=2048)
-        state = slti_1.behavior(state)
-        slti_1 = SLTIU(rd=1, rs1=1, imm=4095)
-        state = slti_1.behavior(state)
-        slti_1 = SLTIU(rd=2, rs1=2, imm=4096)
-        state = slti_1.behavior(state)
-        slti_1 = SLTIU(rd=3, rs1=3, imm=4097)
-        state = slti_1.behavior(state)
-        self.assertEqual(state.register_file.registers, [b1, b1, b0, b1])
+    def test_csrrci(self):
+        max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
+        test_result_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
+        test_mask_1 = 1
+        state = ArchitecturalState(register_file=RegisterFile(registers=[0]))
+        state.csr_registers.store_word(0, max_number)
+        cssrci_1 = CSRRCI(csr=0, uimm=test_mask_1, rd=0)
+        state = cssrci_1.behavior(state)
+        self.assertEqual(state.register_file.registers, [max_number])
+        self.assertEqual(state.csr_registers.load_word(cssrci_1.csr), test_result_1)
 
     def test_repr_1(self):
         # Tests that the __repr__() method for the instructions works as intended
@@ -2338,10 +2337,10 @@ class TestInstructions(unittest.TestCase):
 
         # Test B-Type
         b_type_ex_beq = BEQ(rs1=4, rs2=5, imm=24)
-        self.assertEqual(b_type_ex_beq.__repr__(), "beq x4, x5, 48")
+        self.assertEqual(b_type_ex_beq.__repr__(), "beq x4, x5, 24")
 
         b_type_ex_bltu = BLTU(rs1=30, rs2=31, imm=-6)
-        self.assertEqual(b_type_ex_bltu.__repr__(), "bltu x30, x31, -12")
+        self.assertEqual(b_type_ex_bltu.__repr__(), "bltu x30, x31, -6")
 
         # Test U-Type
         u_type_ex_lui = LUI(rd=16, imm=123)
@@ -2352,7 +2351,7 @@ class TestInstructions(unittest.TestCase):
 
         # Test J-Type
         j_type_ex_jal = JAL(rd=23, imm=60)
-        self.assertEqual(j_type_ex_jal.__repr__(), "jal x23, 120")
+        self.assertEqual(j_type_ex_jal.__repr__(), "jal x23, 60")
 
         # TODO: Change me, if Fence gets implemented
         # fence_ex = FENCE()
@@ -2400,5 +2399,5 @@ csrrci x0, 0x40f, 16"""
         instructions = parser.parse_res_to_instructions(
             parser.parse_assembly(text), start_address=0
         )
-        for (instruction, line) in zip(instructions, text.splitlines()):
+        for instruction, line in zip(instructions, text.splitlines()):
             self.assertEqual(str(instruction), line)

@@ -238,13 +238,13 @@ class RiscvParser:
             if imm_value % 2:
                 raise ParserOddImmediateException(line_number=line_number, line=line)
             else:
-                return int(instruction_parsed.imm, base=0) // 2
+                return imm_value
         else:
             offset = 0
             if instruction_parsed.offset:
                 offset = int(instruction_parsed.offset, base=0)
             try:
-                return (labels[instruction_parsed.label] + offset - address_count) // 2
+                return labels[instruction_parsed.label] + offset - address_count
             except KeyError:
                 raise ParserLabelException(
                     line_number=line_number, line=line, label=instruction_parsed.label
@@ -429,7 +429,7 @@ class RiscvParser:
                         uimm=int(instruction_parsed.uimm, base=0),
                     )
                 )
-            elif issubclass(instruction_class, instruction_types.fence):
+            elif issubclass(instruction_class, instruction_types.FenceTypeInstruction):
                 # TODO: Change me, if Fence gets implemented
                 instructions.append(FENCE())
             address_count += instruction_map[instruction_parsed.mnemonic.lower()].length

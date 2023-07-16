@@ -9,15 +9,44 @@
         <!--	****************************************************************************************************************************** -->
         <!--codemirror-->
         <script
-            type="text/javascript"
-            src="codemirror/lib/codemirror.js"
+            src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"
+            integrity="sha512-8RnEqURPUc5aqFEN04aQEiPlSAdE0jlFS/9iGgUyNtwFnSKCXhmB6ZTNl7LnDtDWKabJIASzXrzD0K+LYexU9g=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
         ></script>
-        <link rel="stylesheet" href="codemirror/lib/codemirror.css" />
         <script
-            type="text/javascript"
-            src="codemirror/mode/markdown/markdown.js"
+            src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/hint/show-hint.min.js"
+            integrity="sha512-yhmeAerubMLaGAsyS7sE8Oqub6GeTkBDQpkXo2JKHgg7JOCudQvcbDQc5rPxdl7MqcDusTJzSy+ODlyzAwETfQ=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
         ></script>
-        <link rel="stylesheet" href="codemirror/theme/darcula.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css"
+            integrity="sha512-uf06llspW44/LZpHzHT6qBOIVODjWtv4MxCricRxkzvopAlSWnTf6hpZTFxuuZcuNE9CBQhqE0Seu1CoRk84nQ=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/darcula.min.css"
+            integrity="sha512-kqCOYFDdyQF4JM8RddA6rMBi9oaLdR0aEACdB95Xl1EgaBhaXMIe8T4uxmPitfq4qRmHqo+nBU2d1l+M4zUx1g=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/hint/show-hint.min.css"
+            integrity="sha512-OmcLQEy8iGiD7PSm85s06dnR7G7C9C0VqahIPAj/KHk5RpOCmnC6R2ob1oK4/uwYhWa9BF1GC6tzxsC8TIx7Jg=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        />
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/markdown/markdown.min.js"
+            integrity="sha512-DmMao0nRIbyDjbaHc8fNd3kxGsZj9PCU6Iu/CeidLQT9Py8nYVA5n0PqXYmvqNdU+lCiTHOM/4E7bM/G8BttJg=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        ></script>
         <!--	****************************************************************************************************************************** -->
         <link rel="stylesheet" href="bootstrap.min.css" />
         <link rel="stylesheet" type="text/css" href="WEB_APP_BASIC.css" />
@@ -161,6 +190,20 @@
                                             height="25px"
                                         />
                                     </button>
+                                    <button
+                                        class="btn btn-secondary btn-sm button_switch_stage active"
+                                        id="button_SingleStage"
+                                        title="SingleStage"
+                                    >
+                                        SingleStage
+                                    </button>
+                                    <button
+                                        class="btn btn-secondary btn-sm button_switch_stage"
+                                        id="button_5-Stage"
+                                        title="5-Stage"
+                                    >
+                                        5-Stage
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -174,29 +217,36 @@
                         >
                             <div class="row">
                                 <div class="col-md-3 col-12">
-                                    <div class="editor my-2">
-                                        <textarea
-                                            id="input"
-                                            rows="20"
-                                        ></textarea>
-                                        <script>
-                                            // initialize codemirror textarea
-                                            const editor =
-                                                CodeMirror.fromTextArea(
-                                                    document.getElementById(
-                                                        "input"
-                                                    ),
-                                                    {
-                                                        lineNumbers: true,
-                                                        styleActiveLine: true,
-                                                        mode: "markdown",
-                                                    }
-                                                );
-                                            editor.setSize(
-                                                null,
-                                                window.innerHeight
-                                            );
-                                        </script>
+                                    <div
+                                        class="editor my-2"
+                                        style="max-height: 50%"
+                                    >
+                                        <div class="row">
+                                            <div class="col-sm-11">
+                                                <textarea
+                                                    id="input"
+                                                    rows="20"
+                                                ></textarea>
+                                                <script>
+                                                    // initialize codemirror textarea
+                                                    const editor =
+                                                        CodeMirror.fromTextArea(
+                                                            document.getElementById(
+                                                                "input"
+                                                            ),
+                                                            {
+                                                                lineNumbers: true,
+                                                                styleActiveLine: true,
+                                                                mode: "markdown",
+                                                            }
+                                                        );
+                                                    editor.setSize(
+                                                        null,
+                                                        window.innerHeight
+                                                    );
+                                                </script>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -217,6 +267,9 @@
                                                             </th>
                                                             <th title="command">
                                                                 Command
+                                                            </th>
+                                                            <th title="stage">
+                                                                Stage
                                                             </th>
                                                         </tr>
                                                     </thead>
