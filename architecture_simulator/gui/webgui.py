@@ -1,6 +1,6 @@
 import archsim_js
 from architecture_simulator.isa.parser import ParserException
-from architecture_simulator.simulation.simulation import InstructionExecutionException
+from architecture_simulator.uarch.pipeline import InstructionExecutionException
 
 from architecture_simulator.uarch.architectural_state import (
     RegisterFile,
