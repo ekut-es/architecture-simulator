@@ -1,5 +1,6 @@
 import archsim_js
 from architecture_simulator.isa.parser import ParserException
+from architecture_simulator.uarch.pipeline import InstructionExecutionException
 
 from architecture_simulator.uarch.architectural_state import (
     RegisterFile,
@@ -50,9 +51,12 @@ def step_sim(instr: str):
             archsim_js.set_output(Parser_Exception.__repr__())
 
     # step the simulation
-    simulation_ended_flag = simulation.step_simulation()
-
-    update_ui()
+    try:
+        simulation_ended_flag = simulation.step_simulation()
+        update_ui()
+    except InstructionExecutionException as e:
+        archsim_js.highlight_cmd_table(int(e.address / 4))
+        simulation_ended_flag = False
 
     return (simulation.state.performance_metrics.__repr__(), simulation_ended_flag)
 

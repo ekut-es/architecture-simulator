@@ -150,6 +150,12 @@ const archsim_js = {
         editor.refresh();
         editor.closeHint();
     },
+    highlight_cmd_table: function (position) {
+        table = document.getElementById("gui_cmd_table_id");
+        table.rows[position + 1].cells[0].style.backgroundColor = "yellow";
+        table.rows[position + 1].cells[1].style.backgroundColor = "yellow";
+        console.log(table.innerHTML);
+    },
     update_IF_Stage: function (instruction, address_of_instruction) {},
     update_ID_Stage: function (
         register_read_addr_1,
