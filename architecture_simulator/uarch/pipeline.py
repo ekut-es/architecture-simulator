@@ -93,7 +93,7 @@ class MemoryAccessPipelineRegister(PipelineRegister):
     write_register: Optional[int] = None
     # control signals
     comparison: Optional[bool] = None
-    pc_src: Optional[bool] = None
+    comparison_or_jump: Optional[bool] = None
     pc_plus_imm: Optional[int] = None
     pc_plus_instruction_length: Optional[int] = None
     imm: Optional[int] = None
@@ -340,14 +340,14 @@ class MemoryAccessStage(Stage):
             memory_write_data=memory_write_data,
             architectural_state=state,
         )
-        pc_src = not (
+        comparison_or_jump = (
             pipeline_register.control_unit_signals.jump or pipeline_register.comparison
         )
 
-        # NOTE: pc_src = 0 -> select (pc+imm), pc_src = 1 -> select (pc+i_length)
+        # NOTE: comparison_or_jump = 0 -> select (pc+i_length), comparison_or_jump = 1 -> select (pc+imm)
         incorrect_branch_prediction = (
             pipeline_register.control_unit_signals.branch
-            and pc_src == pipeline_register.branch_prediction
+            and comparison_or_jump != pipeline_register.branch_prediction
         )
 
         if incorrect_branch_prediction or pipeline_register.control_unit_signals.jump:
@@ -380,7 +380,7 @@ class MemoryAccessStage(Stage):
             memory_write_data=memory_write_data,
             memory_read_data=memory_read_data,
             comparison=pipeline_register.comparison,
-            pc_src=pc_src,
+            comparison_or_jump=comparison_or_jump,
             write_register=pipeline_register.write_register,
             control_unit_signals=pipeline_register.control_unit_signals,
             pc_plus_imm=pipeline_register.pc_plus_imm,

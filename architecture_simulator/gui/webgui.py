@@ -271,7 +271,7 @@ def update_tables():
                 memory_write_data=MA_pipeline_register.memory_write_data,
                 memory_read_data=MA_pipeline_register.memory_read_data,
                 comparison=MA_pipeline_register.comparison,
-                pc_src=MA_pipeline_register.pc_src,
+                comparison_or_jump=MA_pipeline_register.comparison_or_jump,
                 pc_plus_imm=MA_pipeline_register.pc_plus_imm,
                 control_unit_signals=control_unit_signals,
             )

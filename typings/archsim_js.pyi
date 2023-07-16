@@ -33,7 +33,7 @@ def update_MA_Stage(
     memory_write_data,
     memory_read_data,
     comparison,
-    pc_src,
+    comparison_or_jump,
     pc_plus_imm,
     control_unit_signals,
 ) -> None: ...

@@ -1,5 +1,9 @@
 # Pipeline Class Documentation
-This documentation will tell you, how to create your own custom pipeline using the pipeline class.
+
+This documentation will tell you, how to create your own custom pipeline using the pipeline class. Here is a UML diagram showing all pipeline related classes:
+
+<img src="Pipeline_UML.svg" alt="UML diagram of all pipeline related classes">
+
 ## Idea
 The **pipeline** class is a framework that can be used to create your own custom pipeline implementation. It provides a basic set of methods, that are useful across different implementations. To implement your own pipeline, you will have to create  child classes of the **Stage** class and corresponding child classes of the **PipelineRegister** class.
 ## The pipeline class
