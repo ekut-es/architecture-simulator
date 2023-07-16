@@ -238,13 +238,13 @@ class RiscvParser:
             if imm_value % 2:
                 raise ParserOddImmediateException(line_number=line_number, line=line)
             else:
-                return int(instruction_parsed.imm, base=0) // 2
+                return imm_value
         else:
             offset = 0
             if instruction_parsed.offset:
                 offset = int(instruction_parsed.offset, base=0)
             try:
-                return (labels[instruction_parsed.label] + offset - address_count) // 2
+                return labels[instruction_parsed.label] + offset - address_count
             except KeyError:
                 raise ParserLabelException(
                     line_number=line_number, line=line, label=instruction_parsed.label

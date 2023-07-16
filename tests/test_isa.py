@@ -1757,14 +1757,14 @@ class TestInstructions(unittest.TestCase):
     def test_btype(self):
         btype = BEQ(rs1=0, rs2=0, imm=0)
         self.assertEqual(btype.imm, 0)
-        btype = BEQ(rs1=0, rs2=0, imm=1)
-        self.assertEqual(btype.imm, 1)
-        btype = BEQ(rs1=0, rs2=0, imm=2047)
-        self.assertEqual(btype.imm, 2047)
-        btype = BEQ(rs1=0, rs2=0, imm=2048)
-        self.assertEqual(btype.imm, -2048)
-        btype = BEQ(rs1=0, rs2=0, imm=-2049)
-        self.assertEqual(btype.imm, 2047)
+        btype = BEQ(rs1=0, rs2=0, imm=2)
+        self.assertEqual(btype.imm, 2)
+        btype = BEQ(rs1=0, rs2=0, imm=4094)
+        self.assertEqual(btype.imm, 4094)
+        btype = BEQ(rs1=0, rs2=0, imm=4096)
+        self.assertEqual(btype.imm, -4096)
+        btype = BEQ(rs1=0, rs2=0, imm=-4098)
+        self.assertEqual(btype.imm, 4094)
 
     def test_beq(self):
         state = ArchitecturalState(
@@ -1779,19 +1779,19 @@ class TestInstructions(unittest.TestCase):
 
         # 0, 0
         state.program_counter = 0
-        instruction = BEQ(rs1=0, rs2=1, imm=6)
+        instruction = BEQ(rs1=0, rs2=1, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
         # 0, 1
         state.program_counter = 0
-        instruction = BEQ(rs1=0, rs2=2, imm=6)
+        instruction = BEQ(rs1=0, rs2=2, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
         # 0, 0 - negative immediate
         state.program_counter = 32
-        instruction = BEQ(rs1=0, rs2=1, imm=-6)
+        instruction = BEQ(rs1=0, rs2=1, imm=-12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 16)
 
@@ -1808,19 +1808,19 @@ class TestInstructions(unittest.TestCase):
 
         # 0, 0
         state.program_counter = 0
-        instruction = BNE(rs1=0, rs2=1, imm=6)
+        instruction = BNE(rs1=0, rs2=1, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
         # 0, 1
         state.program_counter = 0
-        instruction = BNE(rs1=0, rs2=2, imm=6)
+        instruction = BNE(rs1=0, rs2=2, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
         # 0, 1 - negative immediate
         state.program_counter = 32
-        instruction = BNE(rs1=0, rs2=2, imm=-6)
+        instruction = BNE(rs1=0, rs2=2, imm=-12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 16)
 
@@ -1839,43 +1839,43 @@ class TestInstructions(unittest.TestCase):
 
         # 0, 0
         state.program_counter = 0
-        instruction = BLT(rs1=0, rs2=1, imm=6)
+        instruction = BLT(rs1=0, rs2=1, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
         # 1, 0
         state.program_counter = 0
-        instruction = BLT(rs1=2, rs2=0, imm=6)
+        instruction = BLT(rs1=2, rs2=0, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
         # 0, 1
         state.program_counter = 0
-        instruction = BLT(rs1=0, rs2=2, imm=6)
+        instruction = BLT(rs1=0, rs2=2, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
         # 0, 1 - negative immediate
         state.program_counter = 32
-        instruction = BLT(rs1=0, rs2=2, imm=-6)
+        instruction = BLT(rs1=0, rs2=2, imm=-12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 16)
 
         # 0, -1
         state.program_counter = 0
-        instruction = BLT(rs1=0, rs2=3, imm=6)
+        instruction = BLT(rs1=0, rs2=3, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
         # -1, 0
         state.program_counter = 0
-        instruction = BLT(rs1=3, rs2=0, imm=6)
+        instruction = BLT(rs1=3, rs2=0, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
         # -2^31, -1
         state.program_counter = 0
-        instruction = BLT(rs1=4, rs2=3, imm=6)
+        instruction = BLT(rs1=4, rs2=3, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
@@ -1894,37 +1894,37 @@ class TestInstructions(unittest.TestCase):
 
         # 0, 0
         state.program_counter = 0
-        instruction = BGE(rs1=0, rs2=1, imm=6)
+        instruction = BGE(rs1=0, rs2=1, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
         # 0, 1
         state.program_counter = 0
-        instruction = BGE(rs1=0, rs2=2, imm=6)
+        instruction = BGE(rs1=0, rs2=2, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
         # 1, 0
         state.program_counter = 0
-        instruction = BGE(rs1=2, rs2=0, imm=6)
+        instruction = BGE(rs1=2, rs2=0, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
         # 1, 0 - negative immediate
         state.program_counter = 32
-        instruction = BGE(rs1=2, rs2=0, imm=-6)
+        instruction = BGE(rs1=2, rs2=0, imm=-12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 16)
 
         # 0, -1
         state.program_counter = 0
-        instruction = BGE(rs1=0, rs2=3, imm=6)
+        instruction = BGE(rs1=0, rs2=3, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
         # -2^31, -1
         state.program_counter = 0
-        instruction = BGE(rs1=4, rs2=3, imm=6)
+        instruction = BGE(rs1=4, rs2=3, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
@@ -1943,43 +1943,43 @@ class TestInstructions(unittest.TestCase):
 
         # 0, 0
         state.program_counter = 0
-        instruction = BLTU(rs1=0, rs2=1, imm=6)
+        instruction = BLTU(rs1=0, rs2=1, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
         # 1, 0
         state.program_counter = 0
-        instruction = BLTU(rs1=2, rs2=0, imm=6)
+        instruction = BLTU(rs1=2, rs2=0, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
         # 0, 1
         state.program_counter = 0
-        instruction = BLTU(rs1=0, rs2=2, imm=6)
+        instruction = BLTU(rs1=0, rs2=2, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
         # 0, 1 - negative immediate
         state.program_counter = 32
-        instruction = BLTU(rs1=0, rs2=2, imm=-6)
+        instruction = BLTU(rs1=0, rs2=2, imm=-12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 16)
 
         # 0, (2^32 - 1)
         state.program_counter = 0
-        instruction = BLTU(rs1=0, rs2=3, imm=6)
+        instruction = BLTU(rs1=0, rs2=3, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
         # (2^32 - 1), 0
         state.program_counter = 0
-        instruction = BLTU(rs1=3, rs2=0, imm=6)
+        instruction = BLTU(rs1=3, rs2=0, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
         # 2^31, (2^32 - 1)
         state.program_counter = 0
-        instruction = BLTU(rs1=4, rs2=3, imm=6)
+        instruction = BLTU(rs1=4, rs2=3, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
@@ -1998,37 +1998,37 @@ class TestInstructions(unittest.TestCase):
 
         # 0, 0
         state.program_counter = 0
-        instruction = BGEU(rs1=0, rs2=1, imm=6)
+        instruction = BGEU(rs1=0, rs2=1, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
         # 0, 1
         state.program_counter = 0
-        instruction = BGEU(rs1=0, rs2=2, imm=6)
+        instruction = BGEU(rs1=0, rs2=2, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
         # 1, 0
         state.program_counter = 0
-        instruction = BGEU(rs1=2, rs2=0, imm=6)
+        instruction = BGEU(rs1=2, rs2=0, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 8)
 
         # 1, 0 - negative immediate
         state.program_counter = 32
-        instruction = BGEU(rs1=2, rs2=0, imm=-6)
+        instruction = BGEU(rs1=2, rs2=0, imm=-12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 16)
 
         # 0, (2^32 - 1)
         state.program_counter = 0
-        instruction = BGEU(rs1=0, rs2=3, imm=6)
+        instruction = BGEU(rs1=0, rs2=3, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
         # 2^31, (2^32 - 1)
         state.program_counter = 0
-        instruction = BGEU(rs1=4, rs2=3, imm=6)
+        instruction = BGEU(rs1=4, rs2=3, imm=12)
         state = instruction.behavior(state)
         self.assertEqual(state.program_counter, 0)
 
@@ -2136,50 +2136,50 @@ class TestInstructions(unittest.TestCase):
     def test_jtype(self):
         jtype = JAL(rd=0, imm=0)
         self.assertEqual(jtype.imm, 0)
-        jtype = JAL(rd=0, imm=1)
-        self.assertEqual(jtype.imm, 1)
-        jtype = JAL(rd=0, imm=-1)
-        self.assertEqual(jtype.imm, -1)
-        jtype = JAL(rd=0, imm=(2**19) - 1)
-        self.assertEqual(jtype.imm, (2**19) - 1)
-        jtype = JAL(rd=0, imm=-(2**19))
-        self.assertEqual(jtype.imm, -(2**19))
-        jtype = JAL(rd=0, imm=(2**19))
-        self.assertEqual(jtype.imm, -(2**19))
-        jtype = JAL(rd=0, imm=-(2**19) - 1)
-        self.assertEqual(jtype.imm, (2**19) - 1)
+        jtype = JAL(rd=0, imm=2)
+        self.assertEqual(jtype.imm, 2)
+        jtype = JAL(rd=0, imm=-2)
+        self.assertEqual(jtype.imm, -2)
+        jtype = JAL(rd=0, imm=(2**20) - 2)
+        self.assertEqual(jtype.imm, (2**20) - 2)
+        jtype = JAL(rd=0, imm=-(2**20))
+        self.assertEqual(jtype.imm, -(2**20))
+        jtype = JAL(rd=0, imm=(2**20))
+        self.assertEqual(jtype.imm, -(2**20))
+        jtype = JAL(rd=0, imm=-(2**20) - 2)
+        self.assertEqual(jtype.imm, (2**20) - 2)
 
     def test_jal(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=[1, 1, 1]))
         state.program_counter = 0
-        jal_1 = JAL(rd=0, imm=2)
+        jal_1 = JAL(rd=0, imm=4)
         state = jal_1.behavior(state)
         self.assertEqual(state.program_counter, 0)
         self.assertEqual(int(state.register_file.registers[0]), 4)
 
-        state.program_counter = 1
-        jal_2 = JAL(rd=0, imm=3)
+        state.program_counter = 2
+        jal_2 = JAL(rd=0, imm=10)
         state = jal_2.behavior(state)
-        self.assertEqual(state.program_counter, 3)
-        self.assertEqual(int(state.register_file.registers[0]), 5)
+        self.assertEqual(state.program_counter, 8)
+        self.assertEqual(int(state.register_file.registers[0]), 6)
 
         state.program_counter = 2
-        jal_3 = JAL(rd=0, imm=4)
+        jal_3 = JAL(rd=0, imm=8)
         state = jal_3.behavior(state)
         self.assertEqual(state.program_counter, 6)
         self.assertEqual(int(state.register_file.registers[0]), 6)
 
-        state.program_counter = 3
-        jal_4 = JAL(rd=1, imm=4)
+        state.program_counter = 4
+        jal_4 = JAL(rd=1, imm=8)
         state = jal_4.behavior(state)
-        self.assertEqual(state.program_counter, 7)
-        self.assertEqual(int(state.register_file.registers[1]), 7)
+        self.assertEqual(state.program_counter, 8)
+        self.assertEqual(int(state.register_file.registers[1]), 8)
 
-        state.program_counter = 7
-        jal_5 = JAL(rd=1, imm=5)
+        state.program_counter = 8
+        jal_5 = JAL(rd=1, imm=10)
         state = jal_5.behavior(state)
-        self.assertEqual(state.program_counter, 13)
-        self.assertEqual(int(state.register_file.registers[1]), 11)
+        self.assertEqual(state.program_counter, 14)
+        self.assertEqual(int(state.register_file.registers[1]), 12)
 
     def test_csrrw_privilege_level_too_low(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
@@ -2337,10 +2337,10 @@ class TestInstructions(unittest.TestCase):
 
         # Test B-Type
         b_type_ex_beq = BEQ(rs1=4, rs2=5, imm=24)
-        self.assertEqual(b_type_ex_beq.__repr__(), "beq x4, x5, 48")
+        self.assertEqual(b_type_ex_beq.__repr__(), "beq x4, x5, 24")
 
         b_type_ex_bltu = BLTU(rs1=30, rs2=31, imm=-6)
-        self.assertEqual(b_type_ex_bltu.__repr__(), "bltu x30, x31, -12")
+        self.assertEqual(b_type_ex_bltu.__repr__(), "bltu x30, x31, -6")
 
         # Test U-Type
         u_type_ex_lui = LUI(rd=16, imm=123)
@@ -2351,7 +2351,7 @@ class TestInstructions(unittest.TestCase):
 
         # Test J-Type
         j_type_ex_jal = JAL(rd=23, imm=60)
-        self.assertEqual(j_type_ex_jal.__repr__(), "jal x23, 120")
+        self.assertEqual(j_type_ex_jal.__repr__(), "jal x23, 60")
 
         # TODO: Change me, if Fence gets implemented
         # fence_ex = FENCE()

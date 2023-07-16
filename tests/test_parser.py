@@ -176,7 +176,7 @@ beq zero, ra, Ban0n3
         self.assertIsInstance(instr[4], BEQ)
         self.assertEqual(instr[4].rs1, 4)
         self.assertEqual(instr[4].rs2, 5)
-        self.assertEqual(instr[4].imm, 21)
+        self.assertEqual(instr[4].imm, 42)
 
         # lui x12, 8000
         self.assertIsInstance(instr[5], LUI)
@@ -186,18 +186,18 @@ beq zero, ra, Ban0n3
         # jal x20, 220
         self.assertIsInstance(instr[6], JAL)
         self.assertEqual(instr[6].rd, 20)
-        self.assertEqual(instr[6].imm, 110)
+        self.assertEqual(instr[6].imm, 220)
 
         # bne x3, x10, Banane
         self.assertIsInstance(instr[7], BNE)
         self.assertEqual(instr[7].rs1, 3)
         self.assertEqual(instr[7].rs2, 10)
-        self.assertEqual(instr[7].imm, -10)
+        self.assertEqual(instr[7].imm, -20)
 
         # jal x10, Ananas
         self.assertIsInstance(instr[8], JAL)
         self.assertEqual(instr[8].rd, 10)
-        self.assertEqual(instr[8].imm, 2)
+        self.assertEqual(instr[8].imm, 4)
 
         # ecall
         self.assertIsInstance(instr[9], ECALL)
@@ -227,7 +227,7 @@ beq zero, ra, Ban0n3
         self.assertIsInstance(instr[14], BEQ)
         self.assertEqual(instr[14].rs1, 0)
         self.assertEqual(instr[14].rs2, 1)
-        self.assertEqual(instr[14].imm, 2)
+        self.assertEqual(instr[14].imm, 4)
 
         # beq x0, x1, Ban0n3
         self.assertIsInstance(instr[15], BEQ)
@@ -442,12 +442,12 @@ fibonacci:
         """
         parser = RiscvParser()
         instr = parser.parse(text, start_address=0)
-        self.assertEqual(instr[0].imm, -2)
-        self.assertEqual(instr[1].imm, -2)
-        self.assertEqual(instr[2].imm, 4)
-        self.assertEqual(instr[3].imm, -6)
-        self.assertEqual(instr[4].imm, 4)
-        self.assertEqual(instr[5].imm, -10)
+        self.assertEqual(instr[0].imm, -4)
+        self.assertEqual(instr[1].imm, -4)
+        self.assertEqual(instr[2].imm, 8)
+        self.assertEqual(instr[3].imm, -12)
+        self.assertEqual(instr[4].imm, 8)
+        self.assertEqual(instr[5].imm, -20)
 
     def test_hex_imm(self):
         text = """
@@ -467,9 +467,9 @@ fibonacci:
         self.assertEqual(instr[1].imm, -15)
         self.assertEqual(instr[2].imm, 0xA)
         self.assertEqual(instr[3].imm, 0x11)
-        self.assertEqual(instr[4].imm, -0xAC // 2)
+        self.assertEqual(instr[4].imm, -0xAC)
         self.assertEqual(instr[5].imm, -0xAF)
-        self.assertEqual(instr[6].imm, 0x3A // 2)
+        self.assertEqual(instr[6].imm, 0x3A)
         self.assertEqual(instr[7].csr, 0x448)
         self.assertEqual(instr[8].csr, 0x448)
         self.assertEqual(instr[8].uimm, 0x1F)
@@ -491,9 +491,9 @@ fibonacci:
         self.assertEqual(instr[1].imm, -15)
         self.assertEqual(instr[2].imm, 0xA)
         self.assertEqual(instr[3].imm, 0x11)
-        self.assertEqual(instr[4].imm, -0xAC // 2)
+        self.assertEqual(instr[4].imm, -0xAC)
         self.assertEqual(instr[5].imm, -0xAF)
-        self.assertEqual(instr[6].imm, 0x3A // 2)
+        self.assertEqual(instr[6].imm, 0x3A)
         self.assertEqual(instr[7].csr, 0x448)
         self.assertEqual(instr[8].csr, 0x448)
         self.assertEqual(instr[8].uimm, 0x1F)
@@ -631,12 +631,12 @@ fibonacci:
         self.assertIsInstance(instr[1], BEQ)
         self.assertEqual(instr[1].rs1, 0)
         self.assertEqual(instr[1].rs2, 0)
-        self.assertEqual(instr[1].imm, 4)
+        self.assertEqual(instr[1].imm, 8)
 
         self.assertIsInstance(instr[2], BEQ)
         self.assertEqual(instr[2].rs1, 0)
         self.assertEqual(instr[2].rs2, 0)
-        self.assertEqual(instr[2].imm, -2)
+        self.assertEqual(instr[2].imm, -4)
 
         program_2 = """lw x0, x1, 8
         lw x0, 8(x1)"""
