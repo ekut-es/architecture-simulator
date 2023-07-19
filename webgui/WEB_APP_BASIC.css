@@ -100,7 +100,11 @@ input:out-of-range + ::after {
 
 /* ************************************************************************* */
 
-html {
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
 }
 
 body header {
@@ -119,8 +123,6 @@ body nav {
 
 body main {
     background-color: var(--app_main_bg_color);
-
-    height: 100%;
 }
 
 body footer {
@@ -164,7 +166,7 @@ body main #input {
 }
 
 body main #gui_cmd_div_id {
-    max-height: 57%;
+    max-height: 88vh;
     overflow-y: scroll;
 }
 
@@ -190,7 +192,7 @@ body main #gui_cmd_table_id td {
 }
 
 body main #gui_memory_div_id {
-    max-height: 57%;
+    max-height: 88vh;
     overflow-y: scroll;
 }
 
@@ -224,7 +226,7 @@ body main #gui_memory_table_id option:disabled {
 }
 
 body main #gui_registers_div_id {
-    max-height: 57%;
+    max-height: 88vh;
     overflow-y: scroll;
 }
 
@@ -258,6 +260,11 @@ body main #gui_registers_table_id option:disabled {
 }
 
 body main #output {
+    overflow: scroll;
+}
+
+body main #performance_metrics {
+    overflow: hidden;
 }
 
 .CodeMirror {

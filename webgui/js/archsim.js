@@ -3,6 +3,7 @@ const registers = document.getElementById("gui_registers_table_body_id");
 const memory = document.getElementById("gui_memory_table_body_id");
 const instructions = document.getElementById("gui_cmd_table_body_id");
 const input = document.getElementById("input");
+const performance_metrics = document.getElementById("performance_metrics");
 
 function addToOutput(s) {
     output.value += ">>>" + input.value + "\n" + s + "\n";
@@ -196,6 +197,7 @@ const archsim_js = {
 
 output.value = "Output \n\nInitializing... ";
 input.value = "add x1, x2, x3 \nlui x1, 1";
+performance_metrics.value = "Performance Metrics";
 // init Pyodide
 async function main() {
     start_loading_visuals();
@@ -228,6 +230,7 @@ from architecture_simulator.gui.webgui import *
 sim_init()
     `);
     output.value += "Ready!\n";
+    performance_metrics.value += "...";
     stop_loading_visuals();
     return pyodide;
 }
@@ -273,7 +276,8 @@ async function stop_timer() {
 async function update_performance_metrics() {
     let pyodide = await pyodideReadyPromise;
     get_performance_metrics = pyodide.globals.get("get_performance_metrics");
-    output.value = get_performance_metrics();
+    //output.value = get_performance_metrics();
+    performance_metrics.value = get_performance_metrics();
 }
 
 // async function evaluatePython_run_sim() {
@@ -303,6 +307,7 @@ async function evaluatePython_reset_sim(pipeline_mode) {
         reset_sim = pyodide.globals.get("reset_sim");
         reset_sim(pipeline_mode);
         output.value = "";
+        performance_metrics.value = "";
     } catch (err) {
         addToOutput(err);
     }
