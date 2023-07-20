@@ -145,15 +145,19 @@ body footer {
     background-color: var(--button_blue_color);
 }
 
+.button_settings {
+    background-color: var(--app_main_bg_color);
+}
+
 .button_switch_stage {
-    background-color: #11101073;
+    /* background-color: #11101073;*/
 }
 
 .loading {
 }
 
 .button_switch_representation {
-    background-color: #5647875d;
+    /*background-color: #5647875d;*/
 }
 
 body main #gui_base_div_id {
@@ -282,4 +286,12 @@ body main #performance_metrics {
 
 .highlighted {
     background-color: yellow;
+}
+
+.modal-content {
+    background-color: #121639;
+}
+
+.modal-body {
+    background-color: var(--app_main_bg_color);
 }
