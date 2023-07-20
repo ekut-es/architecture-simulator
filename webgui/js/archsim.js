@@ -17,7 +17,7 @@ const archsim_js = {
         td1 = document.createElement("td");
         td1.innerText = "x" + reg;
         td2 = document.createElement("td");
-        td2.innerText = Array.from(representations)[representation_mode];
+        td2.innerText = Array.from(representations)[reg_representation_mode];
         td2.id = "val_x" + reg;
         td3 = document.createElement("td");
         td3.innerText = abi_name;
@@ -36,7 +36,7 @@ const archsim_js = {
         td1.innerText = address;
         td2 = document.createElement("td");
         //alert(Array.from(representations))
-        td2.innerText = Array.from(representations)[representation_mode];
+        td2.innerText = Array.from(representations)[mem_representation_mode];
         td2.id = "memory" + address;
         tr.appendChild(td1);
         tr.appendChild(td2);
