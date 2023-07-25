@@ -1,29 +1,14 @@
-from architecture_simulator.uarch.architectural_state import ArchitecturalState
-from .architectural_state import ArchitecturalState
-from ..isa.instruction_types import Instruction, EmptyInstruction, BTypeInstruction
-from typing import Optional
+from __future__ import annotations
+from typing import Optional, TYPE_CHECKING
 from dataclasses import dataclass, field
 
+from ..isa.instruction_types import EmptyInstruction, BTypeInstruction
+from ..isa.rv32i_instructions import JAL
+from .control_unit_signals import ControlUnitSignals
 
-#
-# Classes for a 5 Stage Pipeline:
-#
-@dataclass
-class ControlUnitSignals:
-    """The signals of the control unit, which is located in the ID stage! These signals are used to decide
-    which input gets used, but are mostly asthetic and constructed for the webui!
-    """
-
-    alu_src_1: Optional[bool] = None
-    alu_src_2: Optional[bool] = None
-    wb_src: Optional[int] = None
-    reg_write: Optional[bool] = None
-    mem_read: Optional[bool] = None
-    mem_write: Optional[bool] = None
-    branch: Optional[bool] = None
-    jump: Optional[bool] = None
-    alu_op: Optional[int] = None
-    alu_to_pc: Optional[int] = None
+if TYPE_CHECKING:
+    from ..isa.instruction_types import Instruction
+    from architecture_simulator.uarch.architectural_state import ArchitecturalState
 
 
 @dataclass
@@ -366,8 +351,6 @@ class MemoryAccessStage(Stage):
             flush_signal = None
 
         if flush_signal is not None:
-            from ..isa.rv32i_instructions import JAL
-
             if isinstance(pipeline_register.instruction, BTypeInstruction):
                 state.performance_metrics.branch_count += 1
             elif isinstance(pipeline_register.instruction, JAL):

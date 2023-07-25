@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 import fixedint
 import time
 from typing import Optional
+from ..isa.parser import RiscvParser
 
 
 @dataclass
@@ -443,8 +444,6 @@ class InstructionMemory:
         return self.instructions[address]
 
     def append_instructions(self, program: str):
-        from ..isa.parser import RiscvParser
-
         if self.instructions:
             last_address = max(self.instructions.keys())
             next_address = last_address + self.instructions[last_address].length

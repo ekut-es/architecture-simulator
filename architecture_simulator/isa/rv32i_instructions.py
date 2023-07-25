@@ -1,20 +1,26 @@
-# from ctypes import c_int32, c_uint32, c_int8, c_int16, c_uint8, c_uint16
-
-from architecture_simulator.uarch.pipeline import ControlUnitSignals
-from .instruction_types import RTypeInstruction, CSRTypeInstruction, CSRITypeInstruction
-from .instruction_types import ITypeInstruction
-from .instruction_types import ShiftITypeInstruction
-from .instruction_types import MemoryITypeInstruction
-from architecture_simulator.uarch.architectural_state import ArchitecturalState
-from .instruction_types import BTypeInstruction
-from architecture_simulator.isa.instruction_types import STypeInstruction
-from architecture_simulator.isa.instruction_types import UTypeInstruction
-from architecture_simulator.isa.instruction_types import JTypeInstruction
-from architecture_simulator.isa.instruction_types import FenceTypeInstruction
-from architecture_simulator.isa.instruction_types import Instruction
-from typing import Optional, Type
+from __future__ import annotations
+from typing import Optional, Type, TYPE_CHECKING
 from dataclasses import dataclass
 import fixedint
+
+from architecture_simulator.uarch.control_unit_signals import ControlUnitSignals
+from .instruction_types import (
+    Instruction,
+    RTypeInstruction,
+    ITypeInstruction,
+    ShiftITypeInstruction,
+    MemoryITypeInstruction,
+    STypeInstruction,
+    BTypeInstruction,
+    UTypeInstruction,
+    JTypeInstruction,
+    FenceTypeInstruction,
+    CSRTypeInstruction,
+    CSRITypeInstruction,
+)
+
+if TYPE_CHECKING:
+    from architecture_simulator.uarch.architectural_state import ArchitecturalState
 
 
 @dataclass
@@ -754,6 +760,9 @@ class ECALL(ITypeInstruction):
         raise InstructionNotImplemented(mnemonic=self.mnemonic)
         return architectural_state
 
+    def __repr__(self) -> str:
+        return self.mnemonic
+
 
 class EBREAK(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
@@ -763,6 +772,9 @@ class EBREAK(ITypeInstruction):
         """RaiseException(EnvironmentCall)"""
         raise InstructionNotImplemented(mnemonic=self.mnemonic)
         return architectural_state
+
+    def __repr__(self) -> str:
+        return self.mnemonic
 
 
 class SB(STypeInstruction):

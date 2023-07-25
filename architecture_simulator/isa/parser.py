@@ -1,9 +1,14 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 import pyparsing as pp
-from architecture_simulator.isa.instruction_types import Instruction
-from architecture_simulator.isa.rv32i_instructions import instruction_map
-from architecture_simulator.isa import instruction_types as instruction_types
-from architecture_simulator.isa.rv32i_instructions import ECALL, EBREAK, FENCE
 from dataclasses import dataclass
+
+from architecture_simulator.isa.rv32i_instructions import instruction_map
+from architecture_simulator.isa import instruction_types
+from architecture_simulator.isa.rv32i_instructions import ECALL, EBREAK, FENCE
+
+if TYPE_CHECKING:
+    from architecture_simulator.isa.instruction_types import Instruction
 
 # abi register names
 reg_mapping = {

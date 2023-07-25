@@ -1,18 +1,11 @@
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Optional, TYPE_CHECKING
+
 import archsim_js
 from architecture_simulator.isa.parser import ParserException
-from architecture_simulator.uarch.pipeline import InstructionExecutionException
-
-from architecture_simulator.uarch.architectural_state import (
-    RegisterFile,
-    Memory,
-    InstructionMemory,
-)
-from architecture_simulator.isa.instruction_types import Instruction
-from architecture_simulator.isa.rv32i_instructions import ADD
-from architecture_simulator.uarch.architectural_state import ArchitecturalState
 from architecture_simulator.simulation.simulation import Simulation
-import fixedint
-from dataclasses import dataclass
 from architecture_simulator.uarch.pipeline import (
     PipelineRegister,
     InstructionFetchPipelineRegister,
@@ -20,9 +13,13 @@ from architecture_simulator.uarch.pipeline import (
     ExecutePipelineRegister,
     MemoryAccessPipelineRegister,
     RegisterWritebackPipelineRegister,
+    InstructionExecutionException,
 )
 
-simulation = None
+if TYPE_CHECKING:
+    from architecture_simulator.simulation.simulation import Simulation
+
+simulation: Optional[Simulation] = None
 
 
 @dataclass
