@@ -201,12 +201,14 @@ window.addEventListener("DOMContentLoaded", function () {
                 finished_typing,
                 parse_sim_after_not_typing_for_n_ms
             );
-            document
-                .getElementById("button_SingleStage")
-                .classList.add("active");
-            document
-                .getElementById("button_5-Stage")
-                .classList.remove("active");
+            document.getElementById("tabButtonVisualization").style.display =
+                "none";
+            //document
+            //  .getElementById("button_SingleStage")
+            //.classList.add("active");
+            //document
+            //  .getElementById("button_5-Stage")
+            //.classList.remove("active");
         });
 
     document.getElementById("button_5-Stage").addEventListener("click", () => {
@@ -216,10 +218,12 @@ window.addEventListener("DOMContentLoaded", function () {
             finished_typing,
             parse_sim_after_not_typing_for_n_ms
         );
-        document.getElementById("button_5-Stage").classList.add("active");
-        document
-            .getElementById("button_SingleStage")
-            .classList.remove("active");
+        document.getElementById("tabButtonVisualization").style.display =
+            "block";
+        //document.getElementById("button_5-Stage").classList.add("active");
+        //document
+        //  .getElementById("button_SingleStage")
+        //.classList.remove("active");
     });
 
     editor.on("change", function () {
