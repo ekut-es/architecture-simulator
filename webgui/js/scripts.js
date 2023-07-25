@@ -201,8 +201,13 @@ window.addEventListener("DOMContentLoaded", function () {
                 finished_typing,
                 parse_sim_after_not_typing_for_n_ms
             );
-            document.getElementById("tabButtonVisualization").style.display =
+            document.getElementById("button_tab_visualization").style.display =
                 "none";
+            document.getElementById("VisualizationTabContent").style.display =
+                "none";
+            document.getElementById("MainContent").style.display = "block";
+            document.getElementById("button_tab_visualization").textContent =
+                "Visualization";
             //document
             //  .getElementById("button_SingleStage")
             //.classList.add("active");
@@ -218,7 +223,7 @@ window.addEventListener("DOMContentLoaded", function () {
             finished_typing,
             parse_sim_after_not_typing_for_n_ms
         );
-        document.getElementById("tabButtonVisualization").style.display =
+        document.getElementById("button_tab_visualization").style.display =
             "block";
         //document.getElementById("button_5-Stage").classList.add("active");
         //document
@@ -380,4 +385,23 @@ function stop_loading_visuals() {
     enable_control_buttons();
     stop_loading_animation();
     disable_pause();
+}
+
+function toggleVisualizationTabContent() {
+    if (
+        document.getElementById("VisualizationTabContent").style.display ===
+        "none"
+    ) {
+        document.getElementById("VisualizationTabContent").style.display =
+            "block";
+        document.getElementById("MainContent").style.display = "none";
+        document.getElementById("button_tab_visualization").textContent =
+            "Visualization Off";
+    } else {
+        document.getElementById("VisualizationTabContent").style.display =
+            "none";
+        document.getElementById("MainContent").style.display = "block";
+        document.getElementById("button_tab_visualization").textContent =
+            "Visualization";
+    }
 }
