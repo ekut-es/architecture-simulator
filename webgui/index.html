@@ -428,7 +428,9 @@
                                             class="btn-group-toggle align-items-center justify-content-around"
                                             data-toggle="buttons"
                                         >
-                                            <label class="">
+                                            <label
+                                                class="button_switch_representation"
+                                            >
                                                 <input
                                                     type="radio"
                                                     name="mem_representation"
@@ -438,7 +440,9 @@
                                                 />
                                                 binary
                                             </label>
-                                            <label class="">
+                                            <label
+                                                class="button_switch_representation"
+                                            >
                                                 <input
                                                     type="radio"
                                                     name="mem_representation"
@@ -449,7 +453,9 @@
                                                 />
                                                 decimal
                                             </label>
-                                            <label class="">
+                                            <label
+                                                class="button_switch_representation"
+                                            >
                                                 <input
                                                     type="radio"
                                                     name="mem_representation"
@@ -462,40 +468,51 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">
+                                <div class="row border-bottom">
                                     <div class="col-4">
                                         <div
                                             id="modal_header_switch_stage"
                                             class="h5 mt-2"
                                         >
-                                            Stage Mode:
+                                            Pipeline Mode:
                                         </div>
                                     </div>
                                     <div class="col-8 mt-2">
                                         <div
-                                            class="btn-group-toggle align-items-center"
+                                            class="btn-group-toggle align-items-center justify-content-around"
                                             data-toggle="buttons"
                                         >
-                                            <button
-                                                class="btn btn-secondary btn-sm button_switch_stage active"
-                                                id="button_SingleStage"
-                                                title="SingleStage"
+                                            <label
+                                                class="button_switch_representation"
                                             >
+                                                <input
+                                                    type="radio"
+                                                    name="pipeline_mode"
+                                                    id="button_SingleStage"
+                                                    title="single stage"
+                                                    autocomplete="off"
+                                                    checked
+                                                />
                                                 SingleStage
-                                            </button>
-                                            <button
-                                                class="btn btn-secondary btn-sm button_switch_stage"
-                                                id="button_5-Stage"
-                                                title="5-Stage"
+                                            </label>
+                                            <label
+                                                class="button_switch_representation"
                                             >
+                                                <input
+                                                    type="radio"
+                                                    name="pipeline_mode"
+                                                    id="button_5-Stage"
+                                                    title="five stage"
+                                                    autocomplete="off"
+                                                />
                                                 5-Stage
-                                            </button>
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-6"></div>
-                                    <div class="col-6"></div>
+                                    <div class="col-4"></div>
+                                    <div class="col-8"></div>
                                 </div>
                             </div>
                         </div>
