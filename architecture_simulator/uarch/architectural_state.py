@@ -1,7 +1,5 @@
 from dataclasses import dataclass, field
-import fixedint
 
-from ..isa.parser import RiscvParser
 from .performance_metrics import PerformanceMetrics
 from .register_file import RegisterFile
 from .memory import Memory, InstructionMemory, CsrRegisterFile

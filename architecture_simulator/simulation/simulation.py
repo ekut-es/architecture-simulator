@@ -1,6 +1,6 @@
-from ..uarch.architectural_state import ArchitecturalState
-from ..uarch.pipeline import (
-    Pipeline,
+from architecture_simulator.uarch.architectural_state import ArchitecturalState
+from architecture_simulator.uarch.pipeline import Pipeline
+from architecture_simulator.uarch.stages import (
     SingleStage,
     InstructionFetchStage,
     InstructionDecodeStage,

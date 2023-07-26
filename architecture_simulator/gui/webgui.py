@@ -1,23 +1,20 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, TYPE_CHECKING
+from typing import Optional
 
 import archsim_js
 from architecture_simulator.isa.parser import ParserException
 from architecture_simulator.simulation.simulation import Simulation
-from architecture_simulator.uarch.pipeline import (
+from architecture_simulator.uarch.pipeline_registers import (
     PipelineRegister,
     InstructionFetchPipelineRegister,
     InstructionDecodePipelineRegister,
     ExecutePipelineRegister,
     MemoryAccessPipelineRegister,
     RegisterWritebackPipelineRegister,
-    InstructionExecutionException,
 )
-
-if TYPE_CHECKING:
-    from architecture_simulator.simulation.simulation import Simulation
+from architecture_simulator.uarch.pipeline import InstructionExecutionException
 
 simulation: Optional[Simulation] = None
 

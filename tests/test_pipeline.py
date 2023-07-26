@@ -2,8 +2,7 @@ import unittest
 import fixedint
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 from architecture_simulator.uarch.memory import Memory
-from architecture_simulator.uarch.pipeline import (
-    Pipeline,
+from architecture_simulator.uarch.stages import (
     InstructionFetchStage,
     InstructionDecodeStage,
     ExecuteStage,
@@ -11,6 +10,7 @@ from architecture_simulator.uarch.pipeline import (
     RegisterWritebackStage,
     SingleStage,
 )
+from architecture_simulator.uarch.pipeline import Pipeline
 
 
 class TestPipeline(unittest.TestCase):
