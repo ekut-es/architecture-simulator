@@ -10,6 +10,7 @@ from ..uarch.pipeline import (
 )
 from typing import Optional
 
+
 # Does currently support single_stage_pipeline and five_stage_pipeline
 class Simulation:
     """

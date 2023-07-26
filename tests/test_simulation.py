@@ -1,16 +1,14 @@
 import unittest
 import fixedint
 
-from architecture_simulator.uarch.architectural_state import (
-    RegisterFile,
+from architecture_simulator.uarch.register_file import RegisterFile
+from architecture_simulator.uarch.memory import (
     Memory,
-    InstructionMemory,
-    ArchitecturalState,
     MemoryAddressError,
+    InstructionMemory,
 )
-from architecture_simulator.simulation.simulation import (
-    Simulation,
-)
+from architecture_simulator.uarch.architectural_state import ArchitecturalState
+from architecture_simulator.simulation.simulation import Simulation
 from architecture_simulator.isa.rv32i_instructions import ADDI, BNE, BEQ, JAL, LW
 from architecture_simulator.uarch.pipeline import InstructionExecutionException
 

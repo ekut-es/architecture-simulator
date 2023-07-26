@@ -133,7 +133,6 @@ class RTypeInstruction(Instruction):
         )
 
     def control_unit_signals(self) -> ControlUnitSignals:
-
         # jump, alu_op
         return ControlUnitSignals(
             alu_src_1=True,
@@ -203,7 +202,6 @@ class ITypeInstruction(Instruction):
         )
 
     def control_unit_signals(self) -> ControlUnitSignals:
-
         return ControlUnitSignals(
             alu_src_1=True,
             alu_src_2=True,
@@ -314,7 +312,6 @@ class STypeInstruction(Instruction):
             return (None, None)
 
     def control_unit_signals(self) -> ControlUnitSignals:
-
         # jump, alu_op
         return ControlUnitSignals(
             alu_src_1=True,
@@ -362,7 +359,6 @@ class BTypeInstruction(Instruction):
         )
 
     def control_unit_signals(self) -> ControlUnitSignals:
-
         return ControlUnitSignals(
             alu_src_1=True,
             alu_src_2=False,
@@ -417,7 +413,6 @@ class JTypeInstruction(Instruction):
         return f"{self.mnemonic} x{self.rd}, {self.imm}"
 
     def control_unit_signals(self) -> ControlUnitSignals:
-
         return ControlUnitSignals(
             alu_src_1=None,
             alu_src_2=None,
@@ -516,7 +511,6 @@ class EmptyInstruction(Instruction):
         return (None, None)
 
     def control_unit_signals(self) -> ControlUnitSignals:
-
         return ControlUnitSignals()
 
     def get_write_register(self) -> Optional[int]:

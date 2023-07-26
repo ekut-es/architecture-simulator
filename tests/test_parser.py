@@ -1,11 +1,4 @@
 import unittest
-import pyparsing as pp
-from architecture_simulator.simulation.simulation import Simulation
-from architecture_simulator.uarch.architectural_state import (
-    RegisterFile,
-    Memory,
-    InstructionMemory,
-)
 from architecture_simulator.isa.rv32i_instructions import (
     ADD,
     BEQ,
@@ -23,10 +16,10 @@ from architecture_simulator.isa.rv32i_instructions import (
     LW,
 )
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
-
+from architecture_simulator.simulation.simulation import Simulation
+from architecture_simulator.uarch.memory import Memory
 from architecture_simulator.isa.parser import (
     RiscvParser,
-    ParserException,
     ParserLabelException,
     ParserOddImmediateException,
     ParserSyntaxException,

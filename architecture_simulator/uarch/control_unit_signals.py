@@ -1,6 +1,7 @@
 from typing import Optional
 from dataclasses import dataclass
 
+
 #
 # Classes for a 5 Stage Pipeline:
 #
