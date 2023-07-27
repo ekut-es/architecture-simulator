@@ -93,8 +93,41 @@ class SUB(AddressTypeInstruction):
         state.program_counter += 1
 
 
-class NOT(Instruction):
+class OR(AddressTypeInstruction):
     def __init__(self, address: int):
+        super().__init__(mnemonic="OR", opcode=5, address=address)
+
+    def behavior(self, state: ToyArchitecturalState):
+        byte_aligned_address = self.address << 1
+        memory = state.data_memory.load_halfword(address=byte_aligned_address)
+        state.accu = state.accu | memory
+        state.program_counter += 1
+
+
+class AND(AddressTypeInstruction):
+    def __init__(self, address: int):
+        super().__init__(mnemonic="AND", opcode=6, address=address)
+
+    def behavior(self, state: ToyArchitecturalState):
+        byte_aligned_address = self.address << 1
+        memory = state.data_memory.load_halfword(address=byte_aligned_address)
+        state.accu = state.accu & memory
+        state.program_counter += 1
+
+
+class XOR(AddressTypeInstruction):
+    def __init__(self, address: int):
+        super().__init__(mnemonic="XOR", opcode=7, address=address)
+
+    def behavior(self, state: ToyArchitecturalState):
+        byte_aligned_address = self.address << 1
+        memory = state.data_memory.load_halfword(address=byte_aligned_address)
+        state.accu = state.accu ^ memory
+        state.program_counter += 1
+
+
+class NOT(Instruction):
+    def __init__(self):
         super().__init__(mnemonic="NOT", opcode=8)
 
     def behavior(self, state: ToyArchitecturalState):
@@ -103,7 +136,7 @@ class NOT(Instruction):
 
 
 class INC(Instruction):
-    def __init__(self, address: int) -> None:
+    def __init__(self):
         super().__init__(mnemonic="INC", opcode=9)
 
     def behavior(self, state: ToyArchitecturalState):
@@ -111,6 +144,19 @@ class INC(Instruction):
         state.program_counter += 1
 
 
+class DEC(Instruction):
+    def __init__(self):
+        super().__init__(mnemonic="DEC", opcode=10)
+
+
+class ZRO(Instruction):
+    def __init__(self) -> None:
+        super().__init__(mnemonic="ZRO", opcode=11)
+
+    def behavior(self, state: ToyArchitecturalState):
+        state.accu = MutableUInt16(0)
+
+
 class NOP(Instruction):
-    def __init__(self, address: int) -> None:
+    def __init__(self) -> None:
         super().__init__(mnemonic="NOP", opcode=12)
