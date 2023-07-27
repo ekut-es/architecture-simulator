@@ -40,9 +40,8 @@ class STO(AddressTypeInstruction):
     def behavior(self, state: ToyArchitecturalState):
         # NOTE: The Memory class is byte addressed, but the toy architecture uses a halfword addressed memory.
         # Thus, we need to shift the address by one bit
-        byte_aligned_address = self.address << 1
-        state.data_memory.store_halfword(address=byte_aligned_address, value=state.accu)
-        state.program_counter += 1
+        state.store(address=self.address, value=state.accu)
+        state.increment_pc()
 
 
 class LDA(AddressTypeInstruction):
@@ -52,9 +51,8 @@ class LDA(AddressTypeInstruction):
     def behavior(self, state: ToyArchitecturalState):
         # NOTE: The Memory class is byte addressed, but the toy architecture uses a halfword addressed memory.
         # Thus, we need to shift the address by one bit
-        byte_aligned_address = self.address << 1
-        state.accu = state.data_memory.load_halfword(address=byte_aligned_address)
-        state.program_counter += 1
+        state.accu = state.load(address=self.address)
+        state.increment_pc()
 
 
 class BRZ(AddressTypeInstruction):
@@ -63,12 +61,12 @@ class BRZ(AddressTypeInstruction):
 
     def behavior(self, state: ToyArchitecturalState):
         if state.accu:
-            state.program_counter += 1
+            state.increment_pc()
         else:
             # NOTE: sets the pc to self.address without additionally increasing the program counter.
             # If instructions should ever get saved in a unified memory and are thus editable by other instructions,
             # this needs to change or you need to address this during parsing
-            state.program_counter = self.address
+            state.program_counter = MutableUInt16(self.address)
 
 
 class ADD(AddressTypeInstruction):
@@ -76,10 +74,9 @@ class ADD(AddressTypeInstruction):
         super().__init__(mnemonic="ADD", opcode=3, address=address)
 
     def behavior(self, state: ToyArchitecturalState):
-        byte_aligned_address = self.address << 1
-        memory = state.data_memory.load_halfword(address=byte_aligned_address)
+        memory = state.load(address=self.address)
         state.accu = state.accu + memory
-        state.program_counter += 1
+        state.increment_pc()
 
 
 class SUB(AddressTypeInstruction):
@@ -87,10 +84,9 @@ class SUB(AddressTypeInstruction):
         super().__init__(mnemonic="SUB", opcode=4, address=address)
 
     def behavior(self, state: ToyArchitecturalState):
-        byte_aligned_address = self.address << 1
-        memory = state.data_memory.load_halfword(address=byte_aligned_address)
+        memory = state.load(address=self.address)
         state.accu = state.accu - memory
-        state.program_counter += 1
+        state.increment_pc()
 
 
 class OR(AddressTypeInstruction):
@@ -98,10 +94,9 @@ class OR(AddressTypeInstruction):
         super().__init__(mnemonic="OR", opcode=5, address=address)
 
     def behavior(self, state: ToyArchitecturalState):
-        byte_aligned_address = self.address << 1
-        memory = state.data_memory.load_halfword(address=byte_aligned_address)
+        memory = state.load(address=self.address)
         state.accu = state.accu | memory
-        state.program_counter += 1
+        state.increment_pc()
 
 
 class AND(AddressTypeInstruction):
@@ -109,10 +104,9 @@ class AND(AddressTypeInstruction):
         super().__init__(mnemonic="AND", opcode=6, address=address)
 
     def behavior(self, state: ToyArchitecturalState):
-        byte_aligned_address = self.address << 1
-        memory = state.data_memory.load_halfword(address=byte_aligned_address)
+        memory = state.load(address=self.address)
         state.accu = state.accu & memory
-        state.program_counter += 1
+        state.increment_pc()
 
 
 class XOR(AddressTypeInstruction):
@@ -120,10 +114,9 @@ class XOR(AddressTypeInstruction):
         super().__init__(mnemonic="XOR", opcode=7, address=address)
 
     def behavior(self, state: ToyArchitecturalState):
-        byte_aligned_address = self.address << 1
-        memory = state.data_memory.load_halfword(address=byte_aligned_address)
+        memory = state.load(address=self.address)
         state.accu = state.accu ^ memory
-        state.program_counter += 1
+        state.increment_pc()
 
 
 class NOT(Instruction):
@@ -132,7 +125,7 @@ class NOT(Instruction):
 
     def behavior(self, state: ToyArchitecturalState):
         state.accu = ~state.accu
-        state.program_counter += 1
+        state.increment_pc()
 
 
 class INC(Instruction):
@@ -141,7 +134,7 @@ class INC(Instruction):
 
     def behavior(self, state: ToyArchitecturalState):
         state.accu += MutableUInt16(1)
-        state.program_counter += 1
+        state.increment_pc()
 
 
 class DEC(Instruction):
