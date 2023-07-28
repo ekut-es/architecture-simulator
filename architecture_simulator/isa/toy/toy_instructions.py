@@ -141,6 +141,10 @@ class DEC(Instruction):
     def __init__(self):
         super().__init__(mnemonic="DEC", opcode=10)
 
+    def behavior(self, state: ToyArchitecturalState):
+        state.accu -= MutableUInt16(1)
+        state.increment_pc()
+
 
 class ZRO(Instruction):
     def __init__(self) -> None:
@@ -148,8 +152,12 @@ class ZRO(Instruction):
 
     def behavior(self, state: ToyArchitecturalState):
         state.accu = MutableUInt16(0)
+        state.increment_pc()
 
 
 class NOP(Instruction):
     def __init__(self) -> None:
         super().__init__(mnemonic="NOP", opcode=12)
+
+    def behavior(self, state: ToyArchitecturalState):
+        state.increment_pc()
