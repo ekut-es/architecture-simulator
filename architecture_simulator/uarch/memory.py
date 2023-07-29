@@ -1,6 +1,11 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from dataclasses import dataclass, field
 import fixedint
 from architecture_simulator.isa.parser import RiscvParser
+
+if TYPE_CHECKING:
+    from architecture_simulator.isa.instruction_types import Instruction
 
 
 @dataclass
@@ -267,12 +272,12 @@ class CSRError(ValueError):
 
 @dataclass
 class InstructionMemory:
-    instructions: dict = field(default_factory=dict)
+    instructions: dict[int, Instruction] = field(default_factory=dict)
 
     # max address (exclusive)
     max_bytes: int = 2**14
 
-    def save_instruction(self, address: int, instr):
+    def save_instruction(self, address: int, instr: Instruction):
         if address < 0:
             raise MemoryAddressError(
                 address=address,
@@ -290,7 +295,7 @@ class InstructionMemory:
         else:
             self.instructions[address] = instr
 
-    def load_instruction(self, address):
+    def load_instruction(self, address) -> Instruction:
         return self.instructions[address]
 
     def append_instructions(self, program: str):
