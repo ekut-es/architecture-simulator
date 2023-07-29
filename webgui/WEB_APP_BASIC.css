@@ -104,7 +104,8 @@ html,
 body {
     margin: 0;
     padding: 0;
-    height: 100vh;
+    height: calc(100vh-20px);
+    overflow: hidden;
 }
 
 body header {
@@ -123,6 +124,7 @@ body nav {
 
 body main {
     background-color: var(--app_main_bg_color);
+    height: calc(100vh - 20px);
 }
 
 body footer {
@@ -157,16 +159,24 @@ body footer {
 }
 
 .button_switch_representation {
-    /*background-color: #5647875d;*/
+    /*background-color: #5747875d;*/
 }
 
 body main #gui_base_div_id {
+}
+
+body main #vis_input {
+    width: 100%;
 }
 
 body main #input {
     line-height: 1.5em;
     padding: 0;
     border: 0;
+}
+
+body main #visualization_pipeline {
+    max-height: 86vh;
 }
 
 body main #gui_cmd_div_id {
@@ -190,6 +200,33 @@ body main #gui_cmd_table_id th {
 }
 
 body main #gui_cmd_table_id td {
+    text-align: left;
+
+    font-family: monospace;
+}
+
+body main #vis_gui_cmd_div_id {
+    height: 57vh;
+    overflow-y: scroll;
+    width: 98%;
+}
+
+body main #vis_gui_cmd_table_id {
+    font-family: monospace;
+
+    text-align: right;
+}
+
+body main #vis_gui_cmd_table_id th {
+    position: sticky;
+    top: 0;
+
+    text-align: center;
+
+    font-family: monospace;
+}
+
+body main #vis_gui_cmd_table_id td {
     text-align: left;
 
     font-family: monospace;
@@ -229,6 +266,41 @@ body main #gui_memory_table_id option:disabled {
     color: #f78181;
 }
 
+body main #vis_gui_memory_div_id {
+    height: 57vh;
+    overflow-y: scroll;
+    width: 98%;
+}
+
+body main #vis_gui_memory_table_id {
+    font-family: monospace;
+
+    text-align: right;
+}
+
+body main #vis_gui_memory_table_id th {
+    position: sticky;
+
+    top: 0;
+
+    text-align: center;
+
+    font-family: monospace;
+}
+
+body main #vis_gui_memory_table_id td {
+    text-align: right;
+
+    font-family: monospace;
+}
+
+body main #vis_gui_memory_table_id select {
+}
+
+body main #vis_gui_memory_table_id option:disabled {
+    color: #f78181;
+}
+
 body main #gui_registers_div_id {
     max-height: 88vh;
     overflow-y: scroll;
@@ -262,13 +334,61 @@ body main #gui_registers_table_id select {
 body main #gui_registers_table_id option:disabled {
     color: #f78181;
 }
+body main #vis_gui_registers_div_id {
+    height: 57vh;
+    overflow-y: scroll;
+    width: 98%;
+}
+
+body main #vis_gui_registers_table_id {
+    font-family: monospace;
+
+    text-align: right;
+}
+
+body main #vis_gui_registers_table_id th {
+    position: sticky;
+
+    top: 0;
+
+    text-align: center;
+
+    font-family: monospace;
+}
+
+body main #vis_gui_registers_table_id td {
+    text-align: right;
+
+    font-family: monospace;
+}
+
+body main #vis_gui_registers_table_id select {
+}
+
+body main #vis_gui_registers_table_id option:disabled {
+    color: #f78181;
+}
 
 body main #output {
     overflow: scroll;
+    height: 43vh;
+}
+
+body main #vis_output {
+    overflow: scroll;
+    height: 11.25vh;
+    width: 100%;
 }
 
 body main #performance_metrics {
-    overflow: hidden;
+    overflow: scroll;
+    height: 43vh;
+}
+
+body main #vis_performance_metrics {
+    overflow: scroll;
+    height: 11.25vh;
+    width: 100%;
 }
 
 .CodeMirror {

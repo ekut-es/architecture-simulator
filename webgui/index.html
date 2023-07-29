@@ -74,7 +74,7 @@
                                 </div>
                             </div>
                             <div class="col-auto ms-auto">
-                                <div class="header-icons">
+                                <div class="help-icon">
                                     <img
                                         id="webapp_header_help_image_id"
                                         src="svg/WEB_APP_BASIC_Help.svg"
@@ -93,7 +93,7 @@
                 <nav id="webapp_nav_id" class="no-margin-bottom bg-light">
                     <div class="container-fluid p-0 m-0">
                         <div
-                            class="container-fluid row align-items-center justify-content-between p-0 m-0"
+                            class="container-fluid row align-items-center justify-content-between p-0 m-0 pl-2"
                         >
                             <div class="col-auto mt-1 mb-1">
                                 <button
@@ -183,7 +183,7 @@
                     <div
                         class="flex-grow container-fluid bg-transparent overflow-hidden m-0 p-0"
                     >
-                        <div id="MainContent">
+                        <div id="MainContent" class="tabcontent">
                             <div
                                 id="gui_base_div_id"
                                 class="table-responsive justify-content-around overflow-hidden mx-1 px-1"
@@ -192,7 +192,9 @@
                                     <div class="col-md-3 col-12 mr-0 pr-0">
                                         <div class="editor my-2 mx-0 px-0">
                                             <div class="row">
-                                                <div class="col-sm-11 p-0 m-0">
+                                                <div
+                                                    class="codemirror col-sm-11 p-0 m-0"
+                                                >
                                                     <textarea
                                                         id="input"
                                                         rows="20"
@@ -322,7 +324,6 @@
                                                 <textarea
                                                     id="performance_metrics"
                                                     class="form-control"
-                                                    rows="8"
                                                     disabled
                                                 ></textarea>
                                             </div>
@@ -332,7 +333,6 @@
                                                 <textarea
                                                     id="output"
                                                     class="form-control"
-                                                    rows="12"
                                                     disabled
                                                 ></textarea>
                                             </div>
@@ -343,8 +343,218 @@
                         </div>
                         <div
                             id="VisualizationTabContent"
+                            class="tabcontent"
                             style="display: none"
-                        ></div>
+                        >
+                            <div
+                                class="container-fluid table-responsive justify-content-around align-items-center overflow-hidden mx-2 px-1"
+                            >
+                                <div class="row">
+                                    <div class="col-3 pr-0">
+                                        <div class="row">
+                                            <div
+                                                class="col-12 container-fluid row align-items-center justify-content-center my-2"
+                                            >
+                                                <div
+                                                    class="btn-group d-flex w-100"
+                                                >
+                                                    <button
+                                                        id="button_tab_input"
+                                                        class="btn btn-sm btn-outline-secondary flex-fill active"
+                                                        onclick="toggleInputTab()"
+                                                    >
+                                                        Code Input
+                                                    </button>
+                                                    <button
+                                                        id="button_tab_cmd"
+                                                        class="btn btn-sm btn-outline-secondary flex-fill"
+                                                        onclick="toggleCmdTab()"
+                                                    >
+                                                        Commands
+                                                    </button>
+                                                    <button
+                                                        id="button_tab_reg"
+                                                        class="btn btn-sm btn-outline-secondary flex-fill"
+                                                        onclick="toggleRegisterTab()"
+                                                    >
+                                                        Registers
+                                                    </button>
+                                                    <button
+                                                        id="button_tab_mem"
+                                                        class="btn btn-sm btn-outline-secondary flex-fill"
+                                                        onclick="toggleMemoryTab()"
+                                                    >
+                                                        Memory
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="col-12 col-auto row align-items-center justify-content-around p-0 m-0"
+                                        >
+                                            <div id="InputTab">
+                                                <div
+                                                    class="codemirror col-sm-11 p-0 m-0 my-2"
+                                                >
+                                                    <textarea
+                                                        id="vis_input"
+                                                        rows="30"
+                                                    ></textarea>
+                                                    <script>
+                                                        // initialize codemirror textarea
+                                                        const editor_vis =
+                                                            CodeMirror.fromTextArea(
+                                                                document.getElementById(
+                                                                    "vis_input"
+                                                                ),
+                                                                {
+                                                                    lineNumbers: true,
+                                                                    styleActiveLine: true,
+                                                                    mode: "markdown",
+                                                                }
+                                                            );
+                                                        editor_vis.setSize(
+                                                            null,
+                                                            "57vh"
+                                                        );
+                                                    </script>
+                                                </div>
+                                            </div>
+                                            <div
+                                                id="CmdTab"
+                                                style="display: none"
+                                            >
+                                                <div
+                                                    id="vis_gui_cmd_div_id"
+                                                    class="table-responsive my-2"
+                                                >
+                                                    <table
+                                                        id="vis_gui_cmd_table_id"
+                                                        class="table table-hover table-bordered"
+                                                    >
+                                                        <thead>
+                                                            <tr>
+                                                                <th
+                                                                    title="address"
+                                                                >
+                                                                    Address
+                                                                </th>
+                                                                <th
+                                                                    title="command"
+                                                                >
+                                                                    Command
+                                                                </th>
+                                                                <th
+                                                                    title="stage"
+                                                                >
+                                                                    Stage
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody
+                                                            id="vis_gui_cmd_table_body_id"
+                                                        ></tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div
+                                                id="RegisterTab"
+                                                style="display: none"
+                                            >
+                                                <div
+                                                    id="vis_gui_registers_div_id"
+                                                    class="table-responsive my-2"
+                                                >
+                                                    <table
+                                                        id="vis_gui_registers_table_id"
+                                                        class="table table-hover table-bordered"
+                                                    >
+                                                        <thead>
+                                                            <tr>
+                                                                <th
+                                                                    colspan="2"
+                                                                    title="abi_name"
+                                                                >
+                                                                    Register
+                                                                </th>
+                                                                <th
+                                                                    title="register value"
+                                                                >
+                                                                    Value
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody
+                                                            id="vis_gui_registers_table_body_id"
+                                                        ></tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div
+                                                id="MemoryTab"
+                                                style="display: none"
+                                            >
+                                                <div
+                                                    id="vis_gui_memory_div_id"
+                                                    class="table-responsive my-2"
+                                                >
+                                                    <table
+                                                        id="vis_gui_memory_table_id"
+                                                        class="table table-hover table-bordered"
+                                                    >
+                                                        <thead>
+                                                            <tr>
+                                                                <th
+                                                                    title="memory address"
+                                                                >
+                                                                    Address
+                                                                </th>
+                                                                <th
+                                                                    title="memory value"
+                                                                >
+                                                                    Value
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody
+                                                            id="vis_gui_memory_table_body_id"
+                                                        ></tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row pl-1">
+                                            <div class="overflow-hidden my-2">
+                                                <textarea
+                                                    id="vis_performance_metrics"
+                                                    class="form-control"
+                                                    disabled
+                                                ></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="row pl-1">
+                                            <div class="overflow-hidden my-2">
+                                                <textarea
+                                                    id="vis_output"
+                                                    class="form-control"
+                                                    disabled
+                                                ></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="row p-2 m-1">
+                                            <!--VISUALIZATION SVG-->
+                                            <img
+                                                id="visualization_pipeline"
+                                                class="img-fluid p-0 m-0"
+                                                src="svg/pipeline.svg"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </main>
             </div>
@@ -367,13 +577,6 @@
                             >
                                 Settings
                             </h5>
-                            <button
-                                type="button"
-                                class="close btn btn-sm btn-outline-secondary"
-                                data-bs-dismiss="modal"
-                            >
-                                <span aria-hidden="true">&times;</span>
-                            </button>
                         </div>
                         <div class="modal-body">
                             <div class="rows">
@@ -537,7 +740,14 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="modal-footer"></div>
+                        <div class="modal-footer">
+                            <button
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal"
+                            >
+                                ok
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

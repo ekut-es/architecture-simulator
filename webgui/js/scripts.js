@@ -24,6 +24,7 @@ window.addEventListener("DOMContentLoaded", function () {
             editor.save();
             finished_typing();
             document.getElementById("input").disabled = true;
+            document.getElementById("vis_input").disabled = true;
             if (run) {
                 stop_loading_animation();
                 clearInterval(run);
@@ -45,6 +46,7 @@ window.addEventListener("DOMContentLoaded", function () {
         .getElementById("button_simulation_pause_id")
         .addEventListener("click", () => {
             document.getElementById("input").disabled = true;
+            document.getElementById("vis_input").disabled = true;
             clearInterval(run);
             stop_timer();
             update_performance_metrics();
@@ -61,7 +63,7 @@ window.addEventListener("DOMContentLoaded", function () {
             editor.save();
             finished_typing();
             document.getElementById("input").disabled = true;
-            document.getElementById("input").disabled = true;
+            document.getElementById("vis_input").disabled = true;
             resume_timer();
             evaluatePython_step_sim();
             stop_timer();
@@ -76,8 +78,10 @@ window.addEventListener("DOMContentLoaded", function () {
         .getElementById("button_simulation_refresh_id")
         .addEventListener("click", () => {
             document.getElementById("input").disabled = true;
+            document.getElementById("vis_input").disabled = true;
             clearInterval(run);
             evaluatePython_reset_sim(pipeline_mode);
+            document.getElementById("input").disabled = false;
             document.getElementById("input").disabled = false;
             enable_run();
             disable_pause();
@@ -232,7 +236,19 @@ window.addEventListener("DOMContentLoaded", function () {
     });
 
     editor.on("change", function () {
+        synchronizeEditors(editor, editor_vis);
         editor.save();
+        // autoparse
+        clearTimeout(input_timer);
+        input_timer = setTimeout(
+            finished_typing,
+            parse_sim_after_not_typing_for_n_ms
+        );
+    });
+
+    editor_vis.on("change", function () {
+        synchronizeEditors(editor_vis, editor);
+        editor_vis.save();
         // autoparse
         clearTimeout(input_timer);
         input_timer = setTimeout(
@@ -392,16 +408,84 @@ function toggleVisualizationTabContent() {
         document.getElementById("VisualizationTabContent").style.display ===
         "none"
     ) {
+        synchronizeEditors(editor, editor_vis);
+        editor.closeHint();
         document.getElementById("VisualizationTabContent").style.display =
             "block";
         document.getElementById("MainContent").style.display = "none";
         document.getElementById("button_tab_visualization").textContent =
             "Visualization Off";
     } else {
+        synchronizeEditors(editor_vis, editor);
+        editor_vis.closeHint();
         document.getElementById("VisualizationTabContent").style.display =
             "none";
         document.getElementById("MainContent").style.display = "block";
         document.getElementById("button_tab_visualization").textContent =
             "Visualization";
+    }
+}
+
+function toggleInputTab() {
+    if (document.getElementById("InputTab").style.display === "none") {
+        document.getElementById("InputTab").style.display = "block";
+        document.getElementById("CmdTab").style.display = "none";
+        document.getElementById("RegisterTab").style.display = "none";
+        document.getElementById("MemoryTab").style.display = "none";
+
+        document.getElementById("button_tab_input").classList.add("active");
+        document.getElementById("button_tab_cmd").classList.remove("active");
+        document.getElementById("button_tab_reg").classList.remove("active");
+        document.getElementById("button_tab_mem").classList.remove("active");
+    }
+}
+
+function toggleCmdTab() {
+    if (document.getElementById("CmdTab").style.display === "none") {
+        document.getElementById("CmdTab").style.display = "block";
+        document.getElementById("InputTab").style.display = "none";
+        document.getElementById("RegisterTab").style.display = "none";
+        document.getElementById("MemoryTab").style.display = "none";
+
+        document.getElementById("button_tab_cmd").classList.add("active");
+        document.getElementById("button_tab_input").classList.remove("active");
+        document.getElementById("button_tab_reg").classList.remove("active");
+        document.getElementById("button_tab_mem").classList.remove("active");
+    }
+}
+
+function toggleRegisterTab() {
+    if (document.getElementById("RegisterTab").style.display === "none") {
+        document.getElementById("RegisterTab").style.display = "block";
+        document.getElementById("InputTab").style.display = "none";
+        document.getElementById("CmdTab").style.display = "none";
+        document.getElementById("MemoryTab").style.display = "none";
+
+        document.getElementById("button_tab_reg").classList.add("active");
+        document.getElementById("button_tab_input").classList.remove("active");
+        document.getElementById("button_tab_cmd").classList.remove("active");
+        document.getElementById("button_tab_mem").classList.remove("active");
+    }
+}
+
+function toggleMemoryTab() {
+    if (document.getElementById("MemoryTab").style.display === "none") {
+        document.getElementById("MemoryTab").style.display = "block";
+        document.getElementById("CmdTab").style.display = "none";
+        document.getElementById("RegisterTab").style.display = "none";
+        document.getElementById("InputTab").style.display = "none";
+
+        document.getElementById("button_tab_mem").classList.add("active");
+        document.getElementById("button_tab_input").classList.remove("active");
+        document.getElementById("button_tab_reg").classList.remove("active");
+        document.getElementById("button_tab_cmd").classList.remove("active");
+    }
+}
+
+function synchronizeEditors(sEditor, tEditor) {
+    const content = sEditor.getValue();
+    if (content !== tEditor.getValue()) {
+        tEditor.setValue(content);
+        //sEditor.setValue("");
     }
 }

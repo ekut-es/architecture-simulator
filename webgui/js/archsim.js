@@ -1,13 +1,25 @@
 const output = document.getElementById("output");
+const output_vis = document.getElementById("vis_output");
 const registers = document.getElementById("gui_registers_table_body_id");
+const registers_vis = document.getElementById(
+    "vis_gui_registers_table_body_id"
+);
 const memory = document.getElementById("gui_memory_table_body_id");
+const memory_vis = document.getElementById("vis_gui_memory_table_body_id");
 const instructions = document.getElementById("gui_cmd_table_body_id");
+const instructions_vis = document.getElementById("vis_gui_cmd_table_body_id");
 const input = document.getElementById("input");
+const input_vis = document.getElementById("vis_input");
 const performance_metrics = document.getElementById("performance_metrics");
+const performance_metrics_vis = document.getElementById(
+    "vis_performance_metrics"
+);
 
 function addToOutput(s) {
     output.value += ">>>" + input.value + "\n" + s + "\n";
     output.scrollTop = output.scrollHeight;
+    output_vis.value += ">>>" + input.value + "\n" + s + "\n";
+    output_vis.scrollTop = output_vis.scrollHeight;
 }
 
 // Object containing functions to be exported to python
@@ -26,6 +38,21 @@ const archsim_js = {
         tr.appendChild(td1);
         tr.appendChild(td2);
         registers.appendChild(tr);
+
+        tr_vis = document.createElement("tr");
+        td1_vis = document.createElement("td");
+        td1_vis.innerText = "x" + reg;
+        td2_vis = document.createElement("td");
+        td2_vis.innerText =
+            Array.from(representations)[reg_representation_mode];
+        td2_vis.id = "val_x" + reg;
+        td3_vis = document.createElement("td");
+        td3_vis.innerText = abi_name;
+        td3_vis.id = abi_name;
+        tr_vis.appendChild(td3_vis);
+        tr_vis.appendChild(td1_vis);
+        tr_vis.appendChild(td2_vis);
+        registers_vis.appendChild(tr_vis);
     },
     // update_single_register: function(reg, val) {
     //     document.getElementById("val_x"+reg).innerText = val
@@ -41,6 +68,18 @@ const archsim_js = {
         tr.appendChild(td1);
         tr.appendChild(td2);
         memory.appendChild(tr);
+
+        tr_vis = document.createElement("tr");
+        td1_vis = document.createElement("td");
+        td1.innerText = address;
+        td2_vis = document.createElement("td");
+        //alert(Array.from(representations))
+        td2_vis.innerText =
+            Array.from(representations)[mem_representation_mode];
+        td2_vis.id = "memory" + address;
+        tr_vis.appendChild(td1_vis);
+        tr_vis.appendChild(td2_vis);
+        memory_vis.appendChild(tr_vis);
     },
     // update_single_memory_address: function(address, val) {
     //     try{
@@ -99,26 +138,67 @@ const archsim_js = {
         tr.appendChild(td2);
         tr.appendChild(td3);
         instructions.appendChild(tr);
+
+        tr_vis = document.createElement("tr");
+        tr_vis.id = address;
+        td1_vis = document.createElement("td");
+        td1_vis.innerText = address;
+        td2_vis = document.createElement("td");
+        td2_vis.innerText = val;
+        td2_vis.id = "instr" + address;
+        td3_vis = document.createElement("td");
+        td3_vis.innerText = stage;
+        if (stage == "IF") {
+            td1_vis.style.backgroundColor = "red";
+            td2_vis.style.backgroundColor = "red";
+            td3_vis.style.backgroundColor = "red";
+        } else if (stage == "ID") {
+            td1_vis.style.backgroundColor = "yellow";
+            td2_vis.style.backgroundColor = "yellow";
+            td3_vis.style.backgroundColor = "yellow";
+        } else if (stage == "EX") {
+            td1_vis.style.backgroundColor = "green";
+            td2_vis.style.backgroundColor = "green";
+            td3_vis.style.backgroundColor = "green";
+        } else if (stage == "MA") {
+            td1_vis.style.backgroundColor = "aqua";
+            td2_vis.style.backgroundColor = "aqua";
+            td3_vis.style.backgroundColor = "aqua";
+        } else if (stage == "WB") {
+            td1_vis.style.backgroundColor = "blue";
+            td2_vis.style.backgroundColor = "blue";
+            td3_vis.style.backgroundColor = "blue";
+        }
+        tr_vis.appendChild(td1_vis);
+        tr_vis.appendChild(td2_vis);
+        tr_vis.appendChild(td3_vis);
+        instructions_vis.appendChild(tr_vis);
     },
     clear_memory_table: function () {
         this.clear_a_table(memory);
+        this.clear_a_table(memory_vis);
     },
     clear_register_table: function () {
         this.clear_a_table(registers);
+        this.clear_a_table(registers_vis);
     },
     clear_instruction_table: function () {
         this.clear_a_table(instructions);
+        this.clear_a_table(instructions_vis);
     },
     clear_a_table: function (table) {
         table.innerHTML = "";
     },
     set_output: function (str) {
         output.value = str;
+        output_vis.value = str;
     },
     highlight: function (position, str) {
         //editor.removeLineClass(position-1, "background", "highlight")
         editor.addLineClass(position - 1, "background", "highlight");
         editor.refresh();
+        editor_vis.addLineClass(position - 1, "background", "highlight");
+        editor_vis.refresh();
         str.toString = function () {
             return this.str;
         };
@@ -142,20 +222,36 @@ const archsim_js = {
                 },
             },
         };
-        editor.showHint(error_description);
+
+        if (
+            document.getElementById("VisualizationTabContent").style.display ==
+            "block"
+        )
+            editor_vis.showHint(error_description);
+        else {
+            editor.showHint(error_description);
+        }
     },
     remove_all_highlights: function () {
         for (let i = 0; i < editor.lineCount(); i++) {
             editor.removeLineClass(i, "background", "highlight");
+            editor_vis.removeLineClass(i, "background", "highlight");
         }
         editor.refresh();
+        editor_vis.refresh();
         editor.closeHint();
+        editor_vis.closeHint();
     },
     highlight_cmd_table: function (position) {
         table = document.getElementById("gui_cmd_table_id");
         table.rows[position + 1].cells[0].style.backgroundColor = "yellow";
         table.rows[position + 1].cells[1].style.backgroundColor = "yellow";
         console.log(table.innerHTML);
+
+        table2 = document.getElementById("vis_gui_cmd_table_id");
+        table2.rows[position + 1].cells[0].style.backgroundColor = "yellow";
+        table2.rows[position + 1].cells[1].style.backgroundColor = "yellow";
+        console.log(table2.innerHTML);
     },
     update_IF_Stage: function (instruction, address_of_instruction) {},
     update_ID_Stage: function (
@@ -196,8 +292,11 @@ const archsim_js = {
 };
 
 output.value = "Output \n\nInitializing... ";
+output_vis.value = "Output \n\nInitializing... ";
+
 input.value = "add x1, x2, x3 \nlui x1, 1";
 performance_metrics.value = "Performance Metrics";
+performance_metrics_vis.value = "Performance Metrics";
 // init Pyodide
 async function main() {
     start_loading_visuals();
@@ -231,6 +330,8 @@ sim_init()
     `);
     output.value += "Ready!\n";
     performance_metrics.value += "...";
+    output_vis.value += "Ready!\n";
+    performance_metrics_vis.value += "...";
     stop_loading_visuals();
     return pyodide;
 }
@@ -253,6 +354,7 @@ async function evaluatePython_step_sim() {
         update_performance_metrics();
     } catch (err) {
         output.value = err;
+        output_vis.value = err;
         stop_loading_animation();
         disable_pause();
         disable_step();
@@ -278,6 +380,7 @@ async function update_performance_metrics() {
     get_performance_metrics = pyodide.globals.get("get_performance_metrics");
     //output.value = get_performance_metrics();
     performance_metrics.value = get_performance_metrics();
+    performance_metrics_vis.value = get_performance_metrics();
 }
 
 // async function evaluatePython_run_sim() {
@@ -307,7 +410,9 @@ async function evaluatePython_reset_sim(pipeline_mode) {
         reset_sim = pyodide.globals.get("reset_sim");
         reset_sim(pipeline_mode);
         output.value = "";
+        output_vis.value = "";
         performance_metrics.value = "";
+        performance_metrics_vis.value = "";
     } catch (err) {
         addToOutput(err);
     }
