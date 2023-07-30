@@ -166,7 +166,7 @@ body main #gui_base_div_id {
 }
 
 body main #vis_input {
-    width: 100%;
+    width: 100vh;
 }
 
 body main #input {
@@ -208,7 +208,7 @@ body main #gui_cmd_table_id td {
 body main #vis_gui_cmd_div_id {
     height: 57vh;
     overflow-y: scroll;
-    width: 98%;
+    width: 100%;
 }
 
 body main #vis_gui_cmd_table_id {
@@ -269,7 +269,7 @@ body main #gui_memory_table_id option:disabled {
 body main #vis_gui_memory_div_id {
     height: 57vh;
     overflow-y: scroll;
-    width: 98%;
+    width: 100%;
 }
 
 body main #vis_gui_memory_table_id {
@@ -337,7 +337,7 @@ body main #gui_registers_table_id option:disabled {
 body main #vis_gui_registers_div_id {
     height: 57vh;
     overflow-y: scroll;
-    width: 98%;
+    width: 100%;
 }
 
 body main #vis_gui_registers_table_id {
@@ -414,4 +414,9 @@ body main #vis_performance_metrics {
 
 .modal-body {
     background-color: var(--app_main_bg_color);
+}
+
+.button-group {
+    width: 100vh;
+    padding-right: 0;
 }
