@@ -54,7 +54,7 @@
         <script type="text/javascript" src="js/scripts.js"></script>
     </head>
     <body id="webapp_body_id">
-        <div class="container-fluid p-0 m-0">
+        <div class="container-fluid p-0 m-0 d-flex flex-column h-100 w-100">
             <!-- ************  Tool Title  ****************************************************-->
             <div class="container-fluid p-0 m-0">
                 <header
@@ -73,8 +73,8 @@
                                     RISC-V Simulator
                                 </div>
                             </div>
-                            <div class="col-auto">
-                                <div class="header-icons">
+                            <div class="col-auto ms-auto">
+                                <div class="help-icon">
                                     <img
                                         id="webapp_header_help_image_id"
                                         src="svg/WEB_APP_BASIC_Help.svg"
@@ -91,9 +91,9 @@
 
             <div class="container-fluid p-0 m-0">
                 <nav id="webapp_nav_id" class="no-margin-bottom bg-light">
-                    <div class="container-fluid">
+                    <div class="container-fluid p-0 m-0">
                         <div
-                            class="row align-items-center justify-content-between"
+                            class="container-fluid row align-items-center justify-content-between p-0 m-0 pl-2"
                         >
                             <div class="col-auto mt-1 mb-1">
                                 <button
@@ -151,58 +151,28 @@
                                     style="visibility: hidden"
                                 />
                             </div>
-
-                            <div class="col-auto">
-                                <div
-                                    class="btn-group-toggle mt-1 mb-1"
-                                    data-toggle="buttons"
-                                >
+                            <div class="col-auto ms-auto mt-1 mb-1">
+                                <div class="d-flex">
                                     <button
-                                        class="btn btn-secondary btn-sm button_switch_representation"
-                                        id="button_binary_representation_id"
-                                        title="show binary representation"
+                                        id="button_tab_visualization"
+                                        class="btn btn-sm btn-secondary me-2"
+                                        onclick="toggleVisualizationTabContent()"
+                                        style="display: none"
+                                    >
+                                        Visualization
+                                    </button>
+                                    <button
+                                        class="btn btn-sm button_settings"
+                                        id="button_settings"
+                                        title="settings"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#settingsModal"
                                     >
                                         <img
-                                            src="svg/binary_representation.svg"
-                                            width="25px"
+                                            src="svg/settings.svg"
                                             height="25px"
-                                        />
-                                    </button>
-                                    <button
-                                        class="btn btn-secondary btn-sm button_switch_representation active"
-                                        id="button_decimal_representation_id"
-                                        title="show decimal representation"
-                                    >
-                                        <img
-                                            src="svg/decimal_representation.svg"
                                             width="25px"
-                                            height="25px"
                                         />
-                                    </button>
-                                    <button
-                                        class="btn btn-secondary btn-sm button_switch_representation"
-                                        id="button_hexa_representation_id"
-                                        title="show hexadecimal representation"
-                                    >
-                                        <img
-                                            src="svg/hexadecimal_representation.svg"
-                                            width="25px"
-                                            height="25px"
-                                        />
-                                    </button>
-                                    <button
-                                        class="btn btn-secondary btn-sm button_switch_stage active"
-                                        id="button_SingleStage"
-                                        title="SingleStage"
-                                    >
-                                        SingleStage
-                                    </button>
-                                    <button
-                                        class="btn btn-secondary btn-sm button_switch_stage"
-                                        id="button_5-Stage"
-                                        title="5-Stage"
-                                    >
-                                        5-Stage
                                     </button>
                                 </div>
                             </div>
@@ -210,144 +180,377 @@
                     </div>
                 </nav>
                 <main id="webapp_main_id">
-                    <div class="full-screen container-fluid bg-transparent">
-                        <div
-                            id="gui_base_div_id"
-                            class="table-responsive justify-content-around"
-                        >
-                            <div class="row">
-                                <div class="col-md-3 col-12">
-                                    <div
-                                        class="editor my-2"
-                                        style="max-height: 50%"
-                                    >
-                                        <div class="row">
-                                            <div class="col-sm-11">
-                                                <textarea
-                                                    id="input"
-                                                    rows="20"
-                                                ></textarea>
-                                                <script>
-                                                    // initialize codemirror textarea
-                                                    const editor =
-                                                        CodeMirror.fromTextArea(
-                                                            document.getElementById(
-                                                                "input"
-                                                            ),
-                                                            {
-                                                                lineNumbers: true,
-                                                                styleActiveLine: true,
-                                                                mode: "markdown",
-                                                            }
+                    <div
+                        class="flex-grow container-fluid bg-transparent overflow-hidden m-0 p-0"
+                    >
+                        <div id="MainContent" class="tabcontent">
+                            <div
+                                id="gui_base_div_id"
+                                class="table-responsive justify-content-around overflow-hidden mx-1 px-1"
+                            >
+                                <div class="row">
+                                    <div class="col-md-3 col-12 mr-0 pr-0">
+                                        <div class="editor my-2 mx-0 px-0">
+                                            <div class="row">
+                                                <div
+                                                    class="codemirror col-sm-11 p-0 m-0"
+                                                >
+                                                    <textarea
+                                                        id="input"
+                                                        rows="20"
+                                                    ></textarea>
+                                                    <script>
+                                                        // initialize codemirror textarea
+                                                        const editor =
+                                                            CodeMirror.fromTextArea(
+                                                                document.getElementById(
+                                                                    "input"
+                                                                ),
+                                                                {
+                                                                    lineNumbers: true,
+                                                                    styleActiveLine: true,
+                                                                    mode: "markdown",
+                                                                }
+                                                            );
+                                                        editor.setSize(
+                                                            null,
+                                                            "88vh"
                                                         );
-                                                    editor.setSize(
-                                                        null,
-                                                        window.innerHeight
-                                                    );
-                                                </script>
+                                                    </script>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div
+                                                    id="gui_cmd_div_id"
+                                                    class="table-responsive my-2"
+                                                >
+                                                    <table
+                                                        id="gui_cmd_table_id"
+                                                        class="table table-hover table-bordered"
+                                                    >
+                                                        <thead>
+                                                            <tr>
+                                                                <th
+                                                                    title="address"
+                                                                >
+                                                                    Address
+                                                                </th>
+                                                                <th
+                                                                    title="command"
+                                                                >
+                                                                    Command
+                                                                </th>
+                                                                <th
+                                                                    title="stage"
+                                                                >
+                                                                    Stage
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody
+                                                            id="gui_cmd_table_body_id"
+                                                        ></tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div
+                                                    id="gui_registers_div_id"
+                                                    class="table-responsive my-2"
+                                                >
+                                                    <table
+                                                        id="gui_registers_table_id"
+                                                        class="table table-hover table-bordered"
+                                                    >
+                                                        <thead>
+                                                            <tr>
+                                                                <th
+                                                                    colspan="2"
+                                                                    title="abi_name"
+                                                                >
+                                                                    Register
+                                                                </th>
+                                                                <th
+                                                                    title="register value"
+                                                                >
+                                                                    Value
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody
+                                                            id="gui_registers_table_body_id"
+                                                        ></tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div
+                                                    id="gui_memory_div_id"
+                                                    class="table-responsive my-2"
+                                                >
+                                                    <table
+                                                        id="gui_memory_table_id"
+                                                        class="table table-hover table-bordered"
+                                                    >
+                                                        <thead>
+                                                            <tr>
+                                                                <th
+                                                                    title="memory address"
+                                                                >
+                                                                    Address
+                                                                </th>
+                                                                <th
+                                                                    title="memory value"
+                                                                >
+                                                                    Value
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody
+                                                            id="gui_memory_table_body_id"
+                                                        ></tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="row">
+                                            <div class="overflow-hidden my-2">
+                                                <textarea
+                                                    id="performance_metrics"
+                                                    class="form-control"
+                                                    disabled
+                                                ></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="overflow-hidden my-2">
+                                                <textarea
+                                                    id="output"
+                                                    class="form-control"
+                                                    disabled
+                                                ></textarea>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="row">
-                                        <div class="col-md-4">
+                            </div>
+                        </div>
+                        <div
+                            id="VisualizationTabContent"
+                            class="tabcontent"
+                            style="display: none"
+                        >
+                            <div
+                                class="container-fluid table-responsive justify-content-around align-items-center overflow-hidden mx-2 px-1"
+                            >
+                                <div class="row">
+                                    <div class="col-3">
+                                        <div class="row">
                                             <div
-                                                id="gui_cmd_div_id"
-                                                class="table-responsive my-2"
+                                                class="col-12 container-fluid row align-items-center justify-content-center my-2"
                                             >
-                                                <table
-                                                    id="gui_cmd_table_id"
-                                                    class="table table-hover table-bordered"
+                                                <div
+                                                    class="btn-group button-group"
                                                 >
-                                                    <thead>
-                                                        <tr>
-                                                            <th title="address">
-                                                                Address
-                                                            </th>
-                                                            <th title="command">
-                                                                Command
-                                                            </th>
-                                                            <th title="stage">
-                                                                Stage
-                                                            </th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody
-                                                        id="gui_cmd_table_body_id"
-                                                    ></tbody>
-                                                </table>
+                                                    <button
+                                                        id="button_tab_input"
+                                                        class="btn btn-sm btn-outline-secondary active"
+                                                        onclick="toggleInputTab()"
+                                                    >
+                                                        Code Input
+                                                    </button>
+                                                    <button
+                                                        id="button_tab_cmd"
+                                                        class="btn btn-sm btn-outline-secondary"
+                                                        onclick="toggleCmdTab()"
+                                                    >
+                                                        Commands
+                                                    </button>
+                                                    <button
+                                                        id="button_tab_reg"
+                                                        class="btn btn-sm btn-outline-secondary"
+                                                        onclick="toggleRegisterTab()"
+                                                    >
+                                                        Registers
+                                                    </button>
+                                                    <button
+                                                        id="button_tab_mem"
+                                                        class="btn btn-sm btn-outline-secondary"
+                                                        onclick="toggleMemoryTab()"
+                                                    >
+                                                        Memory
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
-                                            <div
-                                                id="gui_registers_div_id"
-                                                class="table-responsive my-2"
-                                            >
-                                                <table
-                                                    id="gui_registers_table_id"
-                                                    class="table table-hover table-bordered"
+                                        <div
+                                            class="col-12 col-auto row align-items-center justify-content-around p-0 m-0"
+                                        >
+                                            <div id="InputTab">
+                                                <div
+                                                    class="codemirror col-sm-11 p-0 m-0 my-2"
                                                 >
-                                                    <thead>
-                                                        <tr>
-                                                            <th
-                                                                colspan="2"
-                                                                title="abi_name"
-                                                            >
-                                                                Register
-                                                            </th>
-                                                            <th
-                                                                title="register value"
-                                                            >
-                                                                Value
-                                                            </th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody
-                                                        id="gui_registers_table_body_id"
-                                                    ></tbody>
-                                                </table>
+                                                    <textarea
+                                                        id="vis_input"
+                                                        rows="30"
+                                                    ></textarea>
+                                                    <script>
+                                                        // initialize codemirror textarea
+                                                        const editor_vis =
+                                                            CodeMirror.fromTextArea(
+                                                                document.getElementById(
+                                                                    "vis_input"
+                                                                ),
+                                                                {
+                                                                    lineNumbers: true,
+                                                                    styleActiveLine: true,
+                                                                    mode: "markdown",
+                                                                }
+                                                            );
+                                                        editor_vis.setSize(
+                                                            null,
+                                                            "57vh"
+                                                        );
+                                                    </script>
+                                                </div>
+                                            </div>
+                                            <div
+                                                id="CmdTab"
+                                                style="display: none"
+                                            >
+                                                <div
+                                                    id="vis_gui_cmd_div_id"
+                                                    class="table-responsive my-2"
+                                                >
+                                                    <table
+                                                        id="vis_gui_cmd_table_id"
+                                                        class="table table-hover table-bordered table-responsive"
+                                                    >
+                                                        <thead>
+                                                            <tr>
+                                                                <th
+                                                                    title="address"
+                                                                >
+                                                                    Address
+                                                                </th>
+                                                                <th
+                                                                    title="command"
+                                                                >
+                                                                    Command
+                                                                </th>
+                                                                <th
+                                                                    title="stage"
+                                                                >
+                                                                    Stage
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody
+                                                            id="vis_gui_cmd_table_body_id"
+                                                        ></tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div
+                                                id="RegisterTab"
+                                                style="display: none"
+                                            >
+                                                <div
+                                                    id="vis_gui_registers_div_id"
+                                                    class="table-responsive my-2"
+                                                >
+                                                    <table
+                                                        id="vis_gui_registers_table_id"
+                                                        class="table table-hover table-bordered table-responsive"
+                                                    >
+                                                        <thead>
+                                                            <tr>
+                                                                <th
+                                                                    colspan="2"
+                                                                    title="abi_name"
+                                                                >
+                                                                    Register
+                                                                </th>
+                                                                <th
+                                                                    title="register value"
+                                                                >
+                                                                    Value
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody
+                                                            id="vis_gui_registers_table_body_id"
+                                                        ></tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div
+                                                id="MemoryTab"
+                                                style="display: none"
+                                            >
+                                                <div
+                                                    id="vis_gui_memory_div_id"
+                                                    class="table-responsive my-2"
+                                                >
+                                                    <table
+                                                        id="vis_gui_memory_table_id"
+                                                        class="table table-hover table-bordered table-responsive"
+                                                    >
+                                                        <thead>
+                                                            <tr>
+                                                                <th
+                                                                    title="memory address"
+                                                                >
+                                                                    Address
+                                                                </th>
+                                                                <th
+                                                                    title="memory value"
+                                                                >
+                                                                    Value
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody
+                                                            id="vis_gui_memory_table_body_id"
+                                                        ></tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
-                                            <div
-                                                id="gui_memory_div_id"
-                                                class="table-responsive my-2"
-                                            >
-                                                <table
-                                                    id="gui_memory_table_id"
-                                                    class="table table-hover table-bordered"
-                                                >
-                                                    <thead>
-                                                        <tr>
-                                                            <th
-                                                                title="memory address"
-                                                            >
-                                                                Address
-                                                            </th>
-                                                            <th
-                                                                title="memory value"
-                                                            >
-                                                                Value
-                                                            </th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody
-                                                        id="gui_memory_table_body_id"
-                                                    ></tbody>
-                                                </table>
+                                        <div class="row pl-1">
+                                            <div class="overflow-hidden my-2">
+                                                <textarea
+                                                    id="vis_performance_metrics"
+                                                    class="form-control"
+                                                    disabled
+                                                ></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="row pl-1">
+                                            <div class="overflow-hidden my-2">
+                                                <textarea
+                                                    id="vis_output"
+                                                    class="form-control"
+                                                    disabled
+                                                ></textarea>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="overflow-hidden my-2">
-                                        <textarea
-                                            id="output"
-                                            class="form-control"
-                                            rows="20"
-                                            disabled
-                                        ></textarea>
+                                    <div class="col-md-9">
+                                        <div class="row p-2 m-1">
+                                            <!--VISUALIZATION SVG-->
+                                            <img
+                                                id="visualization_pipeline"
+                                                class="img-fluid p-0 m-0"
+                                                src="svg/pipeline.svg"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -355,10 +558,199 @@
                     </div>
                 </main>
             </div>
-            <div class="container-fluid p-0 m-0">
-                <footer id="webapp_footer_id"></footer>
-            </div>
             <dialog id="webapp_dialog_AppHelpID"></dialog>
+            <!--Settings Modal-->
+            <div
+                class="modal fade"
+                id="settingsModal"
+                tabindex="-1"
+                role="dialog"
+                aria-labelledby="settingsModalLabel"
+                aria-hidden="true"
+            >
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5
+                                class="modal-title h2 text-light"
+                                id="settingsModalLabel"
+                            >
+                                Settings
+                            </h5>
+                        </div>
+                        <div class="modal-body">
+                            <div class="rows">
+                                <div class="row">
+                                    <div
+                                        class="modal_header_switch_representation h5"
+                                    >
+                                        Representation Mode
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-4">
+                                        <div
+                                            id="modal_header_switch_representation_register"
+                                            class="h6"
+                                        >
+                                            Register Table:
+                                        </div>
+                                    </div>
+                                    <div class="col-8">
+                                        <div
+                                            class="btn-group-toggle align-items-center justify-content-around"
+                                            data-toggle="buttons"
+                                        >
+                                            <label
+                                                class="button_switch_representation"
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="reg_representation"
+                                                    id="reg_button_binary_representation_id"
+                                                    title="switch to binary representation"
+                                                />
+                                                binary
+                                            </label>
+                                            <label
+                                                class="button_switch_representation"
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="reg_representation"
+                                                    id="reg_button_decimal_representation_id"
+                                                    title="switch to decimal representation"
+                                                    checked
+                                                />
+                                                decimal
+                                            </label>
+                                            <label
+                                                class="button_switch_representation"
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="reg_representation"
+                                                    id="reg_button_hexa_representation_id"
+                                                    title="switch to hexadecimal representation"
+                                                />
+                                                hexadecimal
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row border-bottom mb-2">
+                                    <div class="col-4">
+                                        <div
+                                            id="modal_header_switch_representation_memory"
+                                            class="h6"
+                                        >
+                                            Memory Table:
+                                        </div>
+                                    </div>
+                                    <div class="col-8">
+                                        <div
+                                            class="btn-group-toggle align-items-center justify-content-around"
+                                            data-toggle="buttons"
+                                        >
+                                            <label
+                                                class="button_switch_representation"
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="mem_representation"
+                                                    id="mem_button_binary_representation_id"
+                                                    title="switch to binary representation"
+                                                    autocomplete="off"
+                                                />
+                                                binary
+                                            </label>
+                                            <label
+                                                class="button_switch_representation"
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="mem_representation"
+                                                    id="mem_button_decimal_representation_id"
+                                                    title="switch to decimal representation"
+                                                    autocomplete="off"
+                                                    checked
+                                                />
+                                                decimal
+                                            </label>
+                                            <label
+                                                class="button_switch_representation"
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="mem_representation"
+                                                    id="mem_button_hexa_representation_id"
+                                                    title="switch to hexadecimal representation"
+                                                    autocomplete="off"
+                                                />
+                                                hexadecimal
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row border-bottom">
+                                    <div class="col-4">
+                                        <div
+                                            id="modal_header_switch_stage"
+                                            class="h5 mt-2"
+                                        >
+                                            Pipeline Mode:
+                                        </div>
+                                    </div>
+                                    <div class="col-8 mt-2">
+                                        <div
+                                            class="btn-group-toggle align-items-center justify-content-around"
+                                            data-toggle="buttons"
+                                        >
+                                            <label
+                                                class="button_switch_representation"
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="pipeline_mode"
+                                                    id="button_SingleStage"
+                                                    title="single stage"
+                                                    autocomplete="off"
+                                                    checked
+                                                />
+                                                SingleStage
+                                            </label>
+                                            <label
+                                                class="button_switch_representation"
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="pipeline_mode"
+                                                    id="button_5-Stage"
+                                                    title="five stage"
+                                                    autocomplete="off"
+                                                />
+                                                5-Stage
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-4"></div>
+                                    <div class="col-8"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal"
+                            >
+                                ok
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <script
             type="text/javascript"
