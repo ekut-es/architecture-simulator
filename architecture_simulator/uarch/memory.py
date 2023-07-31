@@ -273,27 +273,12 @@ class CSRError(ValueError):
 @dataclass
 class InstructionMemory:
     instructions: dict[int, Instruction] = field(default_factory=dict)
-
-    # max address (exclusive)
-    max_bytes: int = 2**14
+    address_range: range = field(default_factory=lambda: range(0, 2**14))
 
     def save_instruction(self, address: int, instr: Instruction):
-        if address < 0:
-            raise MemoryAddressError(
-                address=address,
-                min_address_incl=0,
-                max_address_incl=self.max_bytes - 1,
-                memory_type="instruction memory",
-            )
-        elif (address + instr.length - 1) >= self.max_bytes:
-            raise MemoryAddressError(
-                address=(address + instr.length - 1),
-                min_address_incl=0,
-                max_address_incl=self.max_bytes - 1,
-                memory_type="instruction memory",
-            )
-        else:
-            self.instructions[address] = instr
+        self.assert_address_in_range(address)
+        self.assert_address_in_range(address + instr.length - 1)
+        self.instructions[address] = instr
 
     def load_instruction(self, address) -> Instruction:
         return self.instructions[address]
@@ -308,3 +293,20 @@ class InstructionMemory:
         for instr in parser.parse(program, start_address=0):
             self.save_instruction(next_address, instr=instr)
             next_address += instr.length
+
+    def assert_address_in_range(self, address: int):
+        """Raises an error if the address is not inside the valid range.
+
+        Args:
+            address (int): address to be checked
+
+        Raises:
+            MemoryAddressError: An error to indicate that the address was invalid.
+        """
+        if not address in self.address_range:
+            raise MemoryAddressError(
+                address=address,
+                min_address_incl=self.address_range.start,
+                max_address_incl=self.address_range.stop - 1,
+                memory_type="instruction memory",
+            )

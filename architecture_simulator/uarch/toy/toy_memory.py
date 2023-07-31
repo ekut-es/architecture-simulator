@@ -47,6 +47,6 @@ class ToyMemory:
             raise MemoryAddressError(
                 address=address,
                 min_address_incl=self.address_range.start,
-                max_address_incl=self.address_range.stop,
+                max_address_incl=self.address_range.stop - 1,
                 memory_type="data memory",
             )

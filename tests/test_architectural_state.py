@@ -181,7 +181,7 @@ class TestArchitecture(unittest.TestCase):
         self.assertEqual(
             cm.exception,
             MemoryAddressError(
-                address=2**14 + 3,
+                address=2**14,
                 min_address_incl=0,
                 max_address_incl=2**14 - 1,
                 memory_type="instruction memory",
