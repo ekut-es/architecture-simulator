@@ -17,7 +17,8 @@ class ToyMemory:
             value (MutableUInt16): The value (a halfword) to be stored.
         """
         self.assert_address_in_range(address)
-        self.memory_file[address] = value
+        # casting is there to create a copy
+        self.memory_file[address] = MutableUInt16(int(value))
 
     def load_halfword(self, address: int) -> MutableUInt16:
         """Load value from given address. Default is 0 if the address hasn't been written to yet.

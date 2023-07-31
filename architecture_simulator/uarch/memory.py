@@ -274,13 +274,13 @@ class InstructionMemory(Generic[T]):
     instructions: dict[int, T] = field(default_factory=dict)
     address_range: range = field(default_factory=lambda: range(0, 2**14))
 
+    def load_instruction(self, address: int) -> T:
+        return self.instructions[address]
+
     def store_instruction(self, address: int, instr: T):
         self.assert_address_in_range(address)
         self.assert_address_in_range(address + instr.length - 1)
         self.instructions[address] = instr
-
-    def load_instruction(self, address) -> T:
-        return self.instructions[address]
 
     def store_instructions(self, instructions: list[T]):
         """Clear the instruction memory and store given instructions, starting at the first valid address.
@@ -310,3 +310,14 @@ class InstructionMemory(Generic[T]):
                 max_address_incl=self.address_range.stop - 1,
                 memory_type="instruction memory",
             )
+
+    def instruction_at_address(self, address: int) -> bool:
+        """Return whether there in an instruction at the given address.
+
+        Args:
+            address (int): address to check
+
+        Returns:
+            bool: Whether there is an instruction at the given address.
+        """
+        return address in self.instructions
