@@ -6,7 +6,7 @@ from .control_unit_signals import ControlUnitSignals
 from architecture_simulator.isa.instruction_types import EmptyInstruction
 
 if TYPE_CHECKING:
-    from architecture_simulator.isa.instruction_types import Instruction
+    from architecture_simulator.isa.instruction_types import RiscvInstruction
     from .stages import FlushSignal
 
 
@@ -16,7 +16,7 @@ class PipelineRegister:
     Every PipelineRegister needs to save the instruction that is currently in this part of the pipeline!
     """
 
-    instruction: Instruction = field(default_factory=EmptyInstruction)
+    instruction: RiscvInstruction = field(default_factory=EmptyInstruction)
     address_of_instruction: Optional[int] = None
     flush_signal: Optional[FlushSignal] = None
 

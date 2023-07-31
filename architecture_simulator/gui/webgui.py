@@ -32,7 +32,7 @@ def sim_init():
     return simulation
 
 
-def step_sim(instr: str):
+def step_sim(program: str):
     global simulation
     if simulation is None:
         raise StateNotInitializedError()
@@ -40,7 +40,7 @@ def step_sim(instr: str):
     # parse the instr json string into a python dict
     if simulation.state.instruction_memory.instructions == {}:
         try:
-            simulation.state.instruction_memory.append_instructions(instr)
+            simulation.load_program(program)
         except ParserException as Parser_Exception:
             archsim_js.set_output(Parser_Exception.__repr__())
 
@@ -113,7 +113,7 @@ def parse_input(instr: str):
         raise StateNotInitializedError()
     simulation.state.instruction_memory.instructions = {}
     try:
-        simulation.state.instruction_memory.append_instructions(instr)
+        simulation.load_program(instr)
         archsim_js.remove_all_highlights()
     except ParserException as Parser_Exception:
         archsim_js.remove_all_highlights()

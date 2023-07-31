@@ -8,7 +8,7 @@ from architecture_simulator.isa import instruction_types
 from architecture_simulator.isa.rv32i_instructions import ECALL, EBREAK, FENCE
 
 if TYPE_CHECKING:
-    from architecture_simulator.isa.instruction_types import Instruction
+    from architecture_simulator.isa.instruction_types import RiscvInstruction
 
 # abi register names
 reg_mapping = {
@@ -326,7 +326,7 @@ class RiscvParser:
 
     def parse_res_to_instructions(
         self, parse_result: list[tuple[int, str, pp.ParseResults]], start_address: int
-    ) -> list[Instruction]:
+    ) -> list[RiscvInstruction]:
         """Turn parse results into instructions.
 
         Args:
@@ -335,7 +335,7 @@ class RiscvParser:
         Returns:
             list[Instruction]: list of executable instructions
         """
-        instructions: list[Instruction] = []
+        instructions: list[RiscvInstruction] = []
         pure_parse_results = [result[2] for result in parse_result]
         labels = self.compute_labels(pure_parse_results, start_address)
         address_count: int = start_address
@@ -440,7 +440,7 @@ class RiscvParser:
             address_count += instruction_map[instruction_parsed.mnemonic.lower()].length
         return instructions
 
-    def parse(self, program: str, start_address: int = 0) -> list[Instruction]:
+    def parse(self, program: str, start_address: int = 0) -> list[RiscvInstruction]:
         """Turn assembly code into a list of executable instructions.
 
         Args:

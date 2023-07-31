@@ -5,7 +5,7 @@ import fixedint
 
 from architecture_simulator.uarch.control_unit_signals import ControlUnitSignals
 from .instruction_types import (
-    Instruction,
+    RiscvInstruction,
     RTypeInstruction,
     ITypeInstruction,
     ShiftITypeInstruction,
@@ -1248,7 +1248,7 @@ class CSRRCI(CSRITypeInstruction):
         return architectural_state
 
 
-instruction_map: dict[str, Type[Instruction]] = {
+instruction_map: dict[str, Type[RiscvInstruction]] = {
     "add": ADD,
     "beq": BEQ,
     "blt": BLT,

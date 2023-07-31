@@ -160,13 +160,13 @@ class TestArchitecture(unittest.TestCase):
         state = ArchitecturalState()
 
         # Save instr tests:
-        state.instruction_memory.save_instruction(
+        state.instruction_memory.store_instruction(
             address=0, instr=ADD(rd=0, rs1=0, rs2=0)
         )
         self.assertEqual(
             state.instruction_memory.instructions[0], ADD(rd=0, rs1=0, rs2=0)
         )
-        state.instruction_memory.save_instruction(
+        state.instruction_memory.store_instruction(
             address=2**14 - 4, instr=ADD(rd=1, rs1=2, rs2=3)
         )
         self.assertEqual(
@@ -175,7 +175,7 @@ class TestArchitecture(unittest.TestCase):
 
         # Illegal access out of bounds of instr memory
         with self.assertRaises(MemoryAddressError) as cm:
-            state.instruction_memory.save_instruction(
+            state.instruction_memory.store_instruction(
                 address=2**14, instr=ADD(rd=1, rs1=2, rs2=3)
             )
         self.assertEqual(
@@ -189,7 +189,7 @@ class TestArchitecture(unittest.TestCase):
         )
 
         with self.assertRaises(MemoryAddressError) as cm:
-            state.instruction_memory.save_instruction(
+            state.instruction_memory.store_instruction(
                 address=-1, instr=ADD(rd=1, rs1=2, rs2=3)
             )
         self.assertEqual(

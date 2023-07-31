@@ -21,9 +21,7 @@ class TestSimulation(unittest.TestCase):
                 memory=Memory(memory_file=()),
             )
         )
-        simulation.state.instruction_memory.append_instructions(
-            "add x0, x0, x1\nadd x0, x0, x1"
-        )
+        simulation.load_program("add x0, x0, x1\nadd x0, x0, x1")
         # simulation.append_instructions("sub x0, x0, x1")
         simulation.step_simulation()
         self.assertEqual(simulation.state.register_file.registers[0], 2)
@@ -31,21 +29,6 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(simulation.state.register_file.registers[0], 4)
         # simulation.step_simulation()
         # self.assertEqual(simulation.state.register_file.registers[0], 2)
-
-    # testing whether the addresses for the instructions get computed correctly
-    def test_append_multiple_instructions(self):
-        simulation = Simulation(state=ArchitecturalState(register_file=RegisterFile()))
-        simulation.state.instruction_memory.append_instructions("addi x1, x0, 12")
-        simulation.state.instruction_memory.append_instructions("bne x7, x7, 30")
-        simulation.state.instruction_memory.append_instructions("jal x12, 30")
-        self.assertEqual(
-            simulation.state.instruction_memory.instructions,
-            {
-                0: ADDI(rd=1, rs1=0, imm=12),
-                4: BNE(rs1=7, rs2=7, imm=30),
-                8: JAL(rd=12, imm=30),
-            },
-        )
 
     def test_run_simulation(self):
         simulation = Simulation(
@@ -268,7 +251,7 @@ class TestSimulation(unittest.TestCase):
             ),
             mode="five_stage_pipeline",
         )
-        simulation.state.instruction_memory.append_instructions(program)
+        simulation.load_program(program)
         simulation.run_simulation()
         self.assertEqual(simulation.state.register_file.registers[10], 55)
 
@@ -282,7 +265,7 @@ class TestSimulation(unittest.TestCase):
         jal x0, test
         test:
         """
-        simulation.state.instruction_memory.append_instructions(program=programm)
+        simulation.load_program(program=programm)
         simulation.run_simulation()
         self.assertGreater(simulation.state.performance_metrics.execution_time_s, 0)
         self.assertEqual(simulation.state.performance_metrics.instruction_count, 10)
@@ -300,7 +283,7 @@ class TestSimulation(unittest.TestCase):
         beq x0, x0, label
         label:
         """
-        simulation.state.instruction_memory.append_instructions(program=programm)
+        simulation.load_program(program=programm)
         simulation.run_simulation()
         self.assertEqual(simulation.state.performance_metrics.flushes, 2)
         self.assertEqual(simulation.state.performance_metrics.cycles, 12)
@@ -310,7 +293,7 @@ class TestSimulation(unittest.TestCase):
         programm = """
         add x0, x0, x0
         """
-        simulation.state.instruction_memory.append_instructions(program=programm)
+        simulation.load_program(program=programm)
         simulation.run_simulation()
         self.assertEqual(simulation.state.performance_metrics.cycles, 5)
 
@@ -319,6 +302,6 @@ class TestSimulation(unittest.TestCase):
         programm = """
         add x0, x0, x0
         """
-        simulation.state.instruction_memory.append_instructions(program=programm)
+        simulation.load_program(program=programm)
         simulation.run_simulation()
         self.assertEqual(simulation.state.performance_metrics.cycles, 1)

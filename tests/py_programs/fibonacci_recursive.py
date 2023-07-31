@@ -113,7 +113,7 @@ def fibonacci_recursive_simulation_2(n: int) -> Simulation:
             register_file=RegisterFile(), memory=Memory(min_bytes=0)
         )
     )
-    simulation.state.instruction_memory.append_instructions(
+    simulation.load_program(
         f"""lui a0, 0
 addi a0, a0, {n} # load n
 addi s0, zero, 1 # load 1 for comparison

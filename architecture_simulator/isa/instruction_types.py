@@ -4,16 +4,15 @@ from typing import Optional, TYPE_CHECKING
 import fixedint
 
 from architecture_simulator.uarch.control_unit_signals import ControlUnitSignals
+from .instruction import Instruction
 
 if TYPE_CHECKING:
     from architecture_simulator.uarch.architectural_state import ArchitecturalState
 
 
 @dataclass
-class Instruction:
+class RiscvInstruction(Instruction):
     mnemonic: str
-    # length of the instruction in bytes. Most instructions are 4 bytes long.
-    # If this is not the case, this needs to be shadowed (I hope that that works in python, but we'll se that when we get to it).
     length: int = 4
 
     def __init__(self, **kwargs):
@@ -101,7 +100,7 @@ class Instruction:
         """
 
 
-class RTypeInstruction(Instruction):
+class RTypeInstruction(RiscvInstruction):
     """Create an R-Type instruction
 
     Args:
@@ -171,7 +170,7 @@ class RTypeInstruction(Instruction):
         ] = fixedint.MutableUInt32(register_write_data)
 
 
-class ITypeInstruction(Instruction):
+class ITypeInstruction(RiscvInstruction):
     def __init__(self, rd: int, rs1: int, imm: int, **args):
         """Create an I-Type instruction
 
@@ -284,7 +283,7 @@ class ShiftITypeInstruction(ITypeInstruction):
         return f"{self.mnemonic} x{self.rd}, x{self.rs1}, {self.imm}"
 
 
-class STypeInstruction(Instruction):
+class STypeInstruction(RiscvInstruction):
     """Create an S-Type instruction
 
     Args:
@@ -327,7 +326,7 @@ class STypeInstruction(Instruction):
         )
 
 
-class BTypeInstruction(Instruction):
+class BTypeInstruction(RiscvInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int, **args):
         """Create a B-Type instruction
         Note: These B-Type-Instructions will actually set the pc to imm-length, because the simulator will always add the instruction length in bytes to the pc.
@@ -373,7 +372,7 @@ class BTypeInstruction(Instruction):
         )
 
 
-class UTypeInstruction(Instruction):
+class UTypeInstruction(RiscvInstruction):
     def __init__(self, rd: int, imm: int, **args):
         super().__init__(**args)
         self.rd = rd
@@ -403,7 +402,7 @@ class UTypeInstruction(Instruction):
         return None, None, None, None, self.imm << 12
 
 
-class JTypeInstruction(Instruction):
+class JTypeInstruction(RiscvInstruction):
     def __init__(self, rd: int, imm: int, **args):
         super().__init__(**args)
         self.rd = rd
@@ -447,7 +446,7 @@ class JTypeInstruction(Instruction):
         return None, None, None, None, self.imm
 
 
-class FenceTypeInstruction(Instruction):
+class FenceTypeInstruction(RiscvInstruction):
     def __init__(self, **args):
         super().__init__(**args)
 
@@ -456,7 +455,7 @@ class FenceTypeInstruction(Instruction):
     #    return f"{self.mnemonic}"
 
 
-class CSRTypeInstruction(Instruction):
+class CSRTypeInstruction(RiscvInstruction):
     """Create a CSR-Type instruction
 
     Args:
@@ -475,7 +474,7 @@ class CSRTypeInstruction(Instruction):
         return f"{self.mnemonic} x{self.rd}, {hex(self.csr)}, x{self.rs1}"
 
 
-class CSRITypeInstruction(Instruction):
+class CSRITypeInstruction(RiscvInstruction):
     """Create a CSRI-Type instruction
 
     Args:
@@ -494,7 +493,7 @@ class CSRITypeInstruction(Instruction):
         return f"{self.mnemonic} x{self.rd}, {hex(self.csr)}, {self.uimm}"
 
 
-class EmptyInstruction(Instruction):
+class EmptyInstruction(RiscvInstruction):
     def __init__(self, **kwargs):
         super().__init__(mnemonic="Empty")
 

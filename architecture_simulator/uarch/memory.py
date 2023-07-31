@@ -1,11 +1,7 @@
-from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import Generic, TypeVar
 from dataclasses import dataclass, field
 import fixedint
-from architecture_simulator.isa.parser import RiscvParser
-
-if TYPE_CHECKING:
-    from architecture_simulator.isa.instruction_types import Instruction
+from architecture_simulator.isa.instruction import Instruction
 
 
 @dataclass
@@ -270,28 +266,32 @@ class CSRError(ValueError):
         return self.message
 
 
+T = TypeVar("T", bound=Instruction)
+
+
 @dataclass
-class InstructionMemory:
-    instructions: dict[int, Instruction] = field(default_factory=dict)
+class InstructionMemory(Generic[T]):
+    instructions: dict[int, T] = field(default_factory=dict)
     address_range: range = field(default_factory=lambda: range(0, 2**14))
 
-    def save_instruction(self, address: int, instr: Instruction):
+    def store_instruction(self, address: int, instr: T):
         self.assert_address_in_range(address)
         self.assert_address_in_range(address + instr.length - 1)
         self.instructions[address] = instr
 
-    def load_instruction(self, address) -> Instruction:
+    def load_instruction(self, address) -> T:
         return self.instructions[address]
 
-    def append_instructions(self, program: str):
-        if self.instructions:
-            last_address = max(self.instructions.keys())
-            next_address = last_address + self.instructions[last_address].length
-        else:
-            next_address = 0
-        parser: RiscvParser = RiscvParser()
-        for instr in parser.parse(program, start_address=0):
-            self.save_instruction(next_address, instr=instr)
+    def store_instructions(self, instructions: list[T]):
+        """Clear the instruction memory and store given instructions, starting at the first valid address.
+
+        Args:
+            instructions (list[Instruction]): Instructions to be stored.
+        """
+        self.instructions = {}
+        next_address = self.address_range.start
+        for instr in instructions:
+            self.store_instruction(next_address, instr=instr)
             next_address += instr.length
 
     def assert_address_in_range(self, address: int):

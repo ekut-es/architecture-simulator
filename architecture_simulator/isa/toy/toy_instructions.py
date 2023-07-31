@@ -1,10 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from fixedint import MutableUInt16
-
-from architecture_simulator.uarch.toy.toy_architectural_state import (
-    ToyArchitecturalState,
-)
+from ..instruction import Instruction
 
 if TYPE_CHECKING:
     from architecture_simulator.uarch.toy.toy_architectural_state import (
@@ -12,7 +9,9 @@ if TYPE_CHECKING:
     )
 
 
-class Instruction:
+class ToyInstruction(Instruction):
+    length: int = 1
+
     def __init__(self, mnemonic: str, opcode: int):
         self.mnemonic = mnemonic.upper()
         self.opcode = opcode % 16
@@ -24,7 +23,7 @@ class Instruction:
         pass
 
 
-class AddressTypeInstruction(Instruction):
+class AddressTypeInstruction(ToyInstruction):
     def __init__(self, mnemonic: str, opcode: int, address: int):
         super().__init__(mnemonic, opcode)
         self.address = address % 4096
@@ -119,7 +118,7 @@ class XOR(AddressTypeInstruction):
         state.increment_pc()
 
 
-class NOT(Instruction):
+class NOT(ToyInstruction):
     def __init__(self):
         super().__init__(mnemonic="NOT", opcode=8)
 
@@ -128,7 +127,7 @@ class NOT(Instruction):
         state.increment_pc()
 
 
-class INC(Instruction):
+class INC(ToyInstruction):
     def __init__(self):
         super().__init__(mnemonic="INC", opcode=9)
 
@@ -137,7 +136,7 @@ class INC(Instruction):
         state.increment_pc()
 
 
-class DEC(Instruction):
+class DEC(ToyInstruction):
     def __init__(self):
         super().__init__(mnemonic="DEC", opcode=10)
 
@@ -146,7 +145,7 @@ class DEC(Instruction):
         state.increment_pc()
 
 
-class ZRO(Instruction):
+class ZRO(ToyInstruction):
     def __init__(self) -> None:
         super().__init__(mnemonic="ZRO", opcode=11)
 
@@ -155,7 +154,7 @@ class ZRO(Instruction):
         state.increment_pc()
 
 
-class NOP(Instruction):
+class NOP(ToyInstruction):
     def __init__(self) -> None:
         super().__init__(mnemonic="NOP", opcode=12)
 

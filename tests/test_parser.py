@@ -282,7 +282,7 @@ beq zero, ra, Ban0n3
 
     def test_fibonacci_parser(self):
         simulation = Simulation(state=ArchitecturalState(memory=Memory(min_bytes=0)))
-        simulation.state.instruction_memory.append_instructions(self.fibonacci)
+        simulation.load_program(self.fibonacci)
         # print(simulation.instructions)
         while simulation.state.program_counter < 104:
             simulation.step_simulation()
@@ -335,7 +335,7 @@ fibonacci:
 
     def test_c_fibonacci(self):
         simulation = Simulation()
-        simulation.state.instruction_memory.append_instructions(self.fibonacci_c)
+        simulation.load_program(self.fibonacci_c)
         # print(simulation.instructions)
         while simulation.state.program_counter != 24:
             simulation.step_simulation()
@@ -363,7 +363,7 @@ fibonacci:
 
     def test_c_add(self):
         simulation = Simulation()
-        simulation.state.instruction_memory.append_instructions(self.add_c)
+        simulation.load_program(self.add_c)
         # print(simulation.instructions)
         while simulation.state.program_counter < 60:
             simulation.step_simulation()
@@ -416,7 +416,7 @@ fibonacci:
 
     def test_c_fibonacci_abi(self):
         simulation = Simulation()
-        simulation.state.instruction_memory.append_instructions(self.fibonacci_c_abi)
+        simulation.load_program(self.fibonacci_c_abi)
         # print(simulation.instructions)
         while simulation.state.program_counter != 24:
             simulation.step_simulation()

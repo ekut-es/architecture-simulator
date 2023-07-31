@@ -1,3 +1,5 @@
+from typing import Optional
+
 from architecture_simulator.uarch.architectural_state import ArchitecturalState
 from architecture_simulator.uarch.pipeline import Pipeline
 from architecture_simulator.uarch.stages import (
@@ -8,7 +10,7 @@ from architecture_simulator.uarch.stages import (
     MemoryAccessStage,
     RegisterWritebackStage,
 )
-from typing import Optional
+from architecture_simulator.isa.parser import RiscvParser
 
 
 # Does currently support single_stage_pipeline and five_stage_pipeline
@@ -56,3 +58,15 @@ class Simulation:
             while not self.pipeline.is_done():
                 self.step_simulation()
         self.state.performance_metrics.stop_timer()
+
+    def load_program(self, program: str):
+        parser = RiscvParser()
+        # Required to compute labels TODO: Actually, I think this is not needed, because instructions always use relative addresses for jumping.
+        # The parser should get slightly reworked.
+        start_address = self.state.instruction_memory.address_range.start
+        self.state.instruction_memory.store_instructions(
+            parser.parse(
+                program=program,
+                start_address=start_address,
+            )
+        )
