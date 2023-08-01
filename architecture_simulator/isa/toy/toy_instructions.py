@@ -75,9 +75,9 @@ class BRZ(AddressTypeInstruction):
             state.increment_pc()
         else:
             # NOTE: sets the pc to self.address without additionally increasing the program counter.
-            # If instructions should ever get saved in a unified memory and are thus editable by other instructions,
-            # this needs to change or you need to address this during parsing
+            # But I dont think this should cause any problems.
             state.program_counter = MutableUInt16(self.address)
+            state.performance_metrics.branch_count += 1
 
 
 class ADD(AddressTypeInstruction):

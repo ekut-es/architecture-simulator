@@ -4,6 +4,7 @@ from typing import Optional
 from .toy_memory import ToyMemory
 from ..memory import InstructionMemory
 from architecture_simulator.isa.toy.toy_instructions import ToyInstruction
+from ..performance_metrics import PerformanceMetrics
 
 
 class ToyArchitecturalState:
@@ -26,6 +27,7 @@ class ToyArchitecturalState:
                 data_memory_range if data_memory_range else range(1024, 4096)
             )
         )
+        self.performance_metrics = PerformanceMetrics()
 
     def increment_pc(self):
         self.program_counter += MutableUInt16(1)

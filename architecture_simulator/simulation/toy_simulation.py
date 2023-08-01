@@ -18,10 +18,14 @@ class ToySimulation:
         )
 
     def step(self):
-        """_summary_"""
+        """Executes the next instruction and updates the performance metrics accordingly."""
+        self.state.performance_metrics.resume_timer()
         self.state.instruction_memory.read_instruction(
             int(self.state.program_counter)
         ).behavior(self.state)
+        self.state.performance_metrics.stop_timer()
+        self.state.performance_metrics.instruction_count += 1
+        self.state.performance_metrics.cycles += 1
 
     def is_done(self) -> bool:
         """Return whether the simulation is done because there is no instruction at the current program counter.
