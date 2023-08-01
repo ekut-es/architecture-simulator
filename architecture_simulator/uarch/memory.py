@@ -275,9 +275,24 @@ class InstructionMemory(Generic[T]):
     address_range: range = field(default_factory=lambda: range(0, 2**14))
 
     def load_instruction(self, address: int) -> T:
+        """Load instruction from given address.
+
+        Args:
+            address (int): Address to load the instruction from.
+
+        Returns:
+            T: The instruction saved at the given address.
+        """
+        self.assert_address_in_range(address)
         return self.instructions[address]
 
     def store_instruction(self, address: int, instr: T):
+        """Store a single instruction at given address.
+
+        Args:
+            address (int): Address at which to store the instruction.
+            instr (T): The instruction to be stored.
+        """
         self.assert_address_in_range(address)
         self.assert_address_in_range(address + instr.length - 1)
         self.instructions[address] = instr

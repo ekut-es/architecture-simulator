@@ -57,3 +57,12 @@ class TestToyArchitecture(unittest.TestCase):
         self.assertEqual(state.instruction_memory.load_instruction(2), instructions[2])
         self.assertEqual(state.instruction_memory.load_instruction(3), instructions[3])
         self.assertEqual(state.instruction_memory.load_instruction(4), instructions[4])
+
+        with self.assertRaises(MemoryAddressError):
+            state.instruction_memory.store_instruction(address=-1, instr=ADD(2000))
+        with self.assertRaises(MemoryAddressError):
+            state.instruction_memory.store_instruction(address=1024, instr=ADD(2000))
+        with self.assertRaises(MemoryAddressError):
+            state.instruction_memory.load_instruction(address=-1)
+        with self.assertRaises(MemoryAddressError):
+            state.instruction_memory.load_instruction(address=1024)
