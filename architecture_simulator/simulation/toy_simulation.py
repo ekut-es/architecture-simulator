@@ -3,6 +3,7 @@ from typing import Optional
 from architecture_simulator.uarch.toy.toy_architectural_state import (
     ToyArchitecturalState,
 )
+from architecture_simulator.isa.toy.toy_parser import ToyParser
 
 
 class ToySimulation:
@@ -34,3 +35,8 @@ class ToySimulation:
         """Step through the simulation until it terminates (which it might not if there is an infinite loop in the program)"""
         while not self.is_done():
             self.step()
+
+    def load_program(self, program: str):
+        parser = ToyParser()
+        instructions = parser.parse(program)
+        self.state.instruction_memory.store_instructions(instructions)

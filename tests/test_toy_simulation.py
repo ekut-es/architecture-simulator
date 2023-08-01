@@ -39,3 +39,17 @@ class TestToySimulation(unittest.TestCase):
         self.assertEqual(simulation.state.data_memory.load_halfword(1024), 2)
         self.assertEqual(simulation.state.data_memory.load_halfword(1025), 4)
         self.assertEqual(simulation.state.data_memory.load_halfword(4095), 0)
+
+    def test_load_program(self):
+        simulation = ToySimulation()
+        program = """INC
+        DEC
+        INC
+        STO $400
+        ADD $400
+        STO $400
+        ADD $400"""
+        simulation.load_program(program)
+        simulation.run()
+        self.assertEqual(simulation.state.data_memory.load_halfword(0x400), 2)
+        self.assertEqual(simulation.state.accu, 4)
