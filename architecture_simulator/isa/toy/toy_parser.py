@@ -1,11 +1,14 @@
 import pyparsing as pp
 
+from ..parser import ParserSyntaxException
+from .toy_instructions import AddressTypeInstruction, ToyInstruction, instruction_map
+
 
 class ToyParser:
     ADDRESS_MNEMONICS = ["STO", "LDA", "BRZ", "ADD", "SUB", "OR", "AND", "XOR"]
     NO_ADDRESS_MNEMONICS = ["NOT", "INC", "DEC", "ZRO", "NOP"]
 
-    pattern_hex_address = pp.Combine("$" + pp.Word(pp.hexnums[3], exact=3))
+    pattern_hex_address = pp.Combine("$" + pp.Word(pp.hexnums, exact=3))
 
     pattern_address_instruction = pp.oneOf(ADDRESS_MNEMONICS, caseless=True)(
         "mnemonic"
@@ -33,3 +36,25 @@ class ToyParser:
             # append linenumber (index+1) and instruction string
             sanitized_program.append((index + 1, instruction_part))
         return sanitized_program
+
+    def parse(self, program: str) -> list[ToyInstruction]:
+        sanitized_program = self._sanitize(program)
+        instructions = []
+        for linenumber, line in sanitized_program:
+            try:
+                tokens = self.pattern_line.parse_string(line)
+                instructions.append(self._tokens_to_instruction(tokens))
+            except pp.ParseException:
+                raise ParserSyntaxException(line_number=linenumber, line=line)
+        return instructions
+
+    def _tokens_to_instruction(self, tokens: pp.ParseResults) -> ToyInstruction:
+        mnemonic = tokens.mnemonic.upper()
+        instruction_class = instruction_map[mnemonic]
+        if issubclass(instruction_class, AddressTypeInstruction):
+            address = self.address_to_int(tokens.address)
+            return instruction_class(address=address)
+        return instruction_class()
+
+    def address_to_int(self, address: str) -> int:
+        return int(address[1:], base=16)

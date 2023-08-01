@@ -214,7 +214,7 @@ class TestArchitecture(unittest.TestCase):
         with self.assertRaises(KeyError):
             state.instruction_memory.load_instruction(4)
 
-        with self.assertRaises(KeyError):
+        with self.assertRaises(MemoryAddressError):
             state.instruction_memory.load_instruction(2**14)
 
         self.assertEqual(

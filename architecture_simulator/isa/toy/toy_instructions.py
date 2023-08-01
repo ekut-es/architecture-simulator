@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Type
 from fixedint import MutableUInt16
 from ..instruction import Instruction
 
@@ -12,9 +12,9 @@ if TYPE_CHECKING:
 class ToyInstruction(Instruction):
     length: int = 1
 
-    def __init__(self, mnemonic: str, opcode: int):
-        self.mnemonic = mnemonic.upper()
-        self.opcode = opcode % 16
+    def __init__(self, **kwargs):
+        self.mnemonic = kwargs["mnemonic"].upper()
+        self.opcode = kwargs["opcode"] % 16
 
     def __repr__(self):
         return self.mnemonic
@@ -22,14 +22,20 @@ class ToyInstruction(Instruction):
     def behavior(self, state: ToyArchitecturalState):
         pass
 
+    def __eq__(self, other):
+        return self.opcode == other.opcode
+
 
 class AddressTypeInstruction(ToyInstruction):
-    def __init__(self, mnemonic: str, opcode: int, address: int):
-        super().__init__(mnemonic, opcode)
+    def __init__(self, address: int, **kwargs):
+        super().__init__(**kwargs)
         self.address = address % 4096
 
     def __repr__(self):
         return f"{self.mnemonic} ${self.address:03x}"
+
+    def __eq__(self, other):
+        return super().__eq__(other) and self.address == other.address
 
 
 class STO(AddressTypeInstruction):
@@ -160,3 +166,20 @@ class NOP(ToyInstruction):
 
     def behavior(self, state: ToyArchitecturalState):
         state.increment_pc()
+
+
+instruction_map: dict[str, Type[ToyInstruction]] = {
+    "STO": STO,
+    "LDA": LDA,
+    "BRZ": BRZ,
+    "ADD": ADD,
+    "SUB": SUB,
+    "OR": OR,
+    "AND": AND,
+    "XOR": XOR,
+    "NOT": NOT,
+    "INC": INC,
+    "DEC": DEC,
+    "ZRO": ZRO,
+    "NOP": NOP,
+}
