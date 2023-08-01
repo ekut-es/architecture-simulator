@@ -6,7 +6,7 @@ from architecture_simulator.isa.toy.toy_instructions import ADD, INC, STO, LDA
 class TestToySimulation(unittest.TestCase):
     def test_step(self):
         simulation = ToySimulation()
-        simulation.state.instruction_memory.store_instructions(
+        simulation.state.instruction_memory.write_instructions(
             [INC(), INC(), STO(1024), ADD(1024), STO(1025), INC(), LDA(4095)]
         )
         self.assert_(not simulation.is_done())
@@ -15,11 +15,11 @@ class TestToySimulation(unittest.TestCase):
         simulation.step()
         self.assertEqual(simulation.state.accu, 2)
         simulation.step()
-        self.assertEqual(simulation.state.data_memory.load_halfword(1024), 2)
+        self.assertEqual(simulation.state.data_memory.read_halfword(1024), 2)
         simulation.step()
         self.assertEqual(simulation.state.accu, 4)
         simulation.step()
-        self.assertEqual(simulation.state.data_memory.load_halfword(1025), 4)
+        self.assertEqual(simulation.state.data_memory.read_halfword(1025), 4)
         simulation.step()
         self.assertEqual(simulation.state.accu, 5)
         simulation.step()
@@ -28,7 +28,7 @@ class TestToySimulation(unittest.TestCase):
 
     def test_run(self):
         simulation = ToySimulation()
-        simulation.state.instruction_memory.store_instructions(
+        simulation.state.instruction_memory.write_instructions(
             [INC(), INC(), STO(1024), ADD(1024), STO(1025), INC(), LDA(4095)]
         )
         self.assert_(not simulation.is_done())
@@ -36,9 +36,9 @@ class TestToySimulation(unittest.TestCase):
         self.assert_(simulation.is_done())
         self.assertEqual(simulation.state.program_counter, 7)
         self.assertEqual(simulation.state.accu, 0)
-        self.assertEqual(simulation.state.data_memory.load_halfword(1024), 2)
-        self.assertEqual(simulation.state.data_memory.load_halfword(1025), 4)
-        self.assertEqual(simulation.state.data_memory.load_halfword(4095), 0)
+        self.assertEqual(simulation.state.data_memory.read_halfword(1024), 2)
+        self.assertEqual(simulation.state.data_memory.read_halfword(1025), 4)
+        self.assertEqual(simulation.state.data_memory.read_halfword(4095), 0)
 
     def test_load_program(self):
         simulation = ToySimulation()
@@ -51,5 +51,5 @@ class TestToySimulation(unittest.TestCase):
         ADD $400"""
         simulation.load_program(program)
         simulation.run()
-        self.assertEqual(simulation.state.data_memory.load_halfword(0x400), 2)
+        self.assertEqual(simulation.state.data_memory.read_halfword(0x400), 2)
         self.assertEqual(simulation.state.accu, 4)

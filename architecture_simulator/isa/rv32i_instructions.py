@@ -560,7 +560,7 @@ class LB(MemoryITypeInstruction):
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             int(
                 fixedint.Int8(
-                    int(architectural_state.memory.load_byte(int(rs1) + self.imm))
+                    int(architectural_state.memory.read_byte(int(rs1) + self.imm))
                 )
             )
         )
@@ -582,7 +582,7 @@ class LB(MemoryITypeInstruction):
     ) -> Optional[int]:
         assert memory_address is not None
         return int(
-            fixedint.Int8(int(architectural_state.memory.load_byte(memory_address)))
+            fixedint.Int8(int(architectural_state.memory.read_byte(memory_address)))
         )
 
 
@@ -596,7 +596,7 @@ class LH(MemoryITypeInstruction):
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             int(
                 fixedint.Int16(
-                    int(architectural_state.memory.load_halfword(int(rs1) + self.imm))
+                    int(architectural_state.memory.read_halfword(int(rs1) + self.imm))
                 )
             )
         )
@@ -619,7 +619,7 @@ class LH(MemoryITypeInstruction):
         assert memory_address is not None
         return int(
             fixedint.Int16(
-                int(architectural_state.memory.load_halfword(memory_address))
+                int(architectural_state.memory.read_halfword(memory_address))
             )
         )
 
@@ -633,7 +633,7 @@ class LW(MemoryITypeInstruction):
         rs1 = architectural_state.register_file.registers[self.rs1]
         architectural_state.register_file.registers[
             self.rd
-        ] = architectural_state.memory.load_word(int(rs1) + self.imm)
+        ] = architectural_state.memory.read_word(int(rs1) + self.imm)
         return architectural_state
 
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
@@ -651,7 +651,7 @@ class LW(MemoryITypeInstruction):
         architectural_state: ArchitecturalState,
     ) -> Optional[int]:
         assert memory_address is not None
-        return int(architectural_state.memory.load_word(memory_address))
+        return int(architectural_state.memory.read_word(memory_address))
 
 
 class LBU(MemoryITypeInstruction):
@@ -662,7 +662,7 @@ class LBU(MemoryITypeInstruction):
         """x[rd] = M[x[rs1] + sext(imm)][7:0]"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            int(architectural_state.memory.load_byte(int(rs1) + self.imm))
+            int(architectural_state.memory.read_byte(int(rs1) + self.imm))
         )
         return architectural_state
 
@@ -681,7 +681,7 @@ class LBU(MemoryITypeInstruction):
         architectural_state: ArchitecturalState,
     ) -> Optional[int]:
         assert memory_address is not None
-        return int(architectural_state.memory.load_byte(memory_address))
+        return int(architectural_state.memory.read_byte(memory_address))
 
 
 class LHU(MemoryITypeInstruction):
@@ -692,7 +692,7 @@ class LHU(MemoryITypeInstruction):
         """x[rd] = M[x[rs1] + sext(imm)][15:0]"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            int(architectural_state.memory.load_halfword(int(rs1) + self.imm))
+            int(architectural_state.memory.read_halfword(int(rs1) + self.imm))
         )
         return architectural_state
 
@@ -711,7 +711,7 @@ class LHU(MemoryITypeInstruction):
         architectural_state: ArchitecturalState,
     ) -> Optional[int]:
         assert memory_address is not None
-        return int(architectural_state.memory.load_halfword(memory_address))
+        return int(architectural_state.memory.read_halfword(memory_address))
 
 
 class JALR(ITypeInstruction):
@@ -785,7 +785,7 @@ class SB(STypeInstruction):
         """M[x[rs1] + sext(imm)] = x[rs2][7:0]"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2][:8]
-        architectural_state.memory.store_byte(
+        architectural_state.memory.write_byte(
             int(rs1 + fixedint.MutableUInt32(self.imm)), fixedint.MutableUInt8(int(rs2))
         )
         return architectural_state
@@ -797,7 +797,7 @@ class SB(STypeInstruction):
         architectural_state: ArchitecturalState,
     ) -> Optional[int]:
         if memory_address is not None and memory_write_data is not None:
-            architectural_state.memory.store_byte(
+            architectural_state.memory.write_byte(
                 memory_address, fixedint.MutableUInt8(memory_write_data)
             )
         return None
@@ -824,7 +824,7 @@ class SH(STypeInstruction):
         """M[x[rs1] + sext(imm)] = x[rs2][15:0]"""
         rs2 = architectural_state.register_file.registers[self.rs2][:16]
         rs1 = architectural_state.register_file.registers[self.rs1]
-        architectural_state.memory.store_halfword(
+        architectural_state.memory.write_halfword(
             int(rs1 + fixedint.MutableUInt32(self.imm)),
             fixedint.MutableUInt16(int(rs2)),
         )
@@ -850,7 +850,7 @@ class SH(STypeInstruction):
         architectural_state: ArchitecturalState,
     ) -> Optional[int]:
         if memory_address is not None and memory_write_data is not None:
-            architectural_state.memory.store_halfword(
+            architectural_state.memory.write_halfword(
                 memory_address, fixedint.MutableUInt16(memory_write_data)
             )
         return None
@@ -864,7 +864,7 @@ class SW(STypeInstruction):
         """M[x[rs1] + sext(imm)] = x[rs2][31:0]"""
         rs2 = architectural_state.register_file.registers[self.rs2]
         rs1 = architectural_state.register_file.registers[self.rs1]
-        architectural_state.memory.store_word(
+        architectural_state.memory.write_word(
             int(rs1 + fixedint.MutableUInt32(self.imm)), rs2
         )
         return architectural_state
@@ -889,7 +889,7 @@ class SW(STypeInstruction):
         architectural_state: ArchitecturalState,
     ) -> Optional[int]:
         if memory_address is not None and memory_write_data is not None:
-            architectural_state.memory.store_word(
+            architectural_state.memory.write_word(
                 memory_address, fixedint.MutableUInt32(memory_write_data)
             )
         return None
@@ -1123,8 +1123,8 @@ class CSRRW(CSRTypeInstruction):
         """
         architectural_state.register_file.registers[
             self.rd
-        ] = architectural_state.csr_registers.load_word(self.csr)
-        architectural_state.csr_registers.store_word(
+        ] = architectural_state.csr_registers.read_word(self.csr)
+        architectural_state.csr_registers.write_word(
             self.csr, architectural_state.register_file.registers[self.rs1]
         )
 
@@ -1147,9 +1147,9 @@ class CSRRS(CSRTypeInstruction):
         rs1_value = architectural_state.register_file.registers[self.rs1]
         architectural_state.register_file.registers[
             self.rd
-        ] = architectural_state.csr_registers.load_word(self.csr)
-        temp = architectural_state.csr_registers.load_word(self.csr) | rs1_value
-        architectural_state.csr_registers.store_word(self.csr, temp)
+        ] = architectural_state.csr_registers.read_word(self.csr)
+        temp = architectural_state.csr_registers.read_word(self.csr) | rs1_value
+        architectural_state.csr_registers.write_word(self.csr, temp)
 
         return architectural_state
 
@@ -1170,9 +1170,9 @@ class CSRRC(CSRTypeInstruction):
         rs1_value = architectural_state.register_file.registers[self.rs1]
         architectural_state.register_file.registers[
             self.rd
-        ] = architectural_state.csr_registers.load_word(self.csr)
-        temp = architectural_state.csr_registers.load_word(self.csr) & (~(rs1_value))
-        architectural_state.csr_registers.store_word(self.csr, temp)
+        ] = architectural_state.csr_registers.read_word(self.csr)
+        temp = architectural_state.csr_registers.read_word(self.csr) & (~(rs1_value))
+        architectural_state.csr_registers.write_word(self.csr, temp)
 
         return architectural_state
 
@@ -1192,8 +1192,8 @@ class CSRRWI(CSRITypeInstruction):
         """
         architectural_state.register_file.registers[
             self.rd
-        ] = architectural_state.csr_registers.load_word(self.csr)
-        architectural_state.csr_registers.store_word(
+        ] = architectural_state.csr_registers.read_word(self.csr)
+        architectural_state.csr_registers.write_word(
             self.csr, fixedint.MutableUInt32(self.uimm)
         )
 
@@ -1215,11 +1215,11 @@ class CSRRSI(CSRITypeInstruction):
         """
         architectural_state.register_file.registers[
             self.rd
-        ] = architectural_state.csr_registers.load_word(self.csr)
-        temp = architectural_state.csr_registers.load_word(
+        ] = architectural_state.csr_registers.read_word(self.csr)
+        temp = architectural_state.csr_registers.read_word(
             self.csr
         ) | fixedint.MutableUInt32(self.uimm)
-        architectural_state.csr_registers.store_word(self.csr, temp)
+        architectural_state.csr_registers.write_word(self.csr, temp)
 
         return architectural_state
 
@@ -1239,11 +1239,11 @@ class CSRRCI(CSRITypeInstruction):
         """
         architectural_state.register_file.registers[
             self.rd
-        ] = architectural_state.csr_registers.load_word(self.csr)
-        temp = architectural_state.csr_registers.load_word(self.csr) & (
+        ] = architectural_state.csr_registers.read_word(self.csr)
+        temp = architectural_state.csr_registers.read_word(self.csr) & (
             ~(fixedint.MutableUInt32(self.uimm))
         )
-        architectural_state.csr_registers.store_word(self.csr, temp)
+        architectural_state.csr_registers.write_word(self.csr, temp)
 
         return architectural_state
 

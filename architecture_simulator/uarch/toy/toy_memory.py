@@ -9,7 +9,7 @@ class ToyMemory:
     memory_file: dict[int, MutableUInt16] = field(default_factory=dict)
     address_range: range = field(default_factory=lambda: range(1024, 4096))
 
-    def store_halfword(self, address: int, value: MutableUInt16):
+    def write_halfword(self, address: int, value: MutableUInt16):
         """Store given value at given address.
 
         Args:
@@ -20,7 +20,7 @@ class ToyMemory:
         # casting is there to create a copy
         self.memory_file[address] = MutableUInt16(int(value))
 
-    def load_halfword(self, address: int) -> MutableUInt16:
+    def read_halfword(self, address: int) -> MutableUInt16:
         """Load value from given address. Default is 0 if the address hasn't been written to yet.
 
         Args:

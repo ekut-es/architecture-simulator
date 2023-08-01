@@ -16,6 +16,7 @@ class RiscvInstruction(Instruction):
     length: int = 4
 
     def __init__(self, **kwargs):
+        """NOTE: I wrote a super long comment for why we use **kwargs here in architecture_simulator.isa.toy.toy_instructions.ToyInstruction"""
         self.mnemonic = kwargs["mnemonic"]
 
     def behavior(self, architectural_state: ArchitecturalState):

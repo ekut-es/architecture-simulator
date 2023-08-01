@@ -13,6 +13,12 @@ class ToyInstruction(Instruction):
     length: int = 1
 
     def __init__(self, **kwargs):
+        """NOTE: I use **kwargs here because otherwise, the parser has to create objects from the 'class objects'.
+        Since it only knows if the instruction it is currently looking at is an AddressTypeInstruction or a
+        normal ToyInstruction and since it doesnt know which exact subclass it is, it can not know which
+        constructor the current instruction has. So to fix this, we use **kwargs for the arguments which we do
+        need to fill in in the parser. If you have a better solution (that does not involve creating a separate
+        if-case for each instruction), go ahead and change this."""
         self.mnemonic = kwargs["mnemonic"].upper()
         self.opcode = kwargs["opcode"] % 16
 
@@ -45,7 +51,7 @@ class STO(AddressTypeInstruction):
     def behavior(self, state: ToyArchitecturalState):
         # NOTE: The Memory class is byte addressed, but the toy architecture uses a halfword addressed memory.
         # Thus, we need to shift the address by one bit
-        state.data_memory.store_halfword(address=self.address, value=state.accu)
+        state.data_memory.write_halfword(address=self.address, value=state.accu)
         state.increment_pc()
 
 
@@ -56,7 +62,7 @@ class LDA(AddressTypeInstruction):
     def behavior(self, state: ToyArchitecturalState):
         # NOTE: The Memory class is byte addressed, but the toy architecture uses a halfword addressed memory.
         # Thus, we need to shift the address by one bit
-        state.accu = state.data_memory.load_halfword(address=self.address)
+        state.accu = state.data_memory.read_halfword(address=self.address)
         state.increment_pc()
 
 
@@ -79,7 +85,7 @@ class ADD(AddressTypeInstruction):
         super().__init__(mnemonic="ADD", opcode=3, address=address)
 
     def behavior(self, state: ToyArchitecturalState):
-        memory = state.data_memory.load_halfword(address=self.address)
+        memory = state.data_memory.read_halfword(address=self.address)
         state.accu = state.accu + memory
         state.increment_pc()
 
@@ -89,7 +95,7 @@ class SUB(AddressTypeInstruction):
         super().__init__(mnemonic="SUB", opcode=4, address=address)
 
     def behavior(self, state: ToyArchitecturalState):
-        memory = state.data_memory.load_halfword(address=self.address)
+        memory = state.data_memory.read_halfword(address=self.address)
         state.accu = state.accu - memory
         state.increment_pc()
 
@@ -99,7 +105,7 @@ class OR(AddressTypeInstruction):
         super().__init__(mnemonic="OR", opcode=5, address=address)
 
     def behavior(self, state: ToyArchitecturalState):
-        memory = state.data_memory.load_halfword(address=self.address)
+        memory = state.data_memory.read_halfword(address=self.address)
         state.accu = state.accu | memory
         state.increment_pc()
 
@@ -109,7 +115,7 @@ class AND(AddressTypeInstruction):
         super().__init__(mnemonic="AND", opcode=6, address=address)
 
     def behavior(self, state: ToyArchitecturalState):
-        memory = state.data_memory.load_halfword(address=self.address)
+        memory = state.data_memory.read_halfword(address=self.address)
         state.accu = state.accu & memory
         state.increment_pc()
 
@@ -119,7 +125,7 @@ class XOR(AddressTypeInstruction):
         super().__init__(mnemonic="XOR", opcode=7, address=address)
 
     def behavior(self, state: ToyArchitecturalState):
-        memory = state.data_memory.load_halfword(address=self.address)
+        memory = state.data_memory.read_halfword(address=self.address)
         state.accu = state.accu ^ memory
         state.increment_pc()
 

@@ -164,21 +164,21 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(len(simulation1.state.instruction_memory.instructions), 1)
         self.assertEqual(len(simulation2.state.instruction_memory.instructions), 0)
 
-        simulation1.state.csr_registers.store_byte(
+        simulation1.state.csr_registers.write_byte(
             address=5, value=fixedint.MutableUInt8(12)
         )
         self.assertEqual(
-            (int(simulation1.state.csr_registers.load_byte(address=5))), 12
+            (int(simulation1.state.csr_registers.read_byte(address=5))), 12
         )
-        self.assertEqual((int(simulation2.state.csr_registers.load_byte(address=5))), 0)
+        self.assertEqual((int(simulation2.state.csr_registers.read_byte(address=5))), 0)
 
         simulation1.state.performance_metrics.instruction_count = 12
         self.assertEqual(simulation1.state.performance_metrics.instruction_count, 12)
         self.assertEqual(simulation2.state.performance_metrics.instruction_count, 0)
 
-        simulation1.state.memory.store_byte(address=5, value=fixedint.MutableUInt8(12))
-        self.assertEqual(int(simulation1.state.memory.load_byte(address=5)), 12)
-        self.assertEqual(int(simulation2.state.memory.load_byte(address=5)), 0)
+        simulation1.state.memory.write_byte(address=5, value=fixedint.MutableUInt8(12))
+        self.assertEqual(int(simulation1.state.memory.read_byte(address=5)), 12)
+        self.assertEqual(int(simulation2.state.memory.read_byte(address=5)), 0)
 
     def test_step_simulation_over(self):
         simulation = Simulation()

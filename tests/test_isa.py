@@ -1624,31 +1624,31 @@ class TestInstructions(unittest.TestCase):
         )
         sb_0 = SB(rs1=0, rs2=0, imm=0)
         state = sb_0.behavior(state)
-        self.assertEqual(state.memory.load_byte(0), 0)
+        self.assertEqual(state.memory.read_byte(0), 0)
 
         sb_1 = SB(rs1=0, rs2=2, imm=1)
         state = sb_1.behavior(state)
-        self.assertEqual(state.memory.load_byte(1), 1)
+        self.assertEqual(state.memory.read_byte(1), 1)
 
         sb_2 = SB(rs1=0, rs2=1, imm=1)
         state = sb_2.behavior(state)
-        self.assertEqual(state.memory.load_byte(1), 5)
+        self.assertEqual(state.memory.read_byte(1), 5)
 
         sb_3 = SB(rs1=0, rs2=3, imm=0)
         state = sb_3.behavior(state)
-        self.assertEqual(state.memory.load_byte(0), 0)
+        self.assertEqual(state.memory.read_byte(0), 0)
 
         sb_4 = SB(rs1=0, rs2=3, imm=1)
         state = sb_4.behavior(state)
-        self.assertEqual(state.memory.load_byte(1), 0)
+        self.assertEqual(state.memory.read_byte(1), 0)
 
         sb_5 = SB(rs1=0, rs2=4, imm=2)
         state = sb_5.behavior(state)
-        self.assertEqual(state.memory.load_byte(2), 128)
+        self.assertEqual(state.memory.read_byte(2), 128)
 
         sb_6 = SB(rs1=0, rs2=5, imm=2)
         state = sb_6.behavior(state)
-        self.assertEqual(state.memory.load_byte(2), 0)
+        self.assertEqual(state.memory.read_byte(2), 0)
 
     def test_sh(self):
         state = ArchitecturalState(
@@ -1670,35 +1670,35 @@ class TestInstructions(unittest.TestCase):
 
         sh_0 = SH(rs1=0, rs2=0, imm=0)
         state = sh_0.behavior(state)
-        self.assertEqual(int(state.memory.load_halfword(0)), 0)
+        self.assertEqual(int(state.memory.read_halfword(0)), 0)
 
         sh_1 = SH(rs1=0, rs2=1, imm=0)
         state = sh_1.behavior(state)
-        self.assertEqual(int(state.memory.load_halfword(0)), 0)
+        self.assertEqual(int(state.memory.read_halfword(0)), 0)
 
         sh_2 = SH(rs1=0, rs2=2, imm=1)
         state = sh_2.behavior(state)
-        self.assertEqual(int(state.memory.load_halfword(1)), 1)
+        self.assertEqual(int(state.memory.read_halfword(1)), 1)
 
         sh_3 = SH(rs1=0, rs2=3, imm=2)
         state = sh_3.behavior(state)
-        self.assertEqual(int(state.memory.load_halfword(2)), 2)
+        self.assertEqual(int(state.memory.read_halfword(2)), 2)
 
         sh_4 = SH(rs1=0, rs2=4, imm=3)
         state = sh_4.behavior(state)
-        self.assertEqual(int(state.memory.load_halfword(3)), 3)
+        self.assertEqual(int(state.memory.read_halfword(3)), 3)
 
         sh_5 = SH(rs1=0, rs2=6, imm=3)
         state = sh_5.behavior(state)
-        self.assertEqual(int(state.memory.load_halfword(3)), 255)
+        self.assertEqual(int(state.memory.read_halfword(3)), 255)
 
         sh_6 = SH(rs1=0, rs2=7, imm=3)
         state = sh_6.behavior(state)
-        self.assertEqual(int(state.memory.load_halfword(3)), 256)
+        self.assertEqual(int(state.memory.read_halfword(3)), 256)
 
         sh_7 = SH(rs1=0, rs2=8, imm=6)
         state = sh_7.behavior(state)
-        self.assertEqual(int(state.memory.load_halfword(6)), 65535)
+        self.assertEqual(int(state.memory.read_halfword(6)), 65535)
 
     def test_sw(self):
         state = ArchitecturalState(
@@ -1719,35 +1719,35 @@ class TestInstructions(unittest.TestCase):
 
         sw_0 = SW(rs1=0, rs2=0, imm=0)
         state = sw_0.behavior(state)
-        self.assertEqual(int(state.memory.load_word(0)), 0)
+        self.assertEqual(int(state.memory.read_word(0)), 0)
 
         sw_1 = SW(rs1=0, rs2=1, imm=1)
         state = sw_1.behavior(state)
-        self.assertEqual(int(state.memory.load_word(1)), 1)
+        self.assertEqual(int(state.memory.read_word(1)), 1)
 
         sw_2 = SW(rs1=0, rs2=2, imm=2)
         state = sw_2.behavior(state)
-        self.assertEqual(int(state.memory.load_word(2)), 2)
+        self.assertEqual(int(state.memory.read_word(2)), 2)
 
         sw_3 = SW(rs1=0, rs2=3, imm=3)
         state = sw_3.behavior(state)
-        self.assertEqual(int(state.memory.load_word(3)), 100)
+        self.assertEqual(int(state.memory.read_word(3)), 100)
 
         sw_4 = SW(rs1=0, rs2=4, imm=0)
         state = sw_4.behavior(state)
-        self.assertEqual(int(state.memory.load_word(0)), 10)
+        self.assertEqual(int(state.memory.read_word(0)), 10)
 
         sw_5 = SW(rs1=0, rs2=5, imm=0)
         state = sw_5.behavior(state)
-        self.assertEqual(int(state.memory.load_word(0)), 255)
+        self.assertEqual(int(state.memory.read_word(0)), 255)
 
         sw_6 = SW(rs1=0, rs2=6, imm=0)
         state = sw_6.behavior(state)
-        self.assertEqual(int(state.memory.load_word(0)), 256)
+        self.assertEqual(int(state.memory.read_word(0)), 256)
 
         sw_7 = SW(rs1=0, rs2=7, imm=8)
         state = sw_7.behavior(state)
-        self.assertEqual(int(state.memory.load_word(8)), 4294967295)
+        self.assertEqual(int(state.memory.read_word(8)), 4294967295)
 
     def test_btype(self):
         btype = BEQ(rs1=0, rs2=0, imm=0)
@@ -2180,7 +2180,7 @@ class TestInstructions(unittest.TestCase):
         state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
         state.csr_registers.privilege_level = 0
         with self.assertRaises(CSRError) as context:
-            state.csr_registers.store_word(3000, fixedint.MutableUInt32(3))
+            state.csr_registers.write_word(3000, fixedint.MutableUInt32(3))
         self.assertTrue(
             "illegal action: privilege level too low to access this csr register"
             in str(context.exception)
@@ -2189,7 +2189,7 @@ class TestInstructions(unittest.TestCase):
     def test_csrrw_attempting_to_write_to_read_only(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
         with self.assertRaises(CSRError) as context:
-            state.csr_registers.store_word(3072, fixedint.MutableUInt32(3))
+            state.csr_registers.write_word(3072, fixedint.MutableUInt32(3))
         self.assertTrue(
             "illegal action: attempting to write into read-only csr register"
             in str(context.exception)
@@ -2199,7 +2199,7 @@ class TestInstructions(unittest.TestCase):
         state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
         state.csr_registers.privilege_level = 4
         with self.assertRaises(CSRError) as context:
-            state.csr_registers.store_word(7000, fixedint.MutableUInt32(3))
+            state.csr_registers.write_word(7000, fixedint.MutableUInt32(3))
         self.assertTrue(
             "illegal action: csr register does not exist" in str(context.exception)
         )
@@ -2209,11 +2209,11 @@ class TestInstructions(unittest.TestCase):
         fixedint.MutableUInt32(1)
         state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
         cssrw_1 = CSRRW(csr=0, rs1=1, rd=0)
-        state.csr_registers.store_word(0, fixedint.MutableUInt32(3))
+        state.csr_registers.write_word(0, fixedint.MutableUInt32(3))
         state.csr_registers.privilege_level = 4
         state = cssrw_1.behavior(state)
         self.assertEqual(state.register_file.registers, [3, 2])
-        self.assertEqual(state.csr_registers.load_word(cssrw_1.csr), 2)
+        self.assertEqual(state.csr_registers.read_word(cssrw_1.csr), 2)
 
     def test_csrrs(self):
         max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
@@ -2222,11 +2222,11 @@ class TestInstructions(unittest.TestCase):
         state = ArchitecturalState(
             register_file=RegisterFile(registers=[0, test_mask_1])
         )
-        state.csr_registers.store_word(0, test_number_1)
+        state.csr_registers.write_word(0, test_number_1)
         cssrs_1 = CSRRS(csr=0, rs1=1, rd=0)
         state = cssrs_1.behavior(state)
         self.assertEqual(state.register_file.registers, [test_number_1, test_mask_1])
-        self.assertEqual(state.csr_registers.load_word(cssrs_1.csr), max_number)
+        self.assertEqual(state.csr_registers.read_word(cssrs_1.csr), max_number)
 
     def test_csrrc(self):
         max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
@@ -2235,11 +2235,11 @@ class TestInstructions(unittest.TestCase):
         state = ArchitecturalState(
             register_file=RegisterFile(registers=[0, test_mask_1])
         )
-        state.csr_registers.store_word(0, max_number)
+        state.csr_registers.write_word(0, max_number)
         cssrc_1 = CSRRC(csr=0, rs1=1, rd=0)
         state = cssrc_1.behavior(state)
         self.assertEqual(state.register_file.registers, [max_number, test_mask_1])
-        self.assertEqual(state.csr_registers.load_word(cssrc_1.csr), test_result_1)
+        self.assertEqual(state.csr_registers.read_word(cssrc_1.csr), test_result_1)
 
     def test_csritype(self):
         cssrwi_1 = CSRRWI(csr=0, rd=0, uimm=0)
@@ -2255,11 +2255,11 @@ class TestInstructions(unittest.TestCase):
 
     def test_csrrwi(self):
         state = ArchitecturalState(register_file=RegisterFile(registers=[0]))
-        state.csr_registers.store_word(0, 3)
+        state.csr_registers.write_word(0, 3)
         cssrwi_1 = CSRRWI(csr=0, uimm=4, rd=0)
         state = cssrwi_1.behavior(state)
         self.assertEqual(state.register_file.registers, [3])
-        self.assertEqual(state.csr_registers.load_word(cssrwi_1.csr), 4)
+        self.assertEqual(state.csr_registers.read_word(cssrwi_1.csr), 4)
 
     def test_csrrsi(self):
         max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
@@ -2267,21 +2267,21 @@ class TestInstructions(unittest.TestCase):
         test_mask_1 = 1
         state = ArchitecturalState(register_file=RegisterFile(registers=[0]))
         cssrsi_1 = CSRRSI(csr=0, uimm=test_mask_1, rd=0)
-        state.csr_registers.store_word(0, test_number_1)
+        state.csr_registers.write_word(0, test_number_1)
         state = cssrsi_1.behavior(state)
         self.assertEqual(state.register_file.registers, [test_number_1])
-        self.assertEqual(state.csr_registers.load_word(cssrsi_1.csr), max_number)
+        self.assertEqual(state.csr_registers.read_word(cssrsi_1.csr), max_number)
 
     def test_csrrci(self):
         max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
         test_result_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
         test_mask_1 = 1
         state = ArchitecturalState(register_file=RegisterFile(registers=[0]))
-        state.csr_registers.store_word(0, max_number)
+        state.csr_registers.write_word(0, max_number)
         cssrci_1 = CSRRCI(csr=0, uimm=test_mask_1, rd=0)
         state = cssrci_1.behavior(state)
         self.assertEqual(state.register_file.registers, [max_number])
-        self.assertEqual(state.csr_registers.load_word(cssrci_1.csr), test_result_1)
+        self.assertEqual(state.csr_registers.read_word(cssrci_1.csr), test_result_1)
 
     def test_repr_1(self):
         # Tests that the __repr__() method for the instructions works as intended

@@ -19,7 +19,7 @@ class ToySimulation:
 
     def step(self):
         """_summary_"""
-        self.state.instruction_memory.load_instruction(
+        self.state.instruction_memory.read_instruction(
             int(self.state.program_counter)
         ).behavior(self.state)
 
@@ -39,4 +39,4 @@ class ToySimulation:
     def load_program(self, program: str):
         parser = ToyParser()
         instructions = parser.parse(program)
-        self.state.instruction_memory.store_instructions(instructions)
+        self.state.instruction_memory.write_instructions(instructions)

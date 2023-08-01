@@ -794,18 +794,18 @@ class TestPipeline(unittest.TestCase):
         pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(2**7)
         self.assert_steps(pipeline=pipeline, steps=11)
         self.assertEqual(
-            pipeline.state.memory.load_byte(2**16), fixedint.MutableUInt8(2**8 - 1)
+            pipeline.state.memory.read_byte(2**16), fixedint.MutableUInt8(2**8 - 1)
         )
         self.assertEqual(
-            pipeline.state.memory.load_halfword(2**16 + 4),
+            pipeline.state.memory.read_halfword(2**16 + 4),
             fixedint.MutableUInt16(2**16 - 1),
         )
         self.assertEqual(
-            pipeline.state.memory.load_word(2**16 + 8),
+            pipeline.state.memory.read_word(2**16 + 8),
             fixedint.MutableUInt32(2**32 - 1),
         )
         self.assertEqual(
-            pipeline.state.memory.load_word(2**16 + 12),
+            pipeline.state.memory.read_word(2**16 + 12),
             fixedint.MutableUInt32(2**7 + 2**15 + 2**23 + 2**31),
         )
 

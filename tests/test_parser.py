@@ -368,7 +368,7 @@ fibonacci:
         while simulation.state.program_counter < 60:
             simulation.step_simulation()
             simulation.state.register_file.registers[0] = 0
-        self.assertEqual(int(simulation.state.memory.load_word(4294967268)), 65)
+        self.assertEqual(int(simulation.state.memory.read_word(4294967268)), 65)
 
     fibonacci_c_abi = """main:
 	addi	sp,sp,-16

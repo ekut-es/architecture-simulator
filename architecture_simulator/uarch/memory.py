@@ -28,7 +28,7 @@ class Memory:
         number_of_bytes = self.address_length / 8
         for address in self.memory_file.keys():
             if address % number_of_bytes == 0:
-                word = self.load_word(address=address)
+                word = self.read_word(address=address)
                 bin_word = "{:032b}".format(int(word))
                 hex_word = "{:08X}".format(int(word))
                 bin_word_with_spaces = (
@@ -55,7 +55,7 @@ class Memory:
                     hex_word_with_spaces,
                 )
             elif address % number_of_bytes == 1:
-                word = self.load_word(address=address - 1)
+                word = self.read_word(address=address - 1)
                 bin_word = "{:032b}".format(int(word))
                 hex_word = "{:08X}".format(int(word))
                 bin_word_with_spaces = (
@@ -82,7 +82,7 @@ class Memory:
                     hex_word_with_spaces,
                 )
             elif address % number_of_bytes == 2:
-                word = self.load_word(address=address - 2)
+                word = self.read_word(address=address - 2)
                 bin_word = "{:032b}".format(int(word))
                 hex_word = "{:08X}".format(int(word))
                 bin_word_with_spaces = (
@@ -109,7 +109,7 @@ class Memory:
                     hex_word_with_spaces,
                 )
             elif address % number_of_bytes == 3:
-                word = self.load_word(address=address - 3)
+                word = self.read_word(address=address - 3)
                 bin_word = "{:032b}".format(int(word))
                 hex_word = "{:08X}".format(int(word))
                 bin_word_with_spaces = (
@@ -137,7 +137,7 @@ class Memory:
                 )
         return wordwise_mem
 
-    def load_byte(self, address: int) -> fixedint.MutableUInt8:
+    def read_byte(self, address: int) -> fixedint.MutableUInt8:
         address_with_overflow = address % pow(2, self.address_length)
         if address_with_overflow < self.min_bytes:
             raise MemoryAddressError(
@@ -152,7 +152,7 @@ class Memory:
             addr1 = fixedint.MutableUInt8(0)
         return addr1
 
-    def store_byte(self, address: int, value: fixedint.MutableUInt8):
+    def write_byte(self, address: int, value: fixedint.MutableUInt8):
         address_with_overflow = address % pow(2, self.address_length)
         if address_with_overflow < self.min_bytes:
             raise MemoryAddressError(
@@ -164,40 +164,40 @@ class Memory:
         safe_value = fixedint.MutableUInt8(int(value))
         self.memory_file[address_with_overflow] = safe_value
 
-    def load_halfword(self, address: int) -> fixedint.MutableUInt16:
-        addr1 = int(self.load_byte(address))
-        addr2 = int(self.load_byte(address + 1)) << 8
+    def read_halfword(self, address: int) -> fixedint.MutableUInt16:
+        addr1 = int(self.read_byte(address))
+        addr2 = int(self.read_byte(address + 1)) << 8
 
         return fixedint.MutableUInt16(addr1 | addr2)
 
-    def store_halfword(self, address: int, value: fixedint.MutableUInt16):
+    def write_halfword(self, address: int, value: fixedint.MutableUInt16):
         safe_value = fixedint.MutableUInt16(int(value))
-        self.store_byte(
+        self.write_byte(
             address=address, value=fixedint.MutableUInt8(int(safe_value[0:8]))
         )
-        self.store_byte(
+        self.write_byte(
             address=address + 1, value=fixedint.MutableUInt8(int(safe_value[8:16]))
         )
 
-    def load_word(self, address: int) -> fixedint.MutableUInt32:
-        addr1 = int(self.load_byte(address))
-        addr2 = int(self.load_byte(address + 1)) << 8
-        addr3 = int(self.load_byte(address + 2)) << 16
-        addr4 = int(self.load_byte(address + 3)) << 24
+    def read_word(self, address: int) -> fixedint.MutableUInt32:
+        addr1 = int(self.read_byte(address))
+        addr2 = int(self.read_byte(address + 1)) << 8
+        addr3 = int(self.read_byte(address + 2)) << 16
+        addr4 = int(self.read_byte(address + 3)) << 24
         return fixedint.MutableUInt32(addr4 | addr3 | addr2 | addr1)
 
-    def store_word(self, address: int, value: fixedint.MutableUInt32):
+    def write_word(self, address: int, value: fixedint.MutableUInt32):
         safe_value = fixedint.MutableUInt32(int(value))
-        self.store_byte(
+        self.write_byte(
             address=address, value=fixedint.MutableUInt8(int(safe_value[0:8]))
         )
-        self.store_byte(
+        self.write_byte(
             address=address + 1, value=fixedint.MutableUInt8(int(safe_value[8:16]))
         )
-        self.store_byte(
+        self.write_byte(
             address=address + 2, value=fixedint.MutableUInt8(int(safe_value[16:24]))
         )
-        self.store_byte(
+        self.write_byte(
             address=address + 3, value=fixedint.MutableUInt8(int(safe_value[24:32]))
         )
 
@@ -208,38 +208,38 @@ class CsrRegisterFile(Memory):
         self.privilege_level = privilege_level
         self.min_bytes = min_bytes
 
-    def load_byte(self, address: int) -> fixedint.MutableUInt8:
+    def read_byte(self, address: int) -> fixedint.MutableUInt8:
         self.check_for_legal_address(address)
         self.check_privilege_level(address)
-        return super().load_byte(address)
+        return super().read_byte(address)
 
-    def store_byte(self, address: int, value: fixedint.MutableUInt8):
+    def write_byte(self, address: int, value: fixedint.MutableUInt8):
         self.check_for_legal_address(address)
         self.check_privilege_level(address)
         self.check_read_only(address)
-        return super().store_byte(address, value)
+        return super().write_byte(address, value)
 
-    def load_halfword(self, address: int) -> fixedint.MutableUInt16:
+    def read_halfword(self, address: int) -> fixedint.MutableUInt16:
         self.check_for_legal_address(address)
         self.check_privilege_level(address)
-        return super().load_halfword(address)
+        return super().read_halfword(address)
 
-    def store_halfword(self, address: int, value: fixedint.MutableUInt16):
-        self.check_for_legal_address(address)
-        self.check_privilege_level(address)
-        self.check_read_only(address)
-        return super().store_halfword(address, value)
-
-    def load_word(self, address: int) -> fixedint.MutableUInt32:
-        self.check_for_legal_address(address)
-        self.check_privilege_level(address)
-        return super().load_word(address)
-
-    def store_word(self, address: int, value: fixedint.MutableUInt32):
+    def write_halfword(self, address: int, value: fixedint.MutableUInt16):
         self.check_for_legal_address(address)
         self.check_privilege_level(address)
         self.check_read_only(address)
-        return super().store_word(address, value)
+        return super().write_halfword(address, value)
+
+    def read_word(self, address: int) -> fixedint.MutableUInt32:
+        self.check_for_legal_address(address)
+        self.check_privilege_level(address)
+        return super().read_word(address)
+
+    def write_word(self, address: int, value: fixedint.MutableUInt32):
+        self.check_for_legal_address(address)
+        self.check_privilege_level(address)
+        self.check_read_only(address)
+        return super().write_word(address, value)
 
     def check_privilege_level(self, address: int):
         if (address & 0b001100000000) > self.privilege_level:
@@ -274,7 +274,7 @@ class InstructionMemory(Generic[T]):
     instructions: dict[int, T] = field(default_factory=dict)
     address_range: range = field(default_factory=lambda: range(0, 2**14))
 
-    def load_instruction(self, address: int) -> T:
+    def read_instruction(self, address: int) -> T:
         """Load instruction from given address.
 
         Args:
@@ -286,7 +286,7 @@ class InstructionMemory(Generic[T]):
         self.assert_address_in_range(address)
         return self.instructions[address]
 
-    def store_instruction(self, address: int, instr: T):
+    def write_instruction(self, address: int, instr: T):
         """Store a single instruction at given address.
 
         Args:
@@ -297,7 +297,7 @@ class InstructionMemory(Generic[T]):
         self.assert_address_in_range(address + instr.length - 1)
         self.instructions[address] = instr
 
-    def store_instructions(self, instructions: list[T]):
+    def write_instructions(self, instructions: list[T]):
         """Clear the instruction memory and store given instructions, starting at the first valid address.
 
         Args:
@@ -306,7 +306,7 @@ class InstructionMemory(Generic[T]):
         self.instructions = {}
         next_address = self.address_range.start
         for instr in instructions:
-            self.store_instruction(next_address, instr=instr)
+            self.write_instruction(next_address, instr=instr)
             next_address += instr.length
 
     def assert_address_in_range(self, address: int):

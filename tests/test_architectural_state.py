@@ -71,9 +71,9 @@ class TestArchitecture(unittest.TestCase):
     def test_mem(self):
         # test the wordwise repr method
         state = ArchitecturalState(memory=Memory(min_bytes=0))
-        state.memory.store_word(0, fixedint.MutableUInt32(1))
-        state.memory.store_word(6, fixedint.MutableUInt32(6))
-        state.memory.store_byte(21, fixedint.MutableUInt32(20))
+        state.memory.write_word(0, fixedint.MutableUInt32(1))
+        state.memory.write_word(6, fixedint.MutableUInt32(6))
+        state.memory.write_byte(21, fixedint.MutableUInt32(20))
         self.assertEqual(
             state.memory.memory_wordwise_repr()[0][0],
             "00000000 00000000 00000000 00000001",
@@ -103,40 +103,40 @@ class TestArchitecture(unittest.TestCase):
             register_file=RegisterFile(registers=()), memory=Memory(min_bytes=0)
         )
         # store_byte test
-        state.memory.store_byte(0, fixedint.MutableUInt8(1))
-        self.assertEqual(state.memory.load_byte(0), fixedint.MutableUInt8(1))
+        state.memory.write_byte(0, fixedint.MutableUInt8(1))
+        self.assertEqual(state.memory.read_byte(0), fixedint.MutableUInt8(1))
 
         # store_byte type test
-        state.memory.store_byte(0, fixedint.MutableUInt8(1))
-        self.assertIsInstance(state.memory.load_byte(0), fixedint.MutableUInt8)
+        state.memory.write_byte(0, fixedint.MutableUInt8(1))
+        self.assertIsInstance(state.memory.read_byte(0), fixedint.MutableUInt8)
 
         # store_halfword test
-        state.memory.store_halfword(0, fixedint.MutableUInt16(1))
-        self.assertEqual(state.memory.load_halfword(0), fixedint.MutableUInt16(1))
+        state.memory.write_halfword(0, fixedint.MutableUInt16(1))
+        self.assertEqual(state.memory.read_halfword(0), fixedint.MutableUInt16(1))
 
         # store_halfword type test
-        state.memory.store_halfword(0, fixedint.MutableUInt16(1))
-        self.assertIsInstance(state.memory.load_halfword(0), fixedint.MutableUInt16)
+        state.memory.write_halfword(0, fixedint.MutableUInt16(1))
+        self.assertIsInstance(state.memory.read_halfword(0), fixedint.MutableUInt16)
 
         # store_word test
-        state.memory.store_word(0, fixedint.MutableUInt32(1))
-        self.assertEqual(state.memory.load_word(0), fixedint.MutableUInt32(1))
+        state.memory.write_word(0, fixedint.MutableUInt32(1))
+        self.assertEqual(state.memory.read_word(0), fixedint.MutableUInt32(1))
 
         # store_word type test
-        state.memory.store_word(0, fixedint.MutableUInt32(1))
-        self.assertIsInstance(state.memory.load_word(0), fixedint.MutableUInt32)
+        state.memory.write_word(0, fixedint.MutableUInt32(1))
+        self.assertIsInstance(state.memory.read_word(0), fixedint.MutableUInt32)
 
         # store_byte negative value test
-        state.memory.store_byte(0, fixedint.MutableUInt8(-1))
-        self.assertEqual(state.memory.load_byte(0), fixedint.MutableUInt8(-1))
+        state.memory.write_byte(0, fixedint.MutableUInt8(-1))
+        self.assertEqual(state.memory.read_byte(0), fixedint.MutableUInt8(-1))
 
         # store_halfword negative value test
-        state.memory.store_halfword(0, fixedint.MutableUInt16(-1))
-        self.assertEqual(state.memory.load_halfword(0), fixedint.MutableUInt16(-1))
+        state.memory.write_halfword(0, fixedint.MutableUInt16(-1))
+        self.assertEqual(state.memory.read_halfword(0), fixedint.MutableUInt16(-1))
 
         # store_word test
-        state.memory.store_word(0, fixedint.MutableUInt32(-1))
-        self.assertEqual(state.memory.load_word(0), fixedint.MutableUInt32(-1))
+        state.memory.write_word(0, fixedint.MutableUInt32(-1))
+        self.assertEqual(state.memory.read_word(0), fixedint.MutableUInt32(-1))
 
         # tests are now with 16 bit length of memory
         state = ArchitecturalState(
@@ -145,28 +145,28 @@ class TestArchitecture(unittest.TestCase):
         )
 
         # store_byte test
-        state.memory.store_byte(pow(2, 16), fixedint.MutableUInt8(2))
-        self.assertEqual(state.memory.load_word(0), fixedint.MutableUInt32(2))
+        state.memory.write_byte(pow(2, 16), fixedint.MutableUInt8(2))
+        self.assertEqual(state.memory.read_word(0), fixedint.MutableUInt32(2))
 
         # store_halfword test
-        state.memory.store_halfword(pow(2, 16), fixedint.MutableUInt16(3))
-        self.assertEqual(state.memory.load_halfword(0), fixedint.MutableUInt16(3))
+        state.memory.write_halfword(pow(2, 16), fixedint.MutableUInt16(3))
+        self.assertEqual(state.memory.read_halfword(0), fixedint.MutableUInt16(3))
 
         # store_word test
-        state.memory.store_word(pow(2, 16), fixedint.MutableUInt32(4))
-        self.assertEqual(state.memory.load_word(0), fixedint.MutableUInt32(4))
+        state.memory.write_word(pow(2, 16), fixedint.MutableUInt32(4))
+        self.assertEqual(state.memory.read_word(0), fixedint.MutableUInt32(4))
 
     def test_unified_memory(self):
         state = ArchitecturalState()
 
         # Save instr tests:
-        state.instruction_memory.store_instruction(
+        state.instruction_memory.write_instruction(
             address=0, instr=ADD(rd=0, rs1=0, rs2=0)
         )
         self.assertEqual(
             state.instruction_memory.instructions[0], ADD(rd=0, rs1=0, rs2=0)
         )
-        state.instruction_memory.store_instruction(
+        state.instruction_memory.write_instruction(
             address=2**14 - 4, instr=ADD(rd=1, rs1=2, rs2=3)
         )
         self.assertEqual(
@@ -175,7 +175,7 @@ class TestArchitecture(unittest.TestCase):
 
         # Illegal access out of bounds of instr memory
         with self.assertRaises(MemoryAddressError) as cm:
-            state.instruction_memory.store_instruction(
+            state.instruction_memory.write_instruction(
                 address=2**14, instr=ADD(rd=1, rs1=2, rs2=3)
             )
         self.assertEqual(
@@ -189,7 +189,7 @@ class TestArchitecture(unittest.TestCase):
         )
 
         with self.assertRaises(MemoryAddressError) as cm:
-            state.instruction_memory.store_instruction(
+            state.instruction_memory.write_instruction(
                 address=-1, instr=ADD(rd=1, rs1=2, rs2=3)
             )
         self.assertEqual(
@@ -204,28 +204,28 @@ class TestArchitecture(unittest.TestCase):
 
         # load instr tests:
         self.assertEqual(
-            state.instruction_memory.load_instruction(0), ADD(rd=0, rs1=0, rs2=0)
+            state.instruction_memory.read_instruction(0), ADD(rd=0, rs1=0, rs2=0)
         )
         self.assertEqual(
-            state.instruction_memory.load_instruction(2**14 - 4),
+            state.instruction_memory.read_instruction(2**14 - 4),
             ADD(rd=1, rs1=2, rs2=3),
         )
 
         with self.assertRaises(KeyError):
-            state.instruction_memory.load_instruction(4)
+            state.instruction_memory.read_instruction(4)
 
         with self.assertRaises(MemoryAddressError):
-            state.instruction_memory.load_instruction(2**14)
+            state.instruction_memory.read_instruction(2**14)
 
         self.assertEqual(
-            state.memory.load_byte(address=2**14), fixedint.MutableUInt8(0)
+            state.memory.read_byte(address=2**14), fixedint.MutableUInt8(0)
         )
         self.assertEqual(
-            state.memory.load_byte(address=2**32 - 1), fixedint.MutableUInt8(0)
+            state.memory.read_byte(address=2**32 - 1), fixedint.MutableUInt8(0)
         )
 
         with self.assertRaises(MemoryAddressError) as cm:
-            state.memory.load_byte(address=2**14 - 1)
+            state.memory.read_byte(address=2**14 - 1)
         self.assertEqual(
             cm.exception,
             MemoryAddressError(
@@ -237,7 +237,7 @@ class TestArchitecture(unittest.TestCase):
         )
 
         with self.assertRaises(MemoryAddressError) as cm:
-            state.memory.load_byte(address=2**32)
+            state.memory.read_byte(address=2**32)
         self.assertEqual(
             cm.exception,
             MemoryAddressError(
@@ -249,7 +249,7 @@ class TestArchitecture(unittest.TestCase):
         )
 
         with self.assertRaises(MemoryAddressError) as cm:
-            state.memory.load_word(address=2**14 - 4)
+            state.memory.read_word(address=2**14 - 4)
         self.assertEqual(
             cm.exception,
             MemoryAddressError(
@@ -261,7 +261,7 @@ class TestArchitecture(unittest.TestCase):
         )
 
         with self.assertRaises(MemoryAddressError) as cm:
-            state.memory.load_word(address=2**32)
+            state.memory.read_word(address=2**32)
         self.assertEqual(
             cm.exception,
             MemoryAddressError(

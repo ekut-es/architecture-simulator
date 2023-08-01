@@ -60,7 +60,7 @@ class InstructionFetchStage(Stage):
             return InstructionFetchPipelineRegister()
         # NOTE: PC gets incremented here. This means that branch prediction also happens here. Currently, we just statically predict not taken.
         address_of_instruction = state.program_counter
-        instruction = state.instruction_memory.load_instruction(address_of_instruction)
+        instruction = state.instruction_memory.read_instruction(address_of_instruction)
         state.program_counter += instruction.length
         pc_plus_instruction_length = address_of_instruction + instruction.length
 
@@ -378,7 +378,7 @@ class SingleStage(Stage):
         """
         if state.instruction_at_pc():
             pc_before_increment = state.program_counter
-            instr = state.instruction_memory.load_instruction(state.program_counter)
+            instr = state.instruction_memory.read_instruction(state.program_counter)
 
             state.performance_metrics.instruction_count += 1
             try:
