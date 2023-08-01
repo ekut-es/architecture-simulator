@@ -19,7 +19,7 @@ class ToyParser:
         pattern_address_instruction ^ pattern_no_address_instruction
     ) + pp.StringEnd().suppress()
 
-    def sanitize(self, program: str) -> list[tuple[int, str]]:
+    def _sanitize(self, program: str) -> list[tuple[int, str]]:
         lines = program.splitlines()
         sanitized_program: list[tuple[int, str]] = []
         for index, line in enumerate(lines):
