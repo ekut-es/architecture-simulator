@@ -23,7 +23,7 @@ class ToyInstruction(Instruction):
         self.opcode = kwargs["opcode"] % 16
 
     def __repr__(self):
-        return self.mnemonic
+        return self.mnemonic.upper()
 
     def behavior(self, state: ToyArchitecturalState):
         pass
@@ -38,7 +38,7 @@ class AddressTypeInstruction(ToyInstruction):
         self.address = address % 4096
 
     def __repr__(self):
-        return f"{self.mnemonic} ${self.address:03x}"
+        return f"{self.mnemonic.upper()} ${self.address:03X}"
 
     def __eq__(self, other):
         return super().__eq__(other) and self.address == other.address

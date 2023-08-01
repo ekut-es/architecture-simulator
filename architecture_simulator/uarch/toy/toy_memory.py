@@ -51,3 +51,12 @@ class ToyMemory:
                 max_address_incl=self.address_range.stop - 1,
                 memory_type="data memory",
             )
+
+    def get_entries(self) -> dict[int, tuple]:
+        entries: dict[int, tuple] = {}
+        for address, value in self.memory_file.items():
+            bin_value = "{:019_b}".format(int(value)).replace("_", " ")
+            dec_value = str(int(value))
+            hex_value = "{:04X}".format(int(value))
+            entries[address] = bin_value, dec_value, hex_value
+        return entries

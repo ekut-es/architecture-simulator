@@ -66,3 +66,17 @@ class TestToyArchitecture(unittest.TestCase):
             state.instruction_memory.read_instruction(address=-1)
         with self.assertRaises(MemoryAddressError):
             state.instruction_memory.read_instruction(address=1024)
+
+    def test_memory_get_entries(self):
+        state = ToyArchitecturalState()
+        state.data_memory.write_halfword(address=1024, value=MutableUInt16(0))
+        state.data_memory.write_halfword(address=1025, value=MutableUInt16(0xFFFF))
+        state.data_memory.write_halfword(address=2000, value=MutableUInt16(0x0F0F))
+        state.data_memory.write_halfword(address=4094, value=MutableUInt16(0xDEAD))
+        state.data_memory.write_halfword(address=4095, value=MutableUInt16(0x123A))
+        entries = state.data_memory.get_entries()
+        self.assertEqual(entries[1024], ("0000 0000 0000 0000", "0", "0000"))
+        self.assertEqual(entries[1025], ("1111 1111 1111 1111", "65535", "FFFF"))
+        self.assertEqual(entries[2000], ("0000 1111 0000 1111", "3855", "0F0F"))
+        self.assertEqual(entries[4094], ("1101 1110 1010 1101", "57005", "DEAD"))
+        self.assertEqual(entries[4095], ("0001 0010 0011 1010", "4666", "123A"))

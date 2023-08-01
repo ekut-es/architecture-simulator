@@ -211,3 +211,18 @@ class TestToyInstructions(unittest.TestCase):
         NOP().behavior(state)
         self.assertEqual(state.accu, 111)
         self.assertEqual(state.program_counter, 3)
+
+    def test_repr(self):
+        self.assertEqual(str(STO(0xDEA)), "STO $DEA")
+        self.assertEqual(str(LDA(0xDBE)), "LDA $DBE")
+        self.assertEqual(str(BRZ(0xEF0)), "BRZ $EF0")
+        self.assertEqual(str(ADD(0x0)), "ADD $000")
+        self.assertEqual(str(SUB(0x3)), "SUB $003")
+        self.assertEqual(str(OR(0x333)), "OR $333")
+        self.assertEqual(str(AND(0xFAF)), "AND $FAF")
+        self.assertEqual(str(XOR(0xF8C)), "XOR $F8C")
+        self.assertEqual(str(NOT()), "NOT")
+        self.assertEqual(str(INC()), "INC")
+        self.assertEqual(str(DEC()), "DEC")
+        self.assertEqual(str(ZRO()), "ZRO")
+        self.assertEqual(str(NOP()), "NOP")
