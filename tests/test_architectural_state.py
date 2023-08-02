@@ -4,7 +4,7 @@ import fixedint
 from architecture_simulator.uarch.riscv.register_file import RegisterFile
 from architecture_simulator.uarch.memory import Memory, MemoryAddressError
 from architecture_simulator.uarch.riscv.riscv_architectural_state import (
-    ArchitecturalState,
+    RiscvArchitecturalState,
 )
 from architecture_simulator.isa.riscv.rv32i_instructions import ADD, SLL
 
@@ -12,7 +12,7 @@ from architecture_simulator.isa.riscv.rv32i_instructions import ADD, SLL
 class TestArchitecture(unittest.TestCase):
     def test_register(self):
         # x0 can not be changed
-        state = ArchitecturalState(register_file=RegisterFile())
+        state = RiscvArchitecturalState(register_file=RegisterFile())
         state.register_file.registers[0] = 187
         self.assertEqual(state.register_file.registers[0], 0)
 
@@ -47,7 +47,7 @@ class TestArchitecture(unittest.TestCase):
         )
 
         # reg_repr tests
-        state = ArchitecturalState()
+        state = RiscvArchitecturalState()
         state.register_file.registers[1] = fixedint.MutableUInt32(1)
         state.register_file.registers[2] = fixedint.MutableUInt32(-1)
         state.register_file.registers[3] = fixedint.MutableUInt32(3)
@@ -72,7 +72,7 @@ class TestArchitecture(unittest.TestCase):
 
     def test_mem(self):
         # test the wordwise repr method
-        state = ArchitecturalState(memory=Memory(min_bytes=0))
+        state = RiscvArchitecturalState(memory=Memory(min_bytes=0))
         state.memory.write_word(0, fixedint.MutableUInt32(1))
         state.memory.write_word(6, fixedint.MutableUInt32(6))
         state.memory.write_byte(21, fixedint.MutableUInt32(20))
@@ -101,7 +101,7 @@ class TestArchitecture(unittest.TestCase):
         self.assertEqual(state.memory.memory_wordwise_repr()[20][1], 20 << 8)
         self.assertEqual(state.memory.memory_wordwise_repr()[20][2], "00 00 14 00")
 
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=()), memory=Memory(min_bytes=0)
         )
         # store_byte test
@@ -141,7 +141,7 @@ class TestArchitecture(unittest.TestCase):
         self.assertEqual(state.memory.read_word(0), fixedint.MutableUInt32(-1))
 
         # tests are now with 16 bit length of memory
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=()),
             memory=Memory(memory_file={}, address_length=16, min_bytes=0),
         )
@@ -159,7 +159,7 @@ class TestArchitecture(unittest.TestCase):
         self.assertEqual(state.memory.read_word(0), fixedint.MutableUInt32(4))
 
     def test_unified_memory(self):
-        state = ArchitecturalState()
+        state = RiscvArchitecturalState()
 
         # Save instr tests:
         state.instruction_memory.write_instruction(

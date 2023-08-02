@@ -6,6 +6,10 @@ from ..memory import MemoryAddressError
 
 @dataclass
 class ToyMemory:
+    """A halfword addressed memory designed only for reading and writing halfwords.
+    You may rename this if you find any other architecture which uses a 16bit Memory.
+    """
+
     memory_file: dict[int, MutableUInt16] = field(default_factory=dict)
     address_range: range = field(default_factory=lambda: range(1024, 4096))
 
@@ -53,6 +57,11 @@ class ToyMemory:
             )
 
     def get_entries(self) -> dict[int, tuple]:
+        """Returns the contents of the memory as binary, decimal and hexadecimal numbers.
+
+        Returns:
+            dict[int, tuple]: keys: Addresses. Values: tuples of (binary, decimal, hexadecimal) strings.
+        """
         entries: dict[int, tuple] = {}
         for address, value in self.memory_file.items():
             bin_value = "{:019_b}".format(int(value)).replace("_", " ")

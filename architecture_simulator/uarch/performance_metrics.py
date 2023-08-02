@@ -5,6 +5,11 @@ import time
 
 @dataclass
 class PerformanceMetrics:
+    """A class to store and meassure the performance of a simulation.
+    This class contains information which not all ISAs/simulations need,
+    so you might want to create your own performance metrics class for other ISAs.
+    """
+
     execution_time_s: float = 0
     instruction_count: int = 0
     instructions_per_second: float = -1
@@ -15,10 +20,15 @@ class PerformanceMetrics:
     flushes: int = 0
 
     def resume_timer(self):
+        """Start/resume the timer which measures the time for which the simulation has been running.
+        You may meassure the time that passes during a single step of the simulation, so with this function,
+        you can resume the timer after you have stopped it.
+        """
         if self._start is None:
             self._start = time.time()
 
     def stop_timer(self):
+        """Stops the timer which measures the time for which the simulation has been running."""
         self.execution_time_s += time.time() - self._start
         self.instructions_per_second = (
             (self.instruction_count / self.execution_time_s)

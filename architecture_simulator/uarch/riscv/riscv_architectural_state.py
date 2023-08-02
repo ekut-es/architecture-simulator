@@ -9,7 +9,9 @@ from architecture_simulator.isa.riscv.instruction_types import RiscvInstruction
 
 
 @dataclass
-class ArchitecturalState:
+class RiscvArchitecturalState:
+    """The Architectural State for the RISC-V architecture."""
+
     instruction_memory: InstructionMemory = field(
         default_factory=InstructionMemory[RiscvInstruction]
     )
@@ -27,4 +29,5 @@ class ArchitecturalState:
         return self.csr_registers.privilege_level
 
     def instruction_at_pc(self) -> bool:
+        """Return whether there is an instruction at the current program counter."""
         return self.program_counter in self.instruction_memory.instructions

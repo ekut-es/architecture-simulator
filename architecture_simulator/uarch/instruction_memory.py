@@ -10,6 +10,13 @@ T = TypeVar("T", bound=Instruction)
 
 @dataclass
 class InstructionMemory(Generic[T]):
+    """A Generic instruction memory class. Can store instructions from different ISAs,
+    as long as their instructions are based on the 'Instruction' class.
+
+    Args:
+        Generic (Instruction): The base class for the instructions from some specific ISA.
+    """
+
     instructions: dict[int, T] = field(default_factory=dict)
     address_range: range = field(default_factory=lambda: range(0, 2**14))
 
@@ -22,7 +29,7 @@ class InstructionMemory(Generic[T]):
         Returns:
             T: The instruction saved at the given address.
         """
-        self.assert_address_in_range(address)
+        self._assert_address_in_range(address)
         return self.instructions[address]
 
     def write_instruction(self, address: int, instr: T):
@@ -32,8 +39,8 @@ class InstructionMemory(Generic[T]):
             address (int): Address at which to store the instruction.
             instr (T): The instruction to be stored.
         """
-        self.assert_address_in_range(address)
-        self.assert_address_in_range(address + instr.length - 1)
+        self._assert_address_in_range(address)
+        self._assert_address_in_range(address + instr.length - 1)
         self.instructions[address] = instr
 
     def write_instructions(self, instructions: list[T]):
@@ -48,7 +55,7 @@ class InstructionMemory(Generic[T]):
             self.write_instruction(next_address, instr=instr)
             next_address += instr.length
 
-    def assert_address_in_range(self, address: int):
+    def _assert_address_in_range(self, address: int):
         """Raises an error if the address is not inside the valid range.
 
         Args:

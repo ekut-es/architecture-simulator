@@ -8,7 +8,7 @@ from ..instruction import Instruction
 
 if TYPE_CHECKING:
     from architecture_simulator.uarch.riscv.riscv_architectural_state import (
-        ArchitecturalState,
+        RiscvArchitecturalState,
     )
 
 
@@ -21,11 +21,15 @@ class RiscvInstruction(Instruction):
         """NOTE: I wrote a super long comment for why we use **kwargs here in architecture_simulator.isa.toy.toy_instructions.ToyInstruction"""
         self.mnemonic = kwargs["mnemonic"]
 
-    def behavior(self, architectural_state: ArchitecturalState):
-        pass
+    def behavior(self, architectural_state: RiscvArchitecturalState):
+        """Make the instruction perform all its actions on the given architectural state.
+
+        Args:
+            architectural_state (ArchitecturalState): The state to perform the actions on.
+        """
 
     def access_register_file(
-        self, architectural_state: ArchitecturalState
+        self, architectural_state: RiscvArchitecturalState
     ) -> tuple[
         Optional[int], Optional[int], Optional[int], Optional[int], Optional[int]
     ]:
@@ -74,7 +78,7 @@ class RiscvInstruction(Instruction):
         self,
         memory_address: Optional[int],
         memory_write_data: Optional[int],
-        architectural_state: ArchitecturalState,
+        architectural_state: RiscvArchitecturalState,
     ) -> Optional[int]:
         """Performs memory read and write operations and returns the read data if the instruction reads from the memory.
 
@@ -92,7 +96,7 @@ class RiscvInstruction(Instruction):
         self,
         write_register: Optional[int],
         register_write_data: Optional[int],
-        architectural_state: ArchitecturalState,
+        architectural_state: RiscvArchitecturalState,
     ):
         """Perform register write back operation.
 
@@ -122,7 +126,7 @@ class RTypeInstruction(RiscvInstruction):
         return f"{self.mnemonic} x{self.rd}, x{self.rs1}, x{self.rs2}"
 
     def access_register_file(
-        self, architectural_state: ArchitecturalState
+        self, architectural_state: RiscvArchitecturalState
     ) -> tuple[
         Optional[int], Optional[int], Optional[int], Optional[int], Optional[int]
     ]:
@@ -156,7 +160,7 @@ class RTypeInstruction(RiscvInstruction):
         self,
         memory_address: Optional[int],
         memory_write_data: Optional[int],
-        architectural_state: ArchitecturalState,
+        architectural_state: RiscvArchitecturalState,
     ) -> Optional[int]:
         return None
 
@@ -164,7 +168,7 @@ class RTypeInstruction(RiscvInstruction):
         self,
         write_register: Optional[int],
         register_write_data: Optional[int],
-        architectural_state: ArchitecturalState,
+        architectural_state: RiscvArchitecturalState,
     ):
         assert write_register is not None
         assert register_write_data is not None
@@ -191,7 +195,7 @@ class ITypeInstruction(RiscvInstruction):
         return f"{self.mnemonic} x{self.rd}, x{self.rs1}, {self.imm}"
 
     def access_register_file(
-        self, architectural_state: ArchitecturalState
+        self, architectural_state: RiscvArchitecturalState
     ) -> tuple[
         Optional[int], Optional[int], Optional[int], Optional[int], Optional[int]
     ]:
@@ -224,7 +228,7 @@ class ITypeInstruction(RiscvInstruction):
         self,
         memory_address: Optional[int],
         memory_write_data: Optional[int],
-        architectural_state: ArchitecturalState,
+        architectural_state: RiscvArchitecturalState,
     ) -> Optional[int]:
         return None
 
@@ -232,7 +236,7 @@ class ITypeInstruction(RiscvInstruction):
         self,
         write_register: Optional[int],
         register_write_data: Optional[int],
-        architectural_state: ArchitecturalState,
+        architectural_state: RiscvArchitecturalState,
     ):
         assert write_register is not None
         assert register_write_data is not None
@@ -242,6 +246,8 @@ class ITypeInstruction(RiscvInstruction):
 
 
 class MemoryITypeInstruction(ITypeInstruction):
+    """A special class for memory type instructions because they should have a different __repr__."""
+
     def __init__(self, rd: int, rs1: int, imm: int, **args):
         """Create an I-Type instruction that requires memory access
 
@@ -271,6 +277,8 @@ class MemoryITypeInstruction(ITypeInstruction):
 
 
 class ShiftITypeInstruction(ITypeInstruction):
+    """A special class for shift type instructions because they require a different length immediate than normal I-Types."""
+
     def __init__(self, rd: int, rs1: int, imm: int, **args):
         """Create an I-Type instruction that requires shamt
 
@@ -287,15 +295,14 @@ class ShiftITypeInstruction(ITypeInstruction):
 
 
 class STypeInstruction(RiscvInstruction):
-    """Create an S-Type instruction
-
-    Args:
-        rs1 (int): source register 1
-        rs2 (int): source register 2
-        imm (int): offset to be added to the rs1
-    """
-
     def __init__(self, rs1: int, rs2: int, imm: int, **args):
+        """Create an S-Type instruction
+
+        Args:
+            rs1 (int): source register 1
+            rs2 (int): source register 2
+            imm (int): offset to be added to the rs1
+        """
         super().__init__(**args)
         self.rs1 = rs1
         self.rs2 = rs2
@@ -348,7 +355,7 @@ class BTypeInstruction(RiscvInstruction):
         return f"{self.mnemonic} x{self.rs1}, x{self.rs2}, {self.imm}"
 
     def access_register_file(
-        self, architectural_state: ArchitecturalState
+        self, architectural_state: RiscvArchitecturalState
     ) -> tuple[
         Optional[int], Optional[int], Optional[int], Optional[int], Optional[int]
     ]:
@@ -391,7 +398,7 @@ class UTypeInstruction(RiscvInstruction):
         self,
         write_register: Optional[int],
         register_write_data: Optional[int],
-        architectural_state: ArchitecturalState,
+        architectural_state: RiscvArchitecturalState,
     ):
         assert write_register is not None
         assert register_write_data is not None
@@ -400,7 +407,7 @@ class UTypeInstruction(RiscvInstruction):
         ] = fixedint.MutableUInt32(register_write_data)
 
     def access_register_file(
-        self, architectural_state: ArchitecturalState
+        self, architectural_state: RiscvArchitecturalState
     ) -> tuple[int | None, int | None, int | None, int | None, int | None]:
         return None, None, None, None, self.imm << 12
 
@@ -435,7 +442,7 @@ class JTypeInstruction(RiscvInstruction):
         self,
         write_register: Optional[int],
         register_write_data: Optional[int],
-        architectural_state: ArchitecturalState,
+        architectural_state: RiscvArchitecturalState,
     ):
         assert write_register is not None
         assert register_write_data is not None
@@ -444,7 +451,7 @@ class JTypeInstruction(RiscvInstruction):
         ] = fixedint.MutableUInt32(register_write_data)
 
     def access_register_file(
-        self, architectural_state: ArchitecturalState
+        self, architectural_state: RiscvArchitecturalState
     ) -> tuple[int | None, int | None, int | None, int | None, int | None]:
         return None, None, None, None, self.imm
 
@@ -459,15 +466,14 @@ class FenceTypeInstruction(RiscvInstruction):
 
 
 class CSRTypeInstruction(RiscvInstruction):
-    """Create a CSR-Type instruction
-
-    Args:
-        rd (int): register destination
-        csr (int): the control/status register's index
-        rs1 (int): source register 1
-    """
-
     def __init__(self, rd: int, csr: int, rs1: int, **args):
+        """Create a CSR-Type instruction
+
+        Args:
+            rd (int): register destination
+            csr (int): the control/status register's index
+            rs1 (int): source register 1
+        """
         super().__init__(**args)
         self.rd = rd
         self.csr = csr
@@ -478,15 +484,14 @@ class CSRTypeInstruction(RiscvInstruction):
 
 
 class CSRITypeInstruction(RiscvInstruction):
-    """Create a CSRI-Type instruction
-
-    Args:
-        rd (int): register destination
-        csr (int): the control/status register's index
-        uimm (int): immediate
-    """
-
     def __init__(self, rd: int, csr: int, uimm: int, **args):
+        """Create a CSRI-Type instruction
+
+        Args:
+            rd (int): register destination
+            csr (int): the control/status register's index
+            uimm (int): immediate
+        """
         super().__init__(**args)
         self.rd = rd
         self.csr = csr
@@ -497,11 +502,16 @@ class CSRITypeInstruction(RiscvInstruction):
 
 
 class EmptyInstruction(RiscvInstruction):
+    """A special class for "empty" instructions. These are used only in the pipeline because the stages cannot just contain nothing.
+    This should maybe get replaced by a real instruction which just does nothing (like add x0, x0, x0).
+    But you would have to figure out when to stop the pipeline then.
+    """
+
     def __init__(self, **kwargs):
         super().__init__(mnemonic="Empty")
 
     def access_register_file(
-        self, architectural_state: ArchitecturalState
+        self, architectural_state: RiscvArchitecturalState
     ) -> tuple[
         Optional[int], Optional[int], Optional[int], Optional[int], Optional[int]
     ]:
@@ -522,7 +532,7 @@ class EmptyInstruction(RiscvInstruction):
         self,
         memory_address: Optional[int],
         memory_write_data: Optional[int],
-        architectural_state: ArchitecturalState,
+        architectural_state: RiscvArchitecturalState,
     ) -> Optional[int]:
         return None
 
@@ -530,6 +540,6 @@ class EmptyInstruction(RiscvInstruction):
         self,
         write_register: Optional[int],
         register_write_data: Optional[int],
-        architectural_state: ArchitecturalState,
+        architectural_state: RiscvArchitecturalState,
     ):
         pass

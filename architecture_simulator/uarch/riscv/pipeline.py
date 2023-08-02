@@ -9,21 +9,19 @@ from .pipeline_registers import PipelineRegister
 
 if TYPE_CHECKING:
     from architecture_simulator.uarch.riscv.riscv_architectural_state import (
-        ArchitecturalState,
+        RiscvArchitecturalState,
     )
     from .stages import Stage
 
-#
-# Pipeline wrapper Classs
-#
-
 
 class Pipeline:
+    """The pipeline class which works on a list of stages."""
+
     def __init__(
         self,
         stages: list[Stage],
         execution_ordering: list[int],
-        state: ArchitecturalState,
+        state: RiscvArchitecturalState,
     ) -> None:
         """constructor of the pipeline
 
@@ -44,7 +42,7 @@ class Pipeline:
 
     def step(self):
         """the pipeline step method, this is the central part of the pipeline! Every time it is called, it does one
-        whole step of the pipeline, and every stage gets executed once in their ececution ordering
+        whole step of the pipeline, and every stage gets executed once in their execution ordering
         """
         self.state.performance_metrics.cycles += 1
         next_pipeline_registers = [None] * self.num_stages

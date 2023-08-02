@@ -5,7 +5,7 @@ from architecture_simulator.uarch.riscv.register_file import RegisterFile
 from architecture_simulator.uarch.memory import Memory, MemoryAddressError
 from architecture_simulator.uarch.instruction_memory import InstructionMemory
 from architecture_simulator.uarch.riscv.riscv_architectural_state import (
-    ArchitecturalState,
+    RiscvArchitecturalState,
 )
 from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 from architecture_simulator.isa.riscv.rv32i_instructions import ADDI, BNE, BEQ, JAL, LW
@@ -15,7 +15,7 @@ from architecture_simulator.uarch.riscv.pipeline import InstructionExecutionExce
 class TestSimulation(unittest.TestCase):
     def test_simulation(self):
         simulation = RiscvSimulation(
-            state=ArchitecturalState(
+            state=RiscvArchitecturalState(
                 register_file=RegisterFile(registers=[0, 2, 0, 0]),
                 memory=Memory(memory_file=()),
             )
@@ -31,7 +31,7 @@ class TestSimulation(unittest.TestCase):
 
     def test_run_simulation(self):
         simulation = RiscvSimulation(
-            state=ArchitecturalState(
+            state=RiscvArchitecturalState(
                 register_file=RegisterFile(registers=[0, 0, 0, 0]),
                 instruction_memory=InstructionMemory(
                     instructions={
@@ -57,7 +57,9 @@ class TestSimulation(unittest.TestCase):
         self.assertGreater(simulation.state.performance_metrics.execution_time_s, 0)
 
         simulation = RiscvSimulation(
-            state=ArchitecturalState(register_file=RegisterFile(registers=[0, 0, 0, 0]))
+            state=RiscvArchitecturalState(
+                register_file=RegisterFile(registers=[0, 0, 0, 0])
+            )
         )
 
         simulation.run_simulation()
@@ -73,7 +75,7 @@ class TestSimulation(unittest.TestCase):
         )
 
         simulation = RiscvSimulation(
-            state=ArchitecturalState(
+            state=RiscvArchitecturalState(
                 register_file=RegisterFile(registers=[0, 0, 0, 0]),
                 instruction_memory=InstructionMemory(
                     instructions={
@@ -98,7 +100,7 @@ class TestSimulation(unittest.TestCase):
         self.assertGreater(simulation.state.performance_metrics.execution_time_s, 0)
 
         simulation = RiscvSimulation(
-            state=ArchitecturalState(
+            state=RiscvArchitecturalState(
                 register_file=RegisterFile(registers=[0, 0, 0, 0]),
                 instruction_memory=InstructionMemory(
                     instructions={
@@ -122,7 +124,7 @@ class TestSimulation(unittest.TestCase):
         self.assertGreater(simulation.state.performance_metrics.execution_time_s, 0)
 
         simulation = RiscvSimulation(
-            state=ArchitecturalState(
+            state=RiscvArchitecturalState(
                 register_file=RegisterFile(registers=[0, 0, 0, 0]),
                 instruction_memory=InstructionMemory(
                     instructions={
@@ -151,10 +153,10 @@ class TestSimulation(unittest.TestCase):
     def test_against_class_variables(self):
         """Some tests against class variables (some things used to be class variables and were thus shared between objects, which was undesired)"""
         simulation1 = RiscvSimulation(
-            state=ArchitecturalState(memory=Memory(min_bytes=0))
+            state=RiscvArchitecturalState(memory=Memory(min_bytes=0))
         )
         simulation2 = RiscvSimulation(
-            state=ArchitecturalState(memory=Memory(min_bytes=0))
+            state=RiscvArchitecturalState(memory=Memory(min_bytes=0))
         )
 
         simulation1.state.register_file.registers[5] = fixedint.MutableUInt32(12)
@@ -249,7 +251,7 @@ class TestSimulation(unittest.TestCase):
         End:"""
 
         simulation = RiscvSimulation(
-            state=ArchitecturalState(
+            state=RiscvArchitecturalState(
                 register_file=RegisterFile(), memory=Memory(min_bytes=0)
             ),
             mode="five_stage_pipeline",

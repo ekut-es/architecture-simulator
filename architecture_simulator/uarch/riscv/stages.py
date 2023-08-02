@@ -8,7 +8,7 @@ from .pipeline_registers import (
     MemoryAccessPipelineRegister,
     RegisterWritebackPipelineRegister,
 )
-from .riscv_architectural_state import ArchitecturalState
+from .riscv_architectural_state import RiscvArchitecturalState
 from architecture_simulator.isa.riscv.instruction_types import (
     BTypeInstruction,
     EmptyInstruction,
@@ -17,13 +17,14 @@ from architecture_simulator.isa.riscv.rv32i_instructions import JAL
 from .pipeline import InstructionExecutionException
 
 
-# Stage superclass, every stage need to implement a behaviour method
 class Stage:
+    """Stage superclass. Every stage needs to implement a behavior method"""
+
     def behavior(
         self,
         pipeline_registers: list[PipelineRegister],
         index_of_own_input_register: int,
-        state: ArchitecturalState,
+        state: RiscvArchitecturalState,
     ) -> PipelineRegister:
         """general behavior method
 
@@ -42,7 +43,7 @@ class InstructionFetchStage(Stage):
         self,
         pipeline_registers: list[PipelineRegister],
         index_of_own_input_register: int,
-        state: ArchitecturalState,
+        state: RiscvArchitecturalState,
     ) -> PipelineRegister:
         """behavior of the IF Stage
         The input pipeline_register can be of any type of PipelineRegister
@@ -82,7 +83,7 @@ class InstructionDecodeStage(Stage):
         self,
         pipeline_registers: list[PipelineRegister],
         index_of_own_input_register: int,
-        state: ArchitecturalState,
+        state: RiscvArchitecturalState,
     ) -> PipelineRegister:
         """behavior of the ID Stage
         Should the pipeline_register not be InstructionFetchPipelineRegister it returns an
@@ -160,7 +161,7 @@ class ExecuteStage(Stage):
         self,
         pipeline_registers: list[PipelineRegister],
         index_of_own_input_register: int,
-        state: ArchitecturalState,
+        state: RiscvArchitecturalState,
     ) -> PipelineRegister:
         """behavior of the EX stage
         Should the pipeline_register not be InstructionDecodePipelineRegister it returns an
@@ -221,7 +222,7 @@ class MemoryAccessStage(Stage):
         self,
         pipeline_registers: list[PipelineRegister],
         index_of_own_input_register: int,
-        state: ArchitecturalState,
+        state: RiscvArchitecturalState,
     ) -> PipelineRegister:
         """behavior of MA stage
         Should the pipeline_register not be ExecutePipelineRegister it returns an MemoryAccessPipelineRegister
@@ -301,7 +302,7 @@ class RegisterWritebackStage(Stage):
         self,
         pipeline_registers: list[PipelineRegister],
         index_of_own_input_register: int,
-        state: ArchitecturalState,
+        state: RiscvArchitecturalState,
     ) -> PipelineRegister:
         """behavior of WB stage
         Should the pipeline_register not be MemoryAccessPipelineRegister it returns an
@@ -365,7 +366,7 @@ class SingleStage(Stage):
         self,
         pipeline_registers: list[PipelineRegister],
         index_of_own_input_register: int,
-        state: ArchitecturalState,
+        state: RiscvArchitecturalState,
     ) -> PipelineRegister:
         """behavior of the single stage pipeline
 

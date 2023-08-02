@@ -5,21 +5,21 @@ from .toy_instructions import AddressTypeInstruction, ToyInstruction, instructio
 
 
 class ToyParser:
-    ADDRESS_MNEMONICS = ["STO", "LDA", "BRZ", "ADD", "SUB", "OR", "AND", "XOR"]
-    NO_ADDRESS_MNEMONICS = ["NOT", "INC", "DEC", "ZRO", "NOP"]
+    _address_mnemonics = ["STO", "LDA", "BRZ", "ADD", "SUB", "OR", "AND", "XOR"]
+    _no_address_mnemonics = ["NOT", "INC", "DEC", "ZRO", "NOP"]
 
-    pattern_hex_address = pp.Combine("$" + pp.Word(pp.hexnums, exact=3))
+    _pattern_hex_address = pp.Combine("$" + pp.Word(pp.hexnums, exact=3))
 
-    pattern_address_instruction = pp.oneOf(ADDRESS_MNEMONICS, caseless=True)(
+    _pattern_address_instruction = pp.oneOf(_address_mnemonics, caseless=True)(
         "mnemonic"
-    ) + pattern_hex_address("address")
+    ) + _pattern_hex_address("address")
 
-    pattern_no_address_instruction = pp.oneOf(NO_ADDRESS_MNEMONICS, caseless=True)(
+    _pattern_no_address_instruction = pp.oneOf(_no_address_mnemonics, caseless=True)(
         "mnemonic"
     )
 
-    pattern_line = (
-        pattern_address_instruction ^ pattern_no_address_instruction
+    _pattern_line = (
+        _pattern_address_instruction ^ _pattern_no_address_instruction
     ) + pp.StringEnd().suppress()
 
     def parse(self, program: str) -> list[ToyInstruction]:
@@ -38,7 +38,7 @@ class ToyParser:
         instructions = []
         for linenumber, line in sanitized_program:
             try:
-                tokens = self.pattern_line.parse_string(line)
+                tokens = self._pattern_line.parse_string(line)
                 instructions.append(self._tokens_to_instruction(tokens))
             except pp.ParseException:
                 raise ParserSyntaxException(line_number=linenumber, line=line)

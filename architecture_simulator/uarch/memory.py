@@ -15,6 +15,11 @@ class MemoryAddressError(ValueError):
 
 @dataclass
 class Memory:
+    """A byte addressed memory which is designed to store words.
+    You can also store bytes and halfwords and you could easily adapt it to work with double words as well.
+    There is however only a function for representing the contents as halfwords.
+    """
+
     # Address length in bits. Can be used to limit memory size.
     address_length: int = 32
     # min address (inclusive)
@@ -22,6 +27,11 @@ class Memory:
     memory_file: dict[int, fixedint.MutableUInt8] = field(default_factory=dict)
 
     def memory_wordwise_repr(self) -> dict[int, tuple]:
+        """Returns the contents of the memory as binary, decimal and hexadecimal values, all nicely formatted.
+
+        Returns:
+            dict[int, tuple]: keys: addresses. Values: Tuples of (binary, decimal, hexadecimal) strings.
+        """
         wordwise_mem: dict[int, tuple] = dict()
         number_of_bytes = self.address_length / 8
         for address in self.memory_file.keys():

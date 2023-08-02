@@ -10,6 +10,10 @@ if TYPE_CHECKING:
 
 
 class ToyInstruction(Instruction):
+    """Base class for all Toy instructions.
+    Instructions which do not need an address are directly based on this class.
+    """
+
     length: int = 1
 
     def __init__(self, **kwargs):
@@ -26,13 +30,16 @@ class ToyInstruction(Instruction):
         return self.mnemonic.upper()
 
     def behavior(self, state: ToyArchitecturalState):
-        pass
+        """Make the instruction perform all of its actions on the given state."""
 
     def __eq__(self, other):
+        """Useful for testing, since you can directly compare instructions."""
         return self.opcode == other.opcode
 
 
 class AddressTypeInstruction(ToyInstruction):
+    """Base class for all instructions which do use an address."""
+
     def __init__(self, address: int, **kwargs):
         super().__init__(**kwargs)
         self.address = address % 4096
@@ -49,8 +56,7 @@ class STO(AddressTypeInstruction):
         super().__init__(mnemonic="STO", opcode=0, address=address)
 
     def behavior(self, state: ToyArchitecturalState):
-        # NOTE: The Memory class is byte addressed, but the toy architecture uses a halfword addressed memory.
-        # Thus, we need to shift the address by one bit
+        """MEM[address] = ACCU"""
         state.data_memory.write_halfword(address=self.address, value=state.accu)
         state.increment_pc()
 
@@ -60,8 +66,7 @@ class LDA(AddressTypeInstruction):
         super().__init__(mnemonic="LDA", opcode=1, address=address)
 
     def behavior(self, state: ToyArchitecturalState):
-        # NOTE: The Memory class is byte addressed, but the toy architecture uses a halfword addressed memory.
-        # Thus, we need to shift the address by one bit
+        """ACCU = MEM[address]"""
         state.accu = state.data_memory.read_halfword(address=self.address)
         state.increment_pc()
 
@@ -71,6 +76,7 @@ class BRZ(AddressTypeInstruction):
         super().__init__(mnemonic="BRZ", opcode=2, address=address)
 
     def behavior(self, state: ToyArchitecturalState):
+        """PC = ADDRESS if (ACCU == 0)"""
         if state.accu:
             state.increment_pc()
         else:
@@ -85,6 +91,7 @@ class ADD(AddressTypeInstruction):
         super().__init__(mnemonic="ADD", opcode=3, address=address)
 
     def behavior(self, state: ToyArchitecturalState):
+        """ACCU += MEM[address]"""
         memory = state.data_memory.read_halfword(address=self.address)
         state.accu = state.accu + memory
         state.increment_pc()
@@ -95,6 +102,7 @@ class SUB(AddressTypeInstruction):
         super().__init__(mnemonic="SUB", opcode=4, address=address)
 
     def behavior(self, state: ToyArchitecturalState):
+        """ACCU -= MEM[address]"""
         memory = state.data_memory.read_halfword(address=self.address)
         state.accu = state.accu - memory
         state.increment_pc()
@@ -105,6 +113,7 @@ class OR(AddressTypeInstruction):
         super().__init__(mnemonic="OR", opcode=5, address=address)
 
     def behavior(self, state: ToyArchitecturalState):
+        """ACCU |= MEM[address]"""
         memory = state.data_memory.read_halfword(address=self.address)
         state.accu = state.accu | memory
         state.increment_pc()
@@ -115,6 +124,7 @@ class AND(AddressTypeInstruction):
         super().__init__(mnemonic="AND", opcode=6, address=address)
 
     def behavior(self, state: ToyArchitecturalState):
+        """ACCU &= MEM[address]"""
         memory = state.data_memory.read_halfword(address=self.address)
         state.accu = state.accu & memory
         state.increment_pc()
@@ -125,6 +135,7 @@ class XOR(AddressTypeInstruction):
         super().__init__(mnemonic="XOR", opcode=7, address=address)
 
     def behavior(self, state: ToyArchitecturalState):
+        """ACCU ^= MEM[address]"""
         memory = state.data_memory.read_halfword(address=self.address)
         state.accu = state.accu ^ memory
         state.increment_pc()
@@ -135,6 +146,7 @@ class NOT(ToyInstruction):
         super().__init__(mnemonic="NOT", opcode=8)
 
     def behavior(self, state: ToyArchitecturalState):
+        """ACCU = ~ACCU"""
         state.accu = ~state.accu
         state.increment_pc()
 
@@ -144,6 +156,7 @@ class INC(ToyInstruction):
         super().__init__(mnemonic="INC", opcode=9)
 
     def behavior(self, state: ToyArchitecturalState):
+        """ACCU += 1"""
         state.accu += MutableUInt16(1)
         state.increment_pc()
 
@@ -153,6 +166,7 @@ class DEC(ToyInstruction):
         super().__init__(mnemonic="DEC", opcode=10)
 
     def behavior(self, state: ToyArchitecturalState):
+        """ACCU -= 1"""
         state.accu -= MutableUInt16(1)
         state.increment_pc()
 
@@ -162,6 +176,7 @@ class ZRO(ToyInstruction):
         super().__init__(mnemonic="ZRO", opcode=11)
 
     def behavior(self, state: ToyArchitecturalState):
+        """ACCU = 0"""
         state.accu = MutableUInt16(0)
         state.increment_pc()
 
@@ -171,6 +186,7 @@ class NOP(ToyInstruction):
         super().__init__(mnemonic="NOP", opcode=12)
 
     def behavior(self, state: ToyArchitecturalState):
+        """no operation"""
         state.increment_pc()
 
 

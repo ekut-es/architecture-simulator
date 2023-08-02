@@ -3,9 +3,7 @@ import fixedint
 
 
 class Registers(list):
-    """
-    Custom list, that overwrites [], so that register x0 gets hardwired to zero.
-    """
+    """Custom list that overwrites [] so that register x0 gets hardwired to zero."""
 
     def __getitem__(self, index):
         # access of x0 will alway return zero, since x0 get´s initialized as zero and can not be changed
@@ -20,14 +18,11 @@ class Registers(list):
 
 @dataclass
 class RegisterFile:
-    """
-    This class implements the register file.
+    """This class implements the register file.
 
     Args:
         registers:
-            list[int / fixedint.MutableUInt32] => provided list will be used to init registers, x0 can have any value (test mode)
-
-            no_arg => 32 registers with x0 is hard wired to zero
+            list[fixedint.MutableUInt32] => provided list will be used to init registers, x0 can have any value (test mode). Default: 32 registers with x0 hard wired to zero.
     """
 
     registers: list[fixedint.MutableUInt32] = field(
@@ -35,6 +30,11 @@ class RegisterFile:
     )
 
     def reg_repr(self) -> dict[int, tuple]:
+        """Returns the contents of the register file as binary, decimal and hexadecimal values.
+
+        Returns:
+            dict[int, tuple]: keys: register indices. Values: Register values as tuple of (binary, decimal, hexadecimal)
+        """
         reg_repr: dict[int, tuple] = dict()
         index = 0
         for reg in self.registers:
@@ -67,6 +67,14 @@ class RegisterFile:
         return reg_repr
 
     def get_abi_names(self, register: int) -> str:
+        """Get the ABI name for the given register index.
+
+        Args:
+            register (int): Index of the register.
+
+        Returns:
+            str: ABI name of the register.
+        """
         abi_names = {
             0: "zero",
             1: "ra",

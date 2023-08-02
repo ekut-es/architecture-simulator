@@ -16,7 +16,7 @@ from architecture_simulator.isa.riscv.rv32i_instructions import (
     LW,
 )
 from architecture_simulator.uarch.riscv.riscv_architectural_state import (
-    ArchitecturalState,
+    RiscvArchitecturalState,
 )
 from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 from architecture_simulator.uarch.memory import Memory
@@ -114,7 +114,9 @@ beq zero, ra, Ban0n3
 
     def test_bnf(self):
         parser = RiscvParser()
-        instr = [instr for line_num, line, instr in parser.parse_assembly(self.program)]
+        instr = [
+            instr for line_num, line, instr in parser._tokenize_assembly(self.program)
+        ]
         self.assertEqual(
             [result if type(result) == str else result.as_list() for result in instr],
             self.expected,
@@ -123,13 +125,13 @@ beq zero, ra, Ban0n3
         # self.assertEqual(instr[1].mnemonic, "")
 
         with self.assertRaises(ParserSyntaxException):
-            parser.parse_assembly(self.program_2)
+            parser._tokenize_assembly(self.program_2)
 
         with self.assertRaises(ParserSyntaxException):
-            parser.parse_assembly(self.program_3)
+            parser._tokenize_assembly(self.program_3)
 
         with self.assertRaises(ParserSyntaxException):
-            parser.parse_assembly(self.program_4)
+            parser._tokenize_assembly(self.program_4)
 
     def test_process_labels(self):
         parser = RiscvParser()
@@ -140,8 +142,8 @@ beq zero, ra, Ban0n3
             "Chinakohl": 24,
             "Ban0n3": 60,
         }
-        bnf_result = parser.parse_assembly(self.program)
-        proc_labels = parser.compute_labels([result[2] for result in bnf_result], 0)
+        bnf_result = parser._tokenize_assembly(self.program)
+        proc_labels = parser._compute_labels([result[2] for result in bnf_result], 0)
         self.assertEqual(proc_labels, expected_labels)
 
     def assert_inst_values(self, instr):
@@ -232,19 +234,19 @@ beq zero, ra, Ban0n3
 
     def test_parser(self):
         parser = RiscvParser()
-        instr = parser.parse_res_to_instructions(
-            parser.parse_assembly(self.program), start_address=0
+        instr = parser._tokens_to_instructions(
+            parser._tokenize_assembly(self.program), start_address=0
         )
         self.assert_inst_values(instr)
 
         with self.assertRaises(ParserSyntaxException):
-            parser.parse_res_to_instructions(
-                parser.parse_assembly(self.program_4), start_address=0
+            parser._tokens_to_instructions(
+                parser._tokenize_assembly(self.program_4), start_address=0
             )
 
         parser = RiscvParser()
-        instr = parser.parse_res_to_instructions(
-            parser.parse_assembly(self.program_5_abi), start_address=0
+        instr = parser._tokens_to_instructions(
+            parser._tokenize_assembly(self.program_5_abi), start_address=0
         )
 
         self.assert_inst_values(instr)
@@ -284,7 +286,7 @@ beq zero, ra, Ban0n3
 
     def test_fibonacci_parser(self):
         simulation = RiscvSimulation(
-            state=ArchitecturalState(memory=Memory(min_bytes=0))
+            state=RiscvArchitecturalState(memory=Memory(min_bytes=0))
         )
         simulation.load_program(self.fibonacci)
         # print(simulation.instructions)
@@ -513,7 +515,7 @@ fibonacci:
         jal x2, sp3
         """
 
-        parsed = [result[2] for result in parser.parse_assembly(program)]
+        parsed = [result[2] for result in parser._tokenize_assembly(program)]
         self.assertEqual(
             [result if type(result) == str else result.as_list() for result in parsed],
             [

@@ -89,6 +89,8 @@ reg_numbers = [str(i) for i in range(32)]
 
 
 class RiscvParser:
+    """A parser for RISC-V programs. It is capable of turning a text form program into instruction objects."""
+
     COMMA = pp.Literal(",").suppress()
     Paren_R = pp.Literal(")").suppress()
     Paren_L = pp.Literal("(").suppress()
@@ -228,7 +230,7 @@ class RiscvParser:
         )
     ) + pp.StringEnd().suppress()
 
-    def convert_label_or_imm(
+    def _convert_label_or_imm(
         self,
         instruction_parsed: pp.ParseResults,
         labels: dict[str, int],
@@ -255,8 +257,8 @@ class RiscvParser:
                     line_number=line_number, line=line, label=instruction_parsed.label
                 )
 
-    def p_reg(self, parsed_register: pp.ParseResults | str) -> int:
-        """Parses a register string into a number of the correct register
+    def _convert_register_name(self, parsed_register: pp.ParseResults | str) -> int:
+        """Converts a register string into a number of the correct register
 
         Args:
             parsed_register (pp.ParseResults | str): parse result of the register name or number. May be an ABI name or a number like x18.
@@ -269,7 +271,9 @@ class RiscvParser:
         else:
             return int(parsed_register[0][1])
 
-    def parse_assembly(self, assembly: str) -> list[tuple[int, str, pp.ParseResults]]:
+    def _tokenize_assembly(
+        self, assembly: str
+    ) -> list[tuple[int, str, pp.ParseResults]]:
         """Turn assembly code into a list of parse results.
 
         Args:
@@ -297,7 +301,7 @@ class RiscvParser:
                 raise ParserSyntaxException(line_number=index, line=line)
         return res
 
-    def compute_labels(
+    def _compute_labels(
         self, parse_result: list[pp.ParseResults], start_address: int
     ) -> dict:
         """Compute the addresses for the labels.
@@ -324,7 +328,7 @@ class RiscvParser:
                 instruction_address += instruction_map[mnemonic].length
         return labels
 
-    def parse_res_to_instructions(
+    def _tokens_to_instructions(
         self, parse_result: list[tuple[int, str, pp.ParseResults]], start_address: int
     ) -> list[RiscvInstruction]:
         """Turn parse results into instructions.
@@ -337,7 +341,7 @@ class RiscvParser:
         """
         instructions: list[RiscvInstruction] = []
         pure_parse_results = [result[2] for result in parse_result]
-        labels = self.compute_labels(pure_parse_results, start_address)
+        labels = self._compute_labels(pure_parse_results, start_address)
         address_count: int = start_address
 
         for line_number, line, instruction_parsed in parse_result:
@@ -354,9 +358,9 @@ class RiscvParser:
             if issubclass(instruction_class, instruction_types.RTypeInstruction):
                 instructions.append(
                     instruction_class(
-                        rs1=self.p_reg(instruction_parsed.rs1),
-                        rs2=self.p_reg(instruction_parsed.rs2),
-                        rd=self.p_reg(instruction_parsed.rd),
+                        rs1=self._convert_register_name(instruction_parsed.rs1),
+                        rs2=self._convert_register_name(instruction_parsed.rs2),
+                        rd=self._convert_register_name(instruction_parsed.rd),
                     )
                 )
             elif issubclass(instruction_class, instruction_types.ITypeInstruction):
@@ -365,21 +369,21 @@ class RiscvParser:
                         imm=int(instruction_parsed.imm, base=0),
                         # note: since I/S/B-Types use the same patterns but have different names for the registers (rs1,rs2 vs. rd,rs1),
                         # we instead use reg1 and reg2 as names
-                        rs1=self.p_reg(instruction_parsed.reg2),
-                        rd=self.p_reg(instruction_parsed.reg1),
+                        rs1=self._convert_register_name(instruction_parsed.reg2),
+                        rd=self._convert_register_name(instruction_parsed.reg1),
                     )
                 )
             elif issubclass(instruction_class, instruction_types.STypeInstruction):
                 instructions.append(
                     instruction_class(
-                        rs1=self.p_reg(instruction_parsed.reg2),
-                        rs2=self.p_reg(instruction_parsed.reg1),
+                        rs1=self._convert_register_name(instruction_parsed.reg2),
+                        rs2=self._convert_register_name(instruction_parsed.reg1),
                         imm=int(instruction_parsed.imm, base=0),
                     )
                 )
             elif issubclass(instruction_class, instruction_types.BTypeInstruction):
                 # B-Types can use labels or numerical immediates, so convert that first
-                imm_val = self.convert_label_or_imm(
+                imm_val = self._convert_label_or_imm(
                     instruction_parsed,
                     labels,
                     address_count,
@@ -389,21 +393,21 @@ class RiscvParser:
 
                 instructions.append(
                     instruction_class(
-                        rs1=self.p_reg(instruction_parsed.reg1),
-                        rs2=self.p_reg(instruction_parsed.reg2),
+                        rs1=self._convert_register_name(instruction_parsed.reg1),
+                        rs2=self._convert_register_name(instruction_parsed.reg2),
                         imm=imm_val,
                     )
                 )
             elif issubclass(instruction_class, instruction_types.UTypeInstruction):
                 instructions.append(
                     instruction_class(
-                        rd=self.p_reg(instruction_parsed.rd),
+                        rd=self._convert_register_name(instruction_parsed.rd),
                         imm=int(instruction_parsed.imm, base=0),
                     )
                 )
             elif issubclass(instruction_class, instruction_types.JTypeInstruction):
                 # J-Types can use labels or numerical immediates, so convert that first
-                imm_val = self.convert_label_or_imm(
+                imm_val = self._convert_label_or_imm(
                     instruction_parsed,
                     labels,
                     address_count,
@@ -413,23 +417,23 @@ class RiscvParser:
 
                 instructions.append(
                     instruction_class(
-                        rd=self.p_reg(instruction_parsed.rd),
+                        rd=self._convert_register_name(instruction_parsed.rd),
                         imm=imm_val,
                     )
                 )
             elif issubclass(instruction_class, instruction_types.CSRTypeInstruction):
                 instructions.append(
                     instruction_class(
-                        rd=self.p_reg(instruction_parsed.rd),
+                        rd=self._convert_register_name(instruction_parsed.rd),
                         csr=int(instruction_parsed.csr, base=0),
-                        rs1=self.p_reg(instruction_parsed.rs1),
+                        rs1=self._convert_register_name(instruction_parsed.rs1),
                     )
                 )
             elif issubclass(instruction_class, instruction_types.CSRITypeInstruction):
                 # TODO: Add parser element for this type
                 instructions.append(
                     instruction_class(
-                        rd=self.p_reg(instruction_parsed.rd),
+                        rd=self._convert_register_name(instruction_parsed.rd),
                         csr=int(instruction_parsed.csr, base=0),
                         uimm=int(instruction_parsed.uimm, base=0),
                     )
@@ -449,24 +453,30 @@ class RiscvParser:
         Returns:
             list[Instructions]: List of executable instructions.
         """
-        parsed = self.parse_assembly(program)
-        return self.parse_res_to_instructions(parsed, start_address=start_address)
+        parsed = self._tokenize_assembly(program)
+        return self._tokens_to_instructions(parsed, start_address=start_address)
 
 
 @dataclass
 class ParserException(Exception):
+    """Base class for all exceptions that occur during parsing."""
+
     line_number: int
     line: str
 
 
 @dataclass
 class ParserSyntaxException(ParserException):
+    """A syntax exception that can be raised if the tokenization fails."""
+
     def __repr__(self) -> str:
         return f"There was a syntax error in line {self.line_number}: {self.line}"
 
 
 @dataclass
 class ParserLabelException(ParserException):
+    """An excpetion that can be raised if an instruction refers to an unknown label."""
+
     label: str
 
     def __repr__(self) -> str:
@@ -475,5 +485,7 @@ class ParserLabelException(ParserException):
 
 @dataclass
 class ParserOddImmediateException(ParserException):
+    """An exception that can be raised when an immediate value has to be even, because it will be used to modify the program counter."""
+
     def __repr__(self) -> str:
         return f"Immediate has to be even in line {self.line_number}: {self.line}"

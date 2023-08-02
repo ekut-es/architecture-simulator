@@ -8,7 +8,7 @@ from dataclasses import dataclass
 @dataclass
 class ControlUnitSignals:
     """The signals of the control unit, which is located in the ID stage! These signals are used to decide
-    which input gets used, but are mostly asthetic and constructed for the webui!
+    which input gets used, but are mostly aesthetic and constructed for the webui! Only required for the pipeline.
     """
 
     alu_src_1: Optional[bool] = None

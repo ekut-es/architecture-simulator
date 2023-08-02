@@ -8,6 +8,8 @@ from ..performance_metrics import PerformanceMetrics
 
 
 class ToyArchitecturalState:
+    """Architectural State for the Toy architecture."""
+
     def __init__(
         self,
         instruction_memory_range: Optional[range] = None,
@@ -30,6 +32,7 @@ class ToyArchitecturalState:
         self.performance_metrics = PerformanceMetrics()
 
     def increment_pc(self):
+        """Increment program counter by 1."""
         self.program_counter += MutableUInt16(1)
 
     def instruction_at_pc(self) -> bool:

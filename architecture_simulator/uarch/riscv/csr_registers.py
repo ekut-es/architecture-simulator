@@ -5,6 +5,8 @@ from ..memory import Memory
 
 
 class CsrRegisterFile(Memory):
+    """A class for the CSR memory."""
+
     def __init__(self, privilege_level: int = 0, min_bytes: int = 0):
         super().__init__()
         self.privilege_level = privilege_level
