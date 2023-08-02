@@ -53,3 +53,23 @@ class TestToySimulation(unittest.TestCase):
         simulation.run()
         self.assertEqual(simulation.state.data_memory.read_halfword(0x400), 2)
         self.assertEqual(simulation.state.accu, 4)
+
+    def test_performance_metrics(self):
+        simulation = ToySimulation()
+        program = """INC
+        INC
+        INC
+        INC
+        DEC
+        BRZ $008
+        ZRO
+        BRZ $003
+        BRZ $009
+        ADD $400"""
+        simulation.load_program(program)
+        simulation.run()
+        self.assertEqual(simulation.state.accu, 0)
+        self.assertEqual(simulation.state.performance_metrics.instruction_count, 13)
+        self.assertEqual(simulation.state.performance_metrics.cycles, 13)
+        self.assertEqual(simulation.state.performance_metrics.branch_count, 3)
+        self.assertGreater(simulation.state.performance_metrics.execution_time_s, 0)
