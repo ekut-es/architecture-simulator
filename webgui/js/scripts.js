@@ -238,6 +238,14 @@ window.addEventListener("DOMContentLoaded", function () {
     editor.on("change", function () {
         synchronizeEditors(editor, editor_vis);
         editor.save();
+        for (let i = 0; i < editor.lineCount(); i++) {
+            editor.removeLineClass(i, "background", "highlight");
+            editor_vis.removeLineClass(i, "background", "highlight");
+        }
+        editor.refresh();
+        editor_vis.refresh();
+        editor.closeHint();
+        editor_vis.closeHint();
         // autoparse
         clearTimeout(input_timer);
         input_timer = setTimeout(
