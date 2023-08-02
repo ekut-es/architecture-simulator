@@ -110,29 +110,29 @@ const archsim_js = {
         td3 = document.createElement("td");
         td3.innerText = stage;
         if (stage == "Single") {
-            td1.style.backgroundColor = "purple";
-            td2.style.backgroundColor = "purple";
-            td3.style.backgroundColor = "purple";
+            td1.style.backgroundColor = "#2DA800";
+            td2.style.backgroundColor = "#2DA800";
+            td3.style.backgroundColor = "#2DA800";
         } else if (stage == "IF") {
-            td1.style.backgroundColor = "red";
-            td2.style.backgroundColor = "red";
-            td3.style.backgroundColor = "red";
+            td1.style.backgroundColor = "#FFEC00";
+            td2.style.backgroundColor = "#FFEC00";
+            td3.style.backgroundColor = "#FFEC00";
         } else if (stage == "ID") {
-            td1.style.backgroundColor = "yellow";
-            td2.style.backgroundColor = "yellow";
-            td3.style.backgroundColor = "yellow";
+            td1.style.backgroundColor = "#FFC900";
+            td2.style.backgroundColor = "#FFC900";
+            td3.style.backgroundColor = "#FFC900";
         } else if (stage == "EX") {
-            td1.style.backgroundColor = "green";
-            td2.style.backgroundColor = "green";
-            td3.style.backgroundColor = "green";
+            td1.style.backgroundColor = "#695CC4";
+            td2.style.backgroundColor = "#695CC4";
+            td3.style.backgroundColor = "#695CC4";
         } else if (stage == "MA") {
-            td1.style.backgroundColor = "aqua";
-            td2.style.backgroundColor = "aqua";
-            td3.style.backgroundColor = "aqua";
+            td1.style.backgroundColor = "#2A17B1";
+            td2.style.backgroundColor = "#2A17B1";
+            td3.style.backgroundColor = "#2A17B1";
         } else if (stage == "WB") {
-            td1.style.backgroundColor = "blue";
-            td2.style.backgroundColor = "blue";
-            td3.style.backgroundColor = "blue";
+            td1.style.backgroundColor = "#580EAD";
+            td2.style.backgroundColor = "#580EAD";
+            td3.style.backgroundColor = "#580EAD";
         }
         tr.appendChild(td1);
         tr.appendChild(td2);
@@ -149,25 +149,25 @@ const archsim_js = {
         td3_vis = document.createElement("td");
         td3_vis.innerText = stage;
         if (stage == "IF") {
-            td1_vis.style.backgroundColor = "red";
-            td2_vis.style.backgroundColor = "red";
-            td3_vis.style.backgroundColor = "red";
+            td1.style.backgroundColor = "#FFEC00";
+            td2.style.backgroundColor = "#FFEC00";
+            td3.style.backgroundColor = "#FFEC00";
         } else if (stage == "ID") {
-            td1_vis.style.backgroundColor = "yellow";
-            td2_vis.style.backgroundColor = "yellow";
-            td3_vis.style.backgroundColor = "yellow";
+            td1.style.backgroundColor = "#FFC900";
+            td2.style.backgroundColor = "#FFC900";
+            td3.style.backgroundColor = "#FFC900";
         } else if (stage == "EX") {
-            td1_vis.style.backgroundColor = "green";
-            td2_vis.style.backgroundColor = "green";
-            td3_vis.style.backgroundColor = "green";
+            td1.style.backgroundColor = "#695CC4";
+            td2.style.backgroundColor = "#695CC4";
+            td3.style.backgroundColor = "#695CC4";
         } else if (stage == "MA") {
-            td1_vis.style.backgroundColor = "aqua";
-            td2_vis.style.backgroundColor = "aqua";
-            td3_vis.style.backgroundColor = "aqua";
+            td1.style.backgroundColor = "#2A17B1";
+            td2.style.backgroundColor = "#2A17B1";
+            td3.style.backgroundColor = "#2A17B1";
         } else if (stage == "WB") {
-            td1_vis.style.backgroundColor = "blue";
-            td2_vis.style.backgroundColor = "blue";
-            td3_vis.style.backgroundColor = "blue";
+            td1.style.backgroundColor = "#580EAD";
+            td2.style.backgroundColor = "#580EAD";
+            td3.style.backgroundColor = "#580EAD";
         }
         tr_vis.appendChild(td1_vis);
         tr_vis.appendChild(td2_vis);
