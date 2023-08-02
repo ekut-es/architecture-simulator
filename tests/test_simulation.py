@@ -1,21 +1,20 @@
 import unittest
 import fixedint
 
-from architecture_simulator.uarch.register_file import RegisterFile
-from architecture_simulator.uarch.memory import (
-    Memory,
-    MemoryAddressError,
-    InstructionMemory,
+from architecture_simulator.uarch.riscv.register_file import RegisterFile
+from architecture_simulator.uarch.memory import Memory, MemoryAddressError
+from architecture_simulator.uarch.instruction_memory import InstructionMemory
+from architecture_simulator.uarch.riscv.riscv_architectural_state import (
+    ArchitecturalState,
 )
-from architecture_simulator.uarch.architectural_state import ArchitecturalState
-from architecture_simulator.simulation.simulation import Simulation
-from architecture_simulator.isa.rv32i_instructions import ADDI, BNE, BEQ, JAL, LW
-from architecture_simulator.uarch.pipeline import InstructionExecutionException
+from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
+from architecture_simulator.isa.riscv.rv32i_instructions import ADDI, BNE, BEQ, JAL, LW
+from architecture_simulator.uarch.riscv.pipeline import InstructionExecutionException
 
 
 class TestSimulation(unittest.TestCase):
     def test_simulation(self):
-        simulation = Simulation(
+        simulation = RiscvSimulation(
             state=ArchitecturalState(
                 register_file=RegisterFile(registers=[0, 2, 0, 0]),
                 memory=Memory(memory_file=()),
@@ -31,7 +30,7 @@ class TestSimulation(unittest.TestCase):
         # self.assertEqual(simulation.state.register_file.registers[0], 2)
 
     def test_run_simulation(self):
-        simulation = Simulation(
+        simulation = RiscvSimulation(
             state=ArchitecturalState(
                 register_file=RegisterFile(registers=[0, 0, 0, 0]),
                 instruction_memory=InstructionMemory(
@@ -57,7 +56,7 @@ class TestSimulation(unittest.TestCase):
         )
         self.assertGreater(simulation.state.performance_metrics.execution_time_s, 0)
 
-        simulation = Simulation(
+        simulation = RiscvSimulation(
             state=ArchitecturalState(register_file=RegisterFile(registers=[0, 0, 0, 0]))
         )
 
@@ -73,7 +72,7 @@ class TestSimulation(unittest.TestCase):
             simulation.state.performance_metrics.execution_time_s, 0
         )
 
-        simulation = Simulation(
+        simulation = RiscvSimulation(
             state=ArchitecturalState(
                 register_file=RegisterFile(registers=[0, 0, 0, 0]),
                 instruction_memory=InstructionMemory(
@@ -98,7 +97,7 @@ class TestSimulation(unittest.TestCase):
         )
         self.assertGreater(simulation.state.performance_metrics.execution_time_s, 0)
 
-        simulation = Simulation(
+        simulation = RiscvSimulation(
             state=ArchitecturalState(
                 register_file=RegisterFile(registers=[0, 0, 0, 0]),
                 instruction_memory=InstructionMemory(
@@ -122,7 +121,7 @@ class TestSimulation(unittest.TestCase):
         )
         self.assertGreater(simulation.state.performance_metrics.execution_time_s, 0)
 
-        simulation = Simulation(
+        simulation = RiscvSimulation(
             state=ArchitecturalState(
                 register_file=RegisterFile(registers=[0, 0, 0, 0]),
                 instruction_memory=InstructionMemory(
@@ -151,8 +150,12 @@ class TestSimulation(unittest.TestCase):
 
     def test_against_class_variables(self):
         """Some tests against class variables (some things used to be class variables and were thus shared between objects, which was undesired)"""
-        simulation1 = Simulation(state=ArchitecturalState(memory=Memory(min_bytes=0)))
-        simulation2 = Simulation(state=ArchitecturalState(memory=Memory(min_bytes=0)))
+        simulation1 = RiscvSimulation(
+            state=ArchitecturalState(memory=Memory(min_bytes=0))
+        )
+        simulation2 = RiscvSimulation(
+            state=ArchitecturalState(memory=Memory(min_bytes=0))
+        )
 
         simulation1.state.register_file.registers[5] = fixedint.MutableUInt32(12)
         self.assertEqual(int(simulation1.state.register_file.registers[5]), 12)
@@ -181,7 +184,7 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(int(simulation2.state.memory.read_byte(address=5)), 0)
 
     def test_step_simulation_over(self):
-        simulation = Simulation()
+        simulation = RiscvSimulation()
         simulation.state.instruction_memory.instructions = {
             0: ADDI(rd=1, rs1=1, imm=1),
             4: ADDI(rd=1, rs1=1, imm=1),
@@ -195,7 +198,7 @@ class TestSimulation(unittest.TestCase):
         self.assertTrue(not simulation.step_simulation())
 
     def test_simulation_errors(self):
-        simulation = Simulation()
+        simulation = RiscvSimulation()
         simulation.state.instruction_memory.instructions = {
             0: ADDI(rd=1, rs1=1, imm=1),
             4: LW(rd=1, rs1=0, imm=0),
@@ -245,7 +248,7 @@ class TestSimulation(unittest.TestCase):
         jalr zero, ra, 0
         End:"""
 
-        simulation = Simulation(
+        simulation = RiscvSimulation(
             state=ArchitecturalState(
                 register_file=RegisterFile(), memory=Memory(min_bytes=0)
             ),
@@ -256,7 +259,7 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(simulation.state.register_file.registers[10], 55)
 
     def test_five_stage_performance_metrics_1(self):
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         programm = """
         addi x1, x0, 4
         label:
@@ -273,7 +276,7 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(simulation.state.performance_metrics.procedure_count, 1)
 
     def test_five_stage_performance_metrics_2(self):
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         programm = """
         add x0, x0, x0
         addi x1, x1, 1
@@ -289,7 +292,7 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(simulation.state.performance_metrics.cycles, 12)
 
     def test_off_by_one_fix(self):
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         programm = """
         add x0, x0, x0
         """
@@ -298,7 +301,7 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(simulation.state.performance_metrics.cycles, 5)
 
     def test_singele_stage_cycles(self):
-        simulation = Simulation()
+        simulation = RiscvSimulation()
         programm = """
         add x0, x0, x0
         """

@@ -2,13 +2,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from dataclasses import dataclass
 
-from ..isa.instruction_types import EmptyInstruction
+from ...isa.riscv.instruction_types import EmptyInstruction
 
 from .pipeline_registers import PipelineRegister
 
 
 if TYPE_CHECKING:
-    from architecture_simulator.uarch.architectural_state import ArchitecturalState
+    from architecture_simulator.uarch.riscv.riscv_architectural_state import (
+        ArchitecturalState,
+    )
     from .stages import Stage
 
 #

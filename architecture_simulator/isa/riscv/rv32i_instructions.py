@@ -3,7 +3,7 @@ from typing import Optional, Type, TYPE_CHECKING
 from dataclasses import dataclass
 import fixedint
 
-from architecture_simulator.uarch.control_unit_signals import ControlUnitSignals
+from architecture_simulator.uarch.riscv.control_unit_signals import ControlUnitSignals
 from .instruction_types import (
     RiscvInstruction,
     RTypeInstruction,
@@ -20,7 +20,9 @@ from .instruction_types import (
 )
 
 if TYPE_CHECKING:
-    from architecture_simulator.uarch.architectural_state import ArchitecturalState
+    from architecture_simulator.uarch.riscv.riscv_architectural_state import (
+        ArchitecturalState,
+    )
 
 
 @dataclass

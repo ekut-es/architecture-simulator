@@ -8,12 +8,12 @@ from .pipeline_registers import (
     MemoryAccessPipelineRegister,
     RegisterWritebackPipelineRegister,
 )
-from .architectural_state import ArchitecturalState
-from architecture_simulator.isa.instruction_types import (
+from .riscv_architectural_state import ArchitecturalState
+from architecture_simulator.isa.riscv.instruction_types import (
     BTypeInstruction,
     EmptyInstruction,
 )
-from architecture_simulator.isa.rv32i_instructions import JAL
+from architecture_simulator.isa.riscv.rv32i_instructions import JAL
 from .pipeline import InstructionExecutionException
 
 

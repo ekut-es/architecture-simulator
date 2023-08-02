@@ -1,10 +1,12 @@
 import unittest
 import fixedint
 
-from architecture_simulator.uarch.register_file import RegisterFile
+from architecture_simulator.uarch.riscv.register_file import RegisterFile
 from architecture_simulator.uarch.memory import Memory, MemoryAddressError
-from architecture_simulator.uarch.architectural_state import ArchitecturalState
-from architecture_simulator.isa.rv32i_instructions import ADD, SLL
+from architecture_simulator.uarch.riscv.riscv_architectural_state import (
+    ArchitecturalState,
+)
+from architecture_simulator.isa.riscv.rv32i_instructions import ADD, SLL
 
 
 class TestArchitecture(unittest.TestCase):

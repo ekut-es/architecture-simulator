@@ -1,6 +1,6 @@
 import pyparsing as pp
 
-from ..parser import ParserSyntaxException
+from ..riscv.riscv_parser import ParserSyntaxException
 from .toy_instructions import AddressTypeInstruction, ToyInstruction, instruction_map
 
 

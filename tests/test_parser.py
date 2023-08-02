@@ -1,5 +1,5 @@
 import unittest
-from architecture_simulator.isa.rv32i_instructions import (
+from architecture_simulator.isa.riscv.rv32i_instructions import (
     ADD,
     BEQ,
     BNE,
@@ -15,10 +15,12 @@ from architecture_simulator.isa.rv32i_instructions import (
     FENCE,
     LW,
 )
-from architecture_simulator.uarch.architectural_state import ArchitecturalState
-from architecture_simulator.simulation.simulation import Simulation
+from architecture_simulator.uarch.riscv.riscv_architectural_state import (
+    ArchitecturalState,
+)
+from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 from architecture_simulator.uarch.memory import Memory
-from architecture_simulator.isa.parser import (
+from architecture_simulator.isa.riscv.riscv_parser import (
     RiscvParser,
     ParserLabelException,
     ParserOddImmediateException,
@@ -281,7 +283,9 @@ beq zero, ra, Ban0n3
     """
 
     def test_fibonacci_parser(self):
-        simulation = Simulation(state=ArchitecturalState(memory=Memory(min_bytes=0)))
+        simulation = RiscvSimulation(
+            state=ArchitecturalState(memory=Memory(min_bytes=0))
+        )
         simulation.load_program(self.fibonacci)
         # print(simulation.instructions)
         while simulation.state.program_counter < 104:
@@ -334,7 +338,7 @@ fibonacci:
 """
 
     def test_c_fibonacci(self):
-        simulation = Simulation()
+        simulation = RiscvSimulation()
         simulation.load_program(self.fibonacci_c)
         # print(simulation.instructions)
         while simulation.state.program_counter != 24:
@@ -362,7 +366,7 @@ fibonacci:
     """
 
     def test_c_add(self):
-        simulation = Simulation()
+        simulation = RiscvSimulation()
         simulation.load_program(self.add_c)
         # print(simulation.instructions)
         while simulation.state.program_counter < 60:
@@ -415,7 +419,7 @@ fibonacci:
 """
 
     def test_c_fibonacci_abi(self):
-        simulation = Simulation()
+        simulation = RiscvSimulation()
         simulation.load_program(self.fibonacci_c_abi)
         # print(simulation.instructions)
         while simulation.state.program_counter != 24:

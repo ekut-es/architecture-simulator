@@ -3,10 +3,10 @@ from typing import Optional, TYPE_CHECKING
 from dataclasses import dataclass, field
 
 from .control_unit_signals import ControlUnitSignals
-from architecture_simulator.isa.instruction_types import EmptyInstruction
+from architecture_simulator.isa.riscv.instruction_types import EmptyInstruction
 
 if TYPE_CHECKING:
-    from architecture_simulator.isa.instruction_types import RiscvInstruction
+    from architecture_simulator.isa.riscv.instruction_types import RiscvInstruction
     from .stages import FlushSignal
 
 

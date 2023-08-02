@@ -1,9 +1,11 @@
 from dataclasses import dataclass, field
 
-from .performance_metrics import PerformanceMetrics
+from ..performance_metrics import PerformanceMetrics
 from .register_file import RegisterFile
-from .memory import Memory, InstructionMemory, CsrRegisterFile
-from architecture_simulator.isa.instruction_types import RiscvInstruction
+from ..memory import Memory
+from ..instruction_memory import InstructionMemory
+from .csr_registers import CsrRegisterFile
+from architecture_simulator.isa.riscv.instruction_types import RiscvInstruction
 
 
 @dataclass

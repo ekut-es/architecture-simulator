@@ -4,9 +4,9 @@ from dataclasses import dataclass
 from typing import Optional
 
 import archsim_js
-from architecture_simulator.isa.parser import ParserException
-from architecture_simulator.simulation.simulation import Simulation
-from architecture_simulator.uarch.pipeline_registers import (
+from architecture_simulator.isa.riscv.riscv_parser import ParserException
+from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
+from architecture_simulator.uarch.riscv.pipeline_registers import (
     PipelineRegister,
     InstructionFetchPipelineRegister,
     InstructionDecodePipelineRegister,
@@ -14,9 +14,9 @@ from architecture_simulator.uarch.pipeline_registers import (
     MemoryAccessPipelineRegister,
     RegisterWritebackPipelineRegister,
 )
-from architecture_simulator.uarch.pipeline import InstructionExecutionException
+from architecture_simulator.uarch.riscv.pipeline import InstructionExecutionException
 
-simulation: Optional[Simulation] = None
+simulation: Optional[RiscvSimulation] = None
 
 
 @dataclass
@@ -27,7 +27,7 @@ class StateNotInitializedError(RuntimeError):
 
 def sim_init():
     global simulation
-    simulation = Simulation()
+    simulation = RiscvSimulation()
     update_ui()
     return simulation
 
@@ -102,7 +102,7 @@ def reset_sim(pipeline_mode):
     global simulation
     if simulation is None:
         raise StateNotInitializedError()
-    simulation = Simulation(mode=pipeline_mode)
+    simulation = RiscvSimulation(mode=pipeline_mode)
     update_ui()
     return simulation
 

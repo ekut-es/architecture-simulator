@@ -1,8 +1,8 @@
 import unittest
 import fixedint
 from architecture_simulator.uarch.memory import Memory
-from architecture_simulator.uarch.pipeline import Pipeline
-from architecture_simulator.simulation.simulation import Simulation
+from architecture_simulator.uarch.riscv.pipeline import Pipeline
+from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 
 
 class TestPipeline(unittest.TestCase):
@@ -24,7 +24,7 @@ class TestPipeline(unittest.TestCase):
         program = """add x1, x1, x2
         add x4, x5, x6
         sub x7, x8, x9"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(5)
@@ -49,7 +49,7 @@ class TestPipeline(unittest.TestCase):
         program = """add x1, x1, x2
         add x4, x5, x6
         add x7, x8, x9"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(5)
@@ -74,7 +74,7 @@ class TestPipeline(unittest.TestCase):
         program = """sub x1, x1, x2
         sub x4, x5, x6
         sub x7, x8, x9"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(5)
@@ -99,7 +99,7 @@ class TestPipeline(unittest.TestCase):
         program = """sll x1, x1, x2
         sll x4, x5, x6
         sll x7, x8, x9"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(5)
@@ -126,7 +126,7 @@ class TestPipeline(unittest.TestCase):
         program = """slt x1, x1, x2
         slt x4, x5, x6
         slt x7, x8, x9"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(5)
@@ -151,7 +151,7 @@ class TestPipeline(unittest.TestCase):
         program = """sltu x1, x1, x2
         sltu x4, x5, x6
         sltu x7, x8, x9"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(5)
@@ -176,7 +176,7 @@ class TestPipeline(unittest.TestCase):
         program = """xor x1, x1, x2
         xor x4, x5, x6
         xor x7, x8, x9"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
@@ -201,7 +201,7 @@ class TestPipeline(unittest.TestCase):
         program = """srl x1, x1, x2
         srl x4, x5, x6
         srl x7, x8, x9"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(1)
@@ -226,7 +226,7 @@ class TestPipeline(unittest.TestCase):
         program = """sra x1, x1, x2
         sra x4, x5, x6
         sra x7, x8, x9"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(16)
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(2)
@@ -252,7 +252,7 @@ class TestPipeline(unittest.TestCase):
         program = """or x1, x1, x2
         or x4, x5, x6
         or x7, x8, x9"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(1)
@@ -277,7 +277,7 @@ class TestPipeline(unittest.TestCase):
         program = """and x1, x1, x2
         and x4, x5, x6
         and x7, x8, x9"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(1)
@@ -303,7 +303,7 @@ class TestPipeline(unittest.TestCase):
         addi x2, x2, -1
         addi x3, x3, 1234
         addi x4, x4, 20"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(-1)
@@ -330,7 +330,7 @@ class TestPipeline(unittest.TestCase):
         andi x2, x2, -1
         andi x3, x3, 1234
         andi x4, x4, 20"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(-1)
@@ -357,7 +357,7 @@ class TestPipeline(unittest.TestCase):
         ori x2, x2, -1
         ori x3, x3, 0
         ori x4, x4, 2"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(0)
@@ -384,7 +384,7 @@ class TestPipeline(unittest.TestCase):
         xori x2, x2, -1
         xori x3, x3, 0
         xori x4, x4, -1"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(0)
@@ -411,7 +411,7 @@ class TestPipeline(unittest.TestCase):
         slli x2, x2, 20
         slli x3, x3, 31
         slli x4, x4, 1"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(0)
@@ -438,7 +438,7 @@ class TestPipeline(unittest.TestCase):
         srli x2, x2, 20
         srli x3, x3, 31
         srli x4, x4, 1"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(2)
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(100)
@@ -465,7 +465,7 @@ class TestPipeline(unittest.TestCase):
         srai x2, x2, 20
         srai x3, x3, 31
         srai x4, x4, 1"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(2)
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(100)
@@ -492,7 +492,7 @@ class TestPipeline(unittest.TestCase):
         slti x2, x2, 0
         slti x3, x3, 20
         slti x4, x4, 1"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(-1)
@@ -519,7 +519,7 @@ class TestPipeline(unittest.TestCase):
         sltiu x2, x2, 0
         sltiu x3, x3, 20
         sltiu x4, x4, 1"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(-1)
@@ -547,7 +547,7 @@ class TestPipeline(unittest.TestCase):
         lb x8, 0(x3)
         lb x10, 4(x0)
         lb x9, 47(x4)"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         pipeline.state.memory = Memory(
             memory_file=dict(
@@ -593,7 +593,7 @@ class TestPipeline(unittest.TestCase):
         lh x9, 48(x4)
         lh x10, 12(x0)
         """
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         pipeline.state.memory = Memory(
             memory_file=dict(
@@ -640,7 +640,7 @@ class TestPipeline(unittest.TestCase):
         lw x7, 2(x1)
         lw x8, 0(x3)
         lw x9, 48(x4)"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         pipeline.state.memory = Memory(
             memory_file=dict(
@@ -684,7 +684,7 @@ class TestPipeline(unittest.TestCase):
         lbu x9, 48(x4)
         lbu x10, 4(x0)
         """
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         pipeline.state.memory = Memory(
             memory_file=dict(
@@ -732,7 +732,7 @@ class TestPipeline(unittest.TestCase):
         lhu x9, 48(x4)
         lhu x10, 4(x0)
         """
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         pipeline.state.memory = Memory(
             memory_file=dict(
@@ -784,7 +784,7 @@ class TestPipeline(unittest.TestCase):
         sb x5, 14(x1)
         sb x5, 15(x1)
         """
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(2**16)
@@ -816,7 +816,7 @@ class TestPipeline(unittest.TestCase):
         add x3, x0, x2
         add x4, x0, x2
         """
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(2)
@@ -832,7 +832,7 @@ class TestPipeline(unittest.TestCase):
         beq x0, x0, 8
         add x3, x0, x2
         add x4, x0, x2"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(2)
@@ -850,7 +850,7 @@ class TestPipeline(unittest.TestCase):
         beq x0, x0, 8
         add x3, x0, x2
         add x4, x0, x2"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(2)
@@ -867,7 +867,7 @@ class TestPipeline(unittest.TestCase):
         beq x0, x2, 8
         add x3, x0, x2
         add x4, x0, x2"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(2)
@@ -883,7 +883,7 @@ class TestPipeline(unittest.TestCase):
         bne x3, x2, 8
         add x3, x0, x2
         add x4, x0, x2"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(2)
@@ -901,7 +901,7 @@ class TestPipeline(unittest.TestCase):
         bne x1, x3, 8
         add x3, x0, x2
         add x4, x0, x2"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(8)
@@ -917,7 +917,7 @@ class TestPipeline(unittest.TestCase):
         program = """blt x0, x1, 8
         add x2, x1, x1
         add x3, x1, x1"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
@@ -930,7 +930,7 @@ class TestPipeline(unittest.TestCase):
         program = """blt x1, x0, 8
         add x2, x1, x1
         sub x3, x0, x1"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(-1)
@@ -943,7 +943,7 @@ class TestPipeline(unittest.TestCase):
         program = """blt x0, x0, 8
         add x2, x1, x1
         add x3, x1, x1"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
@@ -957,7 +957,7 @@ class TestPipeline(unittest.TestCase):
         program = """bge x0, x0, 8
         add x2, x1, x1
         add x3, x1, x1"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
@@ -970,7 +970,7 @@ class TestPipeline(unittest.TestCase):
         program = """bge x1, x0, 8
         add x2, x1, x1
         add x3, x1, x1"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
@@ -983,7 +983,7 @@ class TestPipeline(unittest.TestCase):
         program = """bge x0, x1, 8
         add x2, x1, x1
         add x3, x1, x1"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
@@ -996,7 +996,7 @@ class TestPipeline(unittest.TestCase):
         program = """bge x0, x1, 8
         add x2, x5, x5
         add x3, x5, x5"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(-1)
@@ -1011,7 +1011,7 @@ class TestPipeline(unittest.TestCase):
         program = """bltu x0, x1, 8
         add x2, x1, x1
         add x3, x1, x1"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
@@ -1024,7 +1024,7 @@ class TestPipeline(unittest.TestCase):
         program = """bltu x1, x0, 8
         add x2, x5, x5
         sub x3, x0, x1"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(-1)
@@ -1038,7 +1038,7 @@ class TestPipeline(unittest.TestCase):
         program = """bltu x0, x0, 8
         add x2, x1, x1
         add x3, x1, x1"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
@@ -1052,7 +1052,7 @@ class TestPipeline(unittest.TestCase):
         program = """bgeu x0, x0, 8
         add x2, x1, x1
         add x3, x1, x1"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
@@ -1065,7 +1065,7 @@ class TestPipeline(unittest.TestCase):
         program = """bgeu x1, x0, 8
         add x2, x1, x1
         add x3, x1, x1"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
@@ -1078,7 +1078,7 @@ class TestPipeline(unittest.TestCase):
         program = """bgeu x0, x1, 8
         add x2, x1, x1
         add x3, x1, x1"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
@@ -1091,7 +1091,7 @@ class TestPipeline(unittest.TestCase):
         program = """bgeu x0, x1, 8
         add x2, x5, x5
         add x3, x5, x5"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(-1)
@@ -1105,7 +1105,7 @@ class TestPipeline(unittest.TestCase):
         program = """jal x2, 8
         add x1, x1, x1
         add x3, x1, x1"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
@@ -1117,7 +1117,7 @@ class TestPipeline(unittest.TestCase):
         program = """jal x2, 4
         add x1, x1, x1
         add x3, x1, x1"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
@@ -1135,7 +1135,7 @@ class TestPipeline(unittest.TestCase):
         add x4, x1, x1
         Kaesekuchen:
         add x5, x1, x1"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
@@ -1156,7 +1156,7 @@ class TestPipeline(unittest.TestCase):
         add x4, x1, x1
         Kaesekuchen:
         add x5, x1, x1"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
@@ -1169,7 +1169,7 @@ class TestPipeline(unittest.TestCase):
 
     def test_jalr(self):
         program = """jalr x2, x1, 20"""
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(8)
@@ -1185,7 +1185,7 @@ class TestPipeline(unittest.TestCase):
         add x6, x1, x1
         add x7, x1, x1
         """
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(8)
@@ -1200,7 +1200,7 @@ class TestPipeline(unittest.TestCase):
     def test_lui(self):
         program = """lui x1, 1
         """
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(8)
@@ -1212,7 +1212,7 @@ class TestPipeline(unittest.TestCase):
         lui x3, {2**20}
         lui x4, {2**20 - 1}
         """
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(8)
@@ -1227,7 +1227,7 @@ class TestPipeline(unittest.TestCase):
     def test_auipc(self):
         program = """auipc x1, 1
         """
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(8)
@@ -1241,7 +1241,7 @@ class TestPipeline(unittest.TestCase):
         auipc x2, 2
         auipc x3, {2**19}
         """
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(8)
@@ -1261,7 +1261,7 @@ class TestPipeline(unittest.TestCase):
         add x0, x0, x0
         sll x9, x7, x8
         """
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(2)
@@ -1292,7 +1292,7 @@ class TestPipeline(unittest.TestCase):
         add x0, x0, x0
         add x0, x0, x0
         """
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(7)
@@ -1323,7 +1323,7 @@ class TestPipeline(unittest.TestCase):
         sub x2, x2, x1
         end:
         """
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
         pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
@@ -1335,7 +1335,7 @@ class TestPipeline(unittest.TestCase):
         )
 
     def test_single_stage(self):
-        simulation = Simulation()
+        simulation = RiscvSimulation()
         pipeline = simulation.pipeline
         n = 10
         simulation.load_program(
@@ -1375,7 +1375,7 @@ End:"""
         label:
         add x2, x1, x1
         """
-        simulation = Simulation(mode="five_stage_pipeline")
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
         pipeline = simulation.pipeline
         simulation.load_program(program)
 

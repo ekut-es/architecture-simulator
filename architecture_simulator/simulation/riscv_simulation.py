@@ -1,8 +1,10 @@
 from typing import Optional
 
-from architecture_simulator.uarch.architectural_state import ArchitecturalState
-from architecture_simulator.uarch.pipeline import Pipeline
-from architecture_simulator.uarch.stages import (
+from architecture_simulator.uarch.riscv.riscv_architectural_state import (
+    ArchitecturalState,
+)
+from architecture_simulator.uarch.riscv.pipeline import Pipeline
+from architecture_simulator.uarch.riscv.stages import (
     SingleStage,
     InstructionFetchStage,
     InstructionDecodeStage,
@@ -10,11 +12,11 @@ from architecture_simulator.uarch.stages import (
     MemoryAccessStage,
     RegisterWritebackStage,
 )
-from architecture_simulator.isa.parser import RiscvParser
+from architecture_simulator.isa.riscv.riscv_parser import RiscvParser
 
 
 # Does currently support single_stage_pipeline and five_stage_pipeline
-class Simulation:
+class RiscvSimulation:
     """
     Args:
         mode : "single_stage_pipeline" (=default) | "five_stage_pipeline"

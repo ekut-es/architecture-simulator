@@ -3,11 +3,13 @@ from dataclasses import dataclass
 from typing import Optional, TYPE_CHECKING
 import fixedint
 
-from architecture_simulator.uarch.control_unit_signals import ControlUnitSignals
-from .instruction import Instruction
+from architecture_simulator.uarch.riscv.control_unit_signals import ControlUnitSignals
+from ..instruction import Instruction
 
 if TYPE_CHECKING:
-    from architecture_simulator.uarch.architectural_state import ArchitecturalState
+    from architecture_simulator.uarch.riscv.riscv_architectural_state import (
+        ArchitecturalState,
+    )
 
 
 @dataclass

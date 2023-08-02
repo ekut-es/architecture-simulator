@@ -2,7 +2,7 @@ from fixedint import MutableUInt16
 from typing import Optional
 
 from .toy_memory import ToyMemory
-from ..memory import InstructionMemory
+from ..instruction_memory import InstructionMemory
 from architecture_simulator.isa.toy.toy_instructions import ToyInstruction
 from ..performance_metrics import PerformanceMetrics
 

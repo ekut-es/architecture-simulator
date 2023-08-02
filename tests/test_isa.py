@@ -1,6 +1,6 @@
 import unittest
 import fixedint
-from architecture_simulator.isa.rv32i_instructions import (
+from architecture_simulator.isa.riscv.rv32i_instructions import (
     ADD,
     BEQ,
     BLT,
@@ -48,10 +48,13 @@ from architecture_simulator.isa.rv32i_instructions import (
     SRLI,
     InstructionNotImplemented,
 )
-from architecture_simulator.uarch.register_file import RegisterFile
-from architecture_simulator.uarch.architectural_state import ArchitecturalState
-from architecture_simulator.uarch.memory import Memory, CSRError
-from architecture_simulator.isa.parser import RiscvParser
+from architecture_simulator.uarch.riscv.register_file import RegisterFile
+from architecture_simulator.uarch.riscv.riscv_architectural_state import (
+    ArchitecturalState,
+)
+from architecture_simulator.uarch.memory import Memory
+from architecture_simulator.uarch.riscv.csr_registers import CSRError
+from architecture_simulator.isa.riscv.riscv_parser import RiscvParser
 
 
 class TestInstructions(unittest.TestCase):

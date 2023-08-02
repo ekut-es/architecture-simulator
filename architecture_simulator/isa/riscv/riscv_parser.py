@@ -3,12 +3,12 @@ from typing import TYPE_CHECKING
 import pyparsing as pp
 from dataclasses import dataclass
 
-from architecture_simulator.isa.rv32i_instructions import instruction_map
-from architecture_simulator.isa import instruction_types
-from architecture_simulator.isa.rv32i_instructions import ECALL, EBREAK, FENCE
+from architecture_simulator.isa.riscv.rv32i_instructions import instruction_map
+from architecture_simulator.isa.riscv import instruction_types
+from architecture_simulator.isa.riscv.rv32i_instructions import ECALL, EBREAK, FENCE
 
 if TYPE_CHECKING:
-    from architecture_simulator.isa.instruction_types import RiscvInstruction
+    from architecture_simulator.isa.riscv.instruction_types import RiscvInstruction
 
 # abi register names
 reg_mapping = {
