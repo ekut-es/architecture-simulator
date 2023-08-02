@@ -324,3 +324,43 @@ class TestSimulation(unittest.TestCase):
         simulation.state.instruction_memory.append_instructions(program=programm)
         simulation.run_simulation()
         self.assertEqual(simulation.state.performance_metrics.cycles, 1)
+
+    def test_turn_off_detect_data_hazards(self):
+        simulation = Simulation(detect_data_hazards=False, mode="five_stage_pipeline")
+        programm = """
+        addi x1, x0, 15
+        add x0, x0, x0
+        addi x1, x1, 1
+        add x0, x0, x0
+        add x0, x0, x0
+        addi x2, x0, 7
+        addi x2, x2, 2
+        add x0, x0, x0
+        add x0, x0, x0
+        addi x2, x2, 1
+        """
+        simulation.state.instruction_memory.append_instructions(program=programm)
+        simulation.run_simulation()
+        self.assertEqual(simulation.state.register_file.registers[1], 1)
+        self.assertEqual(simulation.state.register_file.registers[2], 3)
+        self.assertEqual(simulation.state.performance_metrics.flushes, 0)
+        self.assertEqual(simulation.state.performance_metrics.cycles, 14)
+        self.assertEqual(simulation.state.performance_metrics.instruction_count, 10)
+
+    def test_five_stage_performance_metrics_3(self):
+        simulation = Simulation(detect_data_hazards=True, mode="five_stage_pipeline")
+        programm = """
+    	# multiplication
+        addi x1, x0, 16 # x
+        addi x2, x0, 10 # y
+        loop:
+        add x3, x3, x1
+        addi x2, x2, -1
+        bne x2, zero, loop
+        """
+        simulation.state.instruction_memory.append_instructions(program=programm)
+        simulation.run_simulation()
+        self.assertEqual(simulation.state.register_file.registers[3], 160)
+        self.assertEqual(simulation.state.performance_metrics.instruction_count, 32)
+        self.assertEqual(simulation.state.performance_metrics.branch_count, 9)
+        self.assertEqual(simulation.state.performance_metrics.flushes, 20)
