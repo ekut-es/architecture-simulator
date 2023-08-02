@@ -29,7 +29,7 @@ def update_EX_Stage(
     pc_plus_imm,
     control_unit_signals,
 ) -> None: ...
-def update_MA_Stage(
+def update_MEM_Stage(
     memory_address,
     result,
     memory_write_data,

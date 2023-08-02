@@ -125,7 +125,7 @@ const archsim_js = {
             td1.style.backgroundColor = "#695CC4";
             td2.style.backgroundColor = "#695CC4";
             td3.style.backgroundColor = "#695CC4";
-        } else if (stage == "MA") {
+        } else if (stage == "MEM") {
             td1.style.backgroundColor = "#2A17B1";
             td2.style.backgroundColor = "#2A17B1";
             td3.style.backgroundColor = "#2A17B1";
@@ -160,7 +160,7 @@ const archsim_js = {
             td1.style.backgroundColor = "#695CC4";
             td2.style.backgroundColor = "#695CC4";
             td3.style.backgroundColor = "#695CC4";
-        } else if (stage == "MA") {
+        } else if (stage == "MEM") {
             td1.style.backgroundColor = "#2A17B1";
             td2.style.backgroundColor = "#2A17B1";
             td3.style.backgroundColor = "#2A17B1";
@@ -272,7 +272,7 @@ const archsim_js = {
         pc_plus_imm,
         control_unit_signals
     ) {},
-    update_MA_Stage: function (
+    update_MEM_Stage: function (
         memory_address,
         result,
         memory_write_data,
