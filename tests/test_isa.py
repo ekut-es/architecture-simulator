@@ -1,6 +1,6 @@
 import unittest
-from architecture_simulator.uarch.architectural_state import RegisterFile, Memory
-from architecture_simulator.isa.rv32i_instructions import (
+import fixedint
+from architecture_simulator.isa.riscv.rv32i_instructions import (
     ADD,
     BEQ,
     BLT,
@@ -46,17 +46,15 @@ from architecture_simulator.isa.rv32i_instructions import (
     ANDI,
     SLLI,
     SRLI,
-    FENCE,
     InstructionNotImplemented,
 )
-from architecture_simulator.uarch.architectural_state import (
-    ArchitecturalState,
-    CSRError,
+from architecture_simulator.uarch.riscv.register_file import RegisterFile
+from architecture_simulator.uarch.riscv.riscv_architectural_state import (
+    RiscvArchitecturalState,
 )
-
-import fixedint
-
-from architecture_simulator.isa.parser import RiscvParser
+from architecture_simulator.uarch.memory import Memory
+from architecture_simulator.uarch.riscv.csr_registers import CSRError
+from architecture_simulator.isa.riscv.riscv_parser import RiscvParser
 
 
 class TestInstructions(unittest.TestCase):
@@ -74,7 +72,7 @@ class TestInstructions(unittest.TestCase):
 
         # smallest number + biggest number = -1
         add = ADD(rs1=1, rs2=0, rd=2)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_max, num_min, num_max])
         )
         state = add.behavior(state)
@@ -82,7 +80,7 @@ class TestInstructions(unittest.TestCase):
 
         # smallest number + smallest number = 0
         add = ADD(rs1=0, rs2=1, rd=2)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_min, num_min, num_minus_1])
         )
         state = add.behavior(state)
@@ -90,7 +88,7 @@ class TestInstructions(unittest.TestCase):
 
         # biggest number + biggest number = -2
         add = ADD(rs1=0, rs2=1, rd=2)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_max, num_max, num_0])
         )
         state = add.behavior(state)
@@ -98,7 +96,7 @@ class TestInstructions(unittest.TestCase):
 
         # 16 + (-7) = 9 (non edge case addition)
         add = ADD(rs1=3, rs2=4, rd=1)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(
                 registers=[num_max, num_max, num_0, num_16, num_minus_7]
             )
@@ -110,7 +108,7 @@ class TestInstructions(unittest.TestCase):
 
         # 0 + 0 = 0
         add = ADD(rs1=2, rs2=2, rd=1)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(
                 registers=[num_max, num_max, num_0, num_16, num_minus_7]
             )
@@ -122,7 +120,7 @@ class TestInstructions(unittest.TestCase):
 
         # biggest number + 1 = smallest number
         add = ADD(rs1=0, rs2=1, rd=2)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_max, num_1, num_16])
         )
         state = add.behavior(state)
@@ -141,7 +139,7 @@ class TestInstructions(unittest.TestCase):
 
         # smallest number - smallest number = 0
         sub = SUB(rs1=0, rs2=0, rd=1)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_min, num_15])
         )
         state = sub.behavior(state)
@@ -149,7 +147,7 @@ class TestInstructions(unittest.TestCase):
 
         # biggest number - biggest number = 0
         sub = SUB(rs1=0, rs2=0, rd=1)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_max, num_15])
         )
         state = sub.behavior(state)
@@ -157,7 +155,7 @@ class TestInstructions(unittest.TestCase):
 
         # smallest number - biggest number = 1
         sub = SUB(rs1=0, rs2=1, rd=2)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_min, num_max, num_0])
         )
         state = sub.behavior(state)
@@ -165,7 +163,7 @@ class TestInstructions(unittest.TestCase):
 
         # biggest number - smallest number = -1
         sub = SUB(rs1=0, rs2=1, rd=2)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_max, num_min, num_0])
         )
         state = sub.behavior(state)
@@ -173,7 +171,7 @@ class TestInstructions(unittest.TestCase):
 
         # smallest number - 1 = biggest number
         sub = SUB(rs1=0, rs2=1, rd=2)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_min, num_1, num_0])
         )
         state = sub.behavior(state)
@@ -181,7 +179,7 @@ class TestInstructions(unittest.TestCase):
 
         # biggest number - (-1) = smallest number
         sub = SUB(rs1=0, rs2=1, rd=2)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_max, num_minus_1, num_0])
         )
         state = sub.behavior(state)
@@ -189,7 +187,7 @@ class TestInstructions(unittest.TestCase):
 
         # 23 - 8 = 15
         sub = SUB(rs1=1, rs2=0, rd=0)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_8, num_23])
         )
         state = sub.behavior(state)
@@ -207,7 +205,7 @@ class TestInstructions(unittest.TestCase):
 
         # only most significant bit set shifted by one = zero
         sll = SLL(rs1=1, rs2=2, rd=0)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_max, num_msb, num_1])
         )
         state = sll.behavior(state)
@@ -215,7 +213,7 @@ class TestInstructions(unittest.TestCase):
 
         # FFFFFFFF shifted by 31 = only most significant bit set
         sll = SLL(rs1=1, rs2=2, rd=0)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_0, num_max, num_31])
         )
         state = sll.behavior(state)
@@ -223,7 +221,7 @@ class TestInstructions(unittest.TestCase):
 
         # shif by zero only writes state
         sll = SLL(rs1=1, rs2=0, rd=4)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(
                 registers=[num_0, num_max, num_31, num_612, num_msb]
             )
@@ -235,7 +233,7 @@ class TestInstructions(unittest.TestCase):
 
         # higher bits do not affect shift amount
         sll = SLL(rs1=1, rs2=2, rd=3)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(
                 registers=[num_612, num_1, num_612, num_612, num_0]
             )
@@ -255,7 +253,7 @@ class TestInstructions(unittest.TestCase):
 
         # equivalenz leads to 0
         slt = SLT(rs1=1, rs2=0, rd=2)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_77, num_77, num_77])
         )
         state = slt.behavior(state)
@@ -263,7 +261,7 @@ class TestInstructions(unittest.TestCase):
 
         # numbers are treated as signed
         slt = SLT(rs1=0, rs2=1, rd=2)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_min, num_max, num_77])
         )
         state = slt.behavior(state)
@@ -271,7 +269,7 @@ class TestInstructions(unittest.TestCase):
 
         # rs1 beeing smaller by one leads to 1
         slt = SLT(rs1=1, rs2=2, rd=0)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_min, num_0, num_1])
         )
         state = slt.behavior(state)
@@ -279,7 +277,7 @@ class TestInstructions(unittest.TestCase):
 
         # rs1 beeing greater by one leads to 0
         slt = SLT(rs1=1, rs2=2, rd=0)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_min, num_1, num_0])
         )
         state = slt.behavior(state)
@@ -294,7 +292,7 @@ class TestInstructions(unittest.TestCase):
 
         # equivalenz leads to 0
         sltu = SLTU(rs1=1, rs2=0, rd=2)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_77, num_77, num_77])
         )
         state = sltu.behavior(state)
@@ -302,7 +300,7 @@ class TestInstructions(unittest.TestCase):
 
         # numbers are treated as unsigned
         sltu = SLTU(rs1=0, rs2=1, rd=2)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_max, num_0, num_77])
         )
         state = sltu.behavior(state)
@@ -310,7 +308,7 @@ class TestInstructions(unittest.TestCase):
 
         # rs1 beeing smaller by one leads to 1
         sltu = SLTU(rs1=1, rs2=2, rd=0)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_max, num_0, num_1])
         )
         state = sltu.behavior(state)
@@ -318,7 +316,7 @@ class TestInstructions(unittest.TestCase):
 
         # rs1 beeing greater by one leads to 0
         sltu = SLTU(rs1=1, rs2=2, rd=0)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_max, num_1, num_0])
         )
         state = sltu.behavior(state)
@@ -337,7 +335,7 @@ class TestInstructions(unittest.TestCase):
 
         # general test case
         xor = XOR(rs1=0, rs2=1, rd=2)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_all_but_msb, num_all_bits, num_0])
         )
         state = xor.behavior(state)
@@ -347,7 +345,7 @@ class TestInstructions(unittest.TestCase):
 
         # test all combinations of bit pairs
         xor = XOR(rs1=3, rs2=4, rd=2)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(
                 registers=[num_all_but_msb, num_all_bits, num_0, num_a, num_b]
             )
@@ -360,7 +358,9 @@ class TestInstructions(unittest.TestCase):
 
         # zero xor zero = zero
         xor = XOR(rs1=0, rs2=0, rd=1)
-        state = ArchitecturalState(register_file=RegisterFile(registers=[num_0, num_b]))
+        state = RiscvArchitecturalState(
+            register_file=RegisterFile(registers=[num_0, num_b])
+        )
         state = xor.behavior(state)
         self.assertEqual(state.register_file.registers, [num_0, num_0])
 
@@ -374,7 +374,7 @@ class TestInstructions(unittest.TestCase):
 
         # one shifted by one = zero
         srl = SRL(rs1=1, rs2=2, rd=0)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_max, num_1, num_1])
         )
         state = srl.behavior(state)
@@ -382,7 +382,7 @@ class TestInstructions(unittest.TestCase):
 
         # FFFFFFFF shifted by 31 = one
         srl = SRL(rs1=0, rs2=1, rd=0)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_max, num_31, num_612])
         )
         state = srl.behavior(state)
@@ -390,7 +390,7 @@ class TestInstructions(unittest.TestCase):
 
         # shif by zero only writes state
         srl = SRL(rs1=0, rs2=1, rd=0)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_max, num_0, num_612])
         )
         state = srl.behavior(state)
@@ -398,7 +398,7 @@ class TestInstructions(unittest.TestCase):
 
         # higher bits do not affect shift amount
         srl = SRL(rs1=0, rs2=1, rd=2)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_31, num_612, num_612])
         )
         state = srl.behavior(state)
@@ -419,7 +419,7 @@ class TestInstructions(unittest.TestCase):
 
         # negative numbers get extended with one´s
         sra = SRA(rs1=0, rs2=1, rd=2)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_msb_set, num_31, num_0])
         )
         state = sra.behavior(state)
@@ -428,7 +428,7 @@ class TestInstructions(unittest.TestCase):
         )
         # positive numbers get extended with zero´s
         sra = SRA(rs1=0, rs2=1, rd=2)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_second_set, num_30, num_all_set])
         )
         state = sra.behavior(state)
@@ -436,7 +436,7 @@ class TestInstructions(unittest.TestCase):
 
         # shift amount only affected by 5 lower bits
         sra = SRA(rs1=0, rs2=1, rd=2)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_second_set, num_612, num_all_set])
         )
         state = sra.behavior(state)
@@ -445,7 +445,7 @@ class TestInstructions(unittest.TestCase):
         )
         # percision test
         sra = SRA(rs1=0, rs2=1, rd=2)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_612, num_612, num_all_set])
         )
         state = sra.behavior(state)
@@ -459,7 +459,7 @@ class TestInstructions(unittest.TestCase):
 
         # Test bit wise behavior
         or_inst = OR(rs1=0, rs2=1, rd=2)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_a, num_b, num_a])
         )
         state = or_inst.behavior(state)
@@ -467,7 +467,7 @@ class TestInstructions(unittest.TestCase):
 
         # Test kommutativity
         or_inst = OR(rs1=1, rs2=0, rd=2)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_a, num_b, num_a])
         )
         state = or_inst.behavior(state)
@@ -481,7 +481,7 @@ class TestInstructions(unittest.TestCase):
 
         # Test bit wise behavior
         and_inst = AND(rs1=0, rs2=1, rd=2)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_a, num_b, num_a])
         )
         state = and_inst.behavior(state)
@@ -489,7 +489,7 @@ class TestInstructions(unittest.TestCase):
 
         # Test kommutativity
         and_inst = AND(rs1=1, rs2=0, rd=2)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[num_a, num_b, num_a])
         )
         state = and_inst.behavior(state)
@@ -541,7 +541,7 @@ class TestInstructions(unittest.TestCase):
         # 1 + 0    == 1
         # 0 + -1   == -1
         # 1 + -1   == 0
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[0, 0, 1, 0, 1])
         )
         addi_1 = ADDI(rd=0, rs1=0, imm=0)
@@ -561,7 +561,7 @@ class TestInstructions(unittest.TestCase):
         # 0 + bmaximm    == 2047
         # 0 + bminimm    == -2048
         # brandom + 5
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[bmaxint, bminint, b0, b0, brandom])
         )
         addi_1 = ADDI(rd=0, rs1=0, imm=1)
@@ -584,7 +584,9 @@ class TestInstructions(unittest.TestCase):
         # 0 + -2049 == 2047
         # 0 +  4095 == -1
         # 0 + -4096 == 0
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 0, 0, 0]))
+        state = RiscvArchitecturalState(
+            register_file=RegisterFile(registers=[0, 0, 0, 0])
+        )
         addi_1 = ADDI(rd=0, rs1=0, imm=2048)
         state = addi_1.behavior(state)
         addi_1 = ADDI(rd=1, rs1=1, imm=-2049)
@@ -612,7 +614,7 @@ class TestInstructions(unittest.TestCase):
         # -1 <s 0  == 1
         # 1 <s -1  == 0
         # -1 <s 1  == 1
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[b0, b0, b0, b1, bn1, b1, bn1])
         )
         slti_1 = SLTI(rd=0, rs1=0, imm=0)
@@ -636,7 +638,7 @@ class TestInstructions(unittest.TestCase):
         # 1 <s 5    == 1
         # 5 <s 1    == 0
         # -1 <s -1  == 0
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[bn5, bn1, b1, b5, bn1])
         )
         slti_1 = SLTI(rd=0, rs1=0, imm=-1)
@@ -656,7 +658,7 @@ class TestInstructions(unittest.TestCase):
         # 0 <s 2048  == 0
         # 0 <s -2048 == 0
         # 0 <s -2049 == 1
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[b0, b0, b0, b0])
         )
         slti_1 = SLTI(rd=0, rs1=0, imm=2047)
@@ -683,7 +685,7 @@ class TestInstructions(unittest.TestCase):
         # -1 <u 0  == 0
         # 1 <u -1  == 1
         # -1 <u 1  == 0
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[b0, b0, b0, b1, bn1, b1, bn1])
         )
         slti_1 = SLTIU(rd=0, rs1=0, imm=0)
@@ -706,7 +708,7 @@ class TestInstructions(unittest.TestCase):
         # -1 <u -5  == 0
         # 1 <u 5    == 1
         # 5 <u 1    == 0
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[bn5, bn1, b1, b5])
         )
         slti_1 = SLTIU(rd=0, rs1=0, imm=-1)
@@ -724,7 +726,7 @@ class TestInstructions(unittest.TestCase):
         # 0 <u 4095  == 1
         # 0 <u 4096  == 0
         # 0 <u 4097  == 1
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[b0, b0, b0, b0])
         )
         slti_1 = SLTIU(rd=0, rs1=0, imm=2048)
@@ -752,7 +754,7 @@ class TestInstructions(unittest.TestCase):
         # 0 ^ 1  == 1
         # 1 ^ 0  == 1
         # 1 ^ 1  == 0
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[b0, b0, b1, b1])
         )
         xori_1 = XORI(rd=0, rs1=0, imm=0)
@@ -769,7 +771,7 @@ class TestInstructions(unittest.TestCase):
         # -1 ^ -1       == 0
         # bmaxint ^ -1  == bminint
         # brandom ^ -1  == brandomx
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[bn1, bn1, bmaxint, brandom])
         )
         xori_1 = XORI(rd=0, rs1=0, imm=0)
@@ -787,7 +789,7 @@ class TestInstructions(unittest.TestCase):
         # 0 ^ -2049 == 2047
         # 0 ^  4095 == -1
         # 0 ^ -4096 == 0
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[b0, b0, b0, b0])
         )
         xori_1 = XORI(rd=0, rs1=0, imm=2048)
@@ -812,7 +814,7 @@ class TestInstructions(unittest.TestCase):
         # 0 | 1  == 1
         # 1 | 0  == 1
         # 1 | 1  == 1
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[b0, b0, b1, b1])
         )
         ori_1 = ORI(rd=0, rs1=0, imm=0)
@@ -829,7 +831,7 @@ class TestInstructions(unittest.TestCase):
         # -1 | -1      == -1
         # 0 | bminimm  == bminimm
         # brandom | 5  == brandom
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[bn1, bn1, b0, brandom])
         )
         ori_1 = ORI(rd=0, rs1=0, imm=0)
@@ -847,7 +849,7 @@ class TestInstructions(unittest.TestCase):
         # 0 | -2049 == 2047
         # 0 |  4095 == -1
         # 0 | -4096 == 0
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[b0, b0, b0, b0])
         )
         ori_1 = ORI(rd=0, rs1=0, imm=2048)
@@ -874,7 +876,7 @@ class TestInstructions(unittest.TestCase):
         # 0 & 1    == 0
         # 1 & 0    == 0
         # 1 & 1    == 1
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[b0, b0, b1, b1])
         )
         andi_1 = ANDI(rd=0, rs1=0, imm=0)
@@ -892,7 +894,7 @@ class TestInstructions(unittest.TestCase):
         # bmaxint & bmaximm  == bmaximm
         # bmaxint & -1       == bmaxint
         # brandom & 5        == 5
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[bn1, bn1, bmaxint, bmaxint, brandom])
         )
         andi_1 = ANDI(rd=0, rs1=0, imm=0)
@@ -912,7 +914,7 @@ class TestInstructions(unittest.TestCase):
         # -1 & -2049 == 2047
         # -1 &  4095 == -1
         # -1 & -4096 == 0
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[bn1, bn1, bn1, bn1])
         )
         andi_1 = ANDI(rd=0, rs1=0, imm=2048)
@@ -941,7 +943,7 @@ class TestInstructions(unittest.TestCase):
         # 1 << 0   == 1
         # 1 << 1   == 2
         # 1 << 20  == 2^20
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[b0, b0, b1, b1, b1])
         )
         slli_1 = SLLI(rd=0, rs1=0, imm=0)
@@ -961,7 +963,7 @@ class TestInstructions(unittest.TestCase):
         # 111...1 << 127    == 1000....
         # 1000... << 1     == 0
         # 3320171255 << 2  == 395783132
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[b111, b111, b111, b100, brandom])
         )
         slli_1 = SLLI(rd=0, rs1=0, imm=1)
@@ -981,7 +983,7 @@ class TestInstructions(unittest.TestCase):
         # -1 << -1  == b100
         # -1 << 32  == -1
         # -1 << 33  == 111...10
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[b111, b111, b111, b111])
         )
         slli_1 = SLLI(rd=0, rs1=0, imm=-1)
@@ -1005,7 +1007,7 @@ class TestInstructions(unittest.TestCase):
         # 1 >> 0   == 1
         # 1 >> 1   == 0
         # 1 >> 20  == 0
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[b0, b0, b1, b1, b1])
         )
         srli_1 = SRLI(rd=0, rs1=0, imm=0)
@@ -1024,7 +1026,7 @@ class TestInstructions(unittest.TestCase):
         # 111...1 >> 31    == 1
         # 111...1 >> 127   == 1
         # 3320171255 >> 2  == 395783132
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[b111, b111, b111, brandom])
         )
         srli_1 = SRLI(rd=0, rs1=0, imm=1)
@@ -1040,7 +1042,7 @@ class TestInstructions(unittest.TestCase):
         # -1 >> -1  == 1
         # -1 >> 32  == -1
         # -1 >> 33  == 01111
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[b111, b111, b111])
         )
         srli_1 = SRLI(rd=0, rs1=0, imm=-1)
@@ -1052,7 +1054,9 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.register_file.registers, [b1, b111, b011])
 
     def test_srai(self):
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 1, -128]))
+        state = RiscvArchitecturalState(
+            register_file=RegisterFile(registers=[0, 1, -128])
+        )
         # imm=0, rs1=0
         state.register_file.registers = [0, 1, -128]
         instr = SRAI(imm=0, rs1=0, rd=0)
@@ -1092,7 +1096,7 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.register_file.registers, [0, 1, -128, pow(2, 30)])
 
     def test_lb(self):
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[0, 1, -1, pow(2, 32) - 1]),
             memory=Memory(
                 memory_file=dict(
@@ -1173,7 +1177,7 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.register_file.registers, [0, 1, -1, pow(2, 32) - 1])
 
     def test_lh(self):
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[0, 2, -2, pow(2, 32) - 1]),
             memory=Memory(
                 memory_file=dict(
@@ -1265,7 +1269,7 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.register_file.registers, [0, 1, -1, pow(2, 32) - 1])
 
     def test_lw(self):
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[0, 4, -4, pow(2, 32) - 1]),
             memory=Memory(
                 memory_file=dict(
@@ -1383,7 +1387,7 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.register_file.registers, [0, 1, -1, pow(2, 32) - 1])
 
     def test_lbu(self):
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[0, 1, -1, pow(2, 32) - 1]),
             memory=Memory(
                 memory_file=dict(
@@ -1461,7 +1465,7 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.register_file.registers, [0, 1, -1, pow(2, 32) - 1])
 
     def test_lhu(self):
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[0, 2, -2, pow(2, 32) - 1]),
             memory=Memory(
                 memory_file=dict(
@@ -1550,7 +1554,7 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.register_file.registers, [0, 1, -1, pow(2, 32) - 1])
 
     def test_jalr(self):
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 8]))
+        state = RiscvArchitecturalState(register_file=RegisterFile(registers=[0, 8]))
         # imm=8, rs1=0
         state.register_file.registers = [0, 8]
         state.program_counter = 0
@@ -1584,14 +1588,14 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.program_counter, 10)
 
     def test_ecall(self):
-        state = ArchitecturalState(register_file=RegisterFile(registers=()))
+        state = RiscvArchitecturalState(register_file=RegisterFile(registers=()))
         with self.assertRaises(InstructionNotImplemented) as cm:
             instr = ECALL(imm=0, rs1=0, rd=0)
             state = instr.behavior(state)
         self.assertEqual(cm.exception, InstructionNotImplemented(mnemonic="ecall"))
 
     def test_ebreak(self):
-        state = ArchitecturalState(register_file=RegisterFile(registers=()))
+        state = RiscvArchitecturalState(register_file=RegisterFile(registers=()))
         with self.assertRaises(InstructionNotImplemented) as cm:
             instr = EBREAK(imm=0, rs1=0, rd=0)
             state = instr.behavior(state)
@@ -1614,7 +1618,7 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(stype.imm, 2047)
 
     def test_sb(self):
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(
                 registers=[
                     fixedint.MutableUInt32(0),
@@ -1629,34 +1633,34 @@ class TestInstructions(unittest.TestCase):
         )
         sb_0 = SB(rs1=0, rs2=0, imm=0)
         state = sb_0.behavior(state)
-        self.assertEqual(state.memory.load_byte(0), 0)
+        self.assertEqual(state.memory.read_byte(0), 0)
 
         sb_1 = SB(rs1=0, rs2=2, imm=1)
         state = sb_1.behavior(state)
-        self.assertEqual(state.memory.load_byte(1), 1)
+        self.assertEqual(state.memory.read_byte(1), 1)
 
         sb_2 = SB(rs1=0, rs2=1, imm=1)
         state = sb_2.behavior(state)
-        self.assertEqual(state.memory.load_byte(1), 5)
+        self.assertEqual(state.memory.read_byte(1), 5)
 
         sb_3 = SB(rs1=0, rs2=3, imm=0)
         state = sb_3.behavior(state)
-        self.assertEqual(state.memory.load_byte(0), 0)
+        self.assertEqual(state.memory.read_byte(0), 0)
 
         sb_4 = SB(rs1=0, rs2=3, imm=1)
         state = sb_4.behavior(state)
-        self.assertEqual(state.memory.load_byte(1), 0)
+        self.assertEqual(state.memory.read_byte(1), 0)
 
         sb_5 = SB(rs1=0, rs2=4, imm=2)
         state = sb_5.behavior(state)
-        self.assertEqual(state.memory.load_byte(2), 128)
+        self.assertEqual(state.memory.read_byte(2), 128)
 
         sb_6 = SB(rs1=0, rs2=5, imm=2)
         state = sb_6.behavior(state)
-        self.assertEqual(state.memory.load_byte(2), 0)
+        self.assertEqual(state.memory.read_byte(2), 0)
 
     def test_sh(self):
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(
                 registers=[
                     fixedint.MutableUInt32(0),
@@ -1675,38 +1679,38 @@ class TestInstructions(unittest.TestCase):
 
         sh_0 = SH(rs1=0, rs2=0, imm=0)
         state = sh_0.behavior(state)
-        self.assertEqual(int(state.memory.load_halfword(0)), 0)
+        self.assertEqual(int(state.memory.read_halfword(0)), 0)
 
         sh_1 = SH(rs1=0, rs2=1, imm=0)
         state = sh_1.behavior(state)
-        self.assertEqual(int(state.memory.load_halfword(0)), 0)
+        self.assertEqual(int(state.memory.read_halfword(0)), 0)
 
         sh_2 = SH(rs1=0, rs2=2, imm=1)
         state = sh_2.behavior(state)
-        self.assertEqual(int(state.memory.load_halfword(1)), 1)
+        self.assertEqual(int(state.memory.read_halfword(1)), 1)
 
         sh_3 = SH(rs1=0, rs2=3, imm=2)
         state = sh_3.behavior(state)
-        self.assertEqual(int(state.memory.load_halfword(2)), 2)
+        self.assertEqual(int(state.memory.read_halfword(2)), 2)
 
         sh_4 = SH(rs1=0, rs2=4, imm=3)
         state = sh_4.behavior(state)
-        self.assertEqual(int(state.memory.load_halfword(3)), 3)
+        self.assertEqual(int(state.memory.read_halfword(3)), 3)
 
         sh_5 = SH(rs1=0, rs2=6, imm=3)
         state = sh_5.behavior(state)
-        self.assertEqual(int(state.memory.load_halfword(3)), 255)
+        self.assertEqual(int(state.memory.read_halfword(3)), 255)
 
         sh_6 = SH(rs1=0, rs2=7, imm=3)
         state = sh_6.behavior(state)
-        self.assertEqual(int(state.memory.load_halfword(3)), 256)
+        self.assertEqual(int(state.memory.read_halfword(3)), 256)
 
         sh_7 = SH(rs1=0, rs2=8, imm=6)
         state = sh_7.behavior(state)
-        self.assertEqual(int(state.memory.load_halfword(6)), 65535)
+        self.assertEqual(int(state.memory.read_halfword(6)), 65535)
 
     def test_sw(self):
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(
                 registers=[
                     fixedint.MutableUInt32(0),
@@ -1724,35 +1728,35 @@ class TestInstructions(unittest.TestCase):
 
         sw_0 = SW(rs1=0, rs2=0, imm=0)
         state = sw_0.behavior(state)
-        self.assertEqual(int(state.memory.load_word(0)), 0)
+        self.assertEqual(int(state.memory.read_word(0)), 0)
 
         sw_1 = SW(rs1=0, rs2=1, imm=1)
         state = sw_1.behavior(state)
-        self.assertEqual(int(state.memory.load_word(1)), 1)
+        self.assertEqual(int(state.memory.read_word(1)), 1)
 
         sw_2 = SW(rs1=0, rs2=2, imm=2)
         state = sw_2.behavior(state)
-        self.assertEqual(int(state.memory.load_word(2)), 2)
+        self.assertEqual(int(state.memory.read_word(2)), 2)
 
         sw_3 = SW(rs1=0, rs2=3, imm=3)
         state = sw_3.behavior(state)
-        self.assertEqual(int(state.memory.load_word(3)), 100)
+        self.assertEqual(int(state.memory.read_word(3)), 100)
 
         sw_4 = SW(rs1=0, rs2=4, imm=0)
         state = sw_4.behavior(state)
-        self.assertEqual(int(state.memory.load_word(0)), 10)
+        self.assertEqual(int(state.memory.read_word(0)), 10)
 
         sw_5 = SW(rs1=0, rs2=5, imm=0)
         state = sw_5.behavior(state)
-        self.assertEqual(int(state.memory.load_word(0)), 255)
+        self.assertEqual(int(state.memory.read_word(0)), 255)
 
         sw_6 = SW(rs1=0, rs2=6, imm=0)
         state = sw_6.behavior(state)
-        self.assertEqual(int(state.memory.load_word(0)), 256)
+        self.assertEqual(int(state.memory.read_word(0)), 256)
 
         sw_7 = SW(rs1=0, rs2=7, imm=8)
         state = sw_7.behavior(state)
-        self.assertEqual(int(state.memory.load_word(8)), 4294967295)
+        self.assertEqual(int(state.memory.read_word(8)), 4294967295)
 
     def test_btype(self):
         btype = BEQ(rs1=0, rs2=0, imm=0)
@@ -1767,7 +1771,7 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(btype.imm, 4094)
 
     def test_beq(self):
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(
                 registers=[
                     fixedint.MutableUInt32(0),
@@ -1796,7 +1800,7 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.program_counter, 16)
 
     def test_bne(self):
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(
                 registers=[
                     fixedint.MutableUInt32(0),
@@ -1825,7 +1829,7 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.program_counter, 16)
 
     def test_blt(self):
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(
                 registers=[
                     fixedint.MutableUInt32(0),
@@ -1880,7 +1884,7 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.program_counter, 8)
 
     def test_bge(self):
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(
                 registers=[
                     fixedint.MutableUInt32(0),
@@ -1929,7 +1933,7 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.program_counter, 0)
 
     def test_bltu(self):
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(
                 registers=[
                     fixedint.MutableUInt32(0),
@@ -1984,7 +1988,7 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(state.program_counter, 8)
 
     def test_bgeu(self):
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(
                 registers=[
                     fixedint.MutableUInt32(0),
@@ -2049,7 +2053,9 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(utype.imm, (2**19) - 1)
 
     def test_lui(self):
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 1, 2, 3]))
+        state = RiscvArchitecturalState(
+            register_file=RegisterFile(registers=[0, 1, 2, 3])
+        )
 
         lui_0 = LUI(rd=0, imm=0)
         state = lui_0.behavior(state)
@@ -2067,7 +2073,7 @@ class TestInstructions(unittest.TestCase):
         state = lui_3.behavior(state)
         self.assertEqual(int(state.register_file.registers[1]), 12288)
 
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[0, 0, 0, 0, 0])
         )
         lui_1 = LUI(rd=0, imm=2097151)
@@ -2087,7 +2093,9 @@ class TestInstructions(unittest.TestCase):
         )
 
     def test_auipc(self):
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 1, 2, 3]))
+        state = RiscvArchitecturalState(
+            register_file=RegisterFile(registers=[0, 1, 2, 3])
+        )
 
         state.program_counter = 0
         auipc_0 = AUIPC(rd=0, imm=0)
@@ -2108,7 +2116,9 @@ class TestInstructions(unittest.TestCase):
         state = auipc_3.behavior(state)
         self.assertEqual(int(state.register_file.registers[3]), 12290)
 
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 0, 0, 0]))
+        state = RiscvArchitecturalState(
+            register_file=RegisterFile(registers=[0, 0, 0, 0])
+        )
 
         state.program_counter = 0
         auipc_0 = AUIPC(rd=0, imm=2097151)
@@ -2150,7 +2160,7 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(jtype.imm, (2**20) - 2)
 
     def test_jal(self):
-        state = ArchitecturalState(register_file=RegisterFile(registers=[1, 1, 1]))
+        state = RiscvArchitecturalState(register_file=RegisterFile(registers=[1, 1, 1]))
         state.program_counter = 0
         jal_1 = JAL(rd=0, imm=4)
         state = jal_1.behavior(state)
@@ -2182,29 +2192,29 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(int(state.register_file.registers[1]), 12)
 
     def test_csrrw_privilege_level_too_low(self):
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
+        state = RiscvArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
         state.csr_registers.privilege_level = 0
         with self.assertRaises(CSRError) as context:
-            state.csr_registers.store_word(3000, fixedint.MutableUInt32(3))
+            state.csr_registers.write_word(3000, fixedint.MutableUInt32(3))
         self.assertTrue(
             "illegal action: privilege level too low to access this csr register"
             in str(context.exception)
         )
 
     def test_csrrw_attempting_to_write_to_read_only(self):
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
+        state = RiscvArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
         with self.assertRaises(CSRError) as context:
-            state.csr_registers.store_word(3072, fixedint.MutableUInt32(3))
+            state.csr_registers.write_word(3072, fixedint.MutableUInt32(3))
         self.assertTrue(
             "illegal action: attempting to write into read-only csr register"
             in str(context.exception)
         )
 
     def test_csrrw_invalid_address(self):
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
+        state = RiscvArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
         state.csr_registers.privilege_level = 4
         with self.assertRaises(CSRError) as context:
-            state.csr_registers.store_word(7000, fixedint.MutableUInt32(3))
+            state.csr_registers.write_word(7000, fixedint.MutableUInt32(3))
         self.assertTrue(
             "illegal action: csr register does not exist" in str(context.exception)
         )
@@ -2212,39 +2222,39 @@ class TestInstructions(unittest.TestCase):
     def test_csrrw(self):
         fixedint.MutableUInt32(0)
         fixedint.MutableUInt32(1)
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
+        state = RiscvArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
         cssrw_1 = CSRRW(csr=0, rs1=1, rd=0)
-        state.csr_registers.store_word(0, fixedint.MutableUInt32(3))
+        state.csr_registers.write_word(0, fixedint.MutableUInt32(3))
         state.csr_registers.privilege_level = 4
         state = cssrw_1.behavior(state)
         self.assertEqual(state.register_file.registers, [3, 2])
-        self.assertEqual(state.csr_registers.load_word(cssrw_1.csr), 2)
+        self.assertEqual(state.csr_registers.read_word(cssrw_1.csr), 2)
 
     def test_csrrs(self):
         max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
         test_number_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
         test_mask_1 = fixedint.MutableUInt32(0x00_00_00_01)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[0, test_mask_1])
         )
-        state.csr_registers.store_word(0, test_number_1)
+        state.csr_registers.write_word(0, test_number_1)
         cssrs_1 = CSRRS(csr=0, rs1=1, rd=0)
         state = cssrs_1.behavior(state)
         self.assertEqual(state.register_file.registers, [test_number_1, test_mask_1])
-        self.assertEqual(state.csr_registers.load_word(cssrs_1.csr), max_number)
+        self.assertEqual(state.csr_registers.read_word(cssrs_1.csr), max_number)
 
     def test_csrrc(self):
         max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
         test_result_1 = fixedint.MutableUInt32(0x00_00_00_01)
         test_mask_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
-        state = ArchitecturalState(
+        state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[0, test_mask_1])
         )
-        state.csr_registers.store_word(0, max_number)
+        state.csr_registers.write_word(0, max_number)
         cssrc_1 = CSRRC(csr=0, rs1=1, rd=0)
         state = cssrc_1.behavior(state)
         self.assertEqual(state.register_file.registers, [max_number, test_mask_1])
-        self.assertEqual(state.csr_registers.load_word(cssrc_1.csr), test_result_1)
+        self.assertEqual(state.csr_registers.read_word(cssrc_1.csr), test_result_1)
 
     def test_csritype(self):
         cssrwi_1 = CSRRWI(csr=0, rd=0, uimm=0)
@@ -2259,34 +2269,34 @@ class TestInstructions(unittest.TestCase):
         self.assertEqual(cssrwi_1.uimm, 31)
 
     def test_csrrwi(self):
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0]))
-        state.csr_registers.store_word(0, 3)
+        state = RiscvArchitecturalState(register_file=RegisterFile(registers=[0]))
+        state.csr_registers.write_word(0, 3)
         cssrwi_1 = CSRRWI(csr=0, uimm=4, rd=0)
         state = cssrwi_1.behavior(state)
         self.assertEqual(state.register_file.registers, [3])
-        self.assertEqual(state.csr_registers.load_word(cssrwi_1.csr), 4)
+        self.assertEqual(state.csr_registers.read_word(cssrwi_1.csr), 4)
 
     def test_csrrsi(self):
         max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
         test_number_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
         test_mask_1 = 1
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0]))
+        state = RiscvArchitecturalState(register_file=RegisterFile(registers=[0]))
         cssrsi_1 = CSRRSI(csr=0, uimm=test_mask_1, rd=0)
-        state.csr_registers.store_word(0, test_number_1)
+        state.csr_registers.write_word(0, test_number_1)
         state = cssrsi_1.behavior(state)
         self.assertEqual(state.register_file.registers, [test_number_1])
-        self.assertEqual(state.csr_registers.load_word(cssrsi_1.csr), max_number)
+        self.assertEqual(state.csr_registers.read_word(cssrsi_1.csr), max_number)
 
     def test_csrrci(self):
         max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
         test_result_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
         test_mask_1 = 1
-        state = ArchitecturalState(register_file=RegisterFile(registers=[0]))
-        state.csr_registers.store_word(0, max_number)
+        state = RiscvArchitecturalState(register_file=RegisterFile(registers=[0]))
+        state.csr_registers.write_word(0, max_number)
         cssrci_1 = CSRRCI(csr=0, uimm=test_mask_1, rd=0)
         state = cssrci_1.behavior(state)
         self.assertEqual(state.register_file.registers, [max_number])
-        self.assertEqual(state.csr_registers.load_word(cssrci_1.csr), test_result_1)
+        self.assertEqual(state.csr_registers.read_word(cssrci_1.csr), test_result_1)
 
     def test_repr_1(self):
         # Tests that the __repr__() method for the instructions works as intended
@@ -2396,8 +2406,8 @@ csrrs x31, 0xac, x7
 csrrwi x12, 0x448, 20
 csrrci x0, 0x40f, 16"""
         parser = RiscvParser()
-        instructions = parser.parse_res_to_instructions(
-            parser.parse_assembly(text), start_address=0
+        instructions = parser._tokens_to_instructions(
+            parser._tokenize_assembly(text), start_address=0
         )
         for instruction, line in zip(instructions, text.splitlines()):
             self.assertEqual(str(instruction), line)

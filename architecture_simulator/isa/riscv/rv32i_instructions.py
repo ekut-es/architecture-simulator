@@ -1,20 +1,28 @@
-# from ctypes import c_int32, c_uint32, c_int8, c_int16, c_uint8, c_uint16
-
-from architecture_simulator.uarch.pipeline import ControlUnitSignals
-from .instruction_types import RTypeInstruction, CSRTypeInstruction, CSRITypeInstruction
-from .instruction_types import ITypeInstruction
-from .instruction_types import ShiftITypeInstruction
-from .instruction_types import MemoryITypeInstruction
-from architecture_simulator.uarch.architectural_state import ArchitecturalState
-from .instruction_types import BTypeInstruction
-from architecture_simulator.isa.instruction_types import STypeInstruction
-from architecture_simulator.isa.instruction_types import UTypeInstruction
-from architecture_simulator.isa.instruction_types import JTypeInstruction
-from architecture_simulator.isa.instruction_types import FenceTypeInstruction
-from architecture_simulator.isa.instruction_types import Instruction
-from typing import Optional, Type
+from __future__ import annotations
+from typing import Optional, Type, TYPE_CHECKING
 from dataclasses import dataclass
 import fixedint
+
+from architecture_simulator.uarch.riscv.control_unit_signals import ControlUnitSignals
+from .instruction_types import (
+    RiscvInstruction,
+    RTypeInstruction,
+    ITypeInstruction,
+    ShiftITypeInstruction,
+    MemoryITypeInstruction,
+    STypeInstruction,
+    BTypeInstruction,
+    UTypeInstruction,
+    JTypeInstruction,
+    FenceTypeInstruction,
+    CSRTypeInstruction,
+    CSRITypeInstruction,
+)
+
+if TYPE_CHECKING:
+    from architecture_simulator.uarch.riscv.riscv_architectural_state import (
+        RiscvArchitecturalState,
+    )
 
 
 @dataclass
@@ -29,7 +37,9 @@ class ADD(RTypeInstruction):
     def __init__(self, rd: int, rs1: int, rs2: int):
         super().__init__(rd, rs1, rs2, mnemonic="add")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """
         Addition:
             rd = rs1 + rs2
@@ -58,7 +68,9 @@ class SUB(RTypeInstruction):
     def __init__(self, rd: int, rs1: int, rs2: int):
         super().__init__(rd, rs1, rs2, mnemonic="sub")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """
         Subtraction:
             rd = rs1 - rs2
@@ -89,7 +101,9 @@ class SLL(RTypeInstruction):
     def __init__(self, rd: int, rs1: int, rs2: int):
         super().__init__(rd, rs1, rs2, mnemonic="sll")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """
         Shift left logical:
             rd = rs1 << rs2
@@ -122,7 +136,9 @@ class SLT(RTypeInstruction):
     def __init__(self, rd: int, rs1: int, rs2: int):
         super().__init__(rd, rs1, rs2, mnemonic="slt")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """
         Set lower than:
             rd = 1 if (rs1 < rs2) else 0
@@ -155,7 +171,9 @@ class SLTU(RTypeInstruction):
     def __init__(self, rd: int, rs1: int, rs2: int):
         super().__init__(rd, rs1, rs2, mnemonic="sltu")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """
         Set lower than unsigned:
             rd = 1 if (rs1 < rs2) else 0
@@ -188,7 +206,9 @@ class XOR(RTypeInstruction):
     def __init__(self, rd: int, rs1: int, rs2: int):
         super().__init__(rd, rs1, rs2, mnemonic="xor")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """
         XOR:
             rd = rs1 ^ rs2
@@ -219,7 +239,9 @@ class SRL(RTypeInstruction):
     def __init__(self, rd: int, rs1: int, rs2: int):
         super().__init__(rd, rs1, rs2, mnemonic="srl")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """
         Shift right logical:
             rd = rs1 >> rs2
@@ -252,7 +274,9 @@ class SRA(RTypeInstruction):
     def __init__(self, rd: int, rs1: int, rs2: int):
         super().__init__(rd, rs1, rs2, mnemonic="sra")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """
         Shift right arithmetic:
             rd = rs1 >>s rs2
@@ -292,7 +316,9 @@ class OR(RTypeInstruction):
     def __init__(self, rd: int, rs1: int, rs2: int):
         super().__init__(rd, rs1, rs2, mnemonic="or")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """
         OR:
             rd = rs1 | rs2
@@ -323,7 +349,9 @@ class AND(RTypeInstruction):
     def __init__(self, rd: int, rs1: int, rs2: int):
         super().__init__(rd, rs1, rs2, mnemonic="and")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """
         AND:
             rd = rs1 & rs2
@@ -354,7 +382,9 @@ class ADDI(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="addi")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """x[rd] = x[rs1] + sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         architectural_state.register_file.registers[
@@ -375,7 +405,9 @@ class SLTI(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="slti")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """x[rd] = x[rs1] <s sext(imm)"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         architectural_state.register_file.registers[self.rd] = (
@@ -398,7 +430,9 @@ class SLTIU(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="sltiu")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """x[rd] = x[rs1] <u sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         architectural_state.register_file.registers[self.rd] = (
@@ -421,7 +455,9 @@ class XORI(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="xori")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """x[rd] = x[rs1] ^ sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         architectural_state.register_file.registers[
@@ -442,7 +478,9 @@ class ORI(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="ori")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """x[rd] = x[rs1] | sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         architectural_state.register_file.registers[
@@ -463,7 +501,9 @@ class ANDI(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="andi")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """x[rd] = x[rs1] & sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         architectural_state.register_file.registers[
@@ -484,7 +524,9 @@ class SLLI(ShiftITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="slli")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """x[rd] = x[rs1] << shamt  (imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         architectural_state.register_file.registers[
@@ -505,7 +547,9 @@ class SRLI(ShiftITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="srli")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """x[rd] = x[rs1] >>u shamt  (imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         architectural_state.register_file.registers[
@@ -526,7 +570,9 @@ class SRAI(ShiftITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="srai")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """x[rd] = x[rs1] >>s shamt   (imm)"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
@@ -547,14 +593,16 @@ class LB(MemoryITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="lb")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """x[rd] = sext(M[x[rs1] + sext(imm)][7:0])"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         # casting like this is necessary for sign extension
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             int(
                 fixedint.Int8(
-                    int(architectural_state.memory.load_byte(int(rs1) + self.imm))
+                    int(architectural_state.memory.read_byte(int(rs1) + self.imm))
                 )
             )
         )
@@ -572,11 +620,11 @@ class LB(MemoryITypeInstruction):
         self,
         memory_address: Optional[int],
         memory_write_data: Optional[int],
-        architectural_state: ArchitecturalState,
+        architectural_state: RiscvArchitecturalState,
     ) -> Optional[int]:
         assert memory_address is not None
         return int(
-            fixedint.Int8(int(architectural_state.memory.load_byte(memory_address)))
+            fixedint.Int8(int(architectural_state.memory.read_byte(memory_address)))
         )
 
 
@@ -584,13 +632,15 @@ class LH(MemoryITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="lh")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """x[rd] = sext(M[x[rs1] + sext(imm)][15:0])"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
             int(
                 fixedint.Int16(
-                    int(architectural_state.memory.load_halfword(int(rs1) + self.imm))
+                    int(architectural_state.memory.read_halfword(int(rs1) + self.imm))
                 )
             )
         )
@@ -608,12 +658,12 @@ class LH(MemoryITypeInstruction):
         self,
         memory_address: Optional[int],
         memory_write_data: Optional[int],
-        architectural_state: ArchitecturalState,
+        architectural_state: RiscvArchitecturalState,
     ) -> Optional[int]:
         assert memory_address is not None
         return int(
             fixedint.Int16(
-                int(architectural_state.memory.load_halfword(memory_address))
+                int(architectural_state.memory.read_halfword(memory_address))
             )
         )
 
@@ -622,12 +672,14 @@ class LW(MemoryITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="lw")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """x[rd] = sext(M[x[rs1] + sext(imm)][31:0])"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         architectural_state.register_file.registers[
             self.rd
-        ] = architectural_state.memory.load_word(int(rs1) + self.imm)
+        ] = architectural_state.memory.read_word(int(rs1) + self.imm)
         return architectural_state
 
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
@@ -642,21 +694,23 @@ class LW(MemoryITypeInstruction):
         self,
         memory_address: Optional[int],
         memory_write_data: Optional[int],
-        architectural_state: ArchitecturalState,
+        architectural_state: RiscvArchitecturalState,
     ) -> Optional[int]:
         assert memory_address is not None
-        return int(architectural_state.memory.load_word(memory_address))
+        return int(architectural_state.memory.read_word(memory_address))
 
 
 class LBU(MemoryITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="lbu")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """x[rd] = M[x[rs1] + sext(imm)][7:0]"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            int(architectural_state.memory.load_byte(int(rs1) + self.imm))
+            int(architectural_state.memory.read_byte(int(rs1) + self.imm))
         )
         return architectural_state
 
@@ -672,21 +726,23 @@ class LBU(MemoryITypeInstruction):
         self,
         memory_address: Optional[int],
         memory_write_data: Optional[int],
-        architectural_state: ArchitecturalState,
+        architectural_state: RiscvArchitecturalState,
     ) -> Optional[int]:
         assert memory_address is not None
-        return int(architectural_state.memory.load_byte(memory_address))
+        return int(architectural_state.memory.read_byte(memory_address))
 
 
 class LHU(MemoryITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="lhu")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """x[rd] = M[x[rs1] + sext(imm)][15:0]"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            int(architectural_state.memory.load_halfword(int(rs1) + self.imm))
+            int(architectural_state.memory.read_halfword(int(rs1) + self.imm))
         )
         return architectural_state
 
@@ -702,17 +758,19 @@ class LHU(MemoryITypeInstruction):
         self,
         memory_address: Optional[int],
         memory_write_data: Optional[int],
-        architectural_state: ArchitecturalState,
+        architectural_state: RiscvArchitecturalState,
     ) -> Optional[int]:
         assert memory_address is not None
-        return int(architectural_state.memory.load_halfword(memory_address))
+        return int(architectural_state.memory.read_halfword(memory_address))
 
 
 class JALR(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="jalr")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """t=pc+4; pc=(x[rs1]+sext(imm))&∼1; x[rd]=t"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
@@ -749,31 +807,43 @@ class ECALL(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="ecall")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """RaiseException(EnvironmentCall)"""
         raise InstructionNotImplemented(mnemonic=self.mnemonic)
         return architectural_state
+
+    def __repr__(self) -> str:
+        return self.mnemonic
 
 
 class EBREAK(ITypeInstruction):
     def __init__(self, rd: int, rs1: int, imm: int):
         super().__init__(rd, rs1, imm, mnemonic="ebreak")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """RaiseException(EnvironmentCall)"""
         raise InstructionNotImplemented(mnemonic=self.mnemonic)
         return architectural_state
+
+    def __repr__(self) -> str:
+        return self.mnemonic
 
 
 class SB(STypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1, rs2, imm, mnemonic="sb")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """M[x[rs1] + sext(imm)] = x[rs2][7:0]"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2][:8]
-        architectural_state.memory.store_byte(
+        architectural_state.memory.write_byte(
             int(rs1 + fixedint.MutableUInt32(self.imm)), fixedint.MutableUInt8(int(rs2))
         )
         return architectural_state
@@ -782,16 +852,16 @@ class SB(STypeInstruction):
         self,
         memory_address: Optional[int],
         memory_write_data: Optional[int],
-        architectural_state: ArchitecturalState,
+        architectural_state: RiscvArchitecturalState,
     ) -> Optional[int]:
         if memory_address is not None and memory_write_data is not None:
-            architectural_state.memory.store_byte(
+            architectural_state.memory.write_byte(
                 memory_address, fixedint.MutableUInt8(memory_write_data)
             )
         return None
 
     def access_register_file(
-        self, architectural_state: ArchitecturalState
+        self, architectural_state: RiscvArchitecturalState
     ) -> tuple[
         Optional[int], Optional[int], Optional[int], Optional[int], Optional[int]
     ]:
@@ -808,18 +878,20 @@ class SH(STypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1, rs2, imm, mnemonic="sh")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """M[x[rs1] + sext(imm)] = x[rs2][15:0]"""
         rs2 = architectural_state.register_file.registers[self.rs2][:16]
         rs1 = architectural_state.register_file.registers[self.rs1]
-        architectural_state.memory.store_halfword(
+        architectural_state.memory.write_halfword(
             int(rs1 + fixedint.MutableUInt32(self.imm)),
             fixedint.MutableUInt16(int(rs2)),
         )
         return architectural_state
 
     def access_register_file(
-        self, architectural_state: ArchitecturalState
+        self, architectural_state: RiscvArchitecturalState
     ) -> tuple[
         Optional[int], Optional[int], Optional[int], Optional[int], Optional[int]
     ]:
@@ -835,10 +907,10 @@ class SH(STypeInstruction):
         self,
         memory_address: Optional[int],
         memory_write_data: Optional[int],
-        architectural_state: ArchitecturalState,
+        architectural_state: RiscvArchitecturalState,
     ) -> Optional[int]:
         if memory_address is not None and memory_write_data is not None:
-            architectural_state.memory.store_halfword(
+            architectural_state.memory.write_halfword(
                 memory_address, fixedint.MutableUInt16(memory_write_data)
             )
         return None
@@ -848,17 +920,19 @@ class SW(STypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1, rs2, imm, mnemonic="sw")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """M[x[rs1] + sext(imm)] = x[rs2][31:0]"""
         rs2 = architectural_state.register_file.registers[self.rs2]
         rs1 = architectural_state.register_file.registers[self.rs1]
-        architectural_state.memory.store_word(
+        architectural_state.memory.write_word(
             int(rs1 + fixedint.MutableUInt32(self.imm)), rs2
         )
         return architectural_state
 
     def access_register_file(
-        self, architectural_state: ArchitecturalState
+        self, architectural_state: RiscvArchitecturalState
     ) -> tuple[
         Optional[int], Optional[int], Optional[int], Optional[int], Optional[int]
     ]:
@@ -874,10 +948,10 @@ class SW(STypeInstruction):
         self,
         memory_address: Optional[int],
         memory_write_data: Optional[int],
-        architectural_state: ArchitecturalState,
+        architectural_state: RiscvArchitecturalState,
     ) -> Optional[int]:
         if memory_address is not None and memory_write_data is not None:
-            architectural_state.memory.store_word(
+            architectural_state.memory.write_word(
                 memory_address, fixedint.MutableUInt32(memory_write_data)
             )
         return None
@@ -887,7 +961,9 @@ class BEQ(BTypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1=rs1, rs2=rs2, imm=imm, mnemonic="beq")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """if (x[rs1] == x[rs2]) pc += sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
@@ -908,7 +984,9 @@ class BNE(BTypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1=rs1, rs2=rs2, imm=imm, mnemonic="bne")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """if (x[rs1] != x[rs2]) pc += sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
@@ -929,7 +1007,9 @@ class BLT(BTypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1=rs1, rs2=rs2, imm=imm, mnemonic="blt")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """if (x[rs1] <s x[rs2]) pc += sext(imm)"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         rs2 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs2]))
@@ -951,7 +1031,9 @@ class BGE(BTypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1=rs1, rs2=rs2, imm=imm, mnemonic="bge")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """if (x[rs1] >= x[rs2]) pc += sext(imm)"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         rs2 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs2]))
@@ -973,7 +1055,9 @@ class BLTU(BTypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1=rs1, rs2=rs2, imm=imm, mnemonic="bltu")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """if (x[rs1] <u x[rs2]) pc += sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
@@ -994,7 +1078,9 @@ class BGEU(BTypeInstruction):
     def __init__(self, rs1: int, rs2: int, imm: int):
         super().__init__(rs1=rs1, rs2=rs2, imm=imm, mnemonic="bgeu")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """if (x[rs1] >=u x[rs2]) pc += sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
@@ -1015,7 +1101,9 @@ class LUI(UTypeInstruction):
     def __init__(self, rd: int, imm: int):
         super().__init__(rd, imm, mnemonic="lui")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """x[rd] = sext(imm[31:12] << 12)"""
         imm = self.imm << 12
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
@@ -1042,7 +1130,9 @@ class AUIPC(UTypeInstruction):
     def __init__(self, rd: int, imm: int):
         super().__init__(rd, imm, mnemonic="auipc")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """x[rd] = pc + sext(imm[31:12] << 12)"""
         imm = self.imm << 12
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
@@ -1076,7 +1166,9 @@ class JAL(JTypeInstruction):
     def __init__(self, rd: int, imm: int):
         super().__init__(rd, imm, mnemonic="jal")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         # NOTE: Actually sets the pc to (pc+imm-4) because the simulation always increases the pc by 4 after execution
         """x[rd]=pc+4; pc+=sext(imm)"""
         architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
@@ -1091,7 +1183,9 @@ class FENCE(FenceTypeInstruction):
     def __init__(self):
         super().__init__(mnemonic="fence")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """fence(pred,succ)"""
         raise InstructionNotImplemented(mnemonic=self.mnemonic)
 
@@ -1100,7 +1194,9 @@ class CSRRW(CSRTypeInstruction):
     def __init__(self, rd: int, csr: int, rs1: int):
         super().__init__(rd, csr, rs1, mnemonic="csrrw")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """x[rd] = zext(csr_register[csr]); csr_register[csr] = x[rs1]
 
         Args:
@@ -1111,8 +1207,8 @@ class CSRRW(CSRTypeInstruction):
         """
         architectural_state.register_file.registers[
             self.rd
-        ] = architectural_state.csr_registers.load_word(self.csr)
-        architectural_state.csr_registers.store_word(
+        ] = architectural_state.csr_registers.read_word(self.csr)
+        architectural_state.csr_registers.write_word(
             self.csr, architectural_state.register_file.registers[self.rs1]
         )
 
@@ -1123,7 +1219,9 @@ class CSRRS(CSRTypeInstruction):
     def __init__(self, rd: int, csr: int, rs1: int):
         super().__init__(rd, csr, rs1, mnemonic="csrrs")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """x[rd] = zext(csr_register[csr]); csr_register[csr] = csr_register[csr] or x[rs1]
 
         Args:
@@ -1135,9 +1233,9 @@ class CSRRS(CSRTypeInstruction):
         rs1_value = architectural_state.register_file.registers[self.rs1]
         architectural_state.register_file.registers[
             self.rd
-        ] = architectural_state.csr_registers.load_word(self.csr)
-        temp = architectural_state.csr_registers.load_word(self.csr) | rs1_value
-        architectural_state.csr_registers.store_word(self.csr, temp)
+        ] = architectural_state.csr_registers.read_word(self.csr)
+        temp = architectural_state.csr_registers.read_word(self.csr) | rs1_value
+        architectural_state.csr_registers.write_word(self.csr, temp)
 
         return architectural_state
 
@@ -1146,7 +1244,9 @@ class CSRRC(CSRTypeInstruction):
     def __init__(self, rd: int, csr: int, rs1: int):
         super().__init__(rd, csr, rs1, mnemonic="csrrc")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """x[rd] = zext(csr_register[csr]); csr_register[csr] = csr_register[csr] and not(x[rs1])
 
         Args:
@@ -1158,9 +1258,9 @@ class CSRRC(CSRTypeInstruction):
         rs1_value = architectural_state.register_file.registers[self.rs1]
         architectural_state.register_file.registers[
             self.rd
-        ] = architectural_state.csr_registers.load_word(self.csr)
-        temp = architectural_state.csr_registers.load_word(self.csr) & (~(rs1_value))
-        architectural_state.csr_registers.store_word(self.csr, temp)
+        ] = architectural_state.csr_registers.read_word(self.csr)
+        temp = architectural_state.csr_registers.read_word(self.csr) & (~(rs1_value))
+        architectural_state.csr_registers.write_word(self.csr, temp)
 
         return architectural_state
 
@@ -1169,7 +1269,9 @@ class CSRRWI(CSRITypeInstruction):
     def __init__(self, rd: int, csr: int, uimm: int):
         super().__init__(rd, csr, uimm, mnemonic="csrrwi")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """x[rd] = zext(csr_register[csr]); csr_register[csr] = zext(uimm)
 
         Args:
@@ -1180,8 +1282,8 @@ class CSRRWI(CSRITypeInstruction):
         """
         architectural_state.register_file.registers[
             self.rd
-        ] = architectural_state.csr_registers.load_word(self.csr)
-        architectural_state.csr_registers.store_word(
+        ] = architectural_state.csr_registers.read_word(self.csr)
+        architectural_state.csr_registers.write_word(
             self.csr, fixedint.MutableUInt32(self.uimm)
         )
 
@@ -1192,7 +1294,9 @@ class CSRRSI(CSRITypeInstruction):
     def __init__(self, rd: int, csr: int, uimm: int):
         super().__init__(rd, csr, uimm, mnemonic="csrrsi")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """x[rd] = zext(csr_register[csr]); csr_register[csr] = csr_register[csr] or zext(uimm)
 
         Args:
@@ -1203,11 +1307,11 @@ class CSRRSI(CSRITypeInstruction):
         """
         architectural_state.register_file.registers[
             self.rd
-        ] = architectural_state.csr_registers.load_word(self.csr)
-        temp = architectural_state.csr_registers.load_word(
+        ] = architectural_state.csr_registers.read_word(self.csr)
+        temp = architectural_state.csr_registers.read_word(
             self.csr
         ) | fixedint.MutableUInt32(self.uimm)
-        architectural_state.csr_registers.store_word(self.csr, temp)
+        architectural_state.csr_registers.write_word(self.csr, temp)
 
         return architectural_state
 
@@ -1216,7 +1320,9 @@ class CSRRCI(CSRITypeInstruction):
     def __init__(self, rd: int, csr: int, uimm: int):
         super().__init__(rd, csr, uimm, mnemonic="csrrci")
 
-    def behavior(self, architectural_state: ArchitecturalState) -> ArchitecturalState:
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
         """x[rd] = zext(csr_register[csr]); csr_register[csr] = csr_register[csr] and not(zext(uimm))
 
         Args:
@@ -1227,16 +1333,17 @@ class CSRRCI(CSRITypeInstruction):
         """
         architectural_state.register_file.registers[
             self.rd
-        ] = architectural_state.csr_registers.load_word(self.csr)
-        temp = architectural_state.csr_registers.load_word(self.csr) & (
+        ] = architectural_state.csr_registers.read_word(self.csr)
+        temp = architectural_state.csr_registers.read_word(self.csr) & (
             ~(fixedint.MutableUInt32(self.uimm))
         )
-        architectural_state.csr_registers.store_word(self.csr, temp)
+        architectural_state.csr_registers.write_word(self.csr, temp)
 
         return architectural_state
 
 
-instruction_map: dict[str, Type[Instruction]] = {
+# Used by the parser to instantiate instructions.
+instruction_map: dict[str, Type[RiscvInstruction]] = {
     "add": ADD,
     "beq": BEQ,
     "blt": BLT,

@@ -1,122 +1,30 @@
-from architecture_simulator.uarch.architectural_state import ArchitecturalState
-from .architectural_state import ArchitecturalState
-from ..isa.instruction_types import Instruction, EmptyInstruction, BTypeInstruction
-from typing import Optional
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+
+from .pipeline_registers import (
+    PipelineRegister,
+    InstructionFetchPipelineRegister,
+    InstructionDecodePipelineRegister,
+    ExecutePipelineRegister,
+    MemoryAccessPipelineRegister,
+    RegisterWritebackPipelineRegister,
+)
+from .riscv_architectural_state import RiscvArchitecturalState
+from architecture_simulator.isa.riscv.instruction_types import (
+    BTypeInstruction,
+    EmptyInstruction,
+)
+from architecture_simulator.isa.riscv.rv32i_instructions import JAL
+from .pipeline import InstructionExecutionException
 
 
-#
-# Classes for a 5 Stage Pipeline:
-#
-@dataclass
-class ControlUnitSignals:
-    """The signals of the control unit, which is located in the ID stage! These signals are used to decide
-    which input gets used, but are mostly asthetic and constructed for the webui!
-    """
-
-    alu_src_1: Optional[bool] = None
-    alu_src_2: Optional[bool] = None
-    wb_src: Optional[int] = None
-    reg_write: Optional[bool] = None
-    mem_read: Optional[bool] = None
-    mem_write: Optional[bool] = None
-    branch: Optional[bool] = None
-    jump: Optional[bool] = None
-    alu_op: Optional[int] = None
-    alu_to_pc: Optional[int] = None
-
-
-@dataclass
-class FlushSignal:
-    """A signal that all previous pipeline registers should be flushed and that the program counter should be set back"""
-
-    # whether the pipeline register that holds this signal should be flushed too or not
-    inclusive: bool
-    # address to return to
-    address: int
-
-
-@dataclass
-class PipelineRegister:
-    """The PipelineRegister superclass!
-    Every PipelineRegister needs to save the instruction that is currently in this part of the pipeline!
-    """
-
-    instruction: Instruction = field(default_factory=EmptyInstruction)
-    address_of_instruction: Optional[int] = None
-    flush_signal: Optional[FlushSignal] = None
-
-
-@dataclass
-class InstructionFetchPipelineRegister(PipelineRegister):
-    branch_prediction: Optional[bool] = None
-    pc_plus_instruction_length: Optional[int] = None
-
-
-@dataclass
-class InstructionDecodePipelineRegister(PipelineRegister):
-    control_unit_signals: ControlUnitSignals = field(default_factory=ControlUnitSignals)
-    register_read_addr_1: Optional[int] = None
-    register_read_addr_2: Optional[int] = None
-    register_read_data_1: Optional[int] = None
-    register_read_data_2: Optional[int] = None
-    imm: Optional[int] = None
-    write_register: Optional[int] = None
-    branch_prediction: Optional[bool] = None
-    pc_plus_instruction_length: Optional[int] = None
-
-
-@dataclass
-class ExecutePipelineRegister(PipelineRegister):
-    control_unit_signals: ControlUnitSignals = field(default_factory=ControlUnitSignals)
-    alu_in_1: Optional[int] = None
-    alu_in_2: Optional[int] = None
-    # alu_in_2 is one of read_data_2 and imm
-    register_read_data_2: Optional[int] = None
-    imm: Optional[int] = None
-    result: Optional[int] = None
-    write_register: Optional[int] = None
-    # control signals
-    comparison: Optional[bool] = None
-    pc_plus_imm: Optional[int] = None
-    branch_prediction: Optional[bool] = None
-    pc_plus_instruction_length: Optional[int] = None
-
-
-@dataclass
-class MemoryAccessPipelineRegister(PipelineRegister):
-    control_unit_signals: ControlUnitSignals = field(default_factory=ControlUnitSignals)
-    memory_address: Optional[int] = None
-    result: Optional[int] = None
-    memory_write_data: Optional[int] = None
-    memory_read_data: Optional[int] = None
-    write_register: Optional[int] = None
-    # control signals
-    comparison: Optional[bool] = None
-    comparison_or_jump: Optional[bool] = None
-    pc_plus_imm: Optional[int] = None
-    pc_plus_instruction_length: Optional[int] = None
-    imm: Optional[int] = None
-
-
-@dataclass
-class RegisterWritebackPipelineRegister(PipelineRegister):
-    control_unit_signals: ControlUnitSignals = field(default_factory=ControlUnitSignals)
-    register_write_data: Optional[int] = None
-    write_register: Optional[int] = None
-    memory_read_data: Optional[int] = None
-    alu_result: Optional[int] = None
-    pc_plus_instruction_length: Optional[int] = None
-    imm: Optional[int] = None
-
-
-# Stage superclass, every stage need to implement a behaviour method
 class Stage:
+    """Stage superclass. Every stage needs to implement a behavior method"""
+
     def behavior(
         self,
         pipeline_registers: list[PipelineRegister],
         index_of_own_input_register: int,
-        state: ArchitecturalState,
+        state: RiscvArchitecturalState,
     ) -> PipelineRegister:
         """general behavior method
 
@@ -135,7 +43,7 @@ class InstructionFetchStage(Stage):
         self,
         pipeline_registers: list[PipelineRegister],
         index_of_own_input_register: int,
-        state: ArchitecturalState,
+        state: RiscvArchitecturalState,
     ) -> PipelineRegister:
         """behavior of the IF Stage
         The input pipeline_register can be of any type of PipelineRegister
@@ -153,7 +61,7 @@ class InstructionFetchStage(Stage):
             return InstructionFetchPipelineRegister()
         # NOTE: PC gets incremented here. This means that branch prediction also happens here. Currently, we just statically predict not taken.
         address_of_instruction = state.program_counter
-        instruction = state.instruction_memory.load_instruction(address_of_instruction)
+        instruction = state.instruction_memory.read_instruction(address_of_instruction)
         state.program_counter += instruction.length
         pc_plus_instruction_length = address_of_instruction + instruction.length
 
@@ -175,7 +83,7 @@ class InstructionDecodeStage(Stage):
         self,
         pipeline_registers: list[PipelineRegister],
         index_of_own_input_register: int,
-        state: ArchitecturalState,
+        state: RiscvArchitecturalState,
     ) -> PipelineRegister:
         """behavior of the ID Stage
         Should the pipeline_register not be InstructionFetchPipelineRegister it returns an
@@ -253,7 +161,7 @@ class ExecuteStage(Stage):
         self,
         pipeline_registers: list[PipelineRegister],
         index_of_own_input_register: int,
-        state: ArchitecturalState,
+        state: RiscvArchitecturalState,
     ) -> PipelineRegister:
         """behavior of the EX stage
         Should the pipeline_register not be InstructionDecodePipelineRegister it returns an
@@ -314,7 +222,7 @@ class MemoryAccessStage(Stage):
         self,
         pipeline_registers: list[PipelineRegister],
         index_of_own_input_register: int,
-        state: ArchitecturalState,
+        state: RiscvArchitecturalState,
     ) -> PipelineRegister:
         """behavior of MA stage
         Should the pipeline_register not be ExecutePipelineRegister it returns an MemoryAccessPipelineRegister
@@ -366,8 +274,6 @@ class MemoryAccessStage(Stage):
             flush_signal = None
 
         if flush_signal is not None:
-            from ..isa.rv32i_instructions import JAL
-
             if isinstance(pipeline_register.instruction, BTypeInstruction):
                 state.performance_metrics.branch_count += 1
             elif isinstance(pipeline_register.instruction, JAL):
@@ -396,7 +302,7 @@ class RegisterWritebackStage(Stage):
         self,
         pipeline_registers: list[PipelineRegister],
         index_of_own_input_register: int,
-        state: ArchitecturalState,
+        state: RiscvArchitecturalState,
     ) -> PipelineRegister:
         """behavior of WB stage
         Should the pipeline_register not be MemoryAccessPipelineRegister it returns an
@@ -460,7 +366,7 @@ class SingleStage(Stage):
         self,
         pipeline_registers: list[PipelineRegister],
         index_of_own_input_register: int,
-        state: ArchitecturalState,
+        state: RiscvArchitecturalState,
     ) -> PipelineRegister:
         """behavior of the single stage pipeline
 
@@ -473,7 +379,7 @@ class SingleStage(Stage):
         """
         if state.instruction_at_pc():
             pc_before_increment = state.program_counter
-            instr = state.instruction_memory.load_instruction(state.program_counter)
+            instr = state.instruction_memory.read_instruction(state.program_counter)
 
             state.performance_metrics.instruction_count += 1
             try:
@@ -491,105 +397,11 @@ class SingleStage(Stage):
         return PipelineRegister()
 
 
-#
-# Pipeline wrapper Classs
-#
-
-
-class Pipeline:
-    def __init__(
-        self,
-        stages: list[Stage],
-        execution_ordering: list[int],
-        state: ArchitecturalState,
-    ) -> None:
-        """constructor of the pipeline
-
-        Args:
-            stages (list[Stage]): the stages the user wants to build the pipeline out of
-            execution_ordering (list[int]): the execution ordering of the different stages,
-            the list gets iterated over from first to last element, and executes the ith element in the
-            stages list!
-            state (ArchitecturalState): gets the current architectural state as an argument
-        """
-        self.stages = stages
-        self.num_stages = len(stages)
-        self.execution_ordering = execution_ordering
-        self.state = state
-        self.pipeline_registers: list[PipelineRegister] = [
-            PipelineRegister()
-        ] * self.num_stages
-
-    def step(self):
-        """the pipeline step method, this is the central part of the pipeline! Every time it is called, it does one
-        whole step of the pipeline, and every stage gets executed once in their ececution ordering
-        """
-        self.state.performance_metrics.cycles += 1
-        next_pipeline_registers = [None] * self.num_stages
-        for index in self.execution_ordering:
-            try:
-                next_pipeline_registers[index] = self.stages[index].behavior(
-                    pipeline_registers=self.pipeline_registers,
-                    index_of_own_input_register=(index - 1),
-                    state=self.state,
-                )
-            except Exception as e:
-                if index - 1 >= 0:
-                    raise InstructionExecutionException(
-                        address=self.pipeline_registers[
-                            index - 1
-                        ].address_of_instruction,
-                        instruction_repr=self.pipeline_registers[
-                            index - 1
-                        ].instruction.__repr__(),
-                        error_message=e.__repr__(),
-                    )
-                else:
-                    raise
-        self.pipeline_registers = next_pipeline_registers
-
-        # if one of the stages wants to flush, do so (starting from the back makes sense)
-        for index, pipeline_register in reversed(
-            list(enumerate(self.pipeline_registers))
-        ):
-            flush_signal = pipeline_register.flush_signal
-            if flush_signal is not None:
-                self.state.performance_metrics.flushes += 1
-                # This works because int(True) = 1, int(False) = 0
-                # This is good code, trust me
-                num_to_flush = index + flush_signal.inclusive
-                self.pipeline_registers[:num_to_flush] = [
-                    PipelineRegister()
-                ] * num_to_flush
-                self.state.program_counter = flush_signal.address
-                break  # break since we don't care about the previous stages
-
-    def is_empty(self) -> bool:
-        """Return True if all pipeline registers (exluding the last) are empty (determined by whether the instruction in the pipeline register is empty).
-            Note, that the last pipeline register is not considerd, because it will not be used as input for an other stage.
-
-        Returns:
-            bool: whether all pipeline registers are empty
-        """
-        return all(
-            type(pipeline_register.instruction) == EmptyInstruction
-            for pipeline_register in self.pipeline_registers[:-1]
-        )
-
-    def is_done(self) -> bool:
-        """Return True if the pipeline is empty and there is no instruction at the program counter, so nothing will happen anymore
-
-        Returns:
-            bool: if the pipeline has finished
-        """
-        return self.is_empty() and not self.state.instruction_at_pc()
-
-
 @dataclass
-class InstructionExecutionException(RuntimeError):
-    address: int
-    instruction_repr: str
-    error_message: str
+class FlushSignal:
+    """A signal that all previous pipeline registers should be flushed and that the program counter should be set back"""
 
-    def __repr__(self):
-        return f"There was an error executing the instruction at address '{self.address}': '{self.instruction_repr}':\n{self.error_message}"
+    # whether the pipeline register that holds this signal should be flushed too or not
+    inclusive: bool
+    # address to return to
+    address: int

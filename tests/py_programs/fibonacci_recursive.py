@@ -1,4 +1,4 @@
-from architecture_simulator.isa.rv32i_instructions import (
+from architecture_simulator.isa.riscv.rv32i_instructions import (
     ADD,
     ADDI,
     AND,
@@ -10,9 +10,9 @@ from architecture_simulator.isa.rv32i_instructions import (
     LW,
     SW,
 )
-from architecture_simulator.simulation.simulation import Simulation
-from architecture_simulator.uarch.architectural_state import (
-    ArchitecturalState,
+from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
+from architecture_simulator.uarch.riscv.riscv_architectural_state import (
+    RiscvArchitecturalState,
     RegisterFile,
     InstructionMemory,
     Memory,
@@ -20,9 +20,9 @@ from architecture_simulator.uarch.architectural_state import (
 from fixedint import MutableUInt32
 
 
-def fibonacci_recursive_simulation(n: int) -> Simulation:
-    simulation = Simulation(
-        state=ArchitecturalState(
+def fibonacci_recursive_simulation(n: int) -> RiscvSimulation:
+    simulation = RiscvSimulation(
+        state=RiscvArchitecturalState(
             register_file=RegisterFile(registers=[MutableUInt32(0)] * 32),
             memory=Memory(min_bytes=0),
             instruction_memory=InstructionMemory(
@@ -107,13 +107,13 @@ The algorithm was altered slightly so that you can calculate the number of proce
 The real differences are: Usage of the parser, labels, and ABI register names"""
 
 
-def fibonacci_recursive_simulation_2(n: int) -> Simulation:
-    simulation = Simulation(
-        state=ArchitecturalState(
+def fibonacci_recursive_simulation_2(n: int) -> RiscvSimulation:
+    simulation = RiscvSimulation(
+        state=RiscvArchitecturalState(
             register_file=RegisterFile(), memory=Memory(min_bytes=0)
         )
     )
-    simulation.state.instruction_memory.append_instructions(
+    simulation.load_program(
         f"""lui a0, 0
 addi a0, a0, {n} # load n
 addi s0, zero, 1 # load 1 for comparison
