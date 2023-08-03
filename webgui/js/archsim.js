@@ -15,6 +15,9 @@ const performance_metrics_vis = document.getElementById(
     "vis_performance_metrics"
 );
 
+var previous_registers = {};
+var previous_memory = {};
+
 function addToOutput(s) {
     output.value += ">>>" + input.value + "\n" + s + "\n";
     output.scrollTop = output.scrollHeight;
@@ -31,6 +34,10 @@ const archsim_js = {
         td2 = document.createElement("td");
         td2.innerText = Array.from(representations)[reg_representation_mode];
         td2.id = "val_x" + reg;
+        if (previous_registers[reg] != Array.from(representations)[1]) {
+            td2.style.backgroundColor = "yellow";
+            previous_registers[reg] = Array.from(representations)[1];
+        }
         td3 = document.createElement("td");
         td3.innerText = abi_name;
         td3.id = abi_name;
@@ -65,6 +72,10 @@ const archsim_js = {
         //alert(Array.from(representations))
         td2.innerText = Array.from(representations)[mem_representation_mode];
         td2.id = "memory" + address;
+        if (previous_memory[address] != Array.from(representations)[1]) {
+            td2.style.backgroundColor = "yellow";
+            previous_memory[address] = Array.from(representations)[1];
+        }
         tr.appendChild(td1);
         tr.appendChild(td2);
         memory.appendChild(tr);
