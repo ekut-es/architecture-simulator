@@ -51,7 +51,7 @@ class RiscvSimulation(Simulation):
         self.state.performance_metrics.stop_timer()
 
     def load_program(self, program: str):
-        """Loads a text form program into the simulation.
+        """Loads a text format program into the simulation.
 
         Args:
             program (str): A program which complies with (a subset of) the toy syntax.

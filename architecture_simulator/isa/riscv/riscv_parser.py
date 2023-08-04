@@ -89,7 +89,7 @@ reg_numbers = [str(i) for i in range(32)]
 
 
 class RiscvParser:
-    """A parser for RISC-V programs. It is capable of turning a text form program into instruction objects."""
+    """A parser for RISC-V programs. It is capable of turning a text format program into instruction objects."""
 
     COMMA = pp.Literal(",").suppress()
     Paren_R = pp.Literal(")").suppress()
