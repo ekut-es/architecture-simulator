@@ -14,7 +14,6 @@ from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 from architecture_simulator.uarch.riscv.riscv_architectural_state import (
     RiscvArchitecturalState,
     RegisterFile,
-    InstructionMemory,
     Memory,
 )
 from fixedint import MutableUInt32
@@ -25,46 +24,44 @@ def fibonacci_recursive_simulation(n: int) -> RiscvSimulation:
         state=RiscvArchitecturalState(
             register_file=RegisterFile(registers=[MutableUInt32(0)] * 32),
             memory=Memory(min_bytes=0),
-            instruction_memory=InstructionMemory(
-                instructions={
-                    0: LUI(rd=10, imm=0),  # loading n
-                    4: ADDI(rd=10, rs1=10, imm=n),
-                    8: ADDI(rd=2, rs1=0, imm=1024),  # setting initial stack pointer
-                    12: JAL(rd=1, imm=8),  # call fib(n)
-                    16: BEQ(rs1=0, rs2=0, imm=88),  # jump to end
-                    # Start of fib(n) procedure
-                    20: BGE(rs1=0, rs2=10, imm=68),  # branch if n <= 0
-                    24: ADDI(rd=5, rs1=0, imm=1),
-                    28: BEQ(rs1=5, rs2=10, imm=68),  # branch if n == 1
-                    32: ADDI(rd=2, rs1=2, imm=-8),  # adjust sp for 2 items
-                    36: SW(rs1=2, rs2=1, imm=4),  # store stack pointer
-                    40: SW(rs1=2, rs2=10, imm=0),  # store n
-                    44: ADDI(rd=10, rs1=10, imm=-1),  # x10 = n-1
-                    48: JAL(rd=1, imm=-28),  # call fib(n-1)
-                    52: LW(rd=5, rs1=2, imm=0),  # restore n
-                    56: SW(rs1=2, rs2=10, imm=0),  # store return value (fib(n-1))
-                    60: ADDI(rd=10, rs1=5, imm=-2),  # x10 = n-2
-                    64: JAL(rd=1, imm=-44),  # call fib(n-2)
-                    68: LW(rd=5, rs1=2, imm=0),  # load from memory: x5 = fib(n-1)
-                    72: LW(rd=1, rs1=2, imm=4),  # restore return address
-                    76: ADDI(rd=2, rs1=2, imm=8),  # decrease stack pointer for 2 items
-                    80: ADD(rd=10, rs1=10, rs2=5),  # x10 = fib(n-2) + fib(n-1)
-                    84: JALR(rd=7, rs1=1, imm=0),
-                    88: AND(rd=10, rs1=10, rs2=0),  # branch target: case n <= 0
-                    92: JALR(rd=7, rs1=1, imm=0),
-                    96: ADDI(rd=10, rs1=0, imm=1),  # branch target: case n == 1
-                    100: JALR(rd=7, rs1=1, imm=0),
-                    # end of fib(n) procedure
-                },
-            ),
         ),
     )
+    simulation.state.instruction_memory.instructions = {
+        0: LUI(rd=10, imm=0),  # loading n
+        4: ADDI(rd=10, rs1=10, imm=n),
+        8: ADDI(rd=2, rs1=0, imm=1024),  # setting initial stack pointer
+        12: JAL(rd=1, imm=8),  # call fib(n)
+        16: BEQ(rs1=0, rs2=0, imm=88),  # jump to end
+        # Start of fib(n) procedure
+        20: BGE(rs1=0, rs2=10, imm=68),  # branch if n <= 0
+        24: ADDI(rd=5, rs1=0, imm=1),
+        28: BEQ(rs1=5, rs2=10, imm=68),  # branch if n == 1
+        32: ADDI(rd=2, rs1=2, imm=-8),  # adjust sp for 2 items
+        36: SW(rs1=2, rs2=1, imm=4),  # store stack pointer
+        40: SW(rs1=2, rs2=10, imm=0),  # store n
+        44: ADDI(rd=10, rs1=10, imm=-1),  # x10 = n-1
+        48: JAL(rd=1, imm=-28),  # call fib(n-1)
+        52: LW(rd=5, rs1=2, imm=0),  # restore n
+        56: SW(rs1=2, rs2=10, imm=0),  # store return value (fib(n-1))
+        60: ADDI(rd=10, rs1=5, imm=-2),  # x10 = n-2
+        64: JAL(rd=1, imm=-44),  # call fib(n-2)
+        68: LW(rd=5, rs1=2, imm=0),  # load from memory: x5 = fib(n-1)
+        72: LW(rd=1, rs1=2, imm=4),  # restore return address
+        76: ADDI(rd=2, rs1=2, imm=8),  # decrease stack pointer for 2 items
+        80: ADD(rd=10, rs1=10, rs2=5),  # x10 = fib(n-2) + fib(n-1)
+        84: JALR(rd=7, rs1=1, imm=0),
+        88: AND(rd=10, rs1=10, rs2=0),  # branch target: case n <= 0
+        92: JALR(rd=7, rs1=1, imm=0),
+        96: ADDI(rd=10, rs1=0, imm=1),  # branch target: case n == 1
+        100: JALR(rd=7, rs1=1, imm=0),
+        # end of fib(n) procedure
+    }
     return simulation
 
 
 def fibonacci_recursive(n: int) -> MutableUInt32:
     simulation = fibonacci_recursive_simulation(n)
-    simulation.run_simulation()
+    simulation.run()
     return simulation.state.register_file.registers[10]
 
 
@@ -144,7 +141,7 @@ End:"""
 
 def fibonacci_recursive_2(n: int) -> MutableUInt32:
     simulation = fibonacci_recursive_simulation_2(n)
-    simulation.run_simulation()
+    simulation.run()
     return simulation.state.register_file.registers[10]
 
 
@@ -155,6 +152,6 @@ if __name__ == "__main__":
     # print(simulation.state.performance_metrics)
 
     simulation = fibonacci_recursive_simulation_2(20)
-    simulation.run_simulation()
+    simulation.run()
     print(simulation.state.register_file.registers[10])
     print(simulation.state.performance_metrics)

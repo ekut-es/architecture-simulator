@@ -1,48 +1,48 @@
 import unittest
 import fixedint
 from architecture_simulator.uarch.memory import Memory
-from architecture_simulator.uarch.riscv.pipeline import Pipeline
 from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 
 
 class TestPipeline(unittest.TestCase):
-    def assert_steps(self, pipeline: Pipeline, steps: int):
-        """Execute the given amount of steps on the pipeline and assert the pipeline is finished after exactly that amount of steps and not earlier or later.
+    def assert_steps(self, simulation: RiscvSimulation, steps: int):
+        """Execute the given amount of steps on the Simulation and assert the pipeline is finished after exactly that amount of steps and not earlier or later.
         Args:
-            pipeline (Pipeline): pipeline to test.
+            simulation (RiscvSimulation): simulation to test.
             steps (int): number of steps needed to finish the pipeline.
         """
         for step in range(steps - 1):
-            pipeline.step()
+            simulation.step()
             self.assert_(
-                not pipeline.is_done(), f"Pipeline already finished after {step} steps."
+                not simulation.is_done(),
+                f"Pipeline already finished after {step} steps.",
             )
-        pipeline.step()
-        self.assert_(pipeline.is_done(), "Pipeline has not yet finished.")
+        simulation.step()
+        self.assert_(simulation.is_done(), "Pipeline has not yet finished.")
 
     def test_rtypes(self):
         program = """add x1, x1, x2
         add x4, x5, x6
         sub x7, x8, x9"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(5)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(8)
-        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(32)
-        pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(20)
-        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(32)
-        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(20)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(5)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(8)
+        simulation.state.register_file.registers[5] = fixedint.MutableUInt32(32)
+        simulation.state.register_file.registers[6] = fixedint.MutableUInt32(20)
+        simulation.state.register_file.registers[8] = fixedint.MutableUInt32(32)
+        simulation.state.register_file.registers[9] = fixedint.MutableUInt32(20)
         for _ in range(20):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(13)
+            simulation.state.register_file.registers[1], fixedint.MutableUInt32(13)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(52)
+            simulation.state.register_file.registers[4], fixedint.MutableUInt32(52)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(12)
+            simulation.state.register_file.registers[7], fixedint.MutableUInt32(12)
         )
 
     def test_add(self):
@@ -50,24 +50,23 @@ class TestPipeline(unittest.TestCase):
         add x4, x5, x6
         add x7, x8, x9"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(5)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(8)
-        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(32)
-        pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(20)
-        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(-10)
-        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(10)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(5)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(8)
+        simulation.state.register_file.registers[5] = fixedint.MutableUInt32(32)
+        simulation.state.register_file.registers[6] = fixedint.MutableUInt32(20)
+        simulation.state.register_file.registers[8] = fixedint.MutableUInt32(-10)
+        simulation.state.register_file.registers[9] = fixedint.MutableUInt32(10)
         for _ in range(10):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(13)
+            simulation.state.register_file.registers[1], fixedint.MutableUInt32(13)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(52)
+            simulation.state.register_file.registers[4], fixedint.MutableUInt32(52)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(0)
+            simulation.state.register_file.registers[7], fixedint.MutableUInt32(0)
         )
 
     def test_sub(self):
@@ -75,24 +74,24 @@ class TestPipeline(unittest.TestCase):
         sub x4, x5, x6
         sub x7, x8, x9"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(5)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(8)
-        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(32)
-        pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(20)
-        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(-10)
-        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(-10)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(5)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(8)
+        simulation.state.register_file.registers[5] = fixedint.MutableUInt32(32)
+        simulation.state.register_file.registers[6] = fixedint.MutableUInt32(20)
+        simulation.state.register_file.registers[8] = fixedint.MutableUInt32(-10)
+        simulation.state.register_file.registers[9] = fixedint.MutableUInt32(-10)
         for _ in range(10):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(-3)
+            simulation.state.register_file.registers[1], fixedint.MutableUInt32(-3)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(12)
+            simulation.state.register_file.registers[4], fixedint.MutableUInt32(12)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(0)
+            simulation.state.register_file.registers[7], fixedint.MutableUInt32(0)
         )
 
     def test_sll(self):
@@ -100,26 +99,26 @@ class TestPipeline(unittest.TestCase):
         sll x4, x5, x6
         sll x7, x8, x9"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(5)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(8)
-        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(31)
-        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(31 + 32)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(5)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(8)
+        simulation.state.register_file.registers[5] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[6] = fixedint.MutableUInt32(31)
+        simulation.state.register_file.registers[8] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[9] = fixedint.MutableUInt32(31 + 32)
         for _ in range(10):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[1],
+            simulation.state.register_file.registers[1],
             fixedint.MutableUInt32(5 * 2**8),
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[4],
+            simulation.state.register_file.registers[4],
             fixedint.MutableUInt32(2147483648),
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(2**31)
+            simulation.state.register_file.registers[7], fixedint.MutableUInt32(2**31)
         )
 
     def test_slt(self):
@@ -127,24 +126,24 @@ class TestPipeline(unittest.TestCase):
         slt x4, x5, x6
         slt x7, x8, x9"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(5)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(8)
-        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(32)
-        pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(20)
-        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(20)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(5)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(8)
+        simulation.state.register_file.registers[5] = fixedint.MutableUInt32(32)
+        simulation.state.register_file.registers[6] = fixedint.MutableUInt32(20)
+        simulation.state.register_file.registers[8] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[9] = fixedint.MutableUInt32(20)
         for _ in range(10):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(1)
+            simulation.state.register_file.registers[1], fixedint.MutableUInt32(1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(0)
+            simulation.state.register_file.registers[4], fixedint.MutableUInt32(0)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(1)
+            simulation.state.register_file.registers[7], fixedint.MutableUInt32(1)
         )
 
     def test_sltu(self):
@@ -152,24 +151,24 @@ class TestPipeline(unittest.TestCase):
         sltu x4, x5, x6
         sltu x7, x8, x9"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(5)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(8)
-        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(32)
-        pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(20)
-        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(20)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(5)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(8)
+        simulation.state.register_file.registers[5] = fixedint.MutableUInt32(32)
+        simulation.state.register_file.registers[6] = fixedint.MutableUInt32(20)
+        simulation.state.register_file.registers[8] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[9] = fixedint.MutableUInt32(20)
         for _ in range(10):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(1)
+            simulation.state.register_file.registers[1], fixedint.MutableUInt32(1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(0)
+            simulation.state.register_file.registers[4], fixedint.MutableUInt32(0)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(0)
+            simulation.state.register_file.registers[7], fixedint.MutableUInt32(0)
         )
 
     def test_xor(self):
@@ -177,24 +176,24 @@ class TestPipeline(unittest.TestCase):
         xor x4, x5, x6
         xor x7, x8, x9"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(0)
-        pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(0)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[5] = fixedint.MutableUInt32(0)
+        simulation.state.register_file.registers[6] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[8] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[9] = fixedint.MutableUInt32(0)
         for _ in range(10):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(0)
+            simulation.state.register_file.registers[1], fixedint.MutableUInt32(0)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(1)
+            simulation.state.register_file.registers[4], fixedint.MutableUInt32(1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(-1)
+            simulation.state.register_file.registers[7], fixedint.MutableUInt32(-1)
         )
 
     def test_srl(self):
@@ -202,24 +201,24 @@ class TestPipeline(unittest.TestCase):
         srl x4, x5, x6
         srl x7, x8, x9"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(2**31)
-        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(31)
+
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[5] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[6] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[8] = fixedint.MutableUInt32(2**31)
+        simulation.state.register_file.registers[9] = fixedint.MutableUInt32(31)
         simulation.load_program(program)
         for _ in range(10):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(0)
+            simulation.state.register_file.registers[1], fixedint.MutableUInt32(0)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(1)
+            simulation.state.register_file.registers[4], fixedint.MutableUInt32(1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(1)
+            simulation.state.register_file.registers[7], fixedint.MutableUInt32(1)
         )
 
     def test_sra(self):
@@ -227,24 +226,24 @@ class TestPipeline(unittest.TestCase):
         sra x4, x5, x6
         sra x7, x8, x9"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(16)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(2)
-        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(2**31)
-        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(31)
+
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(16)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(2)
+        simulation.state.register_file.registers[5] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[6] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[8] = fixedint.MutableUInt32(2**31)
+        simulation.state.register_file.registers[9] = fixedint.MutableUInt32(31)
         simulation.load_program(program)
         for _ in range(10):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(4)
+            simulation.state.register_file.registers[1], fixedint.MutableUInt32(4)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(-1)
+            simulation.state.register_file.registers[4], fixedint.MutableUInt32(-1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[7],
+            simulation.state.register_file.registers[7],
             fixedint.MutableUInt32(2**32 - 1),
         )
 
@@ -253,24 +252,24 @@ class TestPipeline(unittest.TestCase):
         or x4, x5, x6
         or x7, x8, x9"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(0)
-        pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(0)
+
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[5] = fixedint.MutableUInt32(0)
+        simulation.state.register_file.registers[6] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[8] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[9] = fixedint.MutableUInt32(0)
         simulation.load_program(program)
         for _ in range(10):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(1)
+            simulation.state.register_file.registers[1], fixedint.MutableUInt32(1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(1)
+            simulation.state.register_file.registers[4], fixedint.MutableUInt32(1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(-1)
+            simulation.state.register_file.registers[7], fixedint.MutableUInt32(-1)
         )
 
     def test_and(self):
@@ -278,24 +277,24 @@ class TestPipeline(unittest.TestCase):
         and x4, x5, x6
         and x7, x8, x9"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(0)
-        pipeline.state.register_file.registers[6] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[9] = fixedint.MutableUInt32(2)
+
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[5] = fixedint.MutableUInt32(0)
+        simulation.state.register_file.registers[6] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[8] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[9] = fixedint.MutableUInt32(2)
         simulation.load_program(program)
         for _ in range(7):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(1)
+            simulation.state.register_file.registers[1], fixedint.MutableUInt32(1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(0)
+            simulation.state.register_file.registers[4], fixedint.MutableUInt32(0)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(2)
+            simulation.state.register_file.registers[7], fixedint.MutableUInt32(2)
         )
 
     def test_addi(self):
@@ -304,25 +303,25 @@ class TestPipeline(unittest.TestCase):
         addi x3, x3, 1234
         addi x4, x4, 20"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(0)
-        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(-100)
+
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[3] = fixedint.MutableUInt32(0)
+        simulation.state.register_file.registers[4] = fixedint.MutableUInt32(-100)
         simulation.load_program(program)
         for _ in range(8):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(2)
+            simulation.state.register_file.registers[1], fixedint.MutableUInt32(2)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[2], fixedint.MutableUInt32(-2)
+            simulation.state.register_file.registers[2], fixedint.MutableUInt32(-2)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[3], fixedint.MutableUInt32(1234)
+            simulation.state.register_file.registers[3], fixedint.MutableUInt32(1234)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(-80)
+            simulation.state.register_file.registers[4], fixedint.MutableUInt32(-80)
         )
 
     def test_andi(self):
@@ -331,25 +330,25 @@ class TestPipeline(unittest.TestCase):
         andi x3, x3, 1234
         andi x4, x4, 20"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(0)
-        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(-100)
+
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[3] = fixedint.MutableUInt32(0)
+        simulation.state.register_file.registers[4] = fixedint.MutableUInt32(-100)
         simulation.load_program(program)
         for _ in range(10):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(1)
+            simulation.state.register_file.registers[1], fixedint.MutableUInt32(1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[2], fixedint.MutableUInt32(-1)
+            simulation.state.register_file.registers[2], fixedint.MutableUInt32(-1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[3], fixedint.MutableUInt32(0)
+            simulation.state.register_file.registers[3], fixedint.MutableUInt32(0)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(20)
+            simulation.state.register_file.registers[4], fixedint.MutableUInt32(20)
         )
 
     def test_ori(self):
@@ -358,25 +357,25 @@ class TestPipeline(unittest.TestCase):
         ori x3, x3, 0
         ori x4, x4, 2"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(0)
-        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(0)
-        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(1)
+
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(0)
+        simulation.state.register_file.registers[3] = fixedint.MutableUInt32(0)
+        simulation.state.register_file.registers[4] = fixedint.MutableUInt32(1)
         simulation.load_program(program)
         for _ in range(10):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(1)
+            simulation.state.register_file.registers[1], fixedint.MutableUInt32(1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[2], fixedint.MutableUInt32(-1)
+            simulation.state.register_file.registers[2], fixedint.MutableUInt32(-1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[3], fixedint.MutableUInt32(0)
+            simulation.state.register_file.registers[3], fixedint.MutableUInt32(0)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(3)
+            simulation.state.register_file.registers[4], fixedint.MutableUInt32(3)
         )
 
     def test_xori(self):
@@ -385,25 +384,25 @@ class TestPipeline(unittest.TestCase):
         xori x3, x3, 0
         xori x4, x4, -1"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(0)
-        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(0)
-        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(-1)
+
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(0)
+        simulation.state.register_file.registers[3] = fixedint.MutableUInt32(0)
+        simulation.state.register_file.registers[4] = fixedint.MutableUInt32(-1)
         simulation.load_program(program)
         for _ in range(10):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(0)
+            simulation.state.register_file.registers[1], fixedint.MutableUInt32(0)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[2], fixedint.MutableUInt32(-1)
+            simulation.state.register_file.registers[2], fixedint.MutableUInt32(-1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[3], fixedint.MutableUInt32(0)
+            simulation.state.register_file.registers[3], fixedint.MutableUInt32(0)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(0)
+            simulation.state.register_file.registers[4], fixedint.MutableUInt32(0)
         )
 
     def test_slli(self):
@@ -412,25 +411,25 @@ class TestPipeline(unittest.TestCase):
         slli x3, x3, 31
         slli x4, x4, 1"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(0)
-        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(8)
+
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(0)
+        simulation.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[4] = fixedint.MutableUInt32(8)
         simulation.load_program(program)
         for _ in range(10):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(2)
+            simulation.state.register_file.registers[1], fixedint.MutableUInt32(2)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[2], fixedint.MutableUInt32(0)
+            simulation.state.register_file.registers[2], fixedint.MutableUInt32(0)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[3], fixedint.MutableUInt32(2**31)
+            simulation.state.register_file.registers[3], fixedint.MutableUInt32(2**31)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(16)
+            simulation.state.register_file.registers[4], fixedint.MutableUInt32(16)
         )
 
     def test_srli(self):
@@ -439,25 +438,25 @@ class TestPipeline(unittest.TestCase):
         srli x3, x3, 31
         srli x4, x4, 1"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(2)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(100)
-        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(16)
+
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(2)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(100)
+        simulation.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[4] = fixedint.MutableUInt32(16)
         simulation.load_program(program)
         for _ in range(10):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(1)
+            simulation.state.register_file.registers[1], fixedint.MutableUInt32(1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[2], fixedint.MutableUInt32(0)
+            simulation.state.register_file.registers[2], fixedint.MutableUInt32(0)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[3], fixedint.MutableUInt32(1)
+            simulation.state.register_file.registers[3], fixedint.MutableUInt32(1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(8)
+            simulation.state.register_file.registers[4], fixedint.MutableUInt32(8)
         )
 
     def test_srai(self):
@@ -466,25 +465,25 @@ class TestPipeline(unittest.TestCase):
         srai x3, x3, 31
         srai x4, x4, 1"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(2)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(100)
-        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(16)
+
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(2)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(100)
+        simulation.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[4] = fixedint.MutableUInt32(16)
         simulation.load_program(program)
         for _ in range(10):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(1)
+            simulation.state.register_file.registers[1], fixedint.MutableUInt32(1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[2], fixedint.MutableUInt32(0)
+            simulation.state.register_file.registers[2], fixedint.MutableUInt32(0)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[3], fixedint.MutableUInt32(-1)
+            simulation.state.register_file.registers[3], fixedint.MutableUInt32(-1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(8)
+            simulation.state.register_file.registers[4], fixedint.MutableUInt32(8)
         )
 
     def test_slti(self):
@@ -493,25 +492,25 @@ class TestPipeline(unittest.TestCase):
         slti x3, x3, 20
         slti x4, x4, 1"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(10)
-        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(-1)
+
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[3] = fixedint.MutableUInt32(10)
+        simulation.state.register_file.registers[4] = fixedint.MutableUInt32(-1)
         simulation.load_program(program)
         for _ in range(10):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(0)
+            simulation.state.register_file.registers[1], fixedint.MutableUInt32(0)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[2], fixedint.MutableUInt32(1)
+            simulation.state.register_file.registers[2], fixedint.MutableUInt32(1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[3], fixedint.MutableUInt32(1)
+            simulation.state.register_file.registers[3], fixedint.MutableUInt32(1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(1)
+            simulation.state.register_file.registers[4], fixedint.MutableUInt32(1)
         )
 
     def test_sltiu(self):
@@ -520,25 +519,25 @@ class TestPipeline(unittest.TestCase):
         sltiu x3, x3, 20
         sltiu x4, x4, 1"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(10)
-        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(-1)
+
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[3] = fixedint.MutableUInt32(10)
+        simulation.state.register_file.registers[4] = fixedint.MutableUInt32(-1)
         simulation.load_program(program)
         for _ in range(10):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(0)
+            simulation.state.register_file.registers[1], fixedint.MutableUInt32(0)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[2], fixedint.MutableUInt32(0)
+            simulation.state.register_file.registers[2], fixedint.MutableUInt32(0)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[3], fixedint.MutableUInt32(1)
+            simulation.state.register_file.registers[3], fixedint.MutableUInt32(1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(0)
+            simulation.state.register_file.registers[4], fixedint.MutableUInt32(0)
         )
 
     def test_lb(self):
@@ -548,8 +547,8 @@ class TestPipeline(unittest.TestCase):
         lb x10, 4(x0)
         lb x9, 47(x4)"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
-        pipeline.state.memory = Memory(
+
+        simulation.state.memory = Memory(
             memory_file=dict(
                 [
                     (0, fixedint.MutableUInt8(1)),
@@ -563,27 +562,27 @@ class TestPipeline(unittest.TestCase):
             ),
             min_bytes=0,
         )
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(20)
-        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(2000)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(20)
+        simulation.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[4] = fixedint.MutableUInt32(2000)
         simulation.load_program(program)
         for _ in range(10):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[6], fixedint.MutableUInt32(1)
+            simulation.state.register_file.registers[6], fixedint.MutableUInt32(1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(3)
+            simulation.state.register_file.registers[7], fixedint.MutableUInt32(3)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[8], fixedint.MutableUInt32(4)
+            simulation.state.register_file.registers[8], fixedint.MutableUInt32(4)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[9], fixedint.MutableUInt32(5)
+            simulation.state.register_file.registers[9], fixedint.MutableUInt32(5)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[10], fixedint.MutableUInt32(-1)
+            simulation.state.register_file.registers[10], fixedint.MutableUInt32(-1)
         )
 
     def test_lh(self):
@@ -594,8 +593,8 @@ class TestPipeline(unittest.TestCase):
         lh x10, 12(x0)
         """
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
-        pipeline.state.memory = Memory(
+
+        simulation.state.memory = Memory(
             memory_file=dict(
                 [
                     (0, fixedint.MutableUInt8(1)),
@@ -610,29 +609,29 @@ class TestPipeline(unittest.TestCase):
             ),
             min_bytes=0,
         )
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(20)
-        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(2000)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(20)
+        simulation.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[4] = fixedint.MutableUInt32(2000)
         simulation.load_program(program)
         for _ in range(10):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[6], fixedint.MutableUInt32(257)
+            simulation.state.register_file.registers[6], fixedint.MutableUInt32(257)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[7],
+            simulation.state.register_file.registers[7],
             fixedint.MutableUInt32((2**32 - 1) - 255),
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[8],
+            simulation.state.register_file.registers[8],
             fixedint.MutableUInt32(256),  # circular memory
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[9], fixedint.MutableUInt32(5)
+            simulation.state.register_file.registers[9], fixedint.MutableUInt32(5)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[10], fixedint.MutableUInt32(-1)
+            simulation.state.register_file.registers[10], fixedint.MutableUInt32(-1)
         )
 
     def test_lw(self):
@@ -641,8 +640,8 @@ class TestPipeline(unittest.TestCase):
         lw x8, 0(x3)
         lw x9, 48(x4)"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
-        pipeline.state.memory = Memory(
+
+        simulation.state.memory = Memory(
             memory_file=dict(
                 [
                     (0, fixedint.MutableUInt8(1)),
@@ -655,26 +654,26 @@ class TestPipeline(unittest.TestCase):
             ),
             min_bytes=0,
         )
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(20)
-        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(2000)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(20)
+        simulation.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[4] = fixedint.MutableUInt32(2000)
         simulation.load_program(program)
         for _ in range(10):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[6],
+            simulation.state.register_file.registers[6],
             fixedint.MutableUInt32(1 + 2**8 + 2**16 + 2**24),
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(1)
+            simulation.state.register_file.registers[7], fixedint.MutableUInt32(1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[8],
+            simulation.state.register_file.registers[8],
             fixedint.MutableUInt32(2**8 + 2**16 + 2**24),  # circular memory
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[9], fixedint.MutableUInt32(5)
+            simulation.state.register_file.registers[9], fixedint.MutableUInt32(5)
         )
 
     def test_lbu(self):
@@ -685,8 +684,8 @@ class TestPipeline(unittest.TestCase):
         lbu x10, 4(x0)
         """
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
-        pipeline.state.memory = Memory(
+
+        simulation.state.memory = Memory(
             memory_file=dict(
                 [
                     (0, fixedint.MutableUInt8(1)),
@@ -700,29 +699,29 @@ class TestPipeline(unittest.TestCase):
             ),
             min_bytes=0,
         )
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(20)
-        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(2000)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(20)
+        simulation.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[4] = fixedint.MutableUInt32(2000)
         simulation.load_program(program)
         for _ in range(10):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[6], fixedint.MutableUInt32(1)
+            simulation.state.register_file.registers[6], fixedint.MutableUInt32(1)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[7],
+            simulation.state.register_file.registers[7],
             fixedint.MutableUInt32(0b11111111),
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[8],
+            simulation.state.register_file.registers[8],
             fixedint.MutableUInt32(5),  # no circular memory
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[9], fixedint.MutableUInt32(5)
+            simulation.state.register_file.registers[9], fixedint.MutableUInt32(5)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[10], fixedint.MutableUInt32(255)
+            simulation.state.register_file.registers[10], fixedint.MutableUInt32(255)
         )
 
     def test_lhu(self):
@@ -733,8 +732,8 @@ class TestPipeline(unittest.TestCase):
         lhu x10, 4(x0)
         """
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
-        pipeline.state.memory = Memory(
+
+        simulation.state.memory = Memory(
             memory_file=dict(
                 [
                     (0, fixedint.MutableUInt8(1)),
@@ -749,29 +748,29 @@ class TestPipeline(unittest.TestCase):
             ),
             min_bytes=0,
         )
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(20)
-        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(2000)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(20)
+        simulation.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[4] = fixedint.MutableUInt32(2000)
         simulation.load_program(program)
         for _ in range(10):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[6], fixedint.MutableUInt32(257)
+            simulation.state.register_file.registers[6], fixedint.MutableUInt32(257)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[7],
+            simulation.state.register_file.registers[7],
             fixedint.MutableUInt32(0b1111111100000000),
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[8],
+            simulation.state.register_file.registers[8],
             fixedint.MutableUInt32(261),  # circular memory
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[9], fixedint.MutableUInt32(5)
+            simulation.state.register_file.registers[9], fixedint.MutableUInt32(5)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[10],
+            simulation.state.register_file.registers[10],
             fixedint.MutableUInt32(2**16 - 1),
         )
 
@@ -785,27 +784,32 @@ class TestPipeline(unittest.TestCase):
         sb x5, 15(x1)
         """
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(2**16)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(2**8 - 1)
-        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(2**16 - 1)
-        pipeline.state.register_file.registers[4] = fixedint.MutableUInt32(2**32 - 1)
-        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(2**7)
-        self.assert_steps(pipeline=pipeline, steps=11)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(2**16)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(2**8 - 1)
+        simulation.state.register_file.registers[3] = fixedint.MutableUInt32(
+            2**16 - 1
+        )
+        simulation.state.register_file.registers[4] = fixedint.MutableUInt32(
+            2**32 - 1
+        )
+        simulation.state.register_file.registers[5] = fixedint.MutableUInt32(2**7)
+        self.assert_steps(simulation=simulation, steps=11)
         self.assertEqual(
-            pipeline.state.memory.read_byte(2**16), fixedint.MutableUInt8(2**8 - 1)
+            simulation.state.memory.read_byte(2**16),
+            fixedint.MutableUInt8(2**8 - 1),
         )
         self.assertEqual(
-            pipeline.state.memory.read_halfword(2**16 + 4),
+            simulation.state.memory.read_halfword(2**16 + 4),
             fixedint.MutableUInt16(2**16 - 1),
         )
         self.assertEqual(
-            pipeline.state.memory.read_word(2**16 + 8),
+            simulation.state.memory.read_word(2**16 + 8),
             fixedint.MutableUInt32(2**32 - 1),
         )
         self.assertEqual(
-            pipeline.state.memory.read_word(2**16 + 12),
+            simulation.state.memory.read_word(2**16 + 12),
             fixedint.MutableUInt32(2**7 + 2**15 + 2**23 + 2**31),
         )
 
@@ -817,15 +821,15 @@ class TestPipeline(unittest.TestCase):
         add x4, x0, x2
         """
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(2)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(2)
         for _ in range(8):
-            pipeline.step()
-        self.assertEqual(pipeline.state.register_file.registers[1], 2)
-        self.assertEqual(pipeline.state.register_file.registers[2], 2)
-        self.assertEqual(pipeline.state.register_file.registers[3], 2)
-        self.assertEqual(pipeline.state.register_file.registers[4], 2)
+            simulation.step()
+        self.assertEqual(simulation.state.register_file.registers[1], 2)
+        self.assertEqual(simulation.state.register_file.registers[2], 2)
+        self.assertEqual(simulation.state.register_file.registers[3], 2)
+        self.assertEqual(simulation.state.register_file.registers[4], 2)
 
         # 0 == 0
         program = """add x1, x0, x2
@@ -833,16 +837,16 @@ class TestPipeline(unittest.TestCase):
         add x3, x0, x2
         add x4, x0, x2"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(2)
-        self.assert_steps(pipeline=pipeline, steps=10)
-        self.assertEqual(pipeline.state.register_file.registers[1], 2)
-        self.assertEqual(pipeline.state.register_file.registers[2], 2)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(2)
+        self.assert_steps(simulation=simulation, steps=10)
+        self.assertEqual(simulation.state.register_file.registers[1], 2)
+        self.assertEqual(simulation.state.register_file.registers[2], 2)
         self.assertEqual(
-            pipeline.state.register_file.registers[3], 0
+            simulation.state.register_file.registers[3], 0
         )  # add x3, x0, x2 should have been skipped
-        self.assertEqual(pipeline.state.register_file.registers[4], 2)
+        self.assertEqual(simulation.state.register_file.registers[4], 2)
 
     def test_beq(self):
         # 0 == 0
@@ -851,16 +855,16 @@ class TestPipeline(unittest.TestCase):
         add x3, x0, x2
         add x4, x0, x2"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(2)
-        self.assert_steps(pipeline=pipeline, steps=10)
-        self.assertEqual(pipeline.state.register_file.registers[1], 2)
-        self.assertEqual(pipeline.state.register_file.registers[2], 2)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(2)
+        self.assert_steps(simulation=simulation, steps=10)
+        self.assertEqual(simulation.state.register_file.registers[1], 2)
+        self.assertEqual(simulation.state.register_file.registers[2], 2)
         self.assertEqual(
-            pipeline.state.register_file.registers[3], 0
+            simulation.state.register_file.registers[3], 0
         )  # add x3, x0, x2 should have been skipped
-        self.assertEqual(pipeline.state.register_file.registers[4], 2)
+        self.assertEqual(simulation.state.register_file.registers[4], 2)
 
         # 0 == 2
         program = """add x1, x0, x2
@@ -868,14 +872,14 @@ class TestPipeline(unittest.TestCase):
         add x3, x0, x2
         add x4, x0, x2"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(2)
-        self.assert_steps(pipeline=pipeline, steps=8)
-        self.assertEqual(pipeline.state.register_file.registers[1], 2)
-        self.assertEqual(pipeline.state.register_file.registers[2], 2)
-        self.assertEqual(pipeline.state.register_file.registers[3], 2)
-        self.assertEqual(pipeline.state.register_file.registers[4], 2)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(2)
+        self.assert_steps(simulation=simulation, steps=8)
+        self.assertEqual(simulation.state.register_file.registers[1], 2)
+        self.assertEqual(simulation.state.register_file.registers[2], 2)
+        self.assertEqual(simulation.state.register_file.registers[3], 2)
+        self.assertEqual(simulation.state.register_file.registers[4], 2)
 
     def test_bne(self):
         # 8 != 2
@@ -884,15 +888,15 @@ class TestPipeline(unittest.TestCase):
         add x3, x0, x2
         add x4, x0, x2"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(2)
-        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(8)
-        self.assert_steps(pipeline=pipeline, steps=10)
-        self.assertEqual(pipeline.state.register_file.registers[1], 2)
-        self.assertEqual(pipeline.state.register_file.registers[2], 2)
-        self.assertEqual(pipeline.state.register_file.registers[3], 8)
-        self.assertEqual(pipeline.state.register_file.registers[4], 2)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(2)
+        simulation.state.register_file.registers[3] = fixedint.MutableUInt32(8)
+        self.assert_steps(simulation=simulation, steps=10)
+        self.assertEqual(simulation.state.register_file.registers[1], 2)
+        self.assertEqual(simulation.state.register_file.registers[2], 2)
+        self.assertEqual(simulation.state.register_file.registers[3], 8)
+        self.assertEqual(simulation.state.register_file.registers[4], 2)
 
         # 8 != 8
         program = """add x1, x0, x3
@@ -902,15 +906,15 @@ class TestPipeline(unittest.TestCase):
         add x3, x0, x2
         add x4, x0, x2"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(8)
-        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(8)
-        self.assert_steps(pipeline=pipeline, steps=10)
-        self.assertEqual(pipeline.state.register_file.registers[1], 8)
-        self.assertEqual(pipeline.state.register_file.registers[2], 8)
-        self.assertEqual(pipeline.state.register_file.registers[3], 8)
-        self.assertEqual(pipeline.state.register_file.registers[4], 8)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(8)
+        simulation.state.register_file.registers[3] = fixedint.MutableUInt32(8)
+        self.assert_steps(simulation=simulation, steps=10)
+        self.assertEqual(simulation.state.register_file.registers[1], 8)
+        self.assertEqual(simulation.state.register_file.registers[2], 8)
+        self.assertEqual(simulation.state.register_file.registers[3], 8)
+        self.assertEqual(simulation.state.register_file.registers[4], 8)
 
     def test_blt(self):
         # 0 < 1
@@ -918,39 +922,39 @@ class TestPipeline(unittest.TestCase):
         add x2, x1, x1
         add x3, x1, x1"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        self.assert_steps(pipeline=pipeline, steps=9)
-        self.assertEqual(pipeline.state.register_file.registers[1], 1)
-        self.assertEqual(pipeline.state.register_file.registers[2], 0)
-        self.assertEqual(pipeline.state.register_file.registers[3], 2)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        self.assert_steps(simulation=simulation, steps=9)
+        self.assertEqual(simulation.state.register_file.registers[1], 1)
+        self.assertEqual(simulation.state.register_file.registers[2], 0)
+        self.assertEqual(simulation.state.register_file.registers[3], 2)
 
         # -1 < 0
         program = """blt x1, x0, 8
         add x2, x1, x1
         sub x3, x0, x1"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(-1)
-        self.assert_steps(pipeline=pipeline, steps=9)
-        self.assertEqual(pipeline.state.register_file.registers[1], 2**32 - 1)
-        self.assertEqual(pipeline.state.register_file.registers[2], 0)
-        self.assertEqual(pipeline.state.register_file.registers[3], 1)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(-1)
+        self.assert_steps(simulation=simulation, steps=9)
+        self.assertEqual(simulation.state.register_file.registers[1], 2**32 - 1)
+        self.assertEqual(simulation.state.register_file.registers[2], 0)
+        self.assertEqual(simulation.state.register_file.registers[3], 1)
 
         # 0 < 0
         program = """blt x0, x0, 8
         add x2, x1, x1
         add x3, x1, x1"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        self.assert_steps(pipeline=pipeline, steps=7)
-        self.assertEqual(pipeline.state.register_file.registers[1], 1)
-        self.assertEqual(pipeline.state.register_file.registers[2], 2)
-        self.assertEqual(pipeline.state.register_file.registers[3], 2)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        self.assert_steps(simulation=simulation, steps=7)
+        self.assertEqual(simulation.state.register_file.registers[1], 1)
+        self.assertEqual(simulation.state.register_file.registers[2], 2)
+        self.assertEqual(simulation.state.register_file.registers[3], 2)
 
     def test_bge(self):
         # 0 >= 0
@@ -958,53 +962,55 @@ class TestPipeline(unittest.TestCase):
         add x2, x1, x1
         add x3, x1, x1"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        self.assert_steps(pipeline=pipeline, steps=9)
-        self.assertEqual(pipeline.state.register_file.registers[1], 1)
-        self.assertEqual(pipeline.state.register_file.registers[2], 0)
-        self.assertEqual(pipeline.state.register_file.registers[3], 2)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        self.assert_steps(simulation=simulation, steps=9)
+        self.assertEqual(simulation.state.register_file.registers[1], 1)
+        self.assertEqual(simulation.state.register_file.registers[2], 0)
+        self.assertEqual(simulation.state.register_file.registers[3], 2)
 
         # 1 >= 0
         program = """bge x1, x0, 8
         add x2, x1, x1
         add x3, x1, x1"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        self.assert_steps(pipeline=pipeline, steps=9)
-        self.assertEqual(pipeline.state.register_file.registers[1], 1)
-        self.assertEqual(pipeline.state.register_file.registers[2], 0)
-        self.assertEqual(pipeline.state.register_file.registers[3], 2)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        self.assert_steps(simulation=simulation, steps=9)
+        self.assertEqual(simulation.state.register_file.registers[1], 1)
+        self.assertEqual(simulation.state.register_file.registers[2], 0)
+        self.assertEqual(simulation.state.register_file.registers[3], 2)
 
         # 0 >= 1
         program = """bge x0, x1, 8
         add x2, x1, x1
         add x3, x1, x1"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        self.assert_steps(pipeline=pipeline, steps=7)
-        self.assertEqual(pipeline.state.register_file.registers[1], 1)
-        self.assertEqual(pipeline.state.register_file.registers[2], 2)
-        self.assertEqual(pipeline.state.register_file.registers[3], 2)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        self.assert_steps(simulation=simulation, steps=7)
+        self.assertEqual(simulation.state.register_file.registers[1], 1)
+        self.assertEqual(simulation.state.register_file.registers[2], 2)
+        self.assertEqual(simulation.state.register_file.registers[3], 2)
 
         # 0 >= -1
         program = """bge x0, x1, 8
         add x2, x5, x5
         add x3, x5, x5"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(1)
-        self.assert_steps(pipeline=pipeline, steps=9)
-        self.assertEqual(pipeline.state.register_file.registers[1], fixedint.UInt32(-1))
-        self.assertEqual(pipeline.state.register_file.registers[2], 0)
-        self.assertEqual(pipeline.state.register_file.registers[3], 2)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[5] = fixedint.MutableUInt32(1)
+        self.assert_steps(simulation=simulation, steps=9)
+        self.assertEqual(
+            simulation.state.register_file.registers[1], fixedint.UInt32(-1)
+        )
+        self.assertEqual(simulation.state.register_file.registers[2], 0)
+        self.assertEqual(simulation.state.register_file.registers[3], 2)
 
     def test_bltu(self):
         # 0 < 1
@@ -1012,40 +1018,40 @@ class TestPipeline(unittest.TestCase):
         add x2, x1, x1
         add x3, x1, x1"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        self.assert_steps(pipeline=pipeline, steps=9)
-        self.assertEqual(pipeline.state.register_file.registers[1], 1)
-        self.assertEqual(pipeline.state.register_file.registers[2], 0)
-        self.assertEqual(pipeline.state.register_file.registers[3], 2)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        self.assert_steps(simulation=simulation, steps=9)
+        self.assertEqual(simulation.state.register_file.registers[1], 1)
+        self.assertEqual(simulation.state.register_file.registers[2], 0)
+        self.assertEqual(simulation.state.register_file.registers[3], 2)
 
         # 2**32 - 1 < 0
         program = """bltu x1, x0, 8
         add x2, x5, x5
         sub x3, x0, x1"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(1)
-        self.assert_steps(pipeline=pipeline, steps=7)
-        self.assertEqual(pipeline.state.register_file.registers[1], 2**32 - 1)
-        self.assertEqual(pipeline.state.register_file.registers[2], 2)
-        self.assertEqual(pipeline.state.register_file.registers[3], 1)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[5] = fixedint.MutableUInt32(1)
+        self.assert_steps(simulation=simulation, steps=7)
+        self.assertEqual(simulation.state.register_file.registers[1], 2**32 - 1)
+        self.assertEqual(simulation.state.register_file.registers[2], 2)
+        self.assertEqual(simulation.state.register_file.registers[3], 1)
 
         # 0 < 0
         program = """bltu x0, x0, 8
         add x2, x1, x1
         add x3, x1, x1"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        self.assert_steps(pipeline=pipeline, steps=7)
-        self.assertEqual(pipeline.state.register_file.registers[1], 1)
-        self.assertEqual(pipeline.state.register_file.registers[2], 2)
-        self.assertEqual(pipeline.state.register_file.registers[3], 2)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        self.assert_steps(simulation=simulation, steps=7)
+        self.assertEqual(simulation.state.register_file.registers[1], 1)
+        self.assertEqual(simulation.state.register_file.registers[2], 2)
+        self.assertEqual(simulation.state.register_file.registers[3], 2)
 
     def test_bgeu(self):
         # 0 >= 0
@@ -1053,78 +1059,80 @@ class TestPipeline(unittest.TestCase):
         add x2, x1, x1
         add x3, x1, x1"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        self.assert_steps(pipeline=pipeline, steps=9)
-        self.assertEqual(pipeline.state.register_file.registers[1], 1)
-        self.assertEqual(pipeline.state.register_file.registers[2], 0)
-        self.assertEqual(pipeline.state.register_file.registers[3], 2)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        self.assert_steps(simulation=simulation, steps=9)
+        self.assertEqual(simulation.state.register_file.registers[1], 1)
+        self.assertEqual(simulation.state.register_file.registers[2], 0)
+        self.assertEqual(simulation.state.register_file.registers[3], 2)
 
         # 1 >= 0
         program = """bgeu x1, x0, 8
         add x2, x1, x1
         add x3, x1, x1"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        self.assert_steps(pipeline=pipeline, steps=9)
-        self.assertEqual(pipeline.state.register_file.registers[1], 1)
-        self.assertEqual(pipeline.state.register_file.registers[2], 0)
-        self.assertEqual(pipeline.state.register_file.registers[3], 2)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        self.assert_steps(simulation=simulation, steps=9)
+        self.assertEqual(simulation.state.register_file.registers[1], 1)
+        self.assertEqual(simulation.state.register_file.registers[2], 0)
+        self.assertEqual(simulation.state.register_file.registers[3], 2)
 
         # 0 >= 1
         program = """bgeu x0, x1, 8
         add x2, x1, x1
         add x3, x1, x1"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        self.assert_steps(pipeline=pipeline, steps=7)
-        self.assertEqual(pipeline.state.register_file.registers[1], 1)
-        self.assertEqual(pipeline.state.register_file.registers[2], 2)
-        self.assertEqual(pipeline.state.register_file.registers[3], 2)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        self.assert_steps(simulation=simulation, steps=7)
+        self.assertEqual(simulation.state.register_file.registers[1], 1)
+        self.assertEqual(simulation.state.register_file.registers[2], 2)
+        self.assertEqual(simulation.state.register_file.registers[3], 2)
 
         # 0 >= 2**32 - 1
         program = """bgeu x0, x1, 8
         add x2, x5, x5
         add x3, x5, x5"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(-1)
-        pipeline.state.register_file.registers[5] = fixedint.MutableUInt32(1)
-        self.assert_steps(pipeline=pipeline, steps=7)
-        self.assertEqual(pipeline.state.register_file.registers[1], fixedint.UInt32(-1))
-        self.assertEqual(pipeline.state.register_file.registers[2], 2)
-        self.assertEqual(pipeline.state.register_file.registers[3], 2)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(-1)
+        simulation.state.register_file.registers[5] = fixedint.MutableUInt32(1)
+        self.assert_steps(simulation=simulation, steps=7)
+        self.assertEqual(
+            simulation.state.register_file.registers[1], fixedint.UInt32(-1)
+        )
+        self.assertEqual(simulation.state.register_file.registers[2], 2)
+        self.assertEqual(simulation.state.register_file.registers[3], 2)
 
     def test_jal(self):
         program = """jal x2, 8
         add x1, x1, x1
         add x3, x1, x1"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        self.assert_steps(pipeline=pipeline, steps=9)
-        self.assertEqual(pipeline.state.register_file.registers[1], 1)
-        self.assertEqual(pipeline.state.register_file.registers[2], 4)
-        self.assertEqual(pipeline.state.register_file.registers[3], 2)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        self.assert_steps(simulation=simulation, steps=9)
+        self.assertEqual(simulation.state.register_file.registers[1], 1)
+        self.assertEqual(simulation.state.register_file.registers[2], 4)
+        self.assertEqual(simulation.state.register_file.registers[3], 2)
 
         program = """jal x2, 4
         add x1, x1, x1
         add x3, x1, x1"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        self.assert_steps(pipeline=pipeline, steps=12)
-        self.assertEqual(pipeline.state.register_file.registers[1], 2)
-        self.assertEqual(pipeline.state.register_file.registers[2], 4)
-        self.assertEqual(pipeline.state.register_file.registers[3], 4)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        self.assert_steps(simulation=simulation, steps=12)
+        self.assertEqual(simulation.state.register_file.registers[1], 2)
+        self.assertEqual(simulation.state.register_file.registers[2], 4)
+        self.assertEqual(simulation.state.register_file.registers[3], 4)
 
         program = """add x8, x0, x0
         add x9, x0, x0
@@ -1136,16 +1144,16 @@ class TestPipeline(unittest.TestCase):
         Kaesekuchen:
         add x5, x1, x1"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        self.assert_steps(pipeline=pipeline, steps=12)
-        self.assertEqual(pipeline.state.register_file.registers[1], 1)
-        self.assertEqual(pipeline.state.register_file.registers[2], 12)
-        self.assertEqual(pipeline.state.register_file.registers[3], 0)
-        self.assertEqual(pipeline.state.register_file.registers[4], 2)
-        self.assertEqual(pipeline.state.register_file.registers[5], 2)
-        self.assertEqual(pipeline.state.register_file.registers[6], 0)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        self.assert_steps(simulation=simulation, steps=12)
+        self.assertEqual(simulation.state.register_file.registers[1], 1)
+        self.assertEqual(simulation.state.register_file.registers[2], 12)
+        self.assertEqual(simulation.state.register_file.registers[3], 0)
+        self.assertEqual(simulation.state.register_file.registers[4], 2)
+        self.assertEqual(simulation.state.register_file.registers[5], 2)
+        self.assertEqual(simulation.state.register_file.registers[6], 0)
 
         program = """add x8, x0, x0
         add x9, x0, x0
@@ -1157,25 +1165,25 @@ class TestPipeline(unittest.TestCase):
         Kaesekuchen:
         add x5, x1, x1"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        self.assert_steps(pipeline=pipeline, steps=12)
-        self.assertEqual(pipeline.state.register_file.registers[1], 1)
-        self.assertEqual(pipeline.state.register_file.registers[2], 12)
-        self.assertEqual(pipeline.state.register_file.registers[3], 0)
-        self.assertEqual(pipeline.state.register_file.registers[4], 2)
-        self.assertEqual(pipeline.state.register_file.registers[5], 2)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        self.assert_steps(simulation=simulation, steps=12)
+        self.assertEqual(simulation.state.register_file.registers[1], 1)
+        self.assertEqual(simulation.state.register_file.registers[2], 12)
+        self.assertEqual(simulation.state.register_file.registers[3], 0)
+        self.assertEqual(simulation.state.register_file.registers[4], 2)
+        self.assertEqual(simulation.state.register_file.registers[5], 2)
 
     def test_jalr(self):
         program = """jalr x2, x1, 20"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(8)
-        self.assert_steps(pipeline=pipeline, steps=5)
-        self.assertEqual(pipeline.state.program_counter, 28)
-        self.assertEqual(pipeline.state.register_file.registers[2], 4)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(8)
+        self.assert_steps(simulation=simulation, steps=5)
+        self.assertEqual(simulation.state.program_counter, 28)
+        self.assertEqual(simulation.state.register_file.registers[2], 4)
 
         program = """add x0, x0, x0
         jalr x2, x1, 13
@@ -1186,26 +1194,26 @@ class TestPipeline(unittest.TestCase):
         add x7, x1, x1
         """
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(8)
-        self.assert_steps(pipeline=pipeline, steps=11)
-        self.assertEqual(pipeline.state.register_file.registers[2], 8)
-        self.assertEqual(pipeline.state.register_file.registers[3], 0)
-        self.assertEqual(pipeline.state.register_file.registers[4], 0)
-        self.assertEqual(pipeline.state.register_file.registers[5], 0)
-        self.assertEqual(pipeline.state.register_file.registers[6], 16)
-        self.assertEqual(pipeline.state.register_file.registers[7], 16)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(8)
+        self.assert_steps(simulation=simulation, steps=11)
+        self.assertEqual(simulation.state.register_file.registers[2], 8)
+        self.assertEqual(simulation.state.register_file.registers[3], 0)
+        self.assertEqual(simulation.state.register_file.registers[4], 0)
+        self.assertEqual(simulation.state.register_file.registers[5], 0)
+        self.assertEqual(simulation.state.register_file.registers[6], 16)
+        self.assertEqual(simulation.state.register_file.registers[7], 16)
 
     def test_lui(self):
         program = """lui x1, 1
         """
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(8)
-        self.assert_steps(pipeline=pipeline, steps=5)
-        self.assertEqual(pipeline.state.register_file.registers[1], 4096)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(8)
+        self.assert_steps(simulation=simulation, steps=5)
+        self.assertEqual(simulation.state.register_file.registers[1], 4096)
 
         program = f"""lui x1, 1
         lui x2, 0
@@ -1213,26 +1221,26 @@ class TestPipeline(unittest.TestCase):
         lui x4, {2**20 - 1}
         """
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(8)
-        self.assert_steps(pipeline=pipeline, steps=8)
-        self.assertEqual(pipeline.state.register_file.registers[1], 4096)
-        self.assertEqual(pipeline.state.register_file.registers[2], 0)
-        self.assertEqual(pipeline.state.register_file.registers[3], 0)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(8)
+        self.assert_steps(simulation=simulation, steps=8)
+        self.assertEqual(simulation.state.register_file.registers[1], 4096)
+        self.assertEqual(simulation.state.register_file.registers[2], 0)
+        self.assertEqual(simulation.state.register_file.registers[3], 0)
         self.assertEqual(
-            pipeline.state.register_file.registers[4], (2**32 - 1) & ~(2**12 - 1)
+            simulation.state.register_file.registers[4], (2**32 - 1) & ~(2**12 - 1)
         )
 
     def test_auipc(self):
         program = """auipc x1, 1
         """
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(8)
-        self.assert_steps(pipeline=pipeline, steps=5)
-        self.assertEqual(pipeline.state.register_file.registers[1], 4096)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(8)
+        self.assert_steps(simulation=simulation, steps=5)
+        self.assertEqual(simulation.state.register_file.registers[1], 4096)
 
         program = f"""add x0, x0, x0
         add x0, x0, x0
@@ -1242,15 +1250,15 @@ class TestPipeline(unittest.TestCase):
         auipc x3, {2**19}
         """
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(8)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(5555)
-        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(3334141)
-        self.assert_steps(pipeline=pipeline, steps=10)
-        self.assertEqual(pipeline.state.register_file.registers[1], 4096 + 12)
-        self.assertEqual(pipeline.state.register_file.registers[2], 8192 + 16)
-        self.assertEqual(pipeline.state.register_file.registers[3], 2**31 + 20)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(8)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(5555)
+        simulation.state.register_file.registers[3] = fixedint.MutableUInt32(3334141)
+        self.assert_steps(simulation=simulation, steps=10)
+        self.assertEqual(simulation.state.register_file.registers[1], 4096 + 12)
+        self.assertEqual(simulation.state.register_file.registers[2], 8192 + 16)
+        self.assertEqual(simulation.state.register_file.registers[3], 2**31 + 20)
 
     def test_data_hazard(self):
         program = """add x1, x0, x2
@@ -1262,23 +1270,23 @@ class TestPipeline(unittest.TestCase):
         sll x9, x7, x8
         """
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(2)
-        pipeline.state.register_file.registers[8] = fixedint.MutableUInt32(2)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(2)
+        simulation.state.register_file.registers[8] = fixedint.MutableUInt32(2)
         for _ in range(100):
-            pipeline.step()
+            simulation.step()
         self.assertEqual(
-            pipeline.state.register_file.registers[1], fixedint.MutableUInt32(2)
+            simulation.state.register_file.registers[1], fixedint.MutableUInt32(2)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[3], fixedint.MutableUInt32(8)
+            simulation.state.register_file.registers[3], fixedint.MutableUInt32(8)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[7], fixedint.MutableUInt32(2)
+            simulation.state.register_file.registers[7], fixedint.MutableUInt32(2)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[9], fixedint.MutableUInt32(8)
+            simulation.state.register_file.registers[9], fixedint.MutableUInt32(8)
         )
 
     def test_data_hazard_handling_2(self):
@@ -1293,22 +1301,22 @@ class TestPipeline(unittest.TestCase):
         add x0, x0, x0
         """
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
-        simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(7)
 
-        self.assert_steps(pipeline=pipeline, steps=16)
+        simulation.load_program(program)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(7)
+
+        self.assert_steps(simulation=simulation, steps=16)
         self.assertEqual(
-            pipeline.state.register_file.registers[2], fixedint.MutableUInt32(14)
+            simulation.state.register_file.registers[2], fixedint.MutableUInt32(14)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[3], fixedint.MutableUInt32(28)
+            simulation.state.register_file.registers[3], fixedint.MutableUInt32(28)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[4], fixedint.MutableUInt32(56)
+            simulation.state.register_file.registers[4], fixedint.MutableUInt32(56)
         )
         self.assertEqual(
-            pipeline.state.register_file.registers[5], fixedint.MutableUInt32(-14)
+            simulation.state.register_file.registers[5], fixedint.MutableUInt32(-14)
         )
 
     def test_data_hazard_handling_and_branch(self):
@@ -1324,19 +1332,19 @@ class TestPipeline(unittest.TestCase):
         end:
         """
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[2] = fixedint.MutableUInt32(1)
-        pipeline.state.register_file.registers[3] = fixedint.MutableUInt32(10)
-        self.assert_steps(pipeline=pipeline, steps=145)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[2] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[3] = fixedint.MutableUInt32(10)
+        self.assert_steps(simulation=simulation, steps=145)
         self.assertEqual(
-            pipeline.state.register_file.registers[2], fixedint.MutableUInt32(2**10)
+            simulation.state.register_file.registers[2], fixedint.MutableUInt32(2**10)
         )
 
     def test_single_stage(self):
         simulation = RiscvSimulation()
-        pipeline = simulation.pipeline
+
         n = 10
         simulation.load_program(
             f"""lui a0, 0
@@ -1364,8 +1372,8 @@ jalr zero, ra, 0
 End:"""
         )
         for _ in range(2000):
-            pipeline.step()
-        self.assertEqual(pipeline.state.register_file.registers[10], 55)
+            simulation.step()
+        self.assertEqual(simulation.state.register_file.registers[10], 55)
 
     def test_fix_too_many_flushes(self):
         program = """
@@ -1376,10 +1384,10 @@ End:"""
         add x2, x1, x1
         """
         simulation = RiscvSimulation(mode="five_stage_pipeline")
-        pipeline = simulation.pipeline
+
         simulation.load_program(program)
 
-        pipeline.state.register_file.registers[1] = fixedint.MutableUInt32(1)
+        simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
 
-        self.assert_steps(pipeline=pipeline, steps=9)
-        self.assertEqual(pipeline.state.register_file.registers[2], 2)
+        self.assert_steps(simulation=simulation, steps=9)
+        self.assertEqual(simulation.state.register_file.registers[2], 2)

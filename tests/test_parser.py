@@ -291,7 +291,7 @@ beq zero, ra, Ban0n3
         simulation.load_program(self.fibonacci)
         # print(simulation.instructions)
         while simulation.state.program_counter < 104:
-            simulation.step_simulation()
+            simulation.step()
         self.assertEqual(int(simulation.state.register_file.registers[10]), 55)
 
     fibonacci_c = """main:
@@ -344,7 +344,7 @@ fibonacci:
         simulation.load_program(self.fibonacci_c)
         # print(simulation.instructions)
         while simulation.state.program_counter != 24:
-            simulation.step_simulation()
+            simulation.step()
             simulation.state.register_file.registers[0] = 0
         self.assertEqual(int(simulation.state.register_file.registers[15]), 55)
 
@@ -372,7 +372,7 @@ fibonacci:
         simulation.load_program(self.add_c)
         # print(simulation.instructions)
         while simulation.state.program_counter < 60:
-            simulation.step_simulation()
+            simulation.step()
             simulation.state.register_file.registers[0] = 0
         self.assertEqual(int(simulation.state.memory.read_word(4294967268)), 65)
 
@@ -425,7 +425,7 @@ fibonacci:
         simulation.load_program(self.fibonacci_c_abi)
         # print(simulation.instructions)
         while simulation.state.program_counter != 24:
-            simulation.step_simulation()
+            simulation.step()
             simulation.state.register_file.registers[0] = 0
         self.assertEqual(int(simulation.state.register_file.registers[15]), 55)
 

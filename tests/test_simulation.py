@@ -22,9 +22,9 @@ class TestSimulation(unittest.TestCase):
         )
         simulation.load_program("add x0, x0, x1\nadd x0, x0, x1")
         # simulation.append_instructions("sub x0, x0, x1")
-        simulation.step_simulation()
+        simulation.step()
         self.assertEqual(simulation.state.register_file.registers[0], 2)
-        simulation.step_simulation()
+        simulation.step()
         self.assertEqual(simulation.state.register_file.registers[0], 4)
         # simulation.step_simulation()
         # self.assertEqual(simulation.state.register_file.registers[0], 2)
@@ -32,21 +32,19 @@ class TestSimulation(unittest.TestCase):
     def test_run_simulation(self):
         simulation = RiscvSimulation(
             state=RiscvArchitecturalState(
-                register_file=RegisterFile(registers=[0, 0, 0, 0]),
-                instruction_memory=InstructionMemory(
-                    instructions={
-                        0: ADDI(rd=1, rs1=1, imm=1),
-                        4: ADDI(rd=1, rs1=1, imm=1),
-                        8: ADDI(rd=1, rs1=1, imm=1),
-                        12: ADDI(rd=1, rs1=1, imm=1),
-                        16: ADDI(rd=1, rs1=1, imm=1),
-                        20: ADDI(rd=1, rs1=1, imm=1),
-                        24: ADDI(rd=1, rs1=1, imm=1),
-                    },
-                ),
+                register_file=RegisterFile(registers=[0, 0, 0, 0])
             ),
         )
-        simulation.run_simulation()
+        simulation.state.instruction_memory.instructions = {
+            0: ADDI(rd=1, rs1=1, imm=1),
+            4: ADDI(rd=1, rs1=1, imm=1),
+            8: ADDI(rd=1, rs1=1, imm=1),
+            12: ADDI(rd=1, rs1=1, imm=1),
+            16: ADDI(rd=1, rs1=1, imm=1),
+            20: ADDI(rd=1, rs1=1, imm=1),
+            24: ADDI(rd=1, rs1=1, imm=1),
+        }
+        simulation.run()
         self.assertEqual(int(simulation.state.register_file.registers[1]), 7)
         self.assertEqual(simulation.state.performance_metrics.branch_count, 0)
         self.assertEqual(simulation.state.performance_metrics.instruction_count, 7)
@@ -62,7 +60,7 @@ class TestSimulation(unittest.TestCase):
             )
         )
 
-        simulation.run_simulation()
+        simulation.run()
         self.assertEqual(int(simulation.state.register_file.registers[0]), 0)
         self.assertEqual(simulation.state.performance_metrics.branch_count, 0)
         self.assertEqual(simulation.state.performance_metrics.instruction_count, 0)
@@ -76,20 +74,18 @@ class TestSimulation(unittest.TestCase):
 
         simulation = RiscvSimulation(
             state=RiscvArchitecturalState(
-                register_file=RegisterFile(registers=[0, 0, 0, 0]),
-                instruction_memory=InstructionMemory(
-                    instructions={
-                        0: ADDI(rd=2, rs1=0, imm=5),
-                        4: ADDI(rd=1, rs1=1, imm=1),
-                        8: BNE(rs1=1, rs2=2, imm=-4),
-                        12: BEQ(rs1=0, rs2=0, imm=8),
-                        16: ADDI(rd=0, rs1=0, imm=0),
-                        20: ADDI(rd=3, rs1=0, imm=64),
-                    },
-                ),
+                register_file=RegisterFile(registers=[0, 0, 0, 0])
             ),
         )
-        simulation.run_simulation()
+        simulation.state.instruction_memory.instructions = {
+            0: ADDI(rd=2, rs1=0, imm=5),
+            4: ADDI(rd=1, rs1=1, imm=1),
+            8: BNE(rs1=1, rs2=2, imm=-4),
+            12: BEQ(rs1=0, rs2=0, imm=8),
+            16: ADDI(rd=0, rs1=0, imm=0),
+            20: ADDI(rd=3, rs1=0, imm=64),
+        }
+        simulation.run()
         self.assertEqual(simulation.state.register_file.registers, [0, 5, 5, 64])
         self.assertEqual(simulation.state.performance_metrics.branch_count, 5)
         self.assertEqual(simulation.state.performance_metrics.instruction_count, 13)
@@ -101,19 +97,17 @@ class TestSimulation(unittest.TestCase):
 
         simulation = RiscvSimulation(
             state=RiscvArchitecturalState(
-                register_file=RegisterFile(registers=[0, 0, 0, 0]),
-                instruction_memory=InstructionMemory(
-                    instructions={
-                        0: ADDI(rd=2, rs1=0, imm=33),
-                        4: ADDI(rd=1, rs1=1, imm=1),
-                        8: ADDI(rd=1, rs1=1, imm=1),
-                        12: ADDI(rd=1, rs1=1, imm=1),
-                        16: BNE(rs1=1, rs2=2, imm=-12),
-                    },
-                ),
+                register_file=RegisterFile(registers=[0, 0, 0, 0])
             ),
         )
-        simulation.run_simulation()
+        simulation.state.instruction_memory.instructions = {
+            0: ADDI(rd=2, rs1=0, imm=33),
+            4: ADDI(rd=1, rs1=1, imm=1),
+            8: ADDI(rd=1, rs1=1, imm=1),
+            12: ADDI(rd=1, rs1=1, imm=1),
+            16: BNE(rs1=1, rs2=2, imm=-12),
+        }
+        simulation.run()
         self.assertEqual(simulation.state.register_file.registers, [0, 33, 33, 0])
         self.assertEqual(simulation.state.performance_metrics.branch_count, 10)
         self.assertEqual(simulation.state.performance_metrics.instruction_count, 45)
@@ -125,20 +119,18 @@ class TestSimulation(unittest.TestCase):
 
         simulation = RiscvSimulation(
             state=RiscvArchitecturalState(
-                register_file=RegisterFile(registers=[0, 0, 0, 0]),
-                instruction_memory=InstructionMemory(
-                    instructions={
-                        0: ADDI(rd=3, rs1=0, imm=8),
-                        4: JAL(rd=2, imm=8),
-                        8: ADDI(rd=1, rs1=1, imm=1),
-                        12: BEQ(rs1=0, rs2=0, imm=4),
-                        16: JAL(rd=2, imm=4),
-                        20: ADDI(rd=1, rs1=1, imm=-10),
-                    },
-                ),
+                register_file=RegisterFile(registers=[0, 0, 0, 0])
             )
         )
-        simulation.run_simulation()
+        simulation.state.instruction_memory.instructions = {
+            0: ADDI(rd=3, rs1=0, imm=8),
+            4: JAL(rd=2, imm=8),
+            8: ADDI(rd=1, rs1=1, imm=1),
+            12: BEQ(rs1=0, rs2=0, imm=4),
+            16: JAL(rd=2, imm=4),
+            20: ADDI(rd=1, rs1=1, imm=-10),
+        }
+        simulation.run()
         self.assertEqual(
             simulation.state.register_file.registers, [0, pow(2, 32) - 10, 20, 8]
         )
@@ -194,10 +186,10 @@ class TestSimulation(unittest.TestCase):
             12: ADDI(rd=1, rs1=1, imm=1),
         }
 
-        self.assertTrue(simulation.step_simulation())
-        self.assertTrue(simulation.step_simulation())
-        self.assertTrue(simulation.step_simulation())
-        self.assertTrue(not simulation.step_simulation())
+        self.assertTrue(simulation.step())
+        self.assertTrue(simulation.step())
+        self.assertTrue(simulation.step())
+        self.assertTrue(not simulation.step())
 
     def test_simulation_errors(self):
         simulation = RiscvSimulation()
@@ -209,7 +201,7 @@ class TestSimulation(unittest.TestCase):
         }
 
         with self.assertRaises(InstructionExecutionException) as cm:
-            simulation.run_simulation()
+            simulation.run()
         self.assertEqual(
             cm.exception.__repr__(),
             InstructionExecutionException(
@@ -257,7 +249,7 @@ class TestSimulation(unittest.TestCase):
             mode="five_stage_pipeline",
         )
         simulation.load_program(program)
-        simulation.run_simulation()
+        simulation.run()
         self.assertEqual(simulation.state.register_file.registers[10], 55)
 
     def test_five_stage_performance_metrics_1(self):
@@ -271,7 +263,7 @@ class TestSimulation(unittest.TestCase):
         test:
         """
         simulation.load_program(program=programm)
-        simulation.run_simulation()
+        simulation.run()
         self.assertGreater(simulation.state.performance_metrics.execution_time_s, 0)
         self.assertEqual(simulation.state.performance_metrics.instruction_count, 10)
         self.assertEqual(simulation.state.performance_metrics.branch_count, 3)
@@ -289,7 +281,7 @@ class TestSimulation(unittest.TestCase):
         label:
         """
         simulation.load_program(program=programm)
-        simulation.run_simulation()
+        simulation.run()
         self.assertEqual(simulation.state.performance_metrics.flushes, 2)
         self.assertEqual(simulation.state.performance_metrics.cycles, 12)
 
@@ -299,7 +291,7 @@ class TestSimulation(unittest.TestCase):
         add x0, x0, x0
         """
         simulation.load_program(program=programm)
-        simulation.run_simulation()
+        simulation.run()
         self.assertEqual(simulation.state.performance_metrics.cycles, 5)
 
     def test_singele_stage_cycles(self):
@@ -308,7 +300,7 @@ class TestSimulation(unittest.TestCase):
         add x0, x0, x0
         """
         simulation.load_program(program=programm)
-        simulation.run_simulation()
+        simulation.run()
         self.assertEqual(simulation.state.performance_metrics.cycles, 1)
 
     def test_turn_off_detect_data_hazards(self):
@@ -328,7 +320,7 @@ class TestSimulation(unittest.TestCase):
         addi x2, x2, 1
         """
         simulation.load_program(program=programm)
-        simulation.run_simulation()
+        simulation.run()
         self.assertEqual(simulation.state.register_file.registers[1], 1)
         self.assertEqual(simulation.state.register_file.registers[2], 3)
         self.assertEqual(simulation.state.performance_metrics.flushes, 0)
@@ -349,7 +341,7 @@ class TestSimulation(unittest.TestCase):
         bne x2, zero, loop
         """
         simulation.load_program(program=programm)
-        simulation.run_simulation()
+        simulation.run()
         self.assertEqual(simulation.state.register_file.registers[3], 160)
         self.assertEqual(simulation.state.performance_metrics.instruction_count, 32)
         self.assertEqual(simulation.state.performance_metrics.branch_count, 9)
