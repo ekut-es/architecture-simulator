@@ -4,9 +4,10 @@ from architecture_simulator.uarch.toy.toy_architectural_state import (
     ToyArchitecturalState,
 )
 from architecture_simulator.isa.toy.toy_parser import ToyParser
+from .simulation import Simulation
 
 
-class ToySimulation:
+class ToySimulation(Simulation):
     def __init__(
         self,
         instruction_memory_range: Optional[range] = None,
