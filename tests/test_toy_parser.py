@@ -1,7 +1,7 @@
 import unittest
 
 from architecture_simulator.isa.toy.toy_parser import ToyParser
-from architecture_simulator.isa.toy.toy_instructions import ADD, SUB, INC, NOP, DEC
+from architecture_simulator.isa.toy.toy_instructions import ADD, SUB, INC, NOP, DEC, STO
 
 
 class TestToyParser(unittest.TestCase):
@@ -42,3 +42,25 @@ class TestToyParser(unittest.TestCase):
         self.assertEqual(parsed[2], expected[2])
         self.assertEqual(parsed[3], expected[3])
         self.assertEqual(parsed[4], expected[4])
+
+    def test_dec_addresses(self):
+        parser = ToyParser()
+        program = """INC
+        STO 1024
+        ADD 1025
+        STO 1026
+        ADD 2000
+        STO 4095
+        SUB 1024"""
+
+        parsed = parser.parse(program)
+        expected = [
+            INC(),
+            STO(1024),
+            ADD(1025),
+            STO(1026),
+            ADD(2000),
+            STO(4095),
+            SUB(1024),
+        ]
+        self.assertEqual(parsed, expected)

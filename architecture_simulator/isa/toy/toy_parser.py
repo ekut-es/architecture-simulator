@@ -8,11 +8,14 @@ class ToyParser:
     _address_mnemonics = ["STO", "LDA", "BRZ", "ADD", "SUB", "OR", "AND", "XOR"]
     _no_address_mnemonics = ["NOT", "INC", "DEC", "ZRO", "NOP"]
 
-    _pattern_hex_address = pp.Combine("$" + pp.Word(pp.hexnums, exact=3))
+    _pattern_hex_address = pp.Combine("$" + pp.Word(pp.hexnums))
+    _pattern_dec_address = pp.Word(pp.nums)
+
+    _pattern_address = _pattern_hex_address | _pattern_dec_address
 
     _pattern_address_instruction = pp.oneOf(_address_mnemonics, caseless=True)(
         "mnemonic"
-    ) + _pattern_hex_address("address")
+    ) + _pattern_address("address")
 
     _pattern_no_address_instruction = pp.oneOf(_no_address_mnemonics, caseless=True)(
         "mnemonic"
@@ -84,12 +87,15 @@ class ToyParser:
         return instruction_class()
 
     def _address_to_int(self, address: str) -> int:
-        """Convert addresses to ints. Currently, only hex addresses, given in the '$abc' format are accepted.
+        """Convert addresses to ints. Hex addresses (starting with '$') and decimal addresses are supported.
 
         Args:
-            address (str): An address like '$abc'
+            address (str): An address like '$d9c' or '1044'.
 
         Returns:
             int: the corresponding integer.
         """
-        return int(address[1:], base=16)
+        if address[0] == "$":
+            return int(address[1:], base=16)
+        else:
+            return int(address)
