@@ -42,6 +42,14 @@ class ToySimulation(Simulation):
             self.step()
 
     def load_program(self, program: str):
+        """Resets the architectural state and loads the program into the new state.
+
+        Args:
+            program (str): A text format toy assembly program.
+        """
+        self.state = ToyArchitecturalState(
+            instruction_memory_range=self.state.instruction_memory.address_range,
+            data_memory_range=self.state.data_memory.address_range,
+        )
         parser = ToyParser()
-        instructions = parser.parse(program)
-        self.state.instruction_memory.write_instructions(instructions)
+        parser.parse(program=program, state=self.state)

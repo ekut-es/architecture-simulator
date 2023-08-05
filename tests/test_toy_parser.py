@@ -2,6 +2,9 @@ import unittest
 
 from architecture_simulator.isa.toy.toy_parser import ToyParser
 from architecture_simulator.isa.toy.toy_instructions import ADD, SUB, INC, NOP, DEC, STO
+from architecture_simulator.uarch.toy.toy_architectural_state import (
+    ToyArchitecturalState,
+)
 
 
 class TestToyParser(unittest.TestCase):
@@ -26,6 +29,7 @@ class TestToyParser(unittest.TestCase):
 
     def test_parse(self):
         parser = ToyParser()
+        state = ToyArchitecturalState()
         program = """ADD $030
         INC
 
@@ -35,7 +39,8 @@ class TestToyParser(unittest.TestCase):
         DEC # Ameisenkuchen
         """
         expected = [ADD(0x030), INC(), SUB(0x200), NOP(), DEC()]
-        parsed = parser.parse(program)
+        parser.parse(program=program, state=state)
+        parsed = state.instruction_memory.instructions
         self.assertEqual(len(parsed), 5)
         self.assertEqual(parsed[0], expected[0])
         self.assertEqual(parsed[1], expected[1])
@@ -45,6 +50,7 @@ class TestToyParser(unittest.TestCase):
 
     def test_dec_addresses(self):
         parser = ToyParser()
+        state = ToyArchitecturalState()
         program = """INC
         STO 1024
         ADD 1025
@@ -53,14 +59,30 @@ class TestToyParser(unittest.TestCase):
         STO 4095
         SUB 1024"""
 
-        parsed = parser.parse(program)
-        expected = [
-            INC(),
-            STO(1024),
-            ADD(1025),
-            STO(1026),
-            ADD(2000),
-            STO(4095),
-            SUB(1024),
-        ]
-        self.assertEqual(parsed, expected)
+        parser.parse(program=program, state=state)
+        expected = {
+            0: INC(),
+            1: STO(1024),
+            2: ADD(1025),
+            3: STO(1026),
+            4: ADD(2000),
+            5: STO(4095),
+            6: SUB(1024),
+        }
+        self.assertEqual(state.instruction_memory.instructions, expected)
+
+    def test_write_data(self):
+        parser = ToyParser()
+        state = ToyArchitecturalState()
+        program = """ADD $400
+        SUB 1025
+        :1025:30
+        :$1400:$1000F # test for overflow
+        ADD 1025
+        #:13141:11111"""
+        parser.parse(program=program, state=state)
+        self.assertEqual(state.data_memory.read_halfword(1025), 30)
+        self.assertEqual(state.data_memory.read_halfword(1024), 15)
+        self.assertEqual(state.instruction_memory.read_instruction(0), ADD(1024))
+        self.assertEqual(state.instruction_memory.read_instruction(1), SUB(1025))
+        self.assertEqual(state.instruction_memory.read_instruction(2), ADD(1025))
