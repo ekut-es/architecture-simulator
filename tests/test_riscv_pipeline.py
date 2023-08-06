@@ -4,7 +4,7 @@ from architecture_simulator.uarch.memory import Memory
 from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 
 
-class TestPipeline(unittest.TestCase):
+class TestRiscvPipeline(unittest.TestCase):
     def assert_steps(self, simulation: RiscvSimulation, steps: int):
         """Execute the given amount of steps on the Simulation and assert the pipeline is finished after exactly that amount of steps and not earlier or later.
         Args:

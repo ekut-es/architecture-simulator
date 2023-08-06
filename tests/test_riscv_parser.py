@@ -20,15 +20,15 @@ from architecture_simulator.uarch.riscv.riscv_architectural_state import (
 )
 from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 from architecture_simulator.uarch.memory import Memory
-from architecture_simulator.isa.riscv.riscv_parser import (
-    RiscvParser,
+from architecture_simulator.isa.riscv.riscv_parser import RiscvParser
+from architecture_simulator.isa.parser_exceptions import (
     ParserLabelException,
     ParserOddImmediateException,
     ParserSyntaxException,
 )
 
 
-class TestParser(unittest.TestCase):
+class TestRiscvParser(unittest.TestCase):
     program = """
 
 Ananas:#dfsdfsdf

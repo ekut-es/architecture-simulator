@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING
 import pyparsing as pp
 from fixedint import MutableUInt16
 
-from ..riscv.riscv_parser import ParserSyntaxException
 from .toy_instructions import AddressTypeInstruction, ToyInstruction, instruction_map
+from ..parser_exceptions import ParserSyntaxException
 
 if TYPE_CHECKING:
     from architecture_simulator.uarch.toy.toy_architectural_state import (

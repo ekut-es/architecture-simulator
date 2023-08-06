@@ -37,13 +37,10 @@ class RiscvSimulation(Simulation):
         )
 
     def step(self) -> bool:
-        """Execute the next instruction."""
-        if not self.state.pipeline.is_done():
-            self.state.pipeline.step()
-        return not self.state.pipeline.is_done()
+        self.state.pipeline.step()
+        return not self.is_done()
 
     def run(self):
-        """run the current simulation until no more instructions are left (pc stepped over last instruction)"""
         self.state.performance_metrics.resume_timer()
         if self.state.instruction_memory.instructions:
             while not self.state.pipeline.is_done():
@@ -51,11 +48,6 @@ class RiscvSimulation(Simulation):
         self.state.performance_metrics.stop_timer()
 
     def load_program(self, program: str):
-        """Loads a text format program into the simulation.
-
-        Args:
-            program (str): A program which complies with (a subset of) the toy syntax.
-        """
         parser = RiscvParser()
         # Required to compute labels TODO: Actually, I think this is not needed, because instructions always use relative addresses for jumping.
         # The parser should get slightly reworked.

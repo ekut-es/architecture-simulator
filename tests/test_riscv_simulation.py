@@ -12,7 +12,7 @@ from architecture_simulator.isa.riscv.rv32i_instructions import ADDI, BNE, BEQ, 
 from architecture_simulator.uarch.riscv.pipeline import InstructionExecutionException
 
 
-class TestSimulation(unittest.TestCase):
+class TestRiscvSimulation(unittest.TestCase):
     def test_simulation(self):
         simulation = RiscvSimulation(
             state=RiscvArchitecturalState(

@@ -57,7 +57,7 @@ from architecture_simulator.uarch.riscv.csr_registers import CSRError
 from architecture_simulator.isa.riscv.riscv_parser import RiscvParser
 
 
-class TestInstructions(unittest.TestCase):
+class TestRiscvInstructions(unittest.TestCase):
     def test_add(self):
         # Number definitions
         num_min = fixedint.MutableUInt32(2147483648)

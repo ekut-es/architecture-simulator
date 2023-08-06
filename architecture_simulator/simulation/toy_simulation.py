@@ -19,7 +19,6 @@ class ToySimulation(Simulation):
         )
 
     def step(self):
-        """Executes the next instruction and updates the performance metrics accordingly."""
         self.state.performance_metrics.resume_timer()
         self.state.instruction_memory.read_instruction(
             int(self.state.program_counter)
@@ -27,26 +26,16 @@ class ToySimulation(Simulation):
         self.state.performance_metrics.stop_timer()
         self.state.performance_metrics.instruction_count += 1
         self.state.performance_metrics.cycles += 1
+        return not self.is_done()
 
     def is_done(self) -> bool:
-        """Return whether the simulation is done because there is no instruction at the current program counter.
-
-        Returns:
-            bool: whether the simulation is done because there is no instruction at the current program counter.
-        """
         return not self.state.instruction_at_pc()
 
     def run(self):
-        """Step through the simulation until it terminates (which it might not if there is an infinite loop in the program)"""
         while not self.is_done():
             self.step()
 
     def load_program(self, program: str):
-        """Resets the architectural state and loads the program into the new state.
-
-        Args:
-            program (str): A text format toy assembly program.
-        """
         self.state = ToyArchitecturalState(
             instruction_memory_range=self.state.instruction_memory.address_range,
             data_memory_range=self.state.data_memory.address_range,

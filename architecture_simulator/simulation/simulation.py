@@ -3,8 +3,12 @@ from abc import ABC, abstractmethod
 
 class Simulation(ABC):
     @abstractmethod
-    def step(self):
-        """Execute the next instruction."""
+    def step(self) -> bool:
+        """Execute the next instruction.
+
+        Returns:
+            bool: True if the simulation has not yet finished, else False.
+        """
 
     @abstractmethod
     def run(self):

@@ -26,11 +26,17 @@ class InstructionMemory(Generic[T]):
         Args:
             address (int): Address to load the instruction from.
 
+        Raises:
+            InstructionMemoryKeyError: An error if there is no instruction at the provided address.
+
         Returns:
             T: The instruction saved at the given address.
         """
         self._assert_address_in_range(address)
-        return self.instructions[address]
+        try:
+            return self.instructions[address]
+        except KeyError:
+            raise InstructionMemoryKeyError(address)
 
     def write_instruction(self, address: int, instr: T):
         """Store a single instruction at given address.
@@ -82,3 +88,11 @@ class InstructionMemory(Generic[T]):
             bool: Whether there is an instruction at the given address.
         """
         return address in self.instructions
+
+
+@dataclass
+class InstructionMemoryKeyError(KeyError):
+    address: int
+
+    def __repr__(self):
+        return f"Error: No instruction at address {self.address}"

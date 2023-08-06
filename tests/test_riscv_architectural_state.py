@@ -7,9 +7,10 @@ from architecture_simulator.uarch.riscv.riscv_architectural_state import (
     RiscvArchitecturalState,
 )
 from architecture_simulator.isa.riscv.rv32i_instructions import ADD, SLL
+from architecture_simulator.uarch.instruction_memory import InstructionMemoryKeyError
 
 
-class TestArchitecture(unittest.TestCase):
+class TestRiscvArchitecture(unittest.TestCase):
     def test_register(self):
         # x0 can not be changed
         state = RiscvArchitecturalState(register_file=RegisterFile())
@@ -273,3 +274,9 @@ class TestArchitecture(unittest.TestCase):
                 memory_type="data memory",
             ),
         )
+
+    def test_instruction_memory(self):
+        state = RiscvArchitecturalState()
+        with self.assertRaises(InstructionMemoryKeyError) as cm:
+            state.instruction_memory.read_instruction(1)
+        self.assertEqual(cm.exception, InstructionMemoryKeyError(1))

@@ -58,4 +58,4 @@ class RiscvArchitecturalState:
 
     def instruction_at_pc(self) -> bool:
         """Return whether there is an instruction at the current program counter."""
-        return self.program_counter in self.instruction_memory.instructions
+        return self.instruction_memory.instruction_at_address(self.program_counter)
