@@ -1,7 +1,15 @@
 import unittest
 
 from architecture_simulator.isa.toy.toy_parser import ToyParser
-from architecture_simulator.isa.toy.toy_instructions import ADD, SUB, INC, NOP, DEC, STO
+from architecture_simulator.isa.toy.toy_instructions import (
+    ADD,
+    SUB,
+    INC,
+    NOP,
+    DEC,
+    STO,
+    BRZ,
+)
 from architecture_simulator.uarch.toy.toy_architectural_state import (
     ToyArchitecturalState,
 )
@@ -49,7 +57,7 @@ class TestToyParser(unittest.TestCase):
         self.assertEqual(parsed[3], expected[3])
         self.assertEqual(parsed[4], expected[4])
 
-    def test_dec_addresses(self):
+    def test_decimal_addresses(self):
         parser = ToyParser()
         state = ToyArchitecturalState()
         program = """INC
@@ -87,3 +95,16 @@ class TestToyParser(unittest.TestCase):
         self.assertEqual(state.instruction_memory.read_instruction(0), ADD(1024))
         self.assertEqual(state.instruction_memory.read_instruction(1), SUB(1025))
         self.assertEqual(state.instruction_memory.read_instruction(2), ADD(1025))
+
+    def test_labels(self):
+        parser = ToyParser()
+        state = ToyArchitecturalState()
+        program = """Ameisenkuchen:
+        _Apfeltarte:
+        ADD Ameisenkuchen
+        INC
+        Banan3nkuch3n3:
+        BRZ _Apfeltarte
+        STO Banan3nkuch3n3"""
+        parser.parse(program=program, state=state)
+        expected = {0: ADD(0), 1: INC(), 2: BRZ(0), 3: STO(2)}

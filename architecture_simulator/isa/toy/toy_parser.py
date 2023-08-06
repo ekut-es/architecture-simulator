@@ -35,7 +35,7 @@ class ToyParser:
         ":" + _pattern_value("address") + ":" + _pattern_value("value")
     )
 
-    _pattern_label_declaration = _pattern_label + ":"
+    _pattern_label_declaration = _pattern_label("label") + ":"
 
     _pattern_line = (
         _pattern_address_instruction
