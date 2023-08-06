@@ -3,8 +3,12 @@ from typing import TYPE_CHECKING
 import pyparsing as pp
 from fixedint import MutableUInt16
 
-from .toy_instructions import AddressTypeInstruction, ToyInstruction, instruction_map
-from ..parser_exceptions import ParserSyntaxException, ParserLabelException
+from .toy_instructions import AddressTypeInstruction, instruction_map
+from ..parser_exceptions import (
+    ParserSyntaxException,
+    ParserLabelException,
+    DuplicateLabelException,
+)
 
 if TYPE_CHECKING:
     from architecture_simulator.uarch.toy.toy_architectural_state import (
@@ -37,11 +41,16 @@ class ToyParser:
 
     _pattern_label_declaration = _pattern_label("label") + ":"
 
+    _pattern_variable_declaration = (
+        _pattern_label("label") + "=" + _pattern_value("value")
+    )
+
     _pattern_line = (
         _pattern_address_instruction
         ^ _pattern_no_address_instruction
         ^ _pattern_write_data("write_data")
         ^ _pattern_label_declaration("label_declaration")
+        ^ _pattern_variable_declaration("variable_declaration")
     ) + pp.StringEnd().suppress()
 
     # def __init__(self):
@@ -65,7 +74,7 @@ class ToyParser:
         self.program = program
         self._sanitize()
         self._tokenize()
-        self._process_labels()
+        self._process_labels_and_variables()
         self._load_instructions()
         self._write_data()
 
@@ -86,7 +95,7 @@ class ToyParser:
 
     def _tokenize(self):
         """Turns self.sanitized_program into tokens and stores them (together with the line numbers and the original line) in self.token_list."""
-        self.token_list = []
+        self.token_list: list[tuple[int, str, pp.ParseResults]] = []
         for linenumber, line in self.sanitized_program:
             try:
                 self.token_list.append(
@@ -95,13 +104,23 @@ class ToyParser:
             except pp.ParseException:
                 raise ParserSyntaxException(line_number=linenumber, line=line)
 
-    def _process_labels(self):
-        """Computes the addresses for the labels from self.token_list and stores them in self.labels."""
+    def _process_labels_and_variables(self):
+        """Takes the variables and computes the addresses for the labels from self.token_list and stores both in self.labels."""
         program_counter = 0
         self.labels = {}
-        for _, _, tokens in self.token_list:
-            if tokens.label_declaration:
-                self.labels[tokens.label] = program_counter
+        for line_number, line, tokens in self.token_list:
+            if tokens.get_name() == "label_declaration":
+                self._add_label_mapping(
+                    label=tokens.label,
+                    value=program_counter,
+                    line=line,
+                    line_number=line_number,
+                )
+            elif tokens.get_name() == "variable_declaration":
+                value = self._value_to_int(tokens.value)
+                self._add_label_mapping(
+                    label=tokens.label, value=value, line=line, line_number=line_number
+                )
             else:
                 program_counter += 1
 
@@ -150,3 +169,21 @@ class ToyParser:
             return int(address[1:], base=16)
         else:
             return int(address)
+
+    def _add_label_mapping(self, label: str, value: int, line_number: int, line: str):
+        """Add label value mapping to self.labels. Raise an error if the label already exists.
+
+        Args:
+            label (str): Label to be added.
+            value (int): The value to which the label should be mapped.
+            line_number (int): The line number in which the label gets declared.
+            line (str): The line in which the label gets declared.
+
+        Raises:
+            DuplicateLabelException: An error gets raised if the label already exists, since this is most likely unwanted.
+        """
+        if label in self.labels:
+            raise DuplicateLabelException(
+                line_number=line_number, line=line, label=label
+            )
+        self.labels[label] = value

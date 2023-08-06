@@ -108,3 +108,17 @@ class TestToyParser(unittest.TestCase):
         STO Banan3nkuch3n3"""
         parser.parse(program=program, state=state)
         expected = {0: ADD(0), 1: INC(), 2: BRZ(0), 3: STO(2)}
+
+    def test_variables(self):
+        parser = ToyParser()
+        state = ToyArchitecturalState()
+        program = """_test = $400
+        test2 = 22
+        INC
+        sto _test
+        add _test
+        sto test2
+        lol:
+        brz lol"""
+        parser.parse(program=program, state=state)
+        expected = {0: INC(), 1: STO(1024), 2: ADD(1024), 3: STO(22), 4: BRZ(4)}

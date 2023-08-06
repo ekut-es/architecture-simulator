@@ -33,3 +33,13 @@ class ParserOddImmediateException(ParserException):
 
     def __repr__(self) -> str:
         return f"Immediate has to be even in line {self.line_number}: {self.line}"
+
+
+@dataclass
+class DuplicateLabelException(ParserException):
+    """An exception that can be raised when a label/variable has been declared twice."""
+
+    label: str
+
+    def __repr__(self) -> str:
+        return f"Label '{self.label}' in line {self.line_number}: '{self.line}' has already been declared before."
