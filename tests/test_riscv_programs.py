@@ -1,6 +1,6 @@
 import unittest
 
-from tests.py_programs.fibonacci_recursive import (
+from tests.riscv_programs.fibonacci_recursive import (
     fibonacci_recursive,
     fibonacci_recursive_2,
 )
