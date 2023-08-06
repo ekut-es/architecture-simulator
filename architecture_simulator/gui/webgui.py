@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 import archsim_js
-from architecture_simulator.isa.riscv.riscv_parser import ParserException
+from architecture_simulator.isa.parser_exceptions import ParserException
 from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 from architecture_simulator.uarch.riscv.pipeline_registers import (
     PipelineRegister,
@@ -163,7 +163,7 @@ def update_tables():
         RegisterWritebackPipelineRegister: "WB",
     }
     pipeline_stages_addresses = dict()
-    for pipeline_register in simulation.pipeline.pipeline_registers:
+    for pipeline_register in simulation.state.pipeline.pipeline_registers:
         if pipeline_register.address_of_instruction is not None:
             pipeline_stages_addresses[
                 pipeline_register.address_of_instruction
@@ -184,7 +184,7 @@ def update_tables():
             archsim_js.update_instruction_table(hex(address), cmd.__repr__(), "")
 
     # Update IF Stage
-    IF_pipeline_register = simulation.pipeline.pipeline_registers[0]
+    IF_pipeline_register = simulation.state.pipeline.pipeline_registers[0]
     if isinstance(IF_pipeline_register, InstructionFetchPipelineRegister):
         archsim_js.update_IF_Stage(
             instruction=IF_pipeline_register.instruction,
@@ -193,7 +193,7 @@ def update_tables():
 
     # Update ID Stage
     try:
-        ID_pipeline_register = simulation.pipeline.pipeline_registers[1]
+        ID_pipeline_register = simulation.state.pipeline.pipeline_registers[1]
         if isinstance(ID_pipeline_register, InstructionDecodePipelineRegister):
             control_unit_signals = [
                 ID_pipeline_register.control_unit_signals.alu_src_1,
@@ -220,7 +220,7 @@ def update_tables():
 
     # Update EX Stage
     try:
-        EX_pipeline_register = simulation.pipeline.pipeline_registers[2]
+        EX_pipeline_register = simulation.state.pipeline.pipeline_registers[2]
         if isinstance(EX_pipeline_register, ExecutePipelineRegister):
             control_unit_signals = [
                 EX_pipeline_register.control_unit_signals.alu_src_1,
@@ -249,7 +249,7 @@ def update_tables():
 
     # Update MA Stage
     try:
-        MA_pipeline_register = simulation.pipeline.pipeline_registers[3]
+        MA_pipeline_register = simulation.state.pipeline.pipeline_registers[3]
         if isinstance(MA_pipeline_register, MemoryAccessPipelineRegister):
             control_unit_signals = [
                 MA_pipeline_register.control_unit_signals.alu_src_1,
@@ -278,7 +278,7 @@ def update_tables():
 
     # Update WB Stage
     try:
-        WB_pipeline_register = simulation.pipeline.pipeline_registers[4]
+        WB_pipeline_register = simulation.state.pipeline.pipeline_registers[4]
         if isinstance(WB_pipeline_register, RegisterWritebackPipelineRegister):
             control_unit_signals = [
                 WB_pipeline_register.control_unit_signals.alu_src_1,
