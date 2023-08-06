@@ -18,6 +18,7 @@ class TestToyParser(unittest.TestCase):
         #Zwetschgenkuchen
         DEC # Ameisenkuchen
         """
+        parser.parse(program, state=ToyArchitecturalState())
         expected = [
             (1, "ADD $030"),
             (2, "INC"),
@@ -25,7 +26,7 @@ class TestToyParser(unittest.TestCase):
             (5, "NOP"),
             (7, "DEC"),
         ]
-        self.assertEqual(parser._sanitize(program), expected)
+        self.assertEqual(parser.sanitized_program, expected)
 
     def test_parse(self):
         parser = ToyParser()
