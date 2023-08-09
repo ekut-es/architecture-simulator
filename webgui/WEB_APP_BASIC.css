@@ -107,7 +107,7 @@ body {
     height: calc(100vh-20px);
     overflow: hidden;
 }
-@media (max-width: 800px) {
+@media (max-width: 850px) {
     body {
         overflow: auto;
     }
