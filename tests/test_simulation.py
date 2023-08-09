@@ -312,7 +312,9 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(simulation.state.performance_metrics.cycles, 1)
 
     def test_turn_off_detect_data_hazards(self):
-        simulation = Simulation(detect_data_hazards=False, mode="five_stage_pipeline")
+        simulation = RiscvSimulation(
+            detect_data_hazards=False, mode="five_stage_pipeline"
+        )
         programm = """
         addi x1, x0, 15
         add x0, x0, x0
@@ -325,7 +327,7 @@ class TestSimulation(unittest.TestCase):
         add x0, x0, x0
         addi x2, x2, 1
         """
-        simulation.state.instruction_memory.append_instructions(program=programm)
+        simulation.load_program(program=programm)
         simulation.run_simulation()
         self.assertEqual(simulation.state.register_file.registers[1], 1)
         self.assertEqual(simulation.state.register_file.registers[2], 3)
@@ -334,7 +336,9 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(simulation.state.performance_metrics.instruction_count, 10)
 
     def test_five_stage_performance_metrics_3(self):
-        simulation = Simulation(detect_data_hazards=True, mode="five_stage_pipeline")
+        simulation = RiscvSimulation(
+            detect_data_hazards=True, mode="five_stage_pipeline"
+        )
         programm = """
     	# multiplication
         addi x1, x0, 16 # x
@@ -344,7 +348,7 @@ class TestSimulation(unittest.TestCase):
         addi x2, x2, -1
         bne x2, zero, loop
         """
-        simulation.state.instruction_memory.append_instructions(program=programm)
+        simulation.load_program(program=programm)
         simulation.run_simulation()
         self.assertEqual(simulation.state.register_file.registers[3], 160)
         self.assertEqual(simulation.state.performance_metrics.instruction_count, 32)
