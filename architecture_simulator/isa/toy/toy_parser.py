@@ -121,7 +121,7 @@ class ToyParser:
                 self._add_label_mapping(
                     label=tokens.label, value=value, line=line, line_number=line_number
                 )
-            else:
+            elif tokens.mnemonic:  # if it is an instruction
                 program_counter += 1
 
     def _load_instructions(self):
