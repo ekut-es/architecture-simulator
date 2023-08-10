@@ -17,6 +17,7 @@ class ToyInstruction(Instruction):
     length: int = 1
 
     def __init__(self, **kwargs):
+        """"""
         """NOTE: I use **kwargs here because otherwise, the parser has to create objects from the 'class objects'.
         Since it only knows if the instruction it is currently looking at is an AddressTypeInstruction or a
         normal ToyInstruction and since it doesnt know which exact subclass it is, it can not know which
@@ -24,7 +25,7 @@ class ToyInstruction(Instruction):
         need to fill in in the parser. If you have a better solution (that does not involve creating a separate
         if-case for each instruction), go ahead and change this."""
         self.mnemonic = kwargs["mnemonic"].upper()
-        self.opcode = kwargs["opcode"] % 16
+        self.opcode = int(kwargs["opcode"]) % 16
 
     def __repr__(self):
         return self.mnemonic.upper()
@@ -34,7 +35,21 @@ class ToyInstruction(Instruction):
 
     def __eq__(self, other):
         """Useful for testing, since you can directly compare instructions."""
-        return self.opcode == other.opcode
+        if isinstance(other, ToyInstruction):
+            return self.opcode == other.opcode
+        return False
+
+    def to_integer(self):
+        return self.opcode << 12
+
+    def __int__(self):
+        return self.to_integer()
+
+    def to_binary(self):
+        return "{:016b}".format(int(self))
+
+    def to_hex(self):
+        return "{:04X}".format(int(self))
 
 
 class AddressTypeInstruction(ToyInstruction):
@@ -48,7 +63,12 @@ class AddressTypeInstruction(ToyInstruction):
         return f"{self.mnemonic.upper()} ${self.address:03X}"
 
     def __eq__(self, other):
-        return super().__eq__(other) and self.address == other.address
+        if isinstance(other, AddressTypeInstruction):
+            return super().__eq__(other) and self.address == other.address
+        return False
+
+    def to_integer(self):
+        return (self.opcode << 12) + self.address
 
 
 class STO(AddressTypeInstruction):
