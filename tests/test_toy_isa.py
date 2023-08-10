@@ -18,6 +18,7 @@ from architecture_simulator.isa.toy.toy_instructions import (
     DEC,
     ZRO,
     NOP,
+    ToyInstruction,
 )
 
 
@@ -271,3 +272,21 @@ class TestToyInstructions(unittest.TestCase):
         self.assertEqual(DEC().to_hex(), "A000")
         self.assertEqual(ZRO().to_hex(), "B000")
         self.assertEqual(NOP().to_hex(), "C000")
+
+    def test_from_integer(self):
+        self.assertEqual(ToyInstruction.from_integer(125), STO(125))
+        self.assertEqual(ToyInstruction.from_integer(4319), LDA(223))
+        self.assertEqual(ToyInstruction.from_integer(8195), BRZ(3))
+        self.assertEqual(ToyInstruction.from_integer(12293), ADD(5))
+        self.assertEqual(ToyInstruction.from_integer(20479), SUB(4095))
+        self.assertEqual(ToyInstruction.from_integer(20736), OR(256))
+        self.assertEqual(ToyInstruction.from_integer(28576), AND(4000))
+        self.assertEqual(ToyInstruction.from_integer(29671), XOR(999))
+        self.assertEqual(ToyInstruction.from_integer(32768), NOT())
+        self.assertEqual(ToyInstruction.from_integer(36864), INC())
+        self.assertEqual(ToyInstruction.from_integer(40960), DEC())
+        self.assertEqual(ToyInstruction.from_integer(45056), ZRO())
+        self.assertEqual(ToyInstruction.from_integer(49152), NOP())
+        self.assertEqual(ToyInstruction.from_integer(53248), NOP())
+        self.assertEqual(ToyInstruction.from_integer(57344), NOP())
+        self.assertEqual(ToyInstruction.from_integer(61440), NOP())

@@ -51,6 +51,37 @@ class ToyInstruction(Instruction):
     def to_hex(self):
         return "{:04X}".format(int(self))
 
+    @classmethod
+    def from_integer(cls, integer_instruction: int) -> ToyInstruction:
+        opcode = opcode = (integer_instruction >> 12) & 0xF
+        address = integer_instruction & 0xFFF
+        if opcode == 0:
+            return STO(address)
+        elif opcode == 1:
+            return LDA(address)
+        elif opcode == 2:
+            return BRZ(address)
+        elif opcode == 3:
+            return ADD(address)
+        elif opcode == 4:
+            return SUB(address)
+        elif opcode == 5:
+            return OR(address)
+        elif opcode == 6:
+            return AND(address)
+        elif opcode == 7:
+            return XOR(address)
+        elif opcode == 8:
+            return NOT()
+        elif opcode == 9:
+            return INC()
+        elif opcode == 10:
+            return DEC()
+        elif opcode == 11:
+            return ZRO()
+        else:
+            return NOP()
+
 
 class AddressTypeInstruction(ToyInstruction):
     """Base class for all instructions which do use an address."""
