@@ -39,20 +39,43 @@ class ToyInstruction(Instruction):
             return self.opcode == other.opcode
         return False
 
-    def to_integer(self):
+    def to_integer(self) -> int:
+        """Get the machine code of the instruction as integer value.
+
+        Returns:
+            int: machine code
+        """
         return self.opcode << 12
 
-    def __int__(self):
+    def __int__(self) -> int:
         return self.to_integer()
 
-    def to_binary(self):
+    def to_binary(self) -> str:
+        """Get the machine code of the instrution as 16 digit binary string.
+
+        Returns:
+            str: A 16 digit long binary string.
+        """
         return "{:016b}".format(int(self))
 
-    def to_hex(self):
+    def to_hex(self) -> str:
+        """Get the machine code of the instruction as 4 digit hexadecimal string.
+
+        Returns:
+            str: A 4 digit long hexadecimal string.
+        """
         return "{:04X}".format(int(self))
 
     @classmethod
     def from_integer(cls, integer_instruction: int) -> ToyInstruction:
+        """Turn a machine code integer into the corresponding instruction object.
+
+        Args:
+            integer_instruction (int): machine code of the instruction.
+
+        Returns:
+            ToyInstruction: The corresponding instruction object.
+        """
         opcode = opcode = (integer_instruction >> 12) & 0xF
         address = integer_instruction & 0xFFF
         if opcode == 0:
