@@ -477,3 +477,20 @@ function synchronizeEditors(sEditor, tEditor) {
         tEditor.setValue(content);
     }
 }
+
+window.addEventListener("load", function () {
+    const pipeline_svg = document.getElementById(
+        "visualization_pipeline"
+    ).contentDocument;
+    console.log(pipeline_svg);
+    pipeline_svg
+        .getElementById("WriteBackExecuteAluResultText")
+        .setAttribute("visibility", "hidden");
+});
+
+function set_svg_text(id, str) {
+    const pipeline_svg = document.getElementById(
+        "visualization_pipeline"
+    ).contentDocument;
+    pipeline_svg.getElementById(id).textContent = str;
+}

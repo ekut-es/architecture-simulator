@@ -274,12 +274,16 @@ def update_tables():
         # If that is all this does, you could simply replace everything by `vars(obj)` which returns a dict of all variables ._.
 
         # Update IF Stage
-        IF_pipeline_register = simulation.state.pipeline.pipeline_registers[0]
-        if isinstance(IF_pipeline_register, InstructionFetchPipelineRegister):
-            archsim_js.update_IF_Stage(
-                instruction=IF_pipeline_register.instruction,
-                address_of_instruction=IF_pipeline_register.instruction,
-            )
+        try:
+            IF_pipeline_register = simulation.state.pipeline.pipeline_registers[0]
+            if isinstance(IF_pipeline_register, InstructionFetchPipelineRegister):
+                archsim_js.update_IF_Stage(
+                    IF_pipeline_register.instruction.__repr__(),
+                    IF_pipeline_register.address_of_instruction,
+                    IF_pipeline_register.pc_plus_instruction_length,
+                )
+        except:
+            ...
 
         # Update ID Stage
         try:  # FIXME: Why is this a try statement without an except block?

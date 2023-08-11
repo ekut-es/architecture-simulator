@@ -14,6 +14,9 @@ const performance_metrics = document.getElementById("performance_metrics");
 const performance_metrics_vis = document.getElementById(
     "vis_performance_metrics"
 );
+const pipeline_svg = document.getElementById(
+    "visualization_pipeline"
+).contentDocument;
 
 var previous_registers = {};
 var previous_memory = {};
@@ -326,7 +329,16 @@ const archsim_js = {
         table2.rows[position].cells[0].style.backgroundColor = "yellow";
         table2.rows[position].cells[1].style.backgroundColor = "yellow";
     },
-    update_IF_Stage: function (instruction, address_of_instruction) {},
+    update_IF_Stage: function (
+        instruction,
+        address_of_instruction,
+        pc_plus_instruction_length
+    ) {
+        set_svg_text("IMInstr", instruction);
+        set_svg_text("IMReadAddress", address_of_instruction);
+        set_svg_text("PC", address_of_instruction);
+        //set_svg_text("FetchAddOutText", pc_plus_instruction_length);
+    },
     update_ID_Stage: function (
         register_read_addr_1,
         register_read_addr_2,
