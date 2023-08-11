@@ -19,11 +19,9 @@ class ToySimulation(Simulation):
         )
 
     def step(self):
-        self.state.performance_metrics.resume_timer()
         self.state.instruction_memory.read_instruction(
             int(self.state.program_counter)
         ).behavior(self.state)
-        self.state.performance_metrics.stop_timer()
         self.state.performance_metrics.instruction_count += 1
         self.state.performance_metrics.cycles += 1
         return not self.is_done()
@@ -32,8 +30,10 @@ class ToySimulation(Simulation):
         return not self.state.instruction_at_pc()
 
     def run(self):
+        self.state.performance_metrics.resume_timer()
         while not self.is_done():
             self.step()
+        self.state.performance_metrics.stop_timer()
 
     def load_program(self, program: str):
         self.state = ToyArchitecturalState(

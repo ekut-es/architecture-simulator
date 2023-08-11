@@ -21,18 +21,36 @@ simulation: Optional[RiscvSimulation] = None
 
 @dataclass
 class StateNotInitializedError(RuntimeError):
+    """An error for when the architectural state (or rather the simulation) has not yet been initialized."""
+
     def __repr__(self):
         return "state has not been initialized."
 
 
-def sim_init():
+def sim_init() -> RiscvSimulation:
+    """Creates a new simulation object and updates the UI elements.
+
+    Returns:
+        RiscvSimulation: The new simulation.
+    """
     global simulation
     simulation = RiscvSimulation()
     update_ui()
     return simulation
 
 
-def step_sim(program: str):
+def step_sim(program: str) -> tuple[str, bool]:
+    """Executes one step in the simulation. First loads the given program in case there are no instructions in the instruction memory yet. Also updates the UI elements.
+
+    Args:
+        program (str): text format assembly program.
+
+    Raises:
+        StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
+
+    Returns:
+        tuple[str, bool]: tuple of (performance metrics string, whether the simulation has not ended yet)
+    """
     global simulation
     if simulation is None:
         raise StateNotInitializedError()
@@ -46,16 +64,23 @@ def step_sim(program: str):
 
     # step the simulation
     try:
-        simulation_ended_flag = simulation.step()
+        simulation_not_ended_flag = simulation.step()
         update_ui()
     except InstructionExecutionException as e:
-        archsim_js.highlight_cmd_table(int(e.address / 4))
-        simulation_ended_flag = False
+        archsim_js.highlight_cmd_table(
+            int(e.address / 4)
+        )  # FIXME: Needs to be changed if compressed instructions get implemented
+        simulation_not_ended_flag = False
 
-    return (simulation.state.performance_metrics.__repr__(), simulation_ended_flag)
+    return (simulation.state.performance_metrics.__repr__(), simulation_not_ended_flag)
 
 
 def resume_timer():
+    """Resumes the performance metrics timer.
+
+    Raises:
+        StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
+    """
     global simulation
     if simulation is None:
         raise StateNotInitializedError()
@@ -64,6 +89,11 @@ def resume_timer():
 
 
 def stop_timer():
+    """Stops/pauses the performance metrics timer.
+
+    Raises:
+        StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
+    """
     global simulation
     if simulation is None:
         raise StateNotInitializedError()
@@ -71,7 +101,15 @@ def stop_timer():
     simulation.state.performance_metrics.stop_timer()
 
 
-def get_performance_metrics():
+def get_performance_metrics() -> str:
+    """Get a string representation of the performance metrics.
+
+    Raises:
+        StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
+
+    Returns:
+        str: String representation of the performance metrics.
+    """
     global simulation
     if simulation is None:
         raise StateNotInitializedError()
@@ -79,26 +117,19 @@ def get_performance_metrics():
     return simulation.state.performance_metrics.__repr__()
 
 
-# runs the simulation, takes a string as input and returns the whole simulation
-# def run_sim(instr: str):
-#     global simulation
-#     if simulation is None:
-#         raise StateNotInitializedError()
+def reset_sim(pipeline_mode: str) -> RiscvSimulation:
+    """Resets the entire simulation and updates the UI elements.
 
-#     # reset the instruction list
-#     simulation = Simulation()
+    Args:
+        pipeline_mode (str): Mode of the pipeline (see RiscvSimulation class for more info)
 
-#     simulation.state.instruction_memory.append_instructions(instr)
-#     # run the simulation
-#     simulation.run_simulation()
+    Raises:
+        StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
 
-#     update_ui()
-
-#     return simulation
-
-
-# resets the entire simulation
-def reset_sim(pipeline_mode):
+    Returns:
+        RiscvSimulation: The new simulation.
+    """
+    # FIXME: Why do we check if the simulation is None? Isn't this pretty much the same as sim_init()?
     global simulation
     if simulation is None:
         raise StateNotInitializedError()
@@ -108,6 +139,14 @@ def reset_sim(pipeline_mode):
 
 
 def parse_input(instr: str):
+    """Parse the input and load it into the simulation and updates the UI elements.
+
+    Args:
+        instr (str): text format assembly program to be loaded.
+
+    Raises:
+        StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
+    """
     global simulation
     if simulation is None:
         raise StateNotInitializedError()
@@ -124,12 +163,19 @@ def parse_input(instr: str):
     update_ui()
 
 
+# FIXME: update_tables() does not only update tables. Put this stuff into their own functions and then make update_ui() call them all individually.
 def update_ui():
+    """Updates all UI elements based on the current simulation and architectural state."""
     update_tables()
-    # update_performance_metrics()
 
 
+# FIXME: this function is way too long. See the suggested fixes above and below.
 def update_tables():
+    """Updates the tables (instructions, registers and memory). Also updates the visualization.
+
+    Raises:
+        StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
+    """
     global simulation
     if simulation is None:
         raise StateNotInitializedError()
@@ -153,7 +199,15 @@ def update_tables():
     ):
         archsim_js.update_memory_table(hex(address), address_value)
 
-    # appends all the instructions one at a time
+    # find out which instructions are in which stages
+    pipeline_stages_addresses = dict()
+    for pipeline_register in simulation.state.pipeline.pipeline_registers:
+        if pipeline_register.address_of_instruction is not None:
+            pipeline_stages_addresses[
+                pipeline_register.address_of_instruction
+            ] = pipeline_register
+
+    # display names for the stages
     stage_mapping = {
         PipelineRegister: "Single",
         InstructionFetchPipelineRegister: "IF",
@@ -162,26 +216,27 @@ def update_tables():
         MemoryAccessPipelineRegister: "MA",
         RegisterWritebackPipelineRegister: "WB",
     }
-    pipeline_stages_addresses = dict()
-    for pipeline_register in simulation.state.pipeline.pipeline_registers:
-        if pipeline_register.address_of_instruction is not None:
-            pipeline_stages_addresses[
-                pipeline_register.address_of_instruction
-            ] = pipeline_register
-
+    # inserts all instructions into the instruction table
     archsim_js.clear_instruction_table()
     for address, cmd in sorted(
         simulation.state.instruction_memory.instructions.items(),
         key=lambda item: item[0],
     ):
         if address in pipeline_stages_addresses.keys():
+            # if the instruction is in one of the stages
             archsim_js.update_instruction_table(
                 hex(address),
                 cmd.__repr__(),
                 stage_mapping[pipeline_stages_addresses[address].__class__],
             )
         else:
+            # if the instruction is not in one of the stages
             archsim_js.update_instruction_table(hex(address), cmd.__repr__(), "")
+
+    # Invoke all the js functions which update the visuals
+
+    # FIXME: This is a lot of code for handing the variables of a python object over to js (I think ?).
+    # If that is all this does, you could simply replace everything by `vars(obj)` which returns a dict of all variables ._.
 
     # Update IF Stage
     IF_pipeline_register = simulation.state.pipeline.pipeline_registers[0]
@@ -192,7 +247,7 @@ def update_tables():
         )
 
     # Update ID Stage
-    try:
+    try:  # FIXME: Why is this a try statement without an except block?
         ID_pipeline_register = simulation.state.pipeline.pipeline_registers[1]
         if isinstance(ID_pipeline_register, InstructionDecodePipelineRegister):
             control_unit_signals = [
@@ -301,12 +356,3 @@ def update_tables():
             )
     except:
         ...
-
-
-# #actual comment: output = performance metric repr but if parser produces error, overwrite output with error
-# def update_output():
-#     global simulation
-#     if simulation is None:
-#         raise RuntimeError("state has not been initialized.")
-
-#     archsim_js.update_output(simulation.state.performance_metrics.__repr__())

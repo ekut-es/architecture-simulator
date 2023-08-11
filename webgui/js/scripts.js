@@ -47,8 +47,8 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             document.getElementById("input").disabled = true;
             document.getElementById("vis_input").disabled = true;
-            clearInterval(run);
             stop_timer();
+            clearInterval(run);
             update_performance_metrics();
             enable_run();
             disable_pause();
@@ -64,9 +64,7 @@ window.addEventListener("DOMContentLoaded", function () {
             finished_typing();
             document.getElementById("input").disabled = true;
             document.getElementById("vis_input").disabled = true;
-            resume_timer();
             evaluatePython_step_sim();
-            stop_timer();
             update_performance_metrics();
             enable_run();
             disable_pause();
@@ -95,9 +93,11 @@ window.addEventListener("DOMContentLoaded", function () {
         });
 
     function step_n_times() {
+        //resume_timer()
         for (i = 0; i < steps_per_interval; i++) {
-            evaluatePython_step_sim();
+            evaluatePython_step_sim(false);
         }
+        //stop_timer()
     }
 
     document

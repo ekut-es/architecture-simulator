@@ -15,6 +15,11 @@ const performance_metrics_vis = document.getElementById(
     "vis_performance_metrics"
 );
 
+/**
+ * Adds the given string to the output field.
+ *
+ * @param {string} s -  string to paste to the output field.
+ */
 function addToOutput(s) {
     output.value += ">>>" + input.value + "\n" + s + "\n";
     output.scrollTop = output.scrollHeight;
@@ -24,6 +29,13 @@ function addToOutput(s) {
 
 // Object containing functions to be exported to python
 const archsim_js = {
+    /**
+     * Appends one row to the register table.
+     *
+     * @param {number} reg - index of the register
+     * @param {Iterable} representations - iterable containing representations of the value stored in the register.
+     * @param {string} abi_name - an alternative name for the register.
+     */
     update_register_table: function (reg, representations, abi_name) {
         tr = document.createElement("tr");
         td1 = document.createElement("td");
@@ -54,9 +66,12 @@ const archsim_js = {
         tr_vis.appendChild(td2_vis);
         registers_vis.appendChild(tr_vis);
     },
-    // update_single_register: function(reg, val) {
-    //     document.getElementById("val_x"+reg).innerText = val
-    // },
+    /**
+     * Appends one row to the memory table.
+     *
+     * @param {string} address - memory address.
+     * @param {Iterable} representations - iterable containing representations of the value stored at the given address.
+     */
     update_memory_table: function (address, representations) {
         tr = document.createElement("tr");
         td1 = document.createElement("td");
@@ -81,24 +96,15 @@ const archsim_js = {
         tr_vis.appendChild(td2_vis);
         memory_vis.appendChild(tr_vis);
     },
-    // update_single_memory_address: function(address, val) {
-    //     try{
-    //     document.getElementById("memory"+address).innerText = val
-    //     }
-    //     catch
-    //     {
-    //     tr = document.createElement("tr")
-    //     td1 = document.createElement("td")
-    //     td1.innerText = address
-    //     td2 = document.createElement("td")
-    //     td2.innerText = val
-    //     td2.id = "memory"+address
-    //     tr.appendChild(td1)
-    //     tr.appendChild(td2)
-    //     memory.appendChild(tr)
-    //     }
-    // },
+    // FIXME: I dont know what the following comment means, it might be outdated
     //ids und inner texts have to be changed then delete this comment
+    /**
+     * Appends one row to the instruction memory table.
+     *
+     * @param {string} address - address of the instruction.
+     * @param {string} val - representation of the instruction.
+     * @param {string} stage - the stage the instruction currently is in.
+     */
     update_instruction_table: function (address, val, stage) {
         tr = document.createElement("tr");
         tr.id = address;
@@ -174,27 +180,52 @@ const archsim_js = {
         tr_vis.appendChild(td3_vis);
         instructions_vis.appendChild(tr_vis);
     },
+    /**
+     * Clears the memory table.
+     */
     clear_memory_table: function () {
         this.clear_a_table(memory);
         this.clear_a_table(memory_vis);
     },
+    /**
+     * Clears the register table.
+     */
     clear_register_table: function () {
         this.clear_a_table(registers);
         this.clear_a_table(registers_vis);
     },
+    /**
+     * Clears the instruction memory table.
+     */
     clear_instruction_table: function () {
         this.clear_a_table(instructions);
         this.clear_a_table(instructions_vis);
     },
+    /**
+     * Clears the given table.
+     *
+     * @param {HTMLElement} table - table to clear.
+     */
     clear_a_table: function (table) {
         table.innerHTML = "";
     },
+    /**
+     * Set the ouput field to the given string.
+     *
+     * @param {string} str - string to set the output field to.
+     */
     set_output: function (str) {
         output.value = str;
         output_vis.value = str;
     },
+    /**
+     * Highlights a line in the text editor and displays the given message as hint.
+     * Can be used to display parser exceptions.
+     *
+     * @param {number} position - line number (starting at 1).
+     * @param {string} str - string to display.
+     */
     highlight: function (position, str) {
-        //editor.removeLineClass(position-1, "background", "highlight")
         editor.addLineClass(position - 1, "background", "highlight");
         editor.refresh();
         editor_vis.addLineClass(position - 1, "background", "highlight");
@@ -232,6 +263,9 @@ const archsim_js = {
             editor.showHint(error_description);
         }
     },
+    /**
+     * Removes all highlights from the editor.
+     */
     remove_all_highlights: function () {
         for (let i = 0; i < editor.lineCount(); i++) {
             editor.removeLineClass(i, "background", "highlight");
@@ -242,6 +276,11 @@ const archsim_js = {
         editor.closeHint();
         editor_vis.closeHint();
     },
+    /**
+     * Highlights one row in the instruction table.
+     *
+     * @param {number} position - position of the instruction to be highlighted.
+     */
     highlight_cmd_table: function (position) {
         table = document.getElementById("gui_cmd_table_id");
         table.rows[position + 1].cells[0].style.backgroundColor = "yellow";
@@ -297,12 +336,16 @@ output_vis.value = "Output \n\nInitializing... ";
 input.value = "add x1, x2, x3 \nlui x1, 1";
 performance_metrics.value = "Performance Metrics";
 performance_metrics_vis.value = "Performance Metrics";
-// init Pyodide
+/**
+ * Initialize pyodide.
+ * @returns pyodide.
+ */
 async function main() {
     start_loading_visuals();
     let pyodide = await loadPyodide();
     await pyodide.loadPackage("micropip");
     const micropip = pyodide.pyimport("micropip");
+    // FIXME: This stuff should probably not be printed any more.
     console.log(window.location.protocol);
     console.log(window.location.href);
     console.log(window.location.origin);
@@ -311,6 +354,7 @@ async function main() {
     console.log(window.location.hostname);
     console.log(window.location.pathname);
     console.log(window.location.port);
+    // FIXME: THIS IS BAD
     if (window.location.href == "https://atreus.cs.uni-tuebingen.de/archsim/") {
         await micropip.install(
             window.location.href +
@@ -337,6 +381,9 @@ sim_init()
 }
 let pyodideReadyPromise = main();
 
+/**
+ * Executes one step in the simulation and updates the visuals accordingly.
+ */
 async function evaluatePython_step_sim() {
     let pyodide = await pyodideReadyPromise;
     input_str = input.value;
@@ -363,18 +410,27 @@ async function evaluatePython_step_sim() {
     }
 }
 
+/**
+ * Resumes the performance metrics timer.
+ */
 async function resume_timer() {
     let pyodide = await pyodideReadyPromise;
     resume_timer = pyodide.globals.get("resume_timer");
     resume_timer();
 }
 
+/**
+ * Stops/pauses the performance metrics timer.
+ */
 async function stop_timer() {
     let pyodide = await pyodideReadyPromise;
     stop_timer = pyodide.globals.get("stop_timer");
     stop_timer();
 }
 
+/**
+ * Updates the performance metrics output field.
+ */
 async function update_performance_metrics() {
     let pyodide = await pyodideReadyPromise;
     get_performance_metrics = pyodide.globals.get("get_performance_metrics");
@@ -383,25 +439,11 @@ async function update_performance_metrics() {
     performance_metrics_vis.value = get_performance_metrics();
 }
 
-// async function evaluatePython_run_sim() {
-//     start_loading_animation();
-//     let pyodide = await pyodideReadyPromise;
-//     stop_loading_animation();
-//     input_str = input.value
-//     let output;
-//     try {
-//         // reset the sim before executing run
-//         reset_sim = pyodide.globals.get("reset_sim");
-//         reset_sim();
-
-//         run_sim = pyodide.globals.get("run_sim");
-//         let output = run_sim(input_str);
-//         addToOutput(output);
-//     } catch (err) {
-//         addToOutput(err);
-//     }
-// }
-
+/**
+ * Resets the simulation and sets it to the given pipeline mode.
+ *
+ * @param {string} pipeline_mode - the pipeline mode to use. See the RiscvSimulation class for more information.
+ */
 async function evaluatePython_reset_sim(pipeline_mode) {
     start_loading_animation();
     let pyodide = await pyodideReadyPromise;
@@ -418,6 +460,9 @@ async function evaluatePython_reset_sim(pipeline_mode) {
     }
 }
 
+/**
+ * Updates the instruction/register/memory tables (and updates the visualization).
+ */
 async function evaluatePython_update_tables() {
     let pyodide = await pyodideReadyPromise;
     try {
@@ -433,6 +478,9 @@ async function evaluatePython_update_tables() {
     }
 }
 
+/**
+ * Parses the text from the input field and loads it into the simulation.
+ */
 async function evaluatePython_parse_input() {
     let pyodide = await pyodideReadyPromise;
     input_str = input.value;
@@ -443,7 +491,3 @@ async function evaluatePython_parse_input() {
         addToOutput(err);
     }
 }
-
-//function update_output(output_string) {
-//    output.value = output_string;
-//}
