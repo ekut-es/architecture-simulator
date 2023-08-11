@@ -28,6 +28,7 @@ function addToOutput(s) {
 // Object containing functions to be exported to python
 const archsim_js = {
     update_register_table: function (reg, representations, abi_name) {
+        vis_highlight = false;
         tr = document.createElement("tr");
         td1 = document.createElement("td");
         td1.innerText = "x" + reg;
@@ -37,6 +38,7 @@ const archsim_js = {
         if (previous_registers[reg] != Array.from(representations)[1]) {
             td2.style.backgroundColor = "yellow";
             previous_registers[reg] = Array.from(representations)[1];
+            vis_highlight = true;
         }
         td3 = document.createElement("td");
         td3.innerText = abi_name;
@@ -53,6 +55,9 @@ const archsim_js = {
         td2_vis.innerText =
             Array.from(representations)[reg_representation_mode];
         td2_vis.id = "val_x" + reg;
+        if (vis_highlight) {
+            td2_vis.style.backgroundColor = "yellow";
+        }
         td3_vis = document.createElement("td");
         td3_vis.innerText = abi_name;
         td3_vis.id = abi_name;
@@ -65,6 +70,7 @@ const archsim_js = {
     //     document.getElementById("val_x"+reg).innerText = val
     // },
     update_memory_table: function (address, representations) {
+        vis_highlight = false;
         tr = document.createElement("tr");
         td1 = document.createElement("td");
         td1.innerText = address;
@@ -75,6 +81,7 @@ const archsim_js = {
         if (previous_memory[address] != Array.from(representations)[1]) {
             td2.style.backgroundColor = "yellow";
             previous_memory[address] = Array.from(representations)[1];
+            vis_highlight = true;
         }
         tr.appendChild(td1);
         tr.appendChild(td2);
@@ -88,6 +95,9 @@ const archsim_js = {
         td2_vis.innerText =
             Array.from(representations)[mem_representation_mode];
         td2_vis.id = "memory" + address;
+        if (vis_highlight) {
+            td2_vis.style.backgroundColor = "yellow";
+        }
         tr_vis.appendChild(td1_vis);
         tr_vis.appendChild(td2_vis);
         memory_vis.appendChild(tr_vis);
@@ -160,25 +170,25 @@ const archsim_js = {
         td3_vis = document.createElement("td");
         td3_vis.innerText = stage;
         if (stage == "IF") {
-            td1.style.backgroundColor = "#FFEC00";
-            td2.style.backgroundColor = "#FFEC00";
-            td3.style.backgroundColor = "#FFEC00";
+            td1_vis.style.backgroundColor = "#FFEC00";
+            td2_vis.style.backgroundColor = "#FFEC00";
+            td3_vis.style.backgroundColor = "#FFEC00";
         } else if (stage == "ID") {
-            td1.style.backgroundColor = "#FFC900";
-            td2.style.backgroundColor = "#FFC900";
-            td3.style.backgroundColor = "#FFC900";
+            td1_vis.style.backgroundColor = "#FFC900";
+            td2_vis.style.backgroundColor = "#FFC900";
+            td3_vis.style.backgroundColor = "#FFC900";
         } else if (stage == "EX") {
-            td1.style.backgroundColor = "#695CC4";
-            td2.style.backgroundColor = "#695CC4";
-            td3.style.backgroundColor = "#695CC4";
+            td1_vis.style.backgroundColor = "#695CC4";
+            td2_vis.style.backgroundColor = "#695CC4";
+            td3_vis.style.backgroundColor = "#695CC4";
         } else if (stage == "MEM") {
-            td1.style.backgroundColor = "#2A17B1";
-            td2.style.backgroundColor = "#2A17B1";
-            td3.style.backgroundColor = "#2A17B1";
+            td1_vis.style.backgroundColor = "#2A17B1";
+            td2_vis.style.backgroundColor = "#2A17B1";
+            td3_vis.style.backgroundColor = "#2A17B1";
         } else if (stage == "WB") {
-            td1.style.backgroundColor = "#580EAD";
-            td2.style.backgroundColor = "#580EAD";
-            td3.style.backgroundColor = "#580EAD";
+            td1_vis.style.backgroundColor = "#580EAD";
+            td2_vis.style.backgroundColor = "#580EAD";
+            td3_vis.style.backgroundColor = "#580EAD";
         }
         tr_vis.appendChild(td1_vis);
         tr_vis.appendChild(td2_vis);
