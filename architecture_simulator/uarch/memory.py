@@ -26,123 +26,43 @@ class Memory:
     min_bytes: int = 2**14  # 2**14
     memory_file: dict[int, fixedint.MutableUInt8] = field(default_factory=dict)
 
-    def memory_wordwise_repr(self) -> dict[int, tuple]:
+    def memory_wordwise_repr(self) -> dict[int, tuple[str, str, str]]:
         """Returns the contents of the memory as binary, decimal and hexadecimal values, all nicely formatted.
 
         Returns:
-            dict[int, tuple]: keys: addresses. Values: Tuples of (binary, decimal, hexadecimal) strings.
+            dict[int, tuple[str, str, str]]: keys: addresses. Values: Tuples of (binary, decimal, hexadecimal) strings.
         """
-        wordwise_mem: dict[int, tuple] = dict()
-        number_of_bytes = self.address_length / 8
+        wordwise_mem: dict[int, tuple[str, str, str]] = dict()
         for address in self.memory_file.keys():
-            if address % number_of_bytes == 0:
-                word = self.read_word(address=address)
-                bin_word = "{:032b}".format(int(word))
-                hex_word = "{:08X}".format(int(word))
-                bin_word_with_spaces = (
-                    bin_word[0:8]
-                    + " "
-                    + bin_word[8:16]
-                    + " "
-                    + bin_word[16:24]
-                    + " "
-                    + bin_word[24:32]
-                )
-                hex_word_with_spaces = (
-                    hex_word[0:2]
-                    + " "
-                    + hex_word[2:4]
-                    + " "
-                    + hex_word[4:6]
-                    + " "
-                    + hex_word[6:8]
-                )
-                wordwise_mem[address] = (
-                    bin_word_with_spaces,
-                    int(word),
-                    hex_word_with_spaces,
-                )
-            elif address % number_of_bytes == 1:
-                word = self.read_word(address=address - 1)
-                bin_word = "{:032b}".format(int(word))
-                hex_word = "{:08X}".format(int(word))
-                bin_word_with_spaces = (
-                    bin_word[0:8]
-                    + " "
-                    + bin_word[8:16]
-                    + " "
-                    + bin_word[16:24]
-                    + " "
-                    + bin_word[24:32]
-                )
-                hex_word_with_spaces = (
-                    hex_word[0:2]
-                    + " "
-                    + hex_word[2:4]
-                    + " "
-                    + hex_word[4:6]
-                    + " "
-                    + hex_word[6:8]
-                )
-                wordwise_mem[address - 1] = (
-                    bin_word_with_spaces,
-                    int(word),
-                    hex_word_with_spaces,
-                )
-            elif address % number_of_bytes == 2:
-                word = self.read_word(address=address - 2)
-                bin_word = "{:032b}".format(int(word))
-                hex_word = "{:08X}".format(int(word))
-                bin_word_with_spaces = (
-                    bin_word[0:8]
-                    + " "
-                    + bin_word[8:16]
-                    + " "
-                    + bin_word[16:24]
-                    + " "
-                    + bin_word[24:32]
-                )
-                hex_word_with_spaces = (
-                    hex_word[0:2]
-                    + " "
-                    + hex_word[2:4]
-                    + " "
-                    + hex_word[4:6]
-                    + " "
-                    + hex_word[6:8]
-                )
-                wordwise_mem[address - 2] = (
-                    bin_word_with_spaces,
-                    int(word),
-                    hex_word_with_spaces,
-                )
-            elif address % number_of_bytes == 3:
-                word = self.read_word(address=address - 3)
-                bin_word = "{:032b}".format(int(word))
-                hex_word = "{:08X}".format(int(word))
-                bin_word_with_spaces = (
-                    bin_word[0:8]
-                    + " "
-                    + bin_word[8:16]
-                    + " "
-                    + bin_word[16:24]
-                    + " "
-                    + bin_word[24:32]
-                )
-                hex_word_with_spaces = (
-                    hex_word[0:2]
-                    + " "
-                    + hex_word[2:4]
-                    + " "
-                    + hex_word[4:6]
-                    + " "
-                    + hex_word[6:8]
-                )
-                wordwise_mem[address - 3] = (
-                    bin_word_with_spaces,
-                    int(word),
-                    hex_word_with_spaces,
-                )
+            aligned_address = address - (address % 4)
+            if aligned_address in wordwise_mem:
+                continue
+            word = self.read_word(address=aligned_address)
+            bin_word = "{:032b}".format(int(word))
+            hex_word = "{:08X}".format(int(word))
+            bin_word_with_spaces = (
+                bin_word[0:8]
+                + " "
+                + bin_word[8:16]
+                + " "
+                + bin_word[16:24]
+                + " "
+                + bin_word[24:32]
+            )
+            hex_word_with_spaces = (
+                hex_word[0:2]
+                + " "
+                + hex_word[2:4]
+                + " "
+                + hex_word[4:6]
+                + " "
+                + hex_word[6:8]
+            )
+            wordwise_mem[aligned_address] = (
+                bin_word_with_spaces,
+                str(word),
+                hex_word_with_spaces,
+            )
         return wordwise_mem
 
     def read_byte(self, address: int) -> fixedint.MutableUInt8:

@@ -105,15 +105,6 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             reg_representation_mode = binary_representation;
             evaluatePython_update_tables();
-            //document
-            //  .getElementById("button_binary_representation_id")
-            // .classList.add("checked");
-            //document
-            //  .getElementById("button_decimal_representation_id")
-            //.classList.remove("checked");
-            //document
-            //  .getElementById("button_hexa_representation_id")
-            //.classList.remove("checked");
         });
 
     document
@@ -121,15 +112,6 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             reg_representation_mode = decimal_representation;
             evaluatePython_update_tables();
-            //document
-            //.getElementById("button_decimal_representation_id")
-            //.classList.add("active");
-            //document
-            //  .getElementById("button_binary_representation_id")
-            //.classList.remove("active");
-            //document
-            //  .getElementById("button_hexa_representation_id")
-            //.classList.remove("active");
         });
 
     document
@@ -137,15 +119,6 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             reg_representation_mode = hexa_representation;
             evaluatePython_update_tables();
-            //document
-            //.getElementById("button_hexa_representation_id")
-            //.classList.add("active");
-            //document
-            //  .getElementById("button_decimal_representation_id")
-            //.classList.remove("active");
-            //document
-            //  .getElementById("button_binary_representation_id")
-            //.classList.remove("active");
         });
 
     document
@@ -153,15 +126,6 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             mem_representation_mode = binary_representation;
             evaluatePython_update_tables();
-            //document
-            //  .getElementById("button_binary_representation_id")
-            // .classList.add("checked");
-            //document
-            //  .getElementById("button_decimal_representation_id")
-            //.classList.remove("checked");
-            //document
-            //  .getElementById("button_hexa_representation_id")
-            //.classList.remove("checked");
         });
 
     document
@@ -169,15 +133,6 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             mem_representation_mode = decimal_representation;
             evaluatePython_update_tables();
-            //document
-            //.getElementById("button_decimal_representation_id")
-            //.classList.add("active");
-            //document
-            //  .getElementById("button_binary_representation_id")
-            //.classList.remove("active");
-            //document
-            //  .getElementById("button_hexa_representation_id")
-            //.classList.remove("active");
         });
 
     document
@@ -185,15 +140,6 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             mem_representation_mode = hexa_representation;
             evaluatePython_update_tables();
-            //document
-            //.getElementById("button_hexa_representation_id")
-            //.classList.add("active");
-            //document
-            //  .getElementById("button_decimal_representation_id")
-            //.classList.remove("active");
-            //document
-            //  .getElementById("button_binary_representation_id")
-            //.classList.remove("active");
         });
 
     document
@@ -212,12 +158,6 @@ window.addEventListener("DOMContentLoaded", function () {
             document.getElementById("MainContent").style.display = "block";
             document.getElementById("button_tab_visualization").textContent =
                 "Visualization";
-            //document
-            //  .getElementById("button_SingleStage")
-            //.classList.add("active");
-            //document
-            //  .getElementById("button_5-Stage")
-            //.classList.remove("active");
         });
 
     document.getElementById("button_5-Stage").addEventListener("click", () => {
@@ -229,10 +169,6 @@ window.addEventListener("DOMContentLoaded", function () {
         );
         document.getElementById("button_tab_visualization").style.display =
             "block";
-        //document.getElementById("button_5-Stage").classList.add("active");
-        //document
-        //  .getElementById("button_SingleStage")
-        //.classList.remove("active");
     });
 
     editor.on("change", function () {
@@ -256,21 +192,6 @@ window.addEventListener("DOMContentLoaded", function () {
             parse_sim_after_not_typing_for_n_ms
         );
     });
-
-    /*document.getElementById("input").addEventListener("keyup", () => {
-        editor.save();
-        editor.change()
-        // autoparse
-        clearTimeout(input_timer);
-        input_timer = setTimeout(
-            finished_typing,
-            parse_sim_after_not_typing_for_n_ms
-        );
-    });
-
-    document.getElementById("input").addEventListener("keydown", () => {
-        clearTimeout(input_timer);
-    });*/
 
     function finished_typing() {
         evaluatePython_parse_input();

@@ -81,25 +81,25 @@ class TestRiscvArchitecture(unittest.TestCase):
             state.memory.memory_wordwise_repr()[0][0],
             "00000000 00000000 00000000 00000001",
         )
-        self.assertEqual(state.memory.memory_wordwise_repr()[0][1], 1)
+        self.assertEqual(state.memory.memory_wordwise_repr()[0][1], "1")
         self.assertEqual(state.memory.memory_wordwise_repr()[0][2], "00 00 00 01")
         self.assertEqual(
             state.memory.memory_wordwise_repr()[4][0],
             "00000000 00000110 00000000 00000000",
         )
-        self.assertEqual(state.memory.memory_wordwise_repr()[4][1], 6 << 16)
+        self.assertEqual(state.memory.memory_wordwise_repr()[4][1], str(6 << 16))
         self.assertEqual(state.memory.memory_wordwise_repr()[4][2], "00 06 00 00")
         self.assertEqual(
             state.memory.memory_wordwise_repr()[8][0],
             "00000000 00000000 00000000 00000000",
         )
-        self.assertEqual(state.memory.memory_wordwise_repr()[8][1], 0)
+        self.assertEqual(state.memory.memory_wordwise_repr()[8][1], "0")
         self.assertEqual(state.memory.memory_wordwise_repr()[8][2], "00 00 00 00")
         self.assertEqual(
             state.memory.memory_wordwise_repr()[20][0],
             "00000000 00000000 00010100 00000000",
         )
-        self.assertEqual(state.memory.memory_wordwise_repr()[20][1], 20 << 8)
+        self.assertEqual(state.memory.memory_wordwise_repr()[20][1], str(20 << 8))
         self.assertEqual(state.memory.memory_wordwise_repr()[20][2], "00 00 14 00")
 
         state = RiscvArchitecturalState(
