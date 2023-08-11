@@ -42,3 +42,15 @@ class ToyArchitecturalState:
             bool: Whether there is an instruction in the instruction memory at the current program counter.
         """
         return self.instruction_memory.instruction_at_address(int(self.program_counter))
+
+    def get_accu_represenatation(self) -> tuple[str, str, str]:
+        """Returns the values of the accu as binary, decimal and hex strings.
+
+        Returns:
+            tuple[str, str, str]: tuple of the bin, dec, hex representation strings of the accu.
+        """
+        accu = int(self.accu)
+        binary = "{:019_b}".format(accu).replace("_", " ")
+        decimal = str(accu)
+        hexadecimal = "{:04X}".format(accu)
+        return binary, decimal, hexadecimal

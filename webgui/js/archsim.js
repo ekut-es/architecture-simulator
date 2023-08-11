@@ -29,6 +29,12 @@ function addToOutput(s) {
 
 // Object containing functions to be exported to python
 const archsim_js = {
+    get_selected_isa: function () {
+        return selected_isa;
+    },
+    get_pipeline_mode: function () {
+        return pipeline_mode;
+    },
     /**
      * Appends one row to the register table.
      *
@@ -450,7 +456,7 @@ async function evaluatePython_reset_sim(pipeline_mode) {
     stop_loading_animation();
     try {
         reset_sim = pyodide.globals.get("reset_sim");
-        reset_sim(pipeline_mode);
+        reset_sim(selected_isa, pipeline_mode);
         output.value = "";
         output_vis.value = "";
         performance_metrics.value = "";

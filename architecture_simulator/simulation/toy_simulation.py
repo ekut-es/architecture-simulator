@@ -42,3 +42,9 @@ class ToySimulation(Simulation):
         )
         parser = ToyParser()
         parser.parse(program=program, state=self.state)
+
+    def has_instructions(self) -> bool:
+        return bool(self.state.instruction_memory)
+
+    def get_performance_metrics_str(self) -> str:
+        return str(self.state.performance_metrics)

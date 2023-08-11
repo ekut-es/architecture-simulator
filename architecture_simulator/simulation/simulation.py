@@ -29,3 +29,19 @@ class Simulation(ABC):
         Args:
             program (str): A text format assembly program.
         """
+
+    @abstractmethod
+    def has_instructions(self) -> bool:
+        """Returns whether there are any instructions loaded in the simulation (e.g. in the instruction memory).
+
+        Returns:
+            bool: Whether there are any instructions in the simulation.
+        """
+
+    @abstractmethod
+    def get_performance_metrics_str(self) -> str:
+        """Returns a string which contains statistics about the simulation.
+
+        Returns:
+            str: A string containing statistics about the simulation.
+        """
