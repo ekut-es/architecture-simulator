@@ -1,15 +1,25 @@
+const riscv_isa = 0;
+const toy_isa = 1;
+
 const binary_representation = 0;
 const decimal_representation = 1;
 const hexa_representation = 2;
+
 //change steps_per_interval if you want to change the amount of times evaluatePython_step_sim() is called per interval (10ms)
 //the higher this number the less responsive the ui gets, at 200 it starts to get a bit too unresponsive. 100 feels acceptable
 const steps_per_interval = 100;
+
 //set use_more_than_one_step_per_10ms to false if you only want to call up evaluatePython_step_sim() more than once per interval (10ms)
 const use_more_than_one_step_per_10ms = true;
 const parse_sim_after_not_typing_for_n_ms = 500;
+
 var input_timer;
+
+let selected_isa = riscv_isa;
+
 let reg_representation_mode = decimal_representation; //change this to set another default repr.
 let mem_representation_mode = decimal_representation;
+
 var run;
 var pipeline_mode = "single_stage_pipeline";
 window.addEventListener("DOMContentLoaded", function () {
@@ -100,6 +110,20 @@ window.addEventListener("DOMContentLoaded", function () {
         //stop_timer()
     }
 
+    // select isa button listeners
+    document
+        .getElementById("isa_button_riscv_id")
+        .addEventListener("click", () => {
+            selected_isa = riscv_isa;
+        });
+
+    document
+        .getElementById("isa_button_toy_id")
+        .addEventListener("click", () => {
+            selected_isa = toy_isa;
+        });
+
+    // register representation button listeners
     document
         .getElementById("reg_button_binary_representation_id")
         .addEventListener("click", () => {
@@ -121,6 +145,7 @@ window.addEventListener("DOMContentLoaded", function () {
             evaluatePython_update_tables();
         });
 
+    // memory representation button listeners
     document
         .getElementById("mem_button_binary_representation_id")
         .addEventListener("click", () => {
@@ -142,6 +167,7 @@ window.addEventListener("DOMContentLoaded", function () {
             evaluatePython_update_tables();
         });
 
+    // pipeline mode button listeners
     document
         .getElementById("button_SingleStage")
         .addEventListener("click", () => {
