@@ -503,11 +503,6 @@ function set_svg_text_complex(id, str) {
         "visualization_pipeline"
     ).contentDocument;
     pipeline_svg.getElementById(id).firstChild.nextSibling.textContent = str;
-    if (str != undefined) {
-        pipeline_svg.getElementById(id).firstChild.width =
-            pipeline_svg.getElementById(id).firstChild.width *
-            (str.length / 11);
-    }
 }
 
 function set_svg_colour(id, str) {
