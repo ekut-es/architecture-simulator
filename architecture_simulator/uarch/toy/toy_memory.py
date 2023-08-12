@@ -35,7 +35,7 @@ class ToyMemory:
         """
         self.assert_address_in_range(address)
         try:
-            return self.memory_file[address]
+            return MutableUInt16(int(self.memory_file[address]))
         except KeyError:
             return MutableUInt16(0)
 

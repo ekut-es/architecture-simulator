@@ -3,7 +3,6 @@
 Loopcount = $400
 Result = $401
 :$400:20 # enter n here
-:$402:20
 
 loop:
 LDA Result

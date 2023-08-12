@@ -192,7 +192,6 @@ def update_tables():
     if isinstance(simulation, ToySimulation):
         # register table
         accu_representation = simulation.state.get_accu_represenatation()
-        print(accu_representation)
         archsim_js.update_register_table(0, accu_representation, "ACCU")
 
         # instruction table
