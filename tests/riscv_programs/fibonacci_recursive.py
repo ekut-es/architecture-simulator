@@ -100,21 +100,15 @@ and x0, x0, x0 # end
 
 """
 Fibonacci Recursive 2 is an updated version of the original fibonacci recursive program.
-The algorithm was altered slightly so that you can calculate the number of procedure calls slightly: it is (2*Fib(n+1) - 1).
+The algorithm was altered slightly so that you can calculate the number of procedure calls: it is (2*Fib(n+1) - 1).
 The real differences are: Usage of the parser, labels, and ABI register names"""
 
 
 def fibonacci_recursive_simulation_2(n: int) -> RiscvSimulation:
-    simulation = RiscvSimulation(
-        state=RiscvArchitecturalState(
-            register_file=RegisterFile(), memory=Memory(min_bytes=0)
-        )
-    )
+    simulation = RiscvSimulation()
     simulation.load_program(
-        f"""lui a0, 0
-addi a0, a0, {n} # load n
+        f"""addi a0, zero, {n} # load n
 addi s0, zero, 1 # load 1 for comparison
-addi sp, zero, 1024 # adjust sp
 jal ra, Fib # fib(n)
 beq zero, zero, End # go to end
 Fib:
