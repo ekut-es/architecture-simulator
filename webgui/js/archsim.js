@@ -14,6 +14,9 @@ const performance_metrics = document.getElementById("performance_metrics");
 const performance_metrics_vis = document.getElementById(
     "vis_performance_metrics"
 );
+
+var previous_pc = 0;
+
 const pipeline_svg = document.getElementById(
     "visualization_pipeline"
 ).contentDocument;
@@ -334,9 +337,14 @@ const archsim_js = {
         address_of_instruction,
         pc_plus_instruction_length
     ) {
-        set_svg_text_simple("IMInstr", instruction);
-        set_svg_text_simple("IMReadAddress", address_of_instruction);
-        set_svg_text_simple("PC", address_of_instruction);
+        set_svg_text_simple_right_align("IMInstr", instruction);
+        set_svg_text_simple_left_align("IMReadAddress", address_of_instruction);
+        if (address_of_instruction != undefined) {
+            set_svg_text_simple("PC", address_of_instruction);
+            previous_pc = address_of_instruction;
+        } else {
+            set_svg_text_simple("PC", previous_pc);
+        }
         set_svg_text_complex("FetchAddOutText", pc_plus_instruction_length);
 
         if (Number.isInteger(address_of_instruction)) {
@@ -368,10 +376,10 @@ const archsim_js = {
         address_of_instruction,
         control_unit_signals
     ) {
-        set_svg_text_simple("RFReadAddress1", register_read_addr_1);
-        set_svg_text_simple("RFReadAddress2", register_read_addr_2);
-        set_svg_text_simple("RFReadData1", register_read_data_1);
-        set_svg_text_simple("RFReadData2", register_read_data_2);
+        set_svg_text_simple_left_align("RFReadAddress1", register_read_addr_1);
+        set_svg_text_simple_left_align("RFReadAddress2", register_read_addr_2);
+        set_svg_text_simple_right_align("RFReadData1", register_read_data_1);
+        set_svg_text_simple_right_align("RFReadData2", register_read_data_2);
         set_svg_text_simple("ImmGen", imm);
         set_svg_text_complex("DecodeInstructionMemory4Text", write_register);
         set_svg_text_complex(
@@ -438,9 +446,11 @@ const archsim_js = {
         if (Number.isInteger(address_of_instruction)) {
             set_svg_colour("DecodeUpperFetchPCOut", "blue");
             set_svg_colour("DecodeLowerFetchPCOut", "blue");
+            set_svg_colour("DecodeInstructionMemory", "blue");
         } else {
             set_svg_colour("DecodeUpperFetchPCOut", "black");
             set_svg_colour("DecodeLowerFetchPCOut", "black");
+            set_svg_colour("DecodeInstructionMemory", "black");
         }
     },
     update_EX_Stage: function (
@@ -484,7 +494,7 @@ const archsim_js = {
         );
         set_svg_text_complex("ExecuteImmGenText1", imm);
         set_svg_text_complex("ExecuteImmGenText3", imm);
-        set_svg_text_simple("ALUResult-8-3-0", result);
+        set_svg_text_simple_right_align("ALUResult-8-3-0", result);
         set_svg_text_complex("ExecuteInstructionMemory4Text", write_register);
         set_svg_text_complex("ExecuteAddText", pc_plus_imm);
         set_svg_text_complex(
@@ -590,11 +600,11 @@ const archsim_js = {
             set_svg_colour("ControlUnitLeft", "black");
         }
 
-        set_svg_text_simple("DMAddress", memory_address);
+        set_svg_text_simple_left_align("DMAddress", memory_address);
         set_svg_text_complex("FetchLeftMuxInZeroText", result);
         set_svg_text_complex("MemoryExecuteAluResultText2", result);
-        set_svg_text_simple("DMWriteData", memory_write_data);
-        set_svg_text_simple("DMReadData", memory_read_data);
+        set_svg_text_simple_left_align("DMWriteData", memory_write_data);
+        set_svg_text_simple_right_align("DMReadData", memory_read_data);
         set_svg_text_complex("MemoryInstructionMemory4Text", write_register);
         set_svg_text_complex("MemoryExecuteAddOutText", pc_plus_imm);
         set_svg_text_complex(
@@ -633,11 +643,11 @@ const archsim_js = {
             set_svg_colour("MemoryALUComparison", "black");
         }
 
-        // if (comparison_or_jump == true) {
-        //     set_svg_colour("FetchLeftMuxInZeroText", "green");
-        // } else {
-        //     set_svg_colour("FetchLeftMuxInZeroText", "black");
-        // }
+        if (comparison_or_jump == true) {
+            set_svg_colour("MemoryJumpOut", "green");
+        } else {
+            set_svg_colour("MemoryJumpOut", "black");
+        }
 
         if (Number.isInteger(pc_plus_imm)) {
             set_svg_colour("MemoryExecuteAddOut", "blue");
@@ -673,8 +683,8 @@ const archsim_js = {
         } else {
             set_svg_colour("ControlUnitLeftRight2", "black");
         }
-        set_svg_text_simple("RFWriteData", register_write_data);
-        set_svg_text_simple("RFWriteFile", write_register);
+        set_svg_text_simple_left_align("RFWriteData", register_write_data);
+        set_svg_text_simple_left_align("RFWriteFile", write_register);
         set_svg_text_complex(
             "WriteBackDataMemoryReadDataText",
             memory_read_data
@@ -727,7 +737,6 @@ const archsim_js = {
         pc_plus_imm_or_pc_plus_instruction_length,
         pc_plus_imm_or_pc_plus_instruction_length_or_ALU_result
     ) {
-        console.log(pc_plus_imm_or_pc_plus_instruction_length);
         set_svg_text_complex(
             "FetchRightMuxOutText",
             pc_plus_imm_or_pc_plus_instruction_length
