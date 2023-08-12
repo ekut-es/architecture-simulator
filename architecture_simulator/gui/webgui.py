@@ -283,7 +283,7 @@ def update_tables():
             archsim_js.update_IF_Stage(
                 None,
                 None,
-                None,
+                [],
             )
     except:
         ...
@@ -328,7 +328,7 @@ def update_tables():
                 None,
                 None,
                 None,
-                None,
+                [],
             )
     except:
         ...
@@ -382,7 +382,7 @@ def update_tables():
                 None,
                 None,
                 None,
-                None,
+                [],
             )
     except:
         ...
@@ -440,7 +440,7 @@ def update_tables():
                 None,
                 None,
                 None,
-                None,
+                [],
             )
     except:
         ...
@@ -491,7 +491,7 @@ def update_tables():
                 None,
                 None,
                 None,
-                None,
+                [],
             )
     except:
         ...

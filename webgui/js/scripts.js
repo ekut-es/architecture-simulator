@@ -488,7 +488,8 @@ window.addEventListener("load", function () {
     // pipeline_svg.getElementById("ExecuteRightMuxOut").setAttribute("stroke", "#FFFFFF");
     console.log(pipeline_svg.getElementById("g42637"));
     // console.log(pipeline_svg.getElementById("WriteBackDataMemoryReadData").style.stroke)
-    set_svg_colour_complex("FetchPCOut", "yellow");
+    set_svg_colour_complex("TopMostLeftMux0-8", "yellow");
+    console.log(pipeline_svg.getElementById("g67505"));
 });
 
 function set_svg_text_simple(id, str) {
@@ -505,19 +506,16 @@ function set_svg_text_complex(id, str) {
     pipeline_svg.getElementById(id).firstChild.nextSibling.textContent = str;
 }
 
-function set_svg_colour_simple(id, str) {
+function set_svg_colour(id, str) {
     const pipeline_svg = document.getElementById(
         "visualization_pipeline"
     ).contentDocument;
-    pipeline_svg.getElementById(id).style.stroke = str;
-}
-
-function set_svg_colour_complex(id, str) {
-    const pipeline_svg = document.getElementById(
-        "visualization_pipeline"
-    ).contentDocument;
-    Child_Nodes = pipeline_svg.getElementById(id).childNodes;
-    for (let i = 0; i < Child_Nodes.length; i++) {
-        Child_Nodes[i].style.stroke = str;
+    const Child_Nodes = pipeline_svg.getElementById(id).childNodes;
+    if (Child_Nodes.length > 0) {
+        for (let i = 0; i < Child_Nodes.length; i++) {
+            set_svg_colour(Child_Nodes[i].id, str);
+        }
+    } else {
+        pipeline_svg.getElementById(id).style.stroke = str;
     }
 }
