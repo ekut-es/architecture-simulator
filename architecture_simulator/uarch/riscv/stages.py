@@ -211,6 +211,7 @@ class ExecuteStage(Stage):
             instruction=pipeline_register.instruction,
             alu_in_1=alu_in_1,
             alu_in_2=alu_in_2,
+            register_read_data_1=pipeline_register.register_read_data_1,
             register_read_data_2=pipeline_register.register_read_data_2,
             imm=pipeline_register.imm,
             result=result,

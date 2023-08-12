@@ -24,11 +24,13 @@ def update_ID_Stage(
     imm,
     write_register,
     pc_plus_instruction_length,
+    address_of_instruction,
     control_unit_signals,
 ) -> None: ...
 def update_EX_Stage(
     alu_in_1,
     alu_in_2,
+    register_read_data_1,
     register_read_data_2,
     imm,
     result,
@@ -36,6 +38,7 @@ def update_EX_Stage(
     comparison,
     pc_plus_imm,
     pc_plus_instruction_length,
+    address_of_instruction,
     control_unit_signals,
 ) -> None: ...
 def update_MEM_Stage(

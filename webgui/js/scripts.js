@@ -488,8 +488,7 @@ window.addEventListener("load", function () {
     // pipeline_svg.getElementById("ExecuteRightMuxOut").setAttribute("stroke", "#FFFFFF");
     console.log(pipeline_svg.getElementById("g42637"));
     // console.log(pipeline_svg.getElementById("WriteBackDataMemoryReadData").style.stroke)
-    set_svg_colour_complex("TopMostLeftMux0-8", "yellow");
-    console.log(pipeline_svg.getElementById("g67505"));
+    console.log(pipeline_svg.getElementById("DecodeUpperFetchPCOut"));
 });
 
 function set_svg_text_simple(id, str) {
@@ -504,6 +503,11 @@ function set_svg_text_complex(id, str) {
         "visualization_pipeline"
     ).contentDocument;
     pipeline_svg.getElementById(id).firstChild.nextSibling.textContent = str;
+    if (str != undefined) {
+        pipeline_svg.getElementById(id).firstChild.width =
+            pipeline_svg.getElementById(id).firstChild.width *
+            (str.length / 11);
+    }
 }
 
 function set_svg_colour(id, str) {

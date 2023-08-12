@@ -283,7 +283,7 @@ def update_tables():
             archsim_js.update_IF_Stage(
                 None,
                 None,
-                [],
+                None,
             )
     except:
         ...
@@ -317,10 +317,12 @@ def update_tables():
                 ID_pipeline_register.imm,
                 ID_pipeline_register.write_register,
                 ID_pipeline_register.pc_plus_instruction_length,
+                ID_pipeline_register.address_of_instruction,
                 control_unit_signals=control_unit_signals,
             )
         elif isinstance(ID_pipeline_register, PipelineRegister):
             archsim_js.update_ID_Stage(
+                None,
                 None,
                 None,
                 None,
@@ -362,6 +364,7 @@ def update_tables():
             archsim_js.update_EX_Stage(
                 EX_pipeline_register.alu_in_1,
                 EX_pipeline_register.alu_in_2,
+                EX_pipeline_register.register_read_data_1,
                 EX_pipeline_register.register_read_data_2,
                 EX_pipeline_register.imm,
                 EX_pipeline_register.result,
@@ -369,10 +372,12 @@ def update_tables():
                 EX_pipeline_register.comparison,
                 EX_pipeline_register.pc_plus_imm,
                 EX_pipeline_register.pc_plus_instruction_length,
+                EX_pipeline_register.address_of_instruction,
                 control_unit_signals,
             )
         elif isinstance(EX_pipeline_register, PipelineRegister):
             archsim_js.update_EX_Stage(
+                None,
                 None,
                 None,
                 None,
