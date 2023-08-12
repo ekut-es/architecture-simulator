@@ -334,10 +334,10 @@ const archsim_js = {
         address_of_instruction,
         pc_plus_instruction_length
     ) {
-        set_svg_text("IMInstr", instruction);
-        set_svg_text("IMReadAddress", address_of_instruction);
-        set_svg_text("PC", address_of_instruction);
-        //set_svg_text("FetchAddOutText", pc_plus_instruction_length);
+        set_svg_text_simple("IMInstr", instruction);
+        set_svg_text_simple("IMReadAddress", address_of_instruction);
+        set_svg_text_simple("PC", address_of_instruction);
+        set_svg_text_complex("FetchAddOutText", pc_plus_instruction_length);
     },
     update_ID_Stage: function (
         register_read_addr_1,
@@ -345,35 +345,94 @@ const archsim_js = {
         register_read_data_1,
         register_read_data_2,
         imm,
+        write_register,
+        pc_plus_instruction_length,
         control_unit_signals
-    ) {},
+    ) {
+        set_svg_text_simple("RFReadAddress1", register_read_addr_1);
+        set_svg_text_simple("RFReadAddress2", register_read_addr_2);
+        set_svg_text_simple("RFReadData1", register_read_data_1);
+        set_svg_text_simple("RFReadData2", register_read_data_2);
+        set_svg_text_simple("ImmGen", imm);
+        set_svg_text_complex("DecodeInstructionMemory4Text", write_register);
+        set_svg_text_complex(
+            "DecodeFetchAddOutText",
+            pc_plus_instruction_length
+        );
+    },
     update_EX_Stage: function (
         alu_in_1,
         alu_in_2,
         register_read_data_2,
         imm,
         result,
+        write_register,
         comparison,
         pc_plus_imm,
+        pc_plus_instruction_length,
         control_unit_signals
-    ) {},
+    ) {
+        set_svg_text_complex(
+            "ExecuteRegisterFileReadData2Text2",
+            register_read_data_2
+        );
+        set_svg_text_complex("ExecuteImmGenText1", imm);
+        set_svg_text_complex("ExecuteImmGenText3", imm);
+        set_svg_text_simple("ALUResult-8-3-0", result);
+        set_svg_text_complex("ExecuteInstructionMemory4Text", write_register);
+        set_svg_text_complex(
+            "ExecuteFetchAddOutText",
+            pc_plus_instruction_length
+        );
+    },
     update_MEM_Stage: function (
         memory_address,
         result,
         memory_write_data,
         memory_read_data,
+        write_register,
         comparison,
-        pc_src,
+        comparison_or_jump,
         pc_plus_imm,
+        pc_plus_instruction_length,
+        imm,
         control_unit_signals
-    ) {},
+    ) {
+        set_svg_text_simple("DMAddress", memory_address);
+        set_svg_text_complex("FetchLeftMuxInZeroText", result);
+        set_svg_text_complex("MemoryExecuteAluResultText2", result);
+        set_svg_text_simple("DMWriteData", memory_write_data);
+        set_svg_text_simple("DMReadData", memory_read_data);
+        set_svg_text_complex("MemoryInstructionMemory4Text", write_register);
+        set_svg_text_complex("MemoryExecuteAddOutText", pc_plus_imm);
+        set_svg_text_complex(
+            "MemoryFetchAddOutText",
+            pc_plus_instruction_length
+        );
+        set_svg_text_complex("MemoryImmGenText", imm);
+    },
     update_WB_Stage: function (
         register_write_data,
         write_register,
         memory_read_data,
         alu_result,
+        pc_plus_instruction_length,
+        imm,
         control_unit_signals
-    ) {},
+    ) {
+        set_svg_text_simple("RFWriteData", register_write_data);
+        set_svg_text_simple("RFWriteFile", write_register);
+        set_svg_text_complex(
+            "WriteBackDataMemoryReadDataText",
+            memory_read_data
+        );
+        set_svg_text_complex("WriteBackExecuteAluResultText", alu_result);
+        set_svg_text_complex(
+            "WriteBackFetchAddOutText",
+            pc_plus_instruction_length
+        );
+        set_svg_text_complex("WriteBackImmGenText", imm);
+    },
 };
 
 output.value = "Output \n\nInitializing... ";

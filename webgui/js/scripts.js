@@ -482,15 +482,48 @@ window.addEventListener("load", function () {
     const pipeline_svg = document.getElementById(
         "visualization_pipeline"
     ).contentDocument;
-    console.log(pipeline_svg);
-    pipeline_svg
-        .getElementById("WriteBackExecuteAluResultText")
-        .setAttribute("visibility", "hidden");
+    //pipeline_svg.getElementById("FetchLeftMuxInZeroText").textContent = "test";
+    //console.log(pipeline_svg.getElementById("FetchLeftMuxInZeroText").textContent)
+    pipeline_svg.getElementById("FetchPCOut").firstChild.style.stroke = "red";
+    // pipeline_svg.getElementById("ExecuteRightMuxOut").setAttribute("stroke", "#FFFFFF");
+    console.log(pipeline_svg.getElementById("FetchPCOut"));
+    // console.log(pipeline_svg.getElementById("WriteBackDataMemoryReadData").style.stroke)
 });
 
-function set_svg_text(id, str) {
+function set_svg_text_simple(id, str) {
     const pipeline_svg = document.getElementById(
         "visualization_pipeline"
     ).contentDocument;
     pipeline_svg.getElementById(id).textContent = str;
+}
+
+function set_svg_text_complex(id, str) {
+    const pipeline_svg = document.getElementById(
+        "visualization_pipeline"
+    ).contentDocument;
+    pipeline_svg.getElementById(id).firstChild.nextSibling.textContent = str;
+}
+
+function set_svg_colour_green(id) {
+    const pipeline_svg = document.getElementById(
+        "visualization_pipeline"
+    ).contentDocument;
+    pipeline_svg.getElementById(id).style.stroke = "green";
+}
+
+function set_svg_colour_blue(id) {
+    const pipeline_svg = document.getElementById(
+        "visualization_pipeline"
+    ).contentDocument;
+    pipeline_svg.getElementById(id).style.stroke = "blue";
+}
+
+function set_svg_colour_complex(id, str) {
+    const pipeline_svg = document.getElementById(
+        "visualization_pipeline"
+    ).contentDocument;
+    Child_Nodes = pipeline_svg.getElementById(id).childNodes;
+    for (let i = 0; i < Child_Nodes.length; i++) {
+        Child_Nodes[i].style.stroke = str;
+    }
 }

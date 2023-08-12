@@ -543,3 +543,6 @@ class EmptyInstruction(RiscvInstruction):
         architectural_state: RiscvArchitecturalState,
     ):
         pass
+
+    def __repr__(self) -> str:
+        return ""

@@ -241,7 +241,7 @@ def update_tables():
                 pipeline_stages_addresses[
                     pipeline_register.address_of_instruction
                 ] = pipeline_register
-
+        
         # display names for the stages
         stage_mapping = {
             PipelineRegister: "Single",
@@ -302,12 +302,12 @@ def update_tables():
                     ID_pipeline_register.control_unit_signals.alu_to_pc,
                 ]
                 archsim_js.update_ID_Stage(
-                    register_read_addr_1=ID_pipeline_register.register_read_addr_1,
-                    register_read_addr_2=ID_pipeline_register.register_read_addr_2,
-                    register_read_data_1=ID_pipeline_register.register_read_data_1,
-                    register_read_data_2=ID_pipeline_register.register_read_data_2,
-                    imm=ID_pipeline_register.imm,
-                    control_unit_signals=control_unit_signals,
+                    ID_pipeline_register.register_read_addr_1,
+                    ID_pipeline_register.register_read_addr_2,
+                    ID_pipeline_register.register_read_data_1,
+                    ID_pipeline_register.register_read_data_2,
+                    ID_pipeline_register.imm,
+                    control_unit_signals,
                 )
         except:
             ...
@@ -329,19 +329,19 @@ def update_tables():
                     EX_pipeline_register.control_unit_signals.alu_to_pc,
                 ]
                 archsim_js.update_EX_Stage(
-                    alu_in_1=EX_pipeline_register.alu_in_1,
-                    alu_in_2=EX_pipeline_register.alu_in_2,
-                    register_read_data_2=EX_pipeline_register.register_read_data_2,
-                    imm=EX_pipeline_register.imm,
-                    result=EX_pipeline_register.result,
-                    comparison=EX_pipeline_register.comparison,
-                    pc_plus_imm=EX_pipeline_register.pc_plus_imm,
-                    control_unit_signals=control_unit_signals,
+                    EX_pipeline_register.alu_in_1,
+                    EX_pipeline_register.alu_in_2,
+                    EX_pipeline_register.register_read_data_2,
+                    EX_pipeline_register.imm,
+                    EX_pipeline_register.result,
+                    EX_pipeline_register.comparison,
+                    EX_pipeline_register.pc_plus_imm,
+                    control_unit_signals,
                 )
         except:
             ...
 
-        # Update MA Stage
+        # Update MEM Stage
         try:
             MEM_pipeline_register = simulation.state.pipeline.pipeline_registers[3]
             if isinstance(MEM_pipeline_register, MemoryAccessPipelineRegister):
@@ -358,14 +358,14 @@ def update_tables():
                     MEM_pipeline_register.control_unit_signals.alu_to_pc,
                 ]
                 archsim_js.update_MEM_Stage(
-                    memory_address=MEM_pipeline_register.memory_address,
-                    result=MEM_pipeline_register.result,
-                    memory_write_data=MEM_pipeline_register.memory_write_data,
-                    memory_read_data=MEM_pipeline_register.memory_read_data,
-                    comparison=MEM_pipeline_register.comparison,
-                    comparison_or_jump=MEM_pipeline_register.comparison_or_jump,
-                    pc_plus_imm=MEM_pipeline_register.pc_plus_imm,
-                    control_unit_signals=control_unit_signals,
+                    MEM_pipeline_register.memory_address,
+                    MEM_pipeline_register.result,
+                    MEM_pipeline_register.memory_write_data,
+                    MEM_pipeline_register.memory_read_data,
+                    MEM_pipeline_register.comparison,
+                    MEM_pipeline_register.comparison_or_jump,
+                    MEM_pipeline_register.pc_plus_imm,
+                    control_unit_signals,
                 )
         except:
             ...
@@ -387,11 +387,11 @@ def update_tables():
                     WB_pipeline_register.control_unit_signals.alu_to_pc,
                 ]
                 archsim_js.update_WB_Stage(
-                    register_write_data=WB_pipeline_register.register_write_data,
-                    write_register=WB_pipeline_register.write_register,
-                    memory_read_data=WB_pipeline_register.memory_read_data,
-                    alu_result=WB_pipeline_register.alu_result,
-                    control_unit_signals=control_unit_signals,
+                    WB_pipeline_register.register_write_data,
+                    WB_pipeline_register.write_register,
+                    WB_pipeline_register.memory_read_data,
+                    WB_pipeline_register.alu_result,
+                    control_unit_signals,
                 )
         except:
             ...

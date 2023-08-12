@@ -22,6 +22,8 @@ def update_ID_Stage(
     register_read_data_1,
     register_read_data_2,
     imm,
+    write_register,
+    pc_plus_instruction_length,
     control_unit_signals,
 ) -> None: ...
 def update_EX_Stage(
@@ -30,8 +32,10 @@ def update_EX_Stage(
     register_read_data_2,
     imm,
     result,
+    write_register,
     comparison,
     pc_plus_imm,
+    pc_plus_instruction_length,
     control_unit_signals,
 ) -> None: ...
 def update_MEM_Stage(
@@ -39,9 +43,12 @@ def update_MEM_Stage(
     result,
     memory_write_data,
     memory_read_data,
+    write_register,
     comparison,
     comparison_or_jump,
     pc_plus_imm,
+    pc_plus_instruction_length,
+    imm,
     control_unit_signals,
 ) -> None: ...
 def update_WB_Stage(
@@ -49,6 +56,8 @@ def update_WB_Stage(
     write_register,
     memory_read_data,
     alu_result,
+    pc_plus_instruction_length,
+    imm,
     control_unit_signals,
 ) -> None: ...
 def clear_register_table() -> None: ...
