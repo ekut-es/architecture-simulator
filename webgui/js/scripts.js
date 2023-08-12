@@ -86,6 +86,7 @@ window.addEventListener("DOMContentLoaded", function () {
     document
         .getElementById("button_simulation_refresh_id")
         .addEventListener("click", () => {
+            console.log(pipeline_mode);
             document.getElementById("input").disabled = true;
             document.getElementById("vis_input").disabled = true;
             clearInterval(run);
@@ -488,6 +489,7 @@ window.addEventListener("load", function () {
     // pipeline_svg.getElementById("ExecuteRightMuxOut").setAttribute("stroke", "#FFFFFF");
     console.log(pipeline_svg.getElementById("FetchPCOut"));
     // console.log(pipeline_svg.getElementById("WriteBackDataMemoryReadData").style.stroke)
+    set_svg_colour_complex("FetchPCOut", "yellow");
 });
 
 function set_svg_text_simple(id, str) {
@@ -504,18 +506,11 @@ function set_svg_text_complex(id, str) {
     pipeline_svg.getElementById(id).firstChild.nextSibling.textContent = str;
 }
 
-function set_svg_colour_green(id) {
+function set_svg_colour_simple(id, str) {
     const pipeline_svg = document.getElementById(
         "visualization_pipeline"
     ).contentDocument;
-    pipeline_svg.getElementById(id).style.stroke = "green";
-}
-
-function set_svg_colour_blue(id) {
-    const pipeline_svg = document.getElementById(
-        "visualization_pipeline"
-    ).contentDocument;
-    pipeline_svg.getElementById(id).style.stroke = "blue";
+    pipeline_svg.getElementById(id).style.stroke = str;
 }
 
 function set_svg_colour_complex(id, str) {

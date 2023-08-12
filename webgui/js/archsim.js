@@ -334,10 +334,29 @@ const archsim_js = {
         address_of_instruction,
         pc_plus_instruction_length
     ) {
+        console.log("update_IF");
         set_svg_text_simple("IMInstr", instruction);
         set_svg_text_simple("IMReadAddress", address_of_instruction);
         set_svg_text_simple("PC", address_of_instruction);
         set_svg_text_complex("FetchAddOutText", pc_plus_instruction_length);
+
+        if (Number.isInteger(address_of_instruction)) {
+            set_svg_colour_complex("FetchPCOut", "blue");
+        } else {
+            set_svg_colour_complex("FetchPCOut", "black");
+        }
+
+        if (Number.isInteger(pc_plus_instruction_length)) {
+            set_svg_colour_complex("FetchAddOut", "blue");
+        } else {
+            set_svg_colour_complex("FetchAddOut", "black");
+        }
+
+        if (instruction != "" && instruction != undefined) {
+            set_svg_colour_complex("InstructionMemory", "blue");
+        } else {
+            set_svg_colour_complex("InstructionMemory", "black");
+        }
     },
     update_ID_Stage: function (
         register_read_addr_1,
@@ -349,6 +368,7 @@ const archsim_js = {
         pc_plus_instruction_length,
         control_unit_signals
     ) {
+        console.log("update_ID");
         set_svg_text_simple("RFReadAddress1", register_read_addr_1);
         set_svg_text_simple("RFReadAddress2", register_read_addr_2);
         set_svg_text_simple("RFReadData1", register_read_data_1);
@@ -359,6 +379,36 @@ const archsim_js = {
             "DecodeFetchAddOutText",
             pc_plus_instruction_length
         );
+
+        if (Number.isInteger(register_read_addr_1)) {
+            set_svg_colour_simple("DecodeInstructionMemory1", "blue");
+        } else {
+            set_svg_colour_simple("DecodeInstructionMemory1", "black");
+        }
+
+        if (Number.isInteger(register_read_addr_2)) {
+            set_svg_colour_simple("DecodeInstructionMemory2", "blue");
+        } else {
+            set_svg_colour_simple("DecodeInstructionMemory2", "black");
+        }
+
+        if (Number.isInteger(imm)) {
+            set_svg_colour_simple("DecodeInstructionMemory3", "blue");
+        } else {
+            set_svg_colour_simple("DecodeInstructionMemory3", "black");
+        }
+
+        if (Number.isInteger(write_register)) {
+            set_svg_colour_simple("DecodeInstructionMemory4", "blue");
+        } else {
+            set_svg_colour_simple("DecodeInstructionMemory4", "black");
+        }
+
+        if (Number.isInteger(pc_plus_instruction_length)) {
+            set_svg_colour_simple("DecodeFetchAddOut", "blue");
+        } else {
+            set_svg_colour_simple("DecodeFetchAddOut", "black");
+        }
     },
     update_EX_Stage: function (
         alu_in_1,

@@ -267,16 +267,16 @@ def update_tables():
                 # if the instruction is not in one of the stages
                 archsim_js.update_instruction_table(hex(address), cmd.__repr__(), "")
 
-        # visualization
-        # Invoke all the js functions which update the visuals
-
-        # FIXME: This is a lot of code for handing the variables of a python object over to js (I think ?).
-        # If that is all this does, you could simply replace everything by `vars(obj)` which returns a dict of all variables ._.
-
         # Update IF Stage
         try:
-            IF_pipeline_register = simulation.state.pipeline.pipeline_registers[0]
+            IF_pipeline_register = simulation.pipeline.pipeline_registers[0]
             if isinstance(IF_pipeline_register, InstructionFetchPipelineRegister):
+                archsim_js.update_IF_Stage(
+                    IF_pipeline_register.instruction.__repr__(),
+                    IF_pipeline_register.address_of_instruction,
+                    IF_pipeline_register.pc_plus_instruction_length,
+                )
+            if isinstance(IF_pipeline_register, PipelineRegister):
                 archsim_js.update_IF_Stage(
                     IF_pipeline_register.instruction.__repr__(),
                     IF_pipeline_register.address_of_instruction,
@@ -284,10 +284,15 @@ def update_tables():
                 )
         except:
             ...
+            # archsim_js.update_IF_Stage(
+            #         None,
+            #         None,
+            #         None,
+            #     )
 
         # Update ID Stage
-        try:  # FIXME: Why is this a try statement without an except block?
-            ID_pipeline_register = simulation.state.pipeline.pipeline_registers[1]
+        try:
+            ID_pipeline_register = simulation.pipeline.pipeline_registers[1]
             if isinstance(ID_pipeline_register, InstructionDecodePipelineRegister):
                 control_unit_signals = [
                     ID_pipeline_register.control_unit_signals.alu_src_1,
@@ -307,14 +312,26 @@ def update_tables():
                     ID_pipeline_register.register_read_data_1,
                     ID_pipeline_register.register_read_data_2,
                     ID_pipeline_register.imm,
-                    control_unit_signals,
+                    ID_pipeline_register.write_register,
+                    ID_pipeline_register.pc_plus_instruction_length,
+                    control_unit_signals=control_unit_signals,
                 )
         except:
             ...
+            # archsim_js.update_ID_Stage(
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #     )
 
         # Update EX Stage
         try:
-            EX_pipeline_register = simulation.state.pipeline.pipeline_registers[2]
+            EX_pipeline_register = simulation.pipeline.pipeline_registers[2]
             if isinstance(EX_pipeline_register, ExecutePipelineRegister):
                 control_unit_signals = [
                     EX_pipeline_register.control_unit_signals.alu_src_1,
@@ -334,45 +351,75 @@ def update_tables():
                     EX_pipeline_register.register_read_data_2,
                     EX_pipeline_register.imm,
                     EX_pipeline_register.result,
+                    EX_pipeline_register.write_register,
                     EX_pipeline_register.comparison,
                     EX_pipeline_register.pc_plus_imm,
+                    EX_pipeline_register.pc_plus_instruction_length,
                     control_unit_signals,
                 )
         except:
             ...
+            # archsim_js.update_EX_Stage(
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #     )
 
-        # Update MEM Stage
+        # Update MA Stage
         try:
-            MEM_pipeline_register = simulation.state.pipeline.pipeline_registers[3]
-            if isinstance(MEM_pipeline_register, MemoryAccessPipelineRegister):
+            MA_pipeline_register = simulation.pipeline.pipeline_registers[3]
+            if isinstance(MA_pipeline_register, MemoryAccessPipelineRegister):
                 control_unit_signals = [
-                    MEM_pipeline_register.control_unit_signals.alu_src_1,
-                    MEM_pipeline_register.control_unit_signals.alu_src_2,
-                    MEM_pipeline_register.control_unit_signals.wb_src,
-                    MEM_pipeline_register.control_unit_signals.reg_write,
-                    MEM_pipeline_register.control_unit_signals.mem_read,
-                    MEM_pipeline_register.control_unit_signals.mem_write,
-                    MEM_pipeline_register.control_unit_signals.branch,
-                    MEM_pipeline_register.control_unit_signals.jump,
-                    MEM_pipeline_register.control_unit_signals.alu_op,
-                    MEM_pipeline_register.control_unit_signals.alu_to_pc,
+                    MA_pipeline_register.control_unit_signals.alu_src_1,
+                    MA_pipeline_register.control_unit_signals.alu_src_2,
+                    MA_pipeline_register.control_unit_signals.wb_src,
+                    MA_pipeline_register.control_unit_signals.reg_write,
+                    MA_pipeline_register.control_unit_signals.mem_read,
+                    MA_pipeline_register.control_unit_signals.mem_write,
+                    MA_pipeline_register.control_unit_signals.branch,
+                    MA_pipeline_register.control_unit_signals.jump,
+                    MA_pipeline_register.control_unit_signals.alu_op,
+                    MA_pipeline_register.control_unit_signals.alu_to_pc,
                 ]
-                archsim_js.update_MEM_Stage(
-                    MEM_pipeline_register.memory_address,
-                    MEM_pipeline_register.result,
-                    MEM_pipeline_register.memory_write_data,
-                    MEM_pipeline_register.memory_read_data,
-                    MEM_pipeline_register.comparison,
-                    MEM_pipeline_register.comparison_or_jump,
-                    MEM_pipeline_register.pc_plus_imm,
+                archsim_js.update_MA_Stage(
+                    MA_pipeline_register.memory_address,
+                    MA_pipeline_register.result,
+                    MA_pipeline_register.memory_write_data,
+                    MA_pipeline_register.memory_read_data,
+                    MA_pipeline_register.write_register,
+                    MA_pipeline_register.comparison,
+                    MA_pipeline_register.comparison_or_jump,
+                    MA_pipeline_register.pc_plus_imm,
+                    MA_pipeline_register.pc_plus_instruction_length,
+                    MA_pipeline_register.imm,
                     control_unit_signals,
                 )
         except:
             ...
+            # archsim_js.update_MA_Stage(
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #     )
 
         # Update WB Stage
         try:
-            WB_pipeline_register = simulation.state.pipeline.pipeline_registers[4]
+            WB_pipeline_register = simulation.pipeline.pipeline_registers[4]
             if isinstance(WB_pipeline_register, RegisterWritebackPipelineRegister):
                 control_unit_signals = [
                     WB_pipeline_register.control_unit_signals.alu_src_1,
@@ -391,7 +438,18 @@ def update_tables():
                     WB_pipeline_register.write_register,
                     WB_pipeline_register.memory_read_data,
                     WB_pipeline_register.alu_result,
+                    WB_pipeline_register.pc_plus_instruction_length,
+                    WB_pipeline_register.imm,
                     control_unit_signals,
                 )
         except:
             ...
+            # archsim_js.update_WB_Stage(
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #         None,
+            #     )
