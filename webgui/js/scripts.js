@@ -489,6 +489,25 @@ window.addEventListener("load", function () {
     console.log(pipeline_svg.getElementById("g42637"));
     // console.log(pipeline_svg.getElementById("WriteBackDataMemoryReadData").style.stroke)
     console.log(pipeline_svg.getElementById("DecodeUpperFetchPCOut"));
+
+    pipeline_svg
+        .getElementById("DecodeInstructionMemory1Text")
+        .setAttribute("visibility", "hidden");
+    pipeline_svg
+        .getElementById("DecodeInstructionMemory2Text")
+        .setAttribute("visibility", "hidden");
+    pipeline_svg
+        .getElementById("WriteBackInstructionMemory4Text")
+        .setAttribute("visibility", "hidden");
+    pipeline_svg
+        .getElementById("WriteBackMuxOutText")
+        .setAttribute("visibility", "hidden");
+    pipeline_svg
+        .getElementById("MemoryExecuteAluResultText1")
+        .setAttribute("visibility", "hidden");
+    pipeline_svg
+        .getElementById("MemoryRegisterFileReadData2Text")
+        .setAttribute("visibility", "hidden");
 });
 
 function set_svg_text_simple(id, str) {
