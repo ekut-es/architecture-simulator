@@ -86,7 +86,6 @@ window.addEventListener("DOMContentLoaded", function () {
     document
         .getElementById("button_simulation_refresh_id")
         .addEventListener("click", () => {
-            console.log(pipeline_mode);
             document.getElementById("input").disabled = true;
             document.getElementById("vis_input").disabled = true;
             clearInterval(run);
@@ -487,7 +486,7 @@ window.addEventListener("load", function () {
     //console.log(pipeline_svg.getElementById("FetchLeftMuxInZeroText").textContent)
     pipeline_svg.getElementById("FetchPCOut").firstChild.style.stroke = "red";
     // pipeline_svg.getElementById("ExecuteRightMuxOut").setAttribute("stroke", "#FFFFFF");
-    console.log(pipeline_svg.getElementById("FetchPCOut"));
+    console.log(pipeline_svg.getElementById("g42637"));
     // console.log(pipeline_svg.getElementById("WriteBackDataMemoryReadData").style.stroke)
     set_svg_colour_complex("FetchPCOut", "yellow");
 });
