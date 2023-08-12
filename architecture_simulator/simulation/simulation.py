@@ -1,4 +1,9 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
+
+if TYPE_CHECKING:
+    from architecture_simulator.uarch.performance_metrics import PerformanceMetrics
 
 
 class Simulation(ABC):
@@ -39,9 +44,9 @@ class Simulation(ABC):
         """
 
     @abstractmethod
-    def get_performance_metrics_str(self) -> str:
-        """Returns a string which contains statistics about the simulation.
+    def get_performance_metrics(self) -> PerformanceMetrics:
+        """Get the performance metrics of the simulation.
 
         Returns:
-            str: A string containing statistics about the simulation.
+            PerformanceMetrics: The performance metrics which contain statistics about the simulation.
         """

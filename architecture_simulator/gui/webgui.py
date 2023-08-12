@@ -74,7 +74,7 @@ def step_sim(program: str) -> tuple[str, bool]:
         )  # FIXME: Needs to be changed if compressed instructions get implemented
         simulation_not_ended_flag = False
 
-    return (simulation.get_performance_metrics_str(), simulation_not_ended_flag)
+    return (str(simulation.get_performance_metrics()), simulation_not_ended_flag)
 
 
 def resume_timer():
@@ -87,7 +87,7 @@ def resume_timer():
     if simulation is None:
         raise StateNotInitializedError()
 
-    simulation.state.performance_metrics.resume_timer()
+    simulation.get_performance_metrics().resume_timer()
 
 
 def stop_timer():
@@ -100,10 +100,10 @@ def stop_timer():
     if simulation is None:
         raise StateNotInitializedError()
 
-    simulation.state.performance_metrics.stop_timer()
+    simulation.get_performance_metrics().stop_timer()
 
 
-def get_performance_metrics() -> str:
+def get_performance_metrics_str() -> str:
     """Get a string representation of the performance metrics.
 
     Raises:
@@ -116,7 +116,7 @@ def get_performance_metrics() -> str:
     if simulation is None:
         raise StateNotInitializedError()
 
-    return simulation.get_performance_metrics_str()
+    return str(simulation.get_performance_metrics())
 
 
 def reset_sim() -> Simulation:
@@ -134,7 +134,7 @@ def reset_sim() -> Simulation:
         raise StateNotInitializedError()
     isa = archsim_js.get_selected_isa()
     if isa == "riscv":
-        pipeline_mode = archsim_js.get_selected_pipeline()
+        pipeline_mode = archsim_js.get_pipeline_mode()
         simulation = RiscvSimulation(mode=pipeline_mode)
     elif isa == "toy":
         simulation = ToySimulation()
@@ -157,11 +157,10 @@ def parse_input(instr: str):
     # reset the whole simulation because there might be things like a data section that also modify the data memory
     # so resetting the instruction memory is not enough
     simulation = reset_sim()
+    archsim_js.remove_all_highlights()
     try:
         simulation.load_program(instr)
-        archsim_js.remove_all_highlights()
     except ParserException as Parser_Exception:
-        archsim_js.remove_all_highlights()
         archsim_js.set_output(Parser_Exception.__repr__())
         archsim_js.highlight(
             Parser_Exception.line_number, str=Parser_Exception.__repr__()
@@ -186,18 +185,31 @@ def update_tables():
     if simulation is None:
         raise StateNotInitializedError()
 
-    archsim_js.get_selected_isa()
-
     # appends all the registers one at a time
     archsim_js.clear_register_table()
+    archsim_js.clear_memory_table()
+    archsim_js.clear_instruction_table()
     if isinstance(simulation, ToySimulation):
         # register table
         accu_representation = simulation.state.get_accu_represenatation()
-        archsim_js.update_register_table(
-            reg=0, representations=accu_representation, abi_name="ACCU"
-        )
+        print(accu_representation)
+        archsim_js.update_register_table(0, accu_representation, "ACCU")
+
         # instruction table
+        for address, cmd in sorted(
+            simulation.state.instruction_memory.instructions.items(),
+            key=lambda item: item[0],
+        ):
+            archsim_js.update_instruction_table(hex(address), cmd.__repr__(), "")
+
         # memory table
+        representations = simulation.state.data_memory.get_entries()
+        for address, address_value in sorted(
+            representations.items(),
+            key=lambda item: item[0],
+        ):
+            archsim_js.update_memory_table(hex(address), address_value)
+
     elif isinstance(simulation, RiscvSimulation):
         # register table
         representations = simulation.state.register_file.reg_repr()
@@ -209,7 +221,7 @@ def update_tables():
             archsim_js.update_register_table(reg_i, reg_val, reg_abi)  # int(reg_val)
 
         # memory table
-        archsim_js.clear_memory_table()
+
         representations = simulation.state.memory.memory_wordwise_repr()
         for address, address_value in sorted(
             representations.items(),
@@ -236,7 +248,6 @@ def update_tables():
             RegisterWritebackPipelineRegister: "WB",
         }
         # inserts all instructions into the instruction table
-        archsim_js.clear_instruction_table()
         for address, cmd in sorted(
             simulation.state.instruction_memory.instructions.items(),
             key=lambda item: item[0],

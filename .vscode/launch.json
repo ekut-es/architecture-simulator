@@ -7,9 +7,14 @@
             "reAttach": true,
             "name": "Launch localhost",
             "url": "http://127.0.0.1:3000/webgui/index.html",
-            "webRoot": "${workspaceFolder}"
+            "webRoot": "${workspaceFolder}",
+            "pathMappings": [
+                {
+                    "url": "http://127.0.0.1:3000/webgui",
+                    "path": "${workspaceFolder}/webgui"
+                }
+            ]
         },
-
         {
             "name": "Python: Current File",
             "type": "python",

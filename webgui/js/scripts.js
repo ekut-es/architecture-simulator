@@ -1,6 +1,3 @@
-const riscv_isa = 0;
-const toy_isa = 1;
-
 const binary_representation = 0;
 const decimal_representation = 1;
 const hexa_representation = 2;
@@ -15,7 +12,7 @@ const parse_sim_after_not_typing_for_n_ms = 500;
 
 var input_timer;
 
-let selected_isa = riscv_isa;
+let selected_isa = "riscv";
 
 let reg_representation_mode = decimal_representation; //change this to set another default repr.
 let mem_representation_mode = decimal_representation;
@@ -32,7 +29,8 @@ window.addEventListener("DOMContentLoaded", function () {
         .getElementById("button_simulation_start_id")
         .addEventListener("click", () => {
             editor.save();
-            finished_typing();
+            //finished_typing(); FIXME: The input should get parsed after clicking the button in case the auto parsing wasn't triggered yet.
+            // But this should only happen if the input has changed and not after the user has already started the simulation.
             document.getElementById("input").disabled = true;
             document.getElementById("vis_input").disabled = true;
             if (run) {
@@ -71,7 +69,8 @@ window.addEventListener("DOMContentLoaded", function () {
         .getElementById("button_simulation_next_id")
         .addEventListener("click", () => {
             editor.save();
-            finished_typing();
+            //finished_typing(); FIXME: The input should get parsed after clicking the button in case the auto parsing wasn't triggered yet.
+            // But this should only happen if the input has changed and not after the user has already started the simulation.
             document.getElementById("input").disabled = true;
             document.getElementById("vis_input").disabled = true;
             evaluatePython_step_sim();
@@ -88,7 +87,7 @@ window.addEventListener("DOMContentLoaded", function () {
             document.getElementById("input").disabled = true;
             document.getElementById("vis_input").disabled = true;
             clearInterval(run);
-            evaluatePython_reset_sim(pipeline_mode);
+            evaluatePython_reset_sim();
             document.getElementById("input").disabled = false;
             document.getElementById("input").disabled = false;
             enable_run();
@@ -114,13 +113,13 @@ window.addEventListener("DOMContentLoaded", function () {
     document
         .getElementById("isa_button_riscv_id")
         .addEventListener("click", () => {
-            selected_isa = riscv_isa;
+            selected_isa = "riscv";
         });
 
     document
         .getElementById("isa_button_toy_id")
         .addEventListener("click", () => {
-            selected_isa = toy_isa;
+            selected_isa = "toy";
         });
 
     // register representation button listeners
@@ -172,7 +171,7 @@ window.addEventListener("DOMContentLoaded", function () {
         .getElementById("button_SingleStage")
         .addEventListener("click", () => {
             pipeline_mode = "single_stage_pipeline";
-            evaluatePython_reset_sim(pipeline_mode);
+            evaluatePython_reset_sim();
             input_timer = setTimeout(
                 finished_typing,
                 parse_sim_after_not_typing_for_n_ms
@@ -188,7 +187,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
     document.getElementById("button_5-Stage").addEventListener("click", () => {
         pipeline_mode = "five_stage_pipeline";
-        evaluatePython_reset_sim(pipeline_mode);
+        evaluatePython_reset_sim();
         input_timer = setTimeout(
             finished_typing,
             parse_sim_after_not_typing_for_n_ms

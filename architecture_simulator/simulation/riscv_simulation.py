@@ -1,10 +1,14 @@
-from typing import Optional
+from __future__ import annotations
+from typing import Optional, TYPE_CHECKING
 
 from architecture_simulator.uarch.riscv.riscv_architectural_state import (
     RiscvArchitecturalState,
 )
 from architecture_simulator.isa.riscv.riscv_parser import RiscvParser
 from .simulation import Simulation
+
+if TYPE_CHECKING:
+    from architecture_simulator.uarch.performance_metrics import PerformanceMetrics
 
 
 class RiscvSimulation(Simulation):
@@ -66,3 +70,6 @@ class RiscvSimulation(Simulation):
 
     def get_performance_metrics_str(self) -> str:
         return str(self.state.performance_metrics)
+
+    def get_performance_metrics(self) -> PerformanceMetrics:
+        return self.state.performance_metrics

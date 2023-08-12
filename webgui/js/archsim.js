@@ -439,16 +439,15 @@ async function stop_timer() {
  */
 async function update_performance_metrics() {
     let pyodide = await pyodideReadyPromise;
-    get_performance_metrics = pyodide.globals.get("get_performance_metrics");
-    //output.value = get_performance_metrics();
-    performance_metrics.value = get_performance_metrics();
-    performance_metrics_vis.value = get_performance_metrics();
+    get_performance_metrics_str = pyodide.globals.get(
+        "get_performance_metrics_str"
+    );
+    performance_metrics.value = get_performance_metrics_str();
+    performance_metrics_vis.value = get_performance_metrics_str();
 }
 
 /**
- * Resets the simulation and sets it to the given pipeline mode.
- *
- * @param {string} pipeline_mode - the pipeline mode to use. See the RiscvSimulation class for more information.
+ * Resets the simulation and sets it to the currently selected pipeline mode.
  */
 async function evaluatePython_reset_sim(pipeline_mode) {
     start_loading_animation();
@@ -456,7 +455,7 @@ async function evaluatePython_reset_sim(pipeline_mode) {
     stop_loading_animation();
     try {
         reset_sim = pyodide.globals.get("reset_sim");
-        reset_sim(selected_isa, pipeline_mode);
+        reset_sim();
         output.value = "";
         output_vis.value = "";
         performance_metrics.value = "";

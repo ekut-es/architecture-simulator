@@ -1,10 +1,14 @@
-from typing import Optional
+from __future__ import annotations
+from typing import Optional, TYPE_CHECKING
 
 from architecture_simulator.uarch.toy.toy_architectural_state import (
     ToyArchitecturalState,
 )
 from architecture_simulator.isa.toy.toy_parser import ToyParser
 from .simulation import Simulation
+
+if TYPE_CHECKING:
+    from architecture_simulator.uarch.performance_metrics import PerformanceMetrics
 
 
 class ToySimulation(Simulation):
@@ -46,5 +50,5 @@ class ToySimulation(Simulation):
     def has_instructions(self) -> bool:
         return bool(self.state.instruction_memory)
 
-    def get_performance_metrics_str(self) -> str:
-        return str(self.state.performance_metrics)
+    def get_performance_metrics(self) -> PerformanceMetrics:
+        return self.state.performance_metrics
