@@ -509,3 +509,48 @@ def update_tables():
         #         None,
         #         None,
         #     )
+    if len(simulation.pipeline.pipeline_registers) > 1:
+        IF_pipeline_register = simulation.pipeline.pipeline_registers[0]
+        MA_pipeline_register = simulation.pipeline.pipeline_registers[3]
+        if isinstance(
+            IF_pipeline_register, InstructionFetchPipelineRegister
+        ) and isinstance(MA_pipeline_register, MemoryAccessPipelineRegister):
+            pc_plus_imm_or_pc_plus_instruction_length = (
+                MA_pipeline_register.pc_plus_imm
+                if MA_pipeline_register.comparison_or_jump
+                else IF_pipeline_register.pc_plus_instruction_length
+            )
+        elif isinstance(IF_pipeline_register, PipelineRegister) and isinstance(
+            MA_pipeline_register, MemoryAccessPipelineRegister
+        ):
+            pc_plus_imm_or_pc_plus_instruction_length = (
+                MA_pipeline_register.pc_plus_imm
+                if MA_pipeline_register.comparison_or_jump
+                else None
+            )
+        else:
+            pc_plus_imm_or_pc_plus_instruction_length = None
+        if pc_plus_imm_or_pc_plus_instruction_length is not None and isinstance(
+            MA_pipeline_register, MemoryAccessPipelineRegister
+        ):
+            pc_plus_imm_or_pc_plus_instruction_length_or_ALU_result = (
+                MA_pipeline_register.result
+                if MA_pipeline_register.control_unit_signals.alu_to_pc
+                else pc_plus_imm_or_pc_plus_instruction_length
+            )
+        else:
+            pc_plus_imm_or_pc_plus_instruction_length_or_ALU_result = None
+
+        archsim_js.update_visualization(
+            pc_plus_imm_or_pc_plus_instruction_length,
+            pc_plus_imm_or_pc_plus_instruction_length_or_ALU_result,
+        )
+
+
+# #actual comment: output = performance metric repr but if parser produces error, overwrite output with error
+# def update_output():
+#     global simulation
+#     if simulation is None:
+#         raise RuntimeError("state has not been initialized.")
+
+#     archsim_js.update_output(simulation.state.performance_metrics.__repr__())

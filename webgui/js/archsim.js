@@ -578,7 +578,6 @@ const archsim_js = {
         control_unit_signals
     ) {
         control_signals = Array.from(control_unit_signals);
-
         if (control_signals[7] == true) {
             set_svg_colour("ControlUnitLeftRight1", "green");
         } else {
@@ -633,6 +632,12 @@ const archsim_js = {
         } else {
             set_svg_colour("MemoryALUComparison", "black");
         }
+
+        // if (comparison_or_jump == true) {
+        //     set_svg_colour("FetchLeftMuxInZeroText", "green");
+        // } else {
+        //     set_svg_colour("FetchLeftMuxInZeroText", "black");
+        // }
 
         if (Number.isInteger(pc_plus_imm)) {
             set_svg_colour("MemoryExecuteAddOut", "blue");
@@ -716,6 +721,35 @@ const archsim_js = {
             set_svg_colour("WriteBackImmGen", "blue");
         } else {
             set_svg_colour("WriteBackImmGen", "black");
+        }
+    },
+    update_visualization: function (
+        pc_plus_imm_or_pc_plus_instruction_length,
+        pc_plus_imm_or_pc_plus_instruction_length_or_ALU_result
+    ) {
+        console.log(pc_plus_imm_or_pc_plus_instruction_length);
+        set_svg_text_complex(
+            "FetchRightMuxOutText",
+            pc_plus_imm_or_pc_plus_instruction_length
+        );
+        set_svg_text_complex(
+            "FetchLeftMuxOutText",
+            pc_plus_imm_or_pc_plus_instruction_length_or_ALU_result
+        );
+        if (Number.isInteger(pc_plus_imm_or_pc_plus_instruction_length)) {
+            set_svg_colour("FetchRightMuxOut", "blue");
+        } else {
+            set_svg_colour("FetchRightMuxOut", "black");
+        }
+
+        if (
+            Number.isInteger(
+                pc_plus_imm_or_pc_plus_instruction_length_or_ALU_result
+            )
+        ) {
+            set_svg_colour("FetchLeftMuxOut", "blue");
+        } else {
+            set_svg_colour("FetchLeftMuxOut", "black");
         }
     },
 };
