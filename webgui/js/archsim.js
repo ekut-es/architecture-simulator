@@ -337,11 +337,24 @@ const archsim_js = {
         address_of_instruction,
         pc_plus_instruction_length
     ) {
+        set_svg_text_simple_left_align("FetchText", instruction);
         set_svg_text_simple_right_align("IMInstr", instruction);
-        set_svg_text_simple_left_align("IMReadAddress", address_of_instruction);
-        if (address_of_instruction != undefined) {
+        if (address_of_instruction != "reset") {
+            set_svg_text_simple_left_align(
+                "IMReadAddress",
+                address_of_instruction
+            );
+        } else {
+            set_svg_text_simple_left_align("IMReadAddress", undefined);
+        }
+        if (
+            address_of_instruction != undefined &&
+            address_of_instruction != "reset"
+        ) {
             set_svg_text_simple("PC", address_of_instruction);
             previous_pc = address_of_instruction;
+        } else if (address_of_instruction == "reset") {
+            set_svg_text_simple("PC", undefined);
         } else {
             set_svg_text_simple("PC", previous_pc);
         }

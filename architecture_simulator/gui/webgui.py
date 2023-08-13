@@ -282,7 +282,7 @@ def update_tables():
         ):
             archsim_js.update_IF_Stage(
                 None,
-                None,
+                "reset",
                 None,
             )
     except:
@@ -377,6 +377,7 @@ def update_tables():
             )
         elif isinstance(EX_pipeline_register, PipelineRegister):
             archsim_js.update_EX_Stage(
+                None,
                 None,
                 None,
                 None,

@@ -488,7 +488,7 @@ window.addEventListener("load", function () {
     // pipeline_svg.getElementById("ExecuteRightMuxOut").setAttribute("stroke", "#FFFFFF");
     console.log(pipeline_svg.getElementById("g42637"));
     // console.log(pipeline_svg.getElementById("WriteBackDataMemoryReadData").style.stroke)
-    console.log(pipeline_svg.getElementById("DecodeUpperFetchPCOut"));
+    console.log(pipeline_svg.getElementById("FetchText"));
 
     pipeline_svg
         .getElementById("DecodeInstructionMemory1Text")
