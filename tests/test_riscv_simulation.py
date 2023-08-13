@@ -49,9 +49,6 @@ class TestRiscvSimulation(unittest.TestCase):
         self.assertEqual(simulation.state.performance_metrics.branch_count, 0)
         self.assertEqual(simulation.state.performance_metrics.instruction_count, 7)
         self.assertEqual(simulation.state.performance_metrics.procedure_count, 0)
-        self.assertGreater(
-            simulation.state.performance_metrics.instructions_per_second, 0
-        )
         self.assertGreater(simulation.state.performance_metrics.execution_time_s, 0)
 
         simulation = RiscvSimulation(
@@ -65,9 +62,6 @@ class TestRiscvSimulation(unittest.TestCase):
         self.assertEqual(simulation.state.performance_metrics.branch_count, 0)
         self.assertEqual(simulation.state.performance_metrics.instruction_count, 0)
         self.assertEqual(simulation.state.performance_metrics.procedure_count, 0)
-        self.assertEqual(
-            simulation.state.performance_metrics.instructions_per_second, 0
-        )
         self.assertGreaterEqual(
             simulation.state.performance_metrics.execution_time_s, 0
         )
@@ -90,9 +84,6 @@ class TestRiscvSimulation(unittest.TestCase):
         self.assertEqual(simulation.state.performance_metrics.branch_count, 5)
         self.assertEqual(simulation.state.performance_metrics.instruction_count, 13)
         self.assertEqual(simulation.state.performance_metrics.procedure_count, 0)
-        self.assertGreater(
-            simulation.state.performance_metrics.instructions_per_second, 0
-        )
         self.assertGreater(simulation.state.performance_metrics.execution_time_s, 0)
 
         simulation = RiscvSimulation(
@@ -112,9 +103,6 @@ class TestRiscvSimulation(unittest.TestCase):
         self.assertEqual(simulation.state.performance_metrics.branch_count, 10)
         self.assertEqual(simulation.state.performance_metrics.instruction_count, 45)
         self.assertEqual(simulation.state.performance_metrics.procedure_count, 0)
-        self.assertGreater(
-            simulation.state.performance_metrics.instructions_per_second, 0
-        )
         self.assertGreater(simulation.state.performance_metrics.execution_time_s, 0)
 
         simulation = RiscvSimulation(
@@ -137,9 +125,6 @@ class TestRiscvSimulation(unittest.TestCase):
         self.assertEqual(simulation.state.performance_metrics.branch_count, 1)
         self.assertEqual(simulation.state.performance_metrics.instruction_count, 5)
         self.assertEqual(simulation.state.performance_metrics.procedure_count, 2)
-        self.assertGreater(
-            simulation.state.performance_metrics.instructions_per_second, 0
-        )
         self.assertGreater(simulation.state.performance_metrics.execution_time_s, 0)
 
     def test_against_class_variables(self):

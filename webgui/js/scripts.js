@@ -31,7 +31,7 @@ window.addEventListener("DOMContentLoaded", function () {
             editor.save();
             //finished_typing(); FIXME: The input should get parsed after clicking the button in case the auto parsing wasn't triggered yet.
             // But this should only happen if the input has changed and not after the user has already started the simulation.
-            document.getElementById("input").disabled = true;
+            document.getElementById("input").disabled = true; // I dont think this does anything. But codemirror provides a function "readOnly" that we could use.
             document.getElementById("vis_input").disabled = true;
             if (run) {
                 stop_loading_animation();
@@ -40,9 +40,9 @@ window.addEventListener("DOMContentLoaded", function () {
             start_loading_animation();
             resume_timer();
             if (use_more_than_one_step_per_10ms) {
-                run = setInterval(step_n_times, 1); //minimum is 10ms but we use 1ms in case it gets changed in the future
+                run = setInterval(step_n_times, 1);
             } else {
-                run = setInterval(evaluatePython_step_sim, 1);
+                run = setInterval(evaluatePython_step_sim, 10);
             }
             disable_run();
             enable_pause();
