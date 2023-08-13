@@ -85,5 +85,5 @@ class TestToyArchitecture(unittest.TestCase):
         state = ToyArchitecturalState()
         state.accu = MutableUInt16(0x6AFE)
         self.assertEqual(
-            state.get_accu_represenatation(), ("0110 1010 1111 1110", "27390", "6AFE")
+            state.get_accu_representation(), ("0110 1010 1111 1110", "27390", "6AFE")
         )

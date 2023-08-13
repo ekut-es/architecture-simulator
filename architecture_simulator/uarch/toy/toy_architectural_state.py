@@ -43,7 +43,7 @@ class ToyArchitecturalState:
         """
         return self.instruction_memory.instruction_at_address(int(self.program_counter))
 
-    def get_accu_represenatation(self) -> tuple[str, str, str]:
+    def get_accu_representation(self) -> tuple[str, str, str]:
         """Returns the values of the accu as binary, decimal and hex strings.
 
         Returns:

@@ -191,7 +191,7 @@ def update_tables():
     archsim_js.clear_instruction_table()
     if isinstance(simulation, ToySimulation):
         # register table
-        accu_representation = simulation.state.get_accu_represenatation()
+        accu_representation = simulation.state.get_accu_representation()
         archsim_js.update_register_table(0, accu_representation, "ACCU")
 
         # instruction table
