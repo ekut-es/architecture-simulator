@@ -2406,8 +2406,10 @@ csrrs x31, 0xac, x7
 csrrwi x12, 0x448, 20
 csrrci x0, 0x40f, 16"""
         parser = RiscvParser()
-        instructions = parser._tokens_to_instructions(
-            parser._tokenize_assembly(text), start_address=0
-        )
+        state = RiscvArchitecturalState()
+
+        parser.parse(text, state)
+
+        instructions = list(state.instruction_memory.instructions.values())
         for instruction, line in zip(instructions, text.splitlines()):
             self.assertEqual(str(instruction), line)

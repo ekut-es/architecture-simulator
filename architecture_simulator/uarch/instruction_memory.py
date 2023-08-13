@@ -73,7 +73,7 @@ class InstructionMemory(Generic[T]):
             )
 
     def instruction_at_address(self, address: int) -> bool:
-        """Return whether there in an instruction at the given address.
+        """Return whether there is an instruction at the given address.
 
         Args:
             address (int): address to check
