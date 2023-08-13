@@ -194,7 +194,7 @@ class RiscvParser:
         + _Paren_R
     )
 
-    # I-Type-Memory-Instructions and la
+    # Pseudo-I-Type-Memory-Instructions and la
     _pattern_memory_pseudo_instruction = pp.Group(
         pp.oneOf(_mem_i_type_mnemonics + _mem_pseudo_mnemonics, caseless=True)(
             "mnemonic"
@@ -202,6 +202,16 @@ class RiscvParser:
         + _pattern_register("reg1")
         + _COMMA
         + _pattern_variable("variable")
+    )
+
+    # Pseudo-S-Types
+    _pattern_s_pseudo_instruction = pp.Group(
+        pp.oneOf(_s_type_mnemonics, caseless=True)("mnemonic")
+        + _pattern_register("reg1")
+        + _COMMA
+        + _pattern_variable("variable")
+        + _COMMA
+        + _pattern_register("reg2")
     )
 
     # J-Types
@@ -273,6 +283,7 @@ class RiscvParser:
             ^ _pattern_b_type_instruction
             ^ _pattern_memory_instruction
             ^ _pattern_memory_pseudo_instruction
+            ^ _pattern_s_pseudo_instruction
             ^ _pattern_reg_csr_reg_instruction
             ^ _pattern_reg_csr_imm_instruction
             ^ _pattern_reg_reg_imm_instruction
@@ -293,9 +304,6 @@ class RiscvParser:
         Args:
             program (str): Text format RISC-V assembly program.
             state (RiscvArchitecturalState): The architectural state into which the program should get loaded.
-
-        Raises:
-            TODO
         """
 
         self.state = state
@@ -365,17 +373,17 @@ class RiscvParser:
             if line_parsed.get("directive") == "data":
                 if not data_exists:
                     data_exists = True
-                    index = self.token_list.index((line_number, line, line_parsed))
-                    self.text = self.text[: index - 1]
-                    self.data = self.token_list[index + 1 :]
+                    index = self.text.index((line_number, line, line_parsed))
+                    self.data = self.text[index + 1 :]
+                    self.text = self.text[:index]
                 else:
                     raise ParserDirectiveException(line_number=line_number, line=line)
             elif line_parsed.get("directive") == "text":
                 if not text_exists:
                     text_exists = True
-                    index = self.token_list.index((line_number, line, line_parsed))
-                    self.data = self.data[: index - 1]
-                    self.text = self.token_list[index + 1 :]
+                    index = self.data.index((line_number, line, line_parsed))
+                    self.text = self.data[index + 1 :]
+                    self.data = self.data[:index]
                 else:
                     raise ParserDirectiveException(line_number=line_number, line=line)
             elif line_parsed.get("directive") is not None:
@@ -455,7 +463,7 @@ class RiscvParser:
                     # compensate addi sign extension
                     if addi_imm > 2047 or addi_imm < -2048:
                         lui_imm += 1
-                    # insert lui, addi into parse_result if imm is outside of 12 bit range
+                    # insert lui, addi into self.text if imm is outside of 12 bit range
                     if imm > 2047 or imm < -2048:
                         self.text[index] = (
                             line_number,
@@ -475,7 +483,7 @@ class RiscvParser:
                             ),
                         )
                     else:
-                        # insert just addi into parse_result, overwrite register content (x0+imm)
+                        # insert just addi into self.text, overwrite register content (x0+imm)
                         self.text[index] = (
                             line_number,
                             line,
@@ -515,7 +523,7 @@ class RiscvParser:
                         # compensate addi sign extension
                         if addi_imm > 2047 or addi_imm < -2048:
                             lui_imm += 1
-                        # insert lui , addi into parse_result
+                        # insert lui, addi into self.text
                         self.text[index] = (
                             line_number,
                             line,
@@ -546,6 +554,66 @@ class RiscvParser:
                                     )[0],
                                 ),
                             )
+                elif mnemonic in self._s_type_mnemonics and line_parsed.get("variable"):
+                    if line_parsed.get("variable").name not in self.variables:
+                        raise ParserVariableException(
+                            line_number=line_number,
+                            line=line,
+                            name=line_parsed.get("variable").name,
+                        )
+                    register_name = (
+                        line_parsed.reg1[0]
+                        if type(line_parsed.reg1[0]) == str
+                        else "x" + line_parsed.reg1[0][1]
+                    )
+                    address_register_name = (
+                        line_parsed.reg2[0]
+                        if type(line_parsed.reg2[0]) == str
+                        else "x" + line_parsed.reg2[0][1]
+                    )
+                    # determine array index (size*index)
+                    array_index = (self.variables[line_parsed.variable.name][1]) * (
+                        int(line_parsed.variable.index)
+                        if line_parsed.variable.index
+                        else 0
+                    )
+                    # address with array offset
+                    address = self.variables[line_parsed.variable.name][0] + array_index
+                    lui_imm = int(fixedint.MutableUInt32(address)) >> 12
+                    # get the 12 first bits
+                    addi_imm = int(fixedint.MutableUInt32(address)) & 0xFFF
+                    # compensate addi sign extension
+                    if addi_imm > 2047 or addi_imm < -2048:
+                        lui_imm += 1
+                    # insert lui, addi into self.text
+                    self.text[index] = (
+                        line_number,
+                        line,
+                        self._pattern_line.parse_string(
+                            f"lui {address_register_name}, {lui_imm}"
+                        )[0],
+                    )
+                    self.text.insert(
+                        index + 1,
+                        (
+                            line_number,
+                            line,
+                            self._pattern_line.parse_string(
+                                f"addi {address_register_name}, {address_register_name}, {addi_imm}"
+                            )[0],
+                        ),
+                    )
+                    # insert "unpseudoified" version of sb/sh/sw
+                    self.text.insert(
+                        index + 2,
+                        (
+                            line_number,
+                            line,
+                            self._pattern_line.parse_string(
+                                f"{mnemonic} {register_name}, 0({address_register_name})"
+                            )[0],
+                        ),
+                    )
 
     def _process_labels(self) -> None:
         """Computes the addresses of all labels in the text segment and stores them in self.labels"""
