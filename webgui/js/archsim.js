@@ -135,25 +135,25 @@ const archsim_js = {
             td2.style.backgroundColor = "#2DA800";
             td3.style.backgroundColor = "#2DA800";
         } else if (stage == "IF") {
-            td1.style.backgroundColor = "#FFEC00";
-            td2.style.backgroundColor = "#FFEC00";
-            td3.style.backgroundColor = "#FFEC00";
+            td1.style.backgroundColor = "#FFFD00";
+            td2.style.backgroundColor = "#FFFD00";
+            td3.style.backgroundColor = "#FFFD00";
         } else if (stage == "ID") {
-            td1.style.backgroundColor = "#FFC900";
-            td2.style.backgroundColor = "#FFC900";
-            td3.style.backgroundColor = "#FFC900";
+            td1.style.backgroundColor = "#FFD700";
+            td2.style.backgroundColor = "#FFD700";
+            td3.style.backgroundColor = "#FFD700";
         } else if (stage == "EX") {
-            td1.style.backgroundColor = "#695CC4";
-            td2.style.backgroundColor = "#695CC4";
-            td3.style.backgroundColor = "#695CC4";
+            td1.style.backgroundColor = "#CD78FF";
+            td2.style.backgroundColor = "#CD78FF";
+            td3.style.backgroundColor = "#CD78FF";
         } else if (stage == "MEM") {
-            td1.style.backgroundColor = "#2A17B1";
-            td2.style.backgroundColor = "#2A17B1";
-            td3.style.backgroundColor = "#2A17B1";
+            td1.style.backgroundColor = "#A37FFF";
+            td2.style.backgroundColor = "#A37FFF";
+            td3.style.backgroundColor = "#A37FFF";
         } else if (stage == "WB") {
-            td1.style.backgroundColor = "#580EAD";
-            td2.style.backgroundColor = "#580EAD";
-            td3.style.backgroundColor = "#580EAD";
+            td1.style.backgroundColor = "#5A1BFF";
+            td2.style.backgroundColor = "#5A1BFF";
+            td3.style.backgroundColor = "#5A1BFF";
         }
         tr.appendChild(td1);
         tr.appendChild(td2);
@@ -170,25 +170,25 @@ const archsim_js = {
         td3_vis = document.createElement("td");
         td3_vis.innerText = stage;
         if (stage == "IF") {
-            td1_vis.style.backgroundColor = "#FFEC00";
-            td2_vis.style.backgroundColor = "#FFEC00";
-            td3_vis.style.backgroundColor = "#FFEC00";
+            td1_vis.style.backgroundColor = "#FFFD00";
+            td2_vis.style.backgroundColor = "#FFFD00";
+            td3_vis.style.backgroundColor = "#FFFD00";
         } else if (stage == "ID") {
-            td1_vis.style.backgroundColor = "#FFC900";
-            td2_vis.style.backgroundColor = "#FFC900";
-            td3_vis.style.backgroundColor = "#FFC900";
+            td1_vis.style.backgroundColor = "#FFD700";
+            td2_vis.style.backgroundColor = "#FFD700";
+            td3_vis.style.backgroundColor = "#FFD700";
         } else if (stage == "EX") {
-            td1_vis.style.backgroundColor = "#695CC4";
-            td2_vis.style.backgroundColor = "#695CC4";
-            td3_vis.style.backgroundColor = "#695CC4";
+            td1_vis.style.backgroundColor = "#CD78FF";
+            td2_vis.style.backgroundColor = "#CD78FF";
+            td3_vis.style.backgroundColor = "#CD78FF";
         } else if (stage == "MEM") {
-            td1_vis.style.backgroundColor = "#2A17B1";
-            td2_vis.style.backgroundColor = "#2A17B1";
-            td3_vis.style.backgroundColor = "#2A17B1";
+            td1_vis.style.backgroundColor = "#A37FFF";
+            td2_vis.style.backgroundColor = "#A37FFF";
+            td3_vis.style.backgroundColor = "#A37FFF";
         } else if (stage == "WB") {
-            td1_vis.style.backgroundColor = "#580EAD";
-            td2_vis.style.backgroundColor = "#580EAD";
-            td3_vis.style.backgroundColor = "#580EAD";
+            td1_vis.style.backgroundColor = "#5A1BFF";
+            td2_vis.style.backgroundColor = "#5A1BFF";
+            td3_vis.style.backgroundColor = "#5A1BFF";
         }
         tr_vis.appendChild(td1_vis);
         tr_vis.appendChild(td2_vis);
