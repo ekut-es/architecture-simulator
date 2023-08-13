@@ -508,6 +508,20 @@ window.addEventListener("load", function () {
     pipeline_svg
         .getElementById("MemoryRegisterFileReadData2Text")
         .setAttribute("visibility", "hidden");
+    pipeline_svg
+        .getElementById("DecodeInstructionMemory3Text")
+        .setAttribute("visibility", "hidden");
+    pipeline_svg
+        .getElementById("DecodeInstructionMemoryText")
+        .setAttribute("visibility", "hidden");
+    // let transformList = pipeline_svg.getElementById("InstructionMemoryInstrText").firstChild.nextSibling.transform.baseVal;
+
+    // // Create a new SVGTransform object that moves it 15 units up
+    // let newTransform = pipeline_svg.getElementById("InstructionMemoryInstrText").firstChild.nextSibling.ownerSVGElement.createSVGTransform();
+    // newTransform.setTranslate(50, 0);
+
+    // // Add it to the transform list
+    // transformList.appendItem(newTransform);
 });
 
 function set_svg_text_simple(id, str) {
@@ -538,6 +552,7 @@ function set_svg_text_complex(id, str) {
         "visualization_pipeline"
     ).contentDocument;
     pipeline_svg.getElementById(id).firstChild.nextSibling.textContent = str;
+    //pipeline_svg.getElementById(id).firstChild.nextSibling.setAttribute("text-anchor", "end");
     //     let bbox = pipeline_svg.getElementById(id).firstChild.nextSibling.getBBox();
     //     let newX = (100 - bbox.width) / 2;
 

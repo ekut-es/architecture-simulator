@@ -332,53 +332,92 @@ const archsim_js = {
         table2.rows[position].cells[0].style.backgroundColor = "yellow";
         table2.rows[position].cells[1].style.backgroundColor = "yellow";
     },
+    /**Update IF Stage:
+     *
+     * Updates all Elements located in the IF Stage of the Visualization.
+     *
+     * Parameters:
+     * @param mnemonic - The mnemonic value of the instr currently in the IF Stage
+     * @param instruction - The repr of the instr currently in the IF Stage
+     * @param address_of_instruction - The address of the instr currently in the IF Stage
+     * @param pc_plus_instruction_length - The PC of the instr plus the instr lenght
+     */
     update_IF_Stage: function (
+        mnemonic,
         instruction,
         address_of_instruction,
         pc_plus_instruction_length
     ) {
-        set_svg_text_simple_left_align("FetchText", instruction);
-        set_svg_text_simple_right_align("IMInstr", instruction);
+        // Update the mnemonic
+        set_svg_text_complex("Fetch", mnemonic);
+        // Update Instr[31-0]
+        set_svg_text_complex("InstructionMemoryInstrText", instruction);
+        if (instruction != "" && instruction != undefined) {
+            set_svg_colour("InstructionMemory", "blue");
+        } else {
+            set_svg_colour("InstructionMemory", "black");
+        }
+
+        // Updates the Read Adress in the instr memory, it is a value if the reset is not pressed, otherwise undefined
         if (address_of_instruction != "reset") {
-            set_svg_text_simple_left_align(
-                "IMReadAddress",
+            set_svg_text_complex(
+                "InstructionReadAddressText",
                 address_of_instruction
             );
         } else {
-            set_svg_text_simple_left_align("IMReadAddress", undefined);
+            set_svg_text_complex("InstructionReadAddressText", undefined);
         }
+
+        // Updates the PC value:
+        // If the PC is not undefined and there is no reset, update normally and save current pc in previous_pc
+        // If there is a reset, set the PC to 0
+        // Else set the PC to the previous PC. This way there is ALWAYS something in PC
         if (
             address_of_instruction != undefined &&
             address_of_instruction != "reset"
         ) {
-            set_svg_text_simple("PC", address_of_instruction);
+            set_svg_text_complex(
+                "InstructionReadAddressText-2",
+                address_of_instruction
+            );
             previous_pc = address_of_instruction;
         } else if (address_of_instruction == "reset") {
-            set_svg_text_simple("PC", undefined);
+            set_svg_text_complex("InstructionReadAddressText-2", 0);
         } else {
-            set_svg_text_simple("PC", previous_pc);
+            set_svg_text_complex("InstructionReadAddressText-2", previous_pc);
         }
-        set_svg_text_complex("FetchAddOutText", pc_plus_instruction_length);
-
         if (Number.isInteger(address_of_instruction)) {
             set_svg_colour("FetchPCOut", "blue");
         } else {
             set_svg_colour("FetchPCOut", "black");
         }
 
+        // Updates the result of the Adder that adds pc and instr lenght
+        set_svg_text_complex("FetchAddOutText", pc_plus_instruction_length);
         if (Number.isInteger(pc_plus_instruction_length)) {
             set_svg_colour("FetchAddOut", "blue");
         } else {
             set_svg_colour("FetchAddOut", "black");
         }
-
-        if (instruction != "" && instruction != undefined) {
-            set_svg_colour("InstructionMemory", "blue");
-        } else {
-            set_svg_colour("InstructionMemory", "black");
-        }
     },
+    /**Update ID Stage:
+     *
+     * Updates all Elements located in the ID Stage of the Visualization.
+     *
+     * Parameters:
+     * @param mnemonic - The mnemonic value of the instr currently in the ID Stage
+     * @param register_read_addr_1 - The read addr 1 of the register file
+     * @param register_read_addr_2 - The read addr 2 of the register file
+     * @param register_read_data_1 - The read data 1 of the register file
+     * @param register_read_data_2 - The read data 2 of the register file
+     * @param imm - The imm of the current instr
+     * @param write_register - The write register of the current instr
+     * @param pc_plus_instruction_length - The PC of the instr plus the instr lenght
+     * @param address_of_instruction - The address of the instr
+     * @param control_unit_signals - The control unit signals
+     */
     update_ID_Stage: function (
+        mnemonic,
         register_read_addr_1,
         register_read_addr_2,
         register_read_data_1,
@@ -389,10 +428,17 @@ const archsim_js = {
         address_of_instruction,
         control_unit_signals
     ) {
-        set_svg_text_simple_left_align("RFReadAddress1", register_read_addr_1);
-        set_svg_text_simple_left_align("RFReadAddress2", register_read_addr_2);
-        set_svg_text_simple_right_align("RFReadData1", register_read_data_1);
-        set_svg_text_simple_right_align("RFReadData2", register_read_data_2);
+        set_svg_text_complex("Decode", mnemonic);
+        set_svg_text_complex(
+            "RegisterFileReadAddress1Text",
+            register_read_addr_1
+        );
+        set_svg_text_complex(
+            "RegisterFileReadAddress2Text",
+            register_read_addr_2
+        );
+        set_svg_text_complex("RegisterFileReadData1Text", register_read_data_1);
+        set_svg_text_complex("RegisterFileReadData2Text", register_read_data_2);
         set_svg_text_simple("ImmGen", imm);
         set_svg_text_complex("DecodeInstructionMemory4Text", write_register);
         set_svg_text_complex(
@@ -466,7 +512,26 @@ const archsim_js = {
             set_svg_colour("DecodeInstructionMemory", "black");
         }
     },
+    /**Update EX Stage:
+     *
+     * Updates all Elements located in the EX Stage of the Visualization.
+     *
+     * Parameters:
+     * @param mnemonic - The mnemonic value of the instr currently in the EX Stage
+     * @param alu_in_1 - The Value that goes into the first ALU input
+     * @param alu_in_2 - The Value that goes into the second ALU input
+     * @param register_read_data_1 - The read data 1 of the register file
+     * @param register_read_data_2 - The read data 2 of the register file
+     * @param imm - The imm of the current instr
+     * @param result - The result of the ALU computation
+     * @param write_register - The write register of the current instr
+     * @param comparison - The result of the comparison unit of the ALU
+     * @param pc_plus_instruction_length - The PC of the instr plus the instr lenght
+     * @param address_of_instruction - The address of the instr
+     * @param control_unit_signals - The control unit signals
+     */
     update_EX_Stage: function (
+        mnemonic,
         alu_in_1,
         alu_in_2,
         register_read_data_1,
@@ -499,6 +564,7 @@ const archsim_js = {
             set_svg_colour("ControlUnitLeftRight4", "black");
         }
 
+        set_svg_text_complex("Execute", mnemonic);
         set_svg_text_complex("ExecuteRightMuxOutText", alu_in_1);
         set_svg_text_complex("ExecuteLeftMuxOutText", alu_in_2);
         set_svg_text_complex(
@@ -507,7 +573,7 @@ const archsim_js = {
         );
         set_svg_text_complex("ExecuteImmGenText1", imm);
         set_svg_text_complex("ExecuteImmGenText3", imm);
-        set_svg_text_simple_right_align("ALUResult-8-3-0", result);
+        set_svg_text_complex("ALUResultText", result);
         set_svg_text_complex("ExecuteInstructionMemory4Text", write_register);
         set_svg_text_complex("ExecuteAddText", pc_plus_imm);
         set_svg_text_complex(
@@ -587,7 +653,27 @@ const archsim_js = {
             set_svg_colour("ExecuteLowerFetchPCOut", "black");
         }
     },
-    update_MEM_Stage: function (
+    /**Update MA Stage:
+     *
+     * Updates all Elements located in the MA Stage of the Visualization
+     *
+     * Parameters:
+     * @param mnemonic - The mnemonic value of the instr currently in the EX Stage
+     * @param memory_address - The address where the data memory is accessed at
+     * @param result - The result of the ALU computation
+     * @param memory_write_data - The data that will be written to memory
+     * @param memory_read_data - The data that is read from memory
+     * @param write_register - The write register of the current instr
+     * @param comparison - The result of the comparison unit of the ALU
+     * @param comparison_or_jump - The result of the or gate and the signal whether to modify pc or not
+     * @param pc_plus_imm - The PC of the instr plus the imm of the instr
+     * @param pc_plus_instruction_length - The PC of the instr plus the instr lenght
+     * @param address_of_instruction - The address of the instr
+     * @param imm - The imm of the instr
+     * @param control_unit_signals - The control unit signals
+     */
+    update_MA_Stage: function (
+        mnemonic,
         memory_address,
         result,
         memory_write_data,
@@ -613,11 +699,12 @@ const archsim_js = {
             set_svg_colour("ControlUnitLeft", "black");
         }
 
-        set_svg_text_simple_left_align("DMAddress", memory_address);
+        set_svg_text_complex("Memory", mnemonic);
+        set_svg_text_complex("DataMemoryAddressText", memory_address);
         set_svg_text_complex("FetchLeftMuxInZeroText", result);
         set_svg_text_complex("MemoryExecuteAluResultText2", result);
-        set_svg_text_simple_left_align("DMWriteData", memory_write_data);
-        set_svg_text_simple_right_align("DMReadData", memory_read_data);
+        set_svg_text_complex("DataMemoryWriteDataText", memory_write_data);
+        set_svg_text_complex("DataMemoryReadDataText", memory_read_data);
         set_svg_text_complex("MemoryInstructionMemory4Text", write_register);
         set_svg_text_complex("MemoryExecuteAddOutText", pc_plus_imm);
         set_svg_text_complex(
@@ -680,7 +767,22 @@ const archsim_js = {
             set_svg_colour("MemoryImmGen", "black");
         }
     },
+    /**Update WB Stage:
+     *
+     * Updates all Elements located in the WB Stage of the Visualization.
+     *
+     * Parameters:
+     * @param mnemonic - The mnemonic value of the instr currently in the EX Stage
+     * @param register_write_data - The data that is written into the Register file
+     * @param write_register - The write register of the current instr
+     * @param memory_read_data - The data that is read from the memory
+     * @param alu_result - The result of the ALU computation
+     * @param pc_plus_instruction_length - The PC of the instr plus the instr lenght
+     * @param imm - The imm of the instr
+     * @param control_unit_signals - The control unit signals
+     */
     update_WB_Stage: function (
+        mnemonic,
         register_write_data,
         write_register,
         memory_read_data,
@@ -696,8 +798,10 @@ const archsim_js = {
         } else {
             set_svg_colour("ControlUnitLeftRight2", "black");
         }
-        set_svg_text_simple_left_align("RFWriteData", register_write_data);
-        set_svg_text_simple_left_align("RFWriteFile", write_register);
+
+        set_svg_text_complex("WriteBack", mnemonic);
+        set_svg_text_complex("RegisterFileWriteDataText", register_write_data);
+        set_svg_text_complex("RegisterFileWriteRegisterText", write_register);
         set_svg_text_complex(
             "WriteBackDataMemoryReadDataText",
             memory_read_data
@@ -708,7 +812,7 @@ const archsim_js = {
             pc_plus_instruction_length
         );
         set_svg_text_complex("WriteBackImmGenText", imm);
-        set_svg_text_complex("g89775", control_signals[2]);
+        set_svg_text_complex("wbsrc", control_signals[2]);
 
         if (Number.isInteger(register_write_data)) {
             set_svg_colour("WriteBackMuxOut", "blue");
@@ -769,9 +873,13 @@ const archsim_js = {
                 pc_plus_imm_or_pc_plus_instruction_length_or_ALU_result
             )
         ) {
-            set_svg_colour("FetchLeftMuxOut", "blue");
+            set_svg_colour("path2453-0-7-7-9", "blue");
+            set_svg_colour("path2453-2-5-7-0-7-5-1-0-4", "blue");
+            set_svg_colour("path2453-2-5-7-0-7-6-2-29", "blue");
         } else {
-            set_svg_colour("FetchLeftMuxOut", "black");
+            set_svg_colour("path2453-0-7-7-9", "black");
+            set_svg_colour("path2453-2-5-7-0-7-5-1-0-4", "black");
+            set_svg_colour("path2453-2-5-7-0-7-6-2-29", "black");
         }
     },
 };

@@ -14,9 +14,10 @@ def remove_all_highlights() -> None: ...
 def highlight_cmd_table(position: int) -> None: ...
 def remove_cmd_table_highlights() -> None: ...
 def update_IF_Stage(
-    instruction, address_of_instruction, pc_plus_instruction_length
+    mnemonic, instruction, address_of_instruction, pc_plus_instruction_length
 ) -> None: ...
 def update_ID_Stage(
+    mnemonic,
     register_read_addr_1,
     register_read_addr_2,
     register_read_data_1,
@@ -28,6 +29,7 @@ def update_ID_Stage(
     control_unit_signals,
 ) -> None: ...
 def update_EX_Stage(
+    mnemonic,
     alu_in_1,
     alu_in_2,
     register_read_data_1,
@@ -41,7 +43,8 @@ def update_EX_Stage(
     address_of_instruction,
     control_unit_signals,
 ) -> None: ...
-def update_MEM_Stage(
+def update_MA_Stage(
+    mnemonic,
     memory_address,
     result,
     memory_write_data,
@@ -55,6 +58,7 @@ def update_MEM_Stage(
     control_unit_signals,
 ) -> None: ...
 def update_WB_Stage(
+    mnemonic,
     register_write_data,
     write_register,
     memory_read_data,
