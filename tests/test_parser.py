@@ -687,6 +687,55 @@ fibonacci:
         self.assertEqual(instr_2[1].rs1, 1)
         self.assertEqual(instr_2[1].imm, 8)
 
+    def test_segmentation(self):
+        program = """.data
+        test: .byte 0
+        .text
+        addi x0, x0, 0
+        """
+
+        program2 = """.text
+        addi x0, x0, 0
+        .data
+        test: .byte 0
+        """
+
+        program3 = """addi x0, x0, 0
+        .data
+        test: .byte 0
+        """
+
+        program4 = """test: .byte 0
+        .text
+        addi x0, x0, 0
+        """
+
+        program5 = """.data
+        test: .byte 0
+        .data
+        test2: .byte 0
+        """
+
+        parser = RiscvParser()
+        state = RiscvArchitecturalState()
+        parser.parse(program, state)
+
+        parser = RiscvParser()
+        state = RiscvArchitecturalState()
+        parser.parse(program2, state)
+
+        parser = RiscvParser()
+        state = RiscvArchitecturalState()
+        parser.parse(program3, state)
+
+        parser = RiscvParser()
+        with self.assertRaises(ParserDirectiveException) as cm:
+            parser.parse(program4, state)
+
+        parser = RiscvParser()
+        with self.assertRaises(ParserDirectiveException) as cm:
+            parser.parse(program5, state)
+
     def test_data_segment(self):
         parser = RiscvParser()
         state = RiscvArchitecturalState()

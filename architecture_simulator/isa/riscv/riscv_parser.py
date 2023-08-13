@@ -366,7 +366,7 @@ class RiscvParser:
                 if not data_exists:
                     data_exists = True
                     index = self.token_list.index((line_number, line, line_parsed))
-                    self.text = self.text[:index]
+                    self.text = self.text[: index - 1]
                     self.data = self.token_list[index + 1 :]
                 else:
                     raise ParserDirectiveException(line_number=line_number, line=line)
