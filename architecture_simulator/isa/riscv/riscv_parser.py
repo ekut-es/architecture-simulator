@@ -2,108 +2,124 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import pyparsing as pp
 from dataclasses import dataclass
+import fixedint
 
 from architecture_simulator.isa.riscv.rv32i_instructions import instruction_map
-from architecture_simulator.isa.riscv import instruction_types
+import architecture_simulator.isa.riscv.instruction_types as instruction_types
 from architecture_simulator.isa.riscv.rv32i_instructions import ECALL, EBREAK, FENCE
 
 if TYPE_CHECKING:
     from architecture_simulator.isa.riscv.instruction_types import RiscvInstruction
-
-# abi register names
-reg_mapping = {
-    "zero": 0,
-    "ra": 1,
-    "sp": 2,
-    "gp": 3,
-    "tp": 4,
-    "t0": 5,
-    "t1": 6,
-    "t2": 7,
-    "fp": 8,  # this is intentional
-    "s0": 8,
-    "s1": 9,
-    "a0": 10,
-    "a1": 11,
-    "a2": 12,
-    "a3": 13,
-    "a4": 14,
-    "a5": 15,
-    "a6": 16,
-    "a7": 17,
-    "s2": 18,
-    "s3": 19,
-    "s4": 20,
-    "s5": 21,
-    "s6": 22,
-    "s7": 23,
-    "s8": 24,
-    "s9": 25,
-    "s10": 26,
-    "s11": 27,
-    "t3": 28,
-    "t4": 29,
-    "t5": 30,
-    "t6": 31,
-}
-
-reg_reg_reg_mnemonics = [
-    "add",
-    "sub",
-    "sll",
-    "slt",
-    "sltu",
-    "xor",
-    "srl",
-    "sra",
-    "or",
-    "and",
-]
-
-csr_mnemonics = ["csrrw", "csrrs", "csrrc"]
-
-csr_i_mnemonics = ["csrrwi", "csrrsi", "csrrci"]
-
-b_type_mnemonics = ["beq", "bne", "blt", "bge", "bltu", "bgeu"]
-
-s_type_mnemonics = ["sb", "sh", "sw"]
-
-normal_i_type_mnemonics = [
-    "addi",
-    "slti",
-    "sltiu",
-    "xori",
-    "ori",
-    "andi",
-    "slli",
-    "srli",
-    "srai",
-]
-
-mem_i_type_mnemonics = ["lb", "lh", "lw", "lbu", "lhu", "jalr"]
-
-u_type_mnemonic = ["lui", "auipc"]
-
-# 0 to 31 for x... register names
-reg_numbers = [str(i) for i in range(32)]
+    from architecture_simulator.uarch.riscv.riscv_architectural_state import (
+        RiscvArchitecturalState,
+    )
 
 
 class RiscvParser:
     """A parser for RISC-V programs. It is capable of turning a text form program into instruction objects."""
 
-    COMMA = pp.Literal(",").suppress()
-    Paren_R = pp.Literal(")").suppress()
-    Paren_L = pp.Literal("(").suppress()
-    D_COL = pp.Literal(":").suppress()
-    PLUS = pp.Literal("+").suppress()
+    _directives = ["text", "data"]
+    _type_directives = ["byte", "half", "word"]
 
-    pattern_register = pp.oneOf(list(reg_mapping.keys())) | pp.Group(
-        "x" + pp.oneOf(reg_numbers)
+    # abi register names
+    _reg_mapping = {
+        "zero": 0,
+        "ra": 1,
+        "sp": 2,
+        "gp": 3,
+        "tp": 4,
+        "t0": 5,
+        "t1": 6,
+        "t2": 7,
+        "fp": 8,  # this is intentional
+        "s0": 8,
+        "s1": 9,
+        "a0": 10,
+        "a1": 11,
+        "a2": 12,
+        "a3": 13,
+        "a4": 14,
+        "a5": 15,
+        "a6": 16,
+        "a7": 17,
+        "s2": 18,
+        "s3": 19,
+        "s4": 20,
+        "s5": 21,
+        "s6": 22,
+        "s7": 23,
+        "s8": 24,
+        "s9": 25,
+        "s10": 26,
+        "s11": 27,
+        "t3": 28,
+        "t4": 29,
+        "t5": 30,
+        "t6": 31,
+    }
+
+    _reg_reg_reg_mnemonics = [
+        "add",
+        "sub",
+        "sll",
+        "slt",
+        "sltu",
+        "xor",
+        "srl",
+        "sra",
+        "or",
+        "and",
+    ]
+
+    _normal_i_type_mnemonics = [
+        "addi",
+        "slti",
+        "sltiu",
+        "xori",
+        "ori",
+        "andi",
+        "slli",
+        "srli",
+        "srai",
+    ]
+
+    _mem_i_type_mnemonics = ["lb", "lh", "lw", "lbu", "lhu", "jalr"]
+
+    _mem_pseudo_mnemonics = ["la"]
+
+    _u_type_mnemonics = ["lui", "auipc"]
+
+    _csr_mnemonics = ["csrrw", "csrrs", "csrrc"]
+
+    _csr_i_mnemonics = ["csrrwi", "csrrsi", "csrrci"]
+
+    _b_type_mnemonics = ["beq", "bne", "blt", "bge", "bltu", "bgeu"]
+
+    _s_type_mnemonics = ["sb", "sh", "sw"]
+
+    # 0 to 31 for x... register names
+    _reg_numbers = [str(i) for i in range(32)]
+
+    _DOT = pp.Literal(".")
+    _COMMA = pp.Literal(",").suppress()
+    _Paren_R = pp.Literal(")").suppress()
+    _Paren_L = pp.Literal("(").suppress()
+    _Bracket_R = pp.Literal("]").suppress()
+    _Bracket_L = pp.Literal("[").suppress()
+    _D_COL = pp.Literal(":").suppress()
+    _PLUS = pp.Literal("+").suppress()
+
+    _pattern_directive = pp.Group(_DOT + pp.oneOf(_directives)("directive"))
+
+    _pattern_type_directive = pp.Group(_DOT + pp.oneOf(_type_directives)("type"))
+
+    _pattern_register = pp.oneOf(list(_reg_mapping.keys())) | pp.Group(
+        "x" + pp.oneOf(_reg_numbers)
     )
 
-    pattern_label = pp.Word(pp.alphas + "_", pp.alphanums + "_")("label")
+    _pattern_label = pp.Word(pp.alphas + "_", pp.alphanums + "_")("label")
 
-    pattern_imm = pp.Combine(
+    _pattern_imm = pp.Combine(
         pp.Optional("-")
         + (
             (
@@ -114,121 +130,552 @@ class RiscvParser:
         )
     )
 
-    pattern_offset = pp.Optional(
-        PLUS + pp.Combine("0x" + pp.Word(pp.hexnums))("offset")
+    _pattern_offset = pp.Optional(
+        _PLUS + pp.Combine("0x" + pp.Word(pp.hexnums))("offset")
+    )
+
+    _pattern_index = pp.Combine(_Bracket_L + pp.Word(pp.nums) + _Bracket_R)
+
+    _pattern_variable = pp.Combine(
+        _pattern_label("name") + pp.Optional(_pattern_index)("index")
+    )
+
+    _pattern_variable_declaration = pp.Group(
+        _pattern_label("name")
+        + _D_COL
+        + _pattern_type_directive("type")
+        + pp.delimitedList(_pattern_imm, delim=",")("values")
     )
 
     # R-Types
-    pattern_r_type_instruction = pp.Group(
-        pp.oneOf(reg_reg_reg_mnemonics, caseless=True)("mnemonic")
-        + pattern_register("rd")
-        + COMMA
-        + pattern_register("rs1")
-        + COMMA
-        + pattern_register("rs2")
+    _pattern_r_type_instruction = pp.Group(
+        pp.oneOf(_reg_reg_reg_mnemonics, caseless=True)("mnemonic")
+        + _pattern_register("rd")
+        + _COMMA
+        + _pattern_register("rs1")
+        + _COMMA
+        + _pattern_register("rs2")
     )
 
     # I-Types, B-Types, S-Types
-    pattern_reg_reg_imm_instruction = pp.Group(
+    _pattern_reg_reg_imm_instruction = pp.Group(
         pp.oneOf(
-            normal_i_type_mnemonics
-            + mem_i_type_mnemonics
-            + b_type_mnemonics
-            + s_type_mnemonics,
+            _normal_i_type_mnemonics
+            + _mem_i_type_mnemonics
+            + _b_type_mnemonics
+            + _s_type_mnemonics,
             caseless=True,
         )("mnemonic")
-        + pattern_register("reg1")
-        + COMMA
-        + pattern_register("reg2")
-        + COMMA
-        + pattern_imm("imm")
+        + _pattern_register("reg1")
+        + _COMMA
+        + _pattern_register("reg2")
+        + _COMMA
+        + _pattern_imm("imm")
     )
 
     # B-Types
-    pattern_b_type_instruction = pp.Group(
-        pp.oneOf(b_type_mnemonics, caseless=True)("mnemonic")
-        + pattern_register("reg1")
-        + COMMA
-        + pattern_register("reg2")
-        + COMMA
-        + (pattern_label + pattern_offset)
+    _pattern_b_type_instruction = pp.Group(
+        pp.oneOf(_b_type_mnemonics, caseless=True)("mnemonic")
+        + _pattern_register("reg1")
+        + _COMMA
+        + _pattern_register("reg2")
+        + _COMMA
+        + (_pattern_label + _pattern_offset)
     )
 
     # I-Type-Memory-Instructions and S-Types
-    pattern_memory_instruction = pp.Group(
-        pp.oneOf(mem_i_type_mnemonics + s_type_mnemonics, caseless=True)("mnemonic")
-        + pattern_register("reg1")
-        + COMMA
-        + pattern_imm("imm")
-        + Paren_L
-        + pattern_register("reg2")
-        + Paren_R
+    _pattern_memory_instruction = pp.Group(
+        pp.oneOf(_mem_i_type_mnemonics + _s_type_mnemonics, caseless=True)("mnemonic")
+        + _pattern_register("reg1")
+        + _COMMA
+        + _pattern_imm("imm")
+        + _Paren_L
+        + _pattern_register("reg2")
+        + _Paren_R
+    )
+
+    # I-Type-Memory-Instructions and la
+    _pattern_memory_pseudo_instruction = pp.Group(
+        pp.oneOf(_mem_i_type_mnemonics + _mem_pseudo_mnemonics, caseless=True)(
+            "mnemonic"
+        )
+        + _pattern_register("reg1")
+        + _COMMA
+        + _pattern_variable("variable")
     )
 
     # J-Types
-    pattern_jal_instruction = pp.Group(
+    _pattern_jal_instruction = pp.Group(
         pp.CaselessLiteral("jal")("mnemonic")
-        + pattern_register("rd")
-        + COMMA
-        + (pattern_imm("imm") ^ (pattern_label + pattern_offset))
+        + _pattern_register("rd")
+        + _COMMA
+        + (_pattern_imm("imm") ^ (_pattern_label + _pattern_offset))
     )
 
     # U-Types
-    pattern_u_type_instruction = pp.Group(
-        pp.oneOf(u_type_mnemonic, caseless=True)("mnemonic")
-        + pattern_register("rd")
-        + COMMA
-        + pattern_imm("imm")
+    _pattern_u_type_instruction = pp.Group(
+        pp.oneOf(_u_type_mnemonics, caseless=True)("mnemonic")
+        + _pattern_register("rd")
+        + _COMMA
+        + _pattern_imm("imm")
     )
 
     # FENCE
-    pattern_fence_instruction = pp.Group(
+    _pattern_fence_instruction = pp.Group(
         pp.CaselessLiteral("fence")("mnemonic")
-        + pattern_register("rd")
-        + COMMA
-        + pattern_register("rs1")
+        + _pattern_register("rd")
+        + _COMMA
+        + _pattern_register("rs1")
     )
 
     # CSR-Types
-    pattern_reg_csr_reg_instruction = pp.Group(
-        pp.oneOf(csr_mnemonics, caseless=True)("mnemonic")
-        + pattern_register("rd")
-        + COMMA
-        + pattern_imm("csr")
-        + COMMA
-        + pattern_register("rs1")
+    _pattern_reg_csr_reg_instruction = pp.Group(
+        pp.oneOf(_csr_mnemonics, caseless=True)("mnemonic")
+        + _pattern_register("rd")
+        + _COMMA
+        + _pattern_imm("csr")
+        + _COMMA
+        + _pattern_register("rs1")
     )
 
     # CSRI-Types
-    pattern_reg_csr_imm_instruction = pp.Group(
-        pp.oneOf(csr_i_mnemonics, caseless=True)("mnemonic")
-        + pattern_register("rd")
-        + COMMA
-        + pattern_imm("csr")
-        + COMMA
-        + pattern_imm("uimm")
+    _pattern_reg_csr_imm_instruction = pp.Group(
+        pp.oneOf(_csr_i_mnemonics, caseless=True)("mnemonic")
+        + _pattern_register("rd")
+        + _COMMA
+        + _pattern_imm("csr")
+        + _COMMA
+        + _pattern_imm("uimm")
     )
 
     # ecall ebreak
-    pattern_ecall_ebreak_instruction = (
+    _pattern_ecall_ebreak_instruction = (
         pp.CaselessLiteral("ecall") | pp.CaselessLiteral("ebreak")
     )("mnemonic")
 
-    line = (
+    # nop
+    _pattern_nop_instruction = pp.CaselessLiteral("nop")("mnemonic")
+
+    # li
+    _pattern_li_instruction = pp.Group(
+        pp.CaselessLiteral("li")("mnemonic")
+        + _pattern_register("rd")
+        + _COMMA
+        + _pattern_imm("imm")
+    )
+
+    _pattern_line = (
         (
-            pattern_r_type_instruction
-            ^ pattern_u_type_instruction
-            ^ pattern_b_type_instruction
-            ^ pattern_memory_instruction
-            ^ pattern_reg_csr_reg_instruction
-            ^ pattern_reg_csr_imm_instruction
-            ^ pattern_reg_reg_imm_instruction
-            ^ pattern_fence_instruction
-            ^ pattern_jal_instruction
-            ^ pattern_ecall_ebreak_instruction
-            ^ (pattern_label + D_COL)
+            _pattern_directive
+            ^ _pattern_variable_declaration("variable_declaration")
+            ^ _pattern_r_type_instruction
+            ^ _pattern_u_type_instruction
+            ^ _pattern_b_type_instruction
+            ^ _pattern_memory_instruction
+            ^ _pattern_memory_pseudo_instruction
+            ^ _pattern_reg_csr_reg_instruction
+            ^ _pattern_reg_csr_imm_instruction
+            ^ _pattern_reg_reg_imm_instruction
+            ^ _pattern_fence_instruction
+            ^ _pattern_jal_instruction
+            ^ _pattern_ecall_ebreak_instruction
+            ^ _pattern_nop_instruction
+            ^ _pattern_li_instruction
+            ^ (_pattern_label + _D_COL)("label_declaration")
         )
     ) + pp.StringEnd().suppress()
+
+    def parse(
+        self, program: str, state: RiscvArchitecturalState, start_address: int = 0
+    ) -> None:
+        """Parses the text format assembly program and loads it into the architectural state.
+
+        Args:
+            program (str): Text format RISC-V assembly program.
+            state (RiscvArchitecturalState): The architectural state into which the program should get loaded.
+
+        Raises:
+            TODO
+        """
+
+        self.state = state
+        self.program = program
+        self.start_address = (
+            state.instruction_memory.address_range.start
+            if start_address == 0
+            else start_address
+        )
+        self._sanitize()
+        self._tokenize()
+        self._segment()
+        self._write_data()
+        self._process_pseudo_instructions()
+        self._process_labels()
+        self._write_instructions()
+
+    def _sanitize(self) -> None:
+        """Removes leading/trailing whitespace, empty lines, comments from self.program. Gives each line a line number (starting at 1). Stores the result in self.sanitized_program."""
+
+        # remove empty lines, lines that only contain white space and comment lines. Enumerate all lines before removing lines.
+        self.sanitized_program = [
+            (index + 1, line)
+            for index, line in enumerate(self.program.splitlines())
+            if line.strip() and not line.strip().startswith("#")
+        ]
+        # remove comments from lines that also contain an instruction and strip the line
+        self.sanitized_program = [
+            (index, line.split("#", 1)[0].strip())
+            for index, line in self.sanitized_program
+        ]
+
+    def _tokenize(self) -> None:
+        """Turns self.sanitized_program into tokens and stores them in self.token_list (together with the line numbers and the original line)."""
+        self.token_list: list[tuple[int, str, pp.ParseResults]] = []
+        for line_number, line in self.sanitized_program:
+            try:
+                self.token_list.append(
+                    (line_number, line, self._pattern_line.parseString(line)[0])
+                )
+            except pp.ParseException:
+                raise ParserSyntaxException(line_number=line_number, line=line)
+
+    def _segment(self) -> None:
+        """Determines the segments of the program (data and text) and stores them in self.data and self.text."""
+
+        self.data: list[tuple[int, str, pp.ParseResults]] = []
+        self.text: list[tuple[int, str, pp.ParseResults]] = []
+
+        data_exists = False
+        text_exists = True
+        self.text = self.token_list
+
+        # first line is segment directive
+        if not isinstance(self.token_list[0][2], str):
+            if self.token_list[0][2].get("directive") == "data":
+                data_exists = True
+                text_exists = False
+                self.data = self.token_list[1:]
+                self.text = []
+            elif self.token_list[0][2].get("directive") == "text":
+                self.text = self.token_list[1:]
+
+        for line_number, line, line_parsed in self.token_list[1:]:
+            if isinstance(line_parsed, str):
+                continue
+            if line_parsed.get("directive") == "data":
+                if not data_exists:
+                    data_exists = True
+                    index = self.token_list.index((line_number, line, line_parsed))
+                    self.text = self.text[: index - 1]
+                    self.data = self.token_list[index + 1 :]
+                else:
+                    raise ParserDirectiveException(line_number=line_number, line=line)
+            elif line_parsed.get("directive") == "text":
+                if not text_exists:
+                    text_exists = True
+                    index = self.token_list.index((line_number, line, line_parsed))
+                    self.data = self.data[: index - 1]
+                    self.text = self.token_list[index + 1 :]
+                else:
+                    raise ParserDirectiveException(line_number=line_number, line=line)
+            elif line_parsed.get("directive") is not None:
+                raise ParserDirectiveException(line_number=line_number, line=line)
+
+    def _write_data(self) -> None:
+        """Looks for data write commands in self.data. Stores the variables in self.variables and writes them to the memory of self.state."""
+
+        # variables are stored as (name: (address, byte_length))
+        self.variables: dict[str, tuple[int, int]] = {}
+        address_counter = self.state.memory.min_bytes
+
+        for line_number, line, line_parsed in self.data:
+            if isinstance(line_parsed, str) or (
+                line_parsed.get_name() != "variable_declaration"
+            ):
+                raise ParserDataSyntaxException(line_number=line_number, line=line)
+            else:
+                if line_parsed.name in self.variables:
+                    raise ParserDataDuplicateException(
+                        name=line_parsed.name, line_number=line_number, line=line
+                    )
+                if line_parsed.type.type == "byte":
+                    self.variables.update(
+                        {line_parsed.get("name"): (address_counter, 1)}
+                    )
+                    for val in line_parsed.get("values"):
+                        self.state.memory.write_byte(
+                            address_counter, fixedint.MutableUInt8(int(val, base=0))
+                        )
+                        address_counter += 1
+                elif line_parsed.type.type == "half":
+                    self.variables.update(
+                        {line_parsed.get("name"): (address_counter, 2)}
+                    )
+                    for val in line_parsed.get("values"):
+                        self.state.memory.write_halfword(
+                            address_counter, fixedint.MutableUInt16(int(val, base=0))
+                        )
+                        address_counter += 2
+                elif line_parsed.type.type == "word":
+                    self.variables.update(
+                        {line_parsed.get("name"): (address_counter, 4)}
+                    )
+                    for val in line_parsed.get("values"):
+                        self.state.memory.write_word(
+                            address_counter, fixedint.MutableUInt32(int(val, base=0))
+                        )
+                        address_counter += 4
+
+    def _process_pseudo_instructions(self) -> None:
+        """Converts pseudo instructions in self.text into regular instructions, and variables into addresses."""
+
+        for line_number, line, line_parsed in self.text:
+            index = self.text.index((line_number, line, line_parsed))
+            if line_parsed == "nop":
+                self.text[index] = (
+                    line_number,
+                    line,
+                    self._pattern_line.parse_string("addi x0, x0, 0")[0],
+                )
+            elif (
+                not isinstance(line_parsed, str)
+                and line_parsed.get("mnemonic") is not None
+            ):
+                mnemonic = line_parsed.get("mnemonic").lower()
+                if mnemonic == "li":
+                    register_name = (
+                        line_parsed.rd[0]
+                        if type(line_parsed.rd[0]) == str
+                        else "x" + line_parsed.rd[0][1]
+                    )
+                    imm = int(line_parsed.imm, base=0)
+                    lui_imm = int(fixedint.MutableUInt32(imm)) >> 12
+                    # get the 12 first bits
+                    addi_imm = int(fixedint.MutableUInt32(imm)) & 0xFFF
+                    # compensate addi sign extension
+                    if addi_imm > 2047 or addi_imm < -2048:
+                        lui_imm += 1
+                    # insert lui, addi into parse_result if imm is outside of 12 bit range
+                    if imm > 2047 or imm < -2048:
+                        self.text[index] = (
+                            line_number,
+                            line,
+                            self._pattern_line.parse_string(
+                                f"lui {register_name}, {lui_imm}"
+                            )[0],
+                        )
+                        self.text.insert(
+                            index + 1,
+                            (
+                                line_number,
+                                line,
+                                self._pattern_line.parse_string(
+                                    f"addi {register_name}, {register_name}, {addi_imm}"
+                                )[0],
+                            ),
+                        )
+                    else:
+                        # insert just addi into parse_result, overwrite register content (x0+imm)
+                        self.text[index] = (
+                            line_number,
+                            line,
+                            self._pattern_line.parse_string(
+                                f"addi {register_name}, x0, {imm}"
+                            )[0],
+                        )
+                elif (
+                    mnemonic in self._mem_i_type_mnemonics
+                    or mnemonic in self._mem_pseudo_mnemonics
+                ):
+                    if line_parsed.get("variable"):
+                        if line_parsed.get("variable").name not in self.variables:
+                            raise ParserVariableException(
+                                line_number=line_number,
+                                line=line,
+                                name=line_parsed.get("variable").name,
+                            )
+                        register_name = (
+                            line_parsed.reg1[0]
+                            if type(line_parsed.reg1[0]) == str
+                            else "x" + line_parsed.reg1[0][1]
+                        )
+                        # determine array index (size*index)
+                        array_index = (self.variables[line_parsed.variable.name][1]) * (
+                            int(line_parsed.variable.index)
+                            if line_parsed.variable.index
+                            else 0
+                        )
+                        # address with array offset
+                        address = (
+                            self.variables[line_parsed.variable.name][0] + array_index
+                        )
+                        lui_imm = int(fixedint.MutableUInt32(address)) >> 12
+                        # get the 12 first bits
+                        addi_imm = int(fixedint.MutableUInt32(address)) & 0xFFF
+                        # compensate addi sign extension
+                        if addi_imm > 2047 or addi_imm < -2048:
+                            lui_imm += 1
+                        # insert lui , addi into parse_result
+                        self.text[index] = (
+                            line_number,
+                            line,
+                            self._pattern_line.parse_string(
+                                f"lui {register_name}, {lui_imm}"
+                            )[0],
+                        )
+                        self.text.insert(
+                            index + 1,
+                            (
+                                line_number,
+                                line,
+                                self._pattern_line.parse_string(
+                                    f"addi {register_name}, {register_name}, {addi_imm}"
+                                )[0],
+                            ),
+                        )
+                        # if instruction is pseudo lb/lh/lw/lbu/lhu
+                        if mnemonic in self._mem_i_type_mnemonics:
+                            # insert "unpseudoified" version
+                            self.text.insert(
+                                index + 2,
+                                (
+                                    line_number,
+                                    line,
+                                    self._pattern_line.parse_string(
+                                        f"{mnemonic} {register_name}, 0({register_name})"
+                                    )[0],
+                                ),
+                            )
+
+    def _process_labels(self) -> None:
+        """Computes the addresses of all labels in the text segment and stores them in self.labels"""
+        self.labels: dict[str, int] = {}
+        instruction_address = self.start_address
+        for line_number, line, line_parsed in self.text:
+            if (
+                isinstance(line_parsed, str)
+                and line_parsed != "ecall"
+                and line_parsed != "ebreak"
+            ):
+                self.labels.update({line_parsed: instruction_address})
+            else:
+                mnemonic = (
+                    line_parsed if type(line_parsed) == str else line_parsed.mnemonic
+                )
+                if mnemonic is not None and mnemonic.lower() in instruction_map:
+                    instruction_address += instruction_map[mnemonic.lower()].length
+
+    def _write_instructions(self) -> None:
+        """Instantiates the instructions from self.text and writes them to the instruction memory of self.state."""
+
+        instructions: list[RiscvInstruction] = []
+        address_count: int = self.start_address
+
+        for line_number, line, line_parsed in self.text:
+            if isinstance(line_parsed, str):
+                # skip if instruction_parsed is a label, but do not skip ecall/ebreak
+                if line_parsed == "ecall":
+                    instructions.append(ECALL(imm=0, rs1=0, rd=0))
+                    address_count += ECALL.length
+                if line_parsed == "ebreak":
+                    instructions.append(EBREAK(imm=1, rs1=0, rd=0))
+                    address_count += EBREAK.length
+                continue
+            if (
+                line_parsed.mnemonic is None
+                or line_parsed.mnemonic.lower() not in instruction_map
+            ):
+                raise ParserSyntaxException(line_number=line_number, line=line)
+            instruction_class = instruction_map[line_parsed.mnemonic.lower()]
+            if issubclass(instruction_class, instruction_types.RTypeInstruction):
+                instructions.append(
+                    instruction_class(
+                        rs1=self._convert_register_name(line_parsed.rs1),
+                        rs2=self._convert_register_name(line_parsed.rs2),
+                        rd=self._convert_register_name(line_parsed.rd),
+                    )
+                )
+            elif issubclass(instruction_class, instruction_types.ITypeInstruction):
+                instructions.append(
+                    instruction_class(
+                        imm=int(line_parsed.imm, base=0),
+                        # note: since I/S/B-Types use the same patterns but have different names for the registers (rs1,rs2 vs. rd,rs1),
+                        # we instead use reg1 and reg2 as names
+                        rs1=self._convert_register_name(line_parsed.reg2),
+                        rd=self._convert_register_name(line_parsed.reg1),
+                    )
+                )
+            elif issubclass(instruction_class, instruction_types.STypeInstruction):
+                instructions.append(
+                    instruction_class(
+                        rs1=self._convert_register_name(line_parsed.reg2),
+                        rs2=self._convert_register_name(line_parsed.reg1),
+                        imm=int(line_parsed.imm, base=0),
+                    )
+                )
+            elif issubclass(instruction_class, instruction_types.BTypeInstruction):
+                # B-Types can use labels or numerical immediates, so convert that first
+                imm_val = self._convert_label_or_imm(
+                    line_parsed,
+                    self.labels,
+                    address_count,
+                    line_number=line_number,
+                    line=line,
+                )
+
+                instructions.append(
+                    instruction_class(
+                        rs1=self._convert_register_name(line_parsed.reg1),
+                        rs2=self._convert_register_name(line_parsed.reg2),
+                        imm=imm_val,
+                    )
+                )
+            elif issubclass(instruction_class, instruction_types.UTypeInstruction):
+                instructions.append(
+                    instruction_class(
+                        rd=self._convert_register_name(line_parsed.rd),
+                        imm=int(line_parsed.imm, base=0),
+                    )
+                )
+            elif issubclass(instruction_class, instruction_types.JTypeInstruction):
+                # J-Types can use labels or numerical immediates, so convert that first
+                imm_val = self._convert_label_or_imm(
+                    line_parsed,
+                    self.labels,
+                    address_count,
+                    line_number=line_number,
+                    line=line,
+                )
+
+                instructions.append(
+                    instruction_class(
+                        rd=self._convert_register_name(line_parsed.rd),
+                        imm=imm_val,
+                    )
+                )
+            elif issubclass(instruction_class, instruction_types.CSRTypeInstruction):
+                instructions.append(
+                    instruction_class(
+                        rd=self._convert_register_name(line_parsed.rd),
+                        csr=int(line_parsed.csr, base=0),
+                        rs1=self._convert_register_name(line_parsed.rs1),
+                    )
+                )
+            elif issubclass(instruction_class, instruction_types.CSRITypeInstruction):
+                # TODO: Add parser element for this type
+                instructions.append(
+                    instruction_class(
+                        rd=self._convert_register_name(line_parsed.rd),
+                        csr=int(line_parsed.csr, base=0),
+                        uimm=int(line_parsed.uimm, base=0),
+                    )
+                )
+            elif issubclass(instruction_class, instruction_types.FenceTypeInstruction):
+                # TODO: Change me, if Fence gets implemented
+                instructions.append(FENCE())
+            address_count += instruction_map[line_parsed.mnemonic.lower()].length
+
+        self.state.instruction_memory.write_instructions(instructions)
 
     def _convert_label_or_imm(
         self,
@@ -267,194 +714,9 @@ class RiscvParser:
             int: number of the register
         """
         if type(parsed_register[0]) == str:
-            return reg_mapping[parsed_register[0]]
+            return self._reg_mapping[parsed_register[0]]
         else:
             return int(parsed_register[0][1])
-
-    def _tokenize_assembly(
-        self, assembly: str
-    ) -> list[tuple[int, str, pp.ParseResults]]:
-        """Turn assembly code into a list of parse results.
-
-        Args:
-            assembly (str): Text assembly which may contain labels and comments.
-
-        Returns:
-            list[tuple[int, str, pp.ParseResults]]: List of line number, original line and ParseResult.
-        """
-        # remove empty lines, lines that only contain white space and comment lines. Enumerate all lines before removing lines.
-        enumerated_lines = [
-            (index + 1, line)
-            for index, line in enumerate(assembly.splitlines())
-            if line.strip() and not line.strip().startswith("#")
-        ]
-        # remove comments from lines that also contain an instruction and strip the line
-        enumerated_lines = [
-            (index, line.split("#", 1)[0].strip()) for index, line in enumerated_lines
-        ]
-        # a line is a list of ParseResults, but there is only one element in each of those lists
-        res: list[tuple[int, str, pp.ParseResults]] = []
-        for index, line in enumerated_lines:
-            try:
-                res.append((index, line, self.line.parse_string(line)[0]))
-            except pp.ParseException:
-                raise ParserSyntaxException(line_number=index, line=line)
-        return res
-
-    def _compute_labels(
-        self, parse_result: list[pp.ParseResults], start_address: int
-    ) -> dict:
-        """Compute the addresses for the labels.
-        Args:
-            parse_result list[pp.ParseResults]: Parsed assembly which may contain labels
-            start_address (int): address of the first instruction.
-
-        Returns:
-            dict: addresses for the labels.
-        """
-        labels: dict[str, int] = {}
-        instruction_address = start_address
-        for i_parsed in parse_result:
-            if (
-                isinstance(i_parsed, str)
-                and i_parsed != "ecall"
-                and i_parsed != "ebreak"
-            ):
-                labels.update({i_parsed: instruction_address})
-            else:
-                mnemonic = (
-                    i_parsed if type(i_parsed) == str else i_parsed.mnemonic
-                ).lower()
-                instruction_address += instruction_map[mnemonic].length
-        return labels
-
-    def _tokens_to_instructions(
-        self, parse_result: list[tuple[int, str, pp.ParseResults]], start_address: int
-    ) -> list[RiscvInstruction]:
-        """Turn parse results into instructions.
-
-        Args:
-            parse_result (list[tuple[int, str, pp.ParseResults]]): parsed assembly which may contain labels.
-
-        Returns:
-            list[Instruction]: list of executable instructions
-        """
-        instructions: list[RiscvInstruction] = []
-        pure_parse_results = [result[2] for result in parse_result]
-        labels = self._compute_labels(pure_parse_results, start_address)
-        address_count: int = start_address
-
-        for line_number, line, instruction_parsed in parse_result:
-            if isinstance(instruction_parsed, str):
-                # skip if instruction_parsed is a label, but do not skip ecall/ebreak
-                if instruction_parsed == "ecall":
-                    instructions.append(ECALL(imm=0, rs1=0, rd=0))
-                    address_count += ECALL.length
-                if instruction_parsed == "ebreak":
-                    instructions.append(EBREAK(imm=1, rs1=0, rd=0))
-                    address_count += EBREAK.length
-                continue
-            instruction_class = instruction_map[instruction_parsed.mnemonic.lower()]
-            if issubclass(instruction_class, instruction_types.RTypeInstruction):
-                instructions.append(
-                    instruction_class(
-                        rs1=self._convert_register_name(instruction_parsed.rs1),
-                        rs2=self._convert_register_name(instruction_parsed.rs2),
-                        rd=self._convert_register_name(instruction_parsed.rd),
-                    )
-                )
-            elif issubclass(instruction_class, instruction_types.ITypeInstruction):
-                instructions.append(
-                    instruction_class(
-                        imm=int(instruction_parsed.imm, base=0),
-                        # note: since I/S/B-Types use the same patterns but have different names for the registers (rs1,rs2 vs. rd,rs1),
-                        # we instead use reg1 and reg2 as names
-                        rs1=self._convert_register_name(instruction_parsed.reg2),
-                        rd=self._convert_register_name(instruction_parsed.reg1),
-                    )
-                )
-            elif issubclass(instruction_class, instruction_types.STypeInstruction):
-                instructions.append(
-                    instruction_class(
-                        rs1=self._convert_register_name(instruction_parsed.reg2),
-                        rs2=self._convert_register_name(instruction_parsed.reg1),
-                        imm=int(instruction_parsed.imm, base=0),
-                    )
-                )
-            elif issubclass(instruction_class, instruction_types.BTypeInstruction):
-                # B-Types can use labels or numerical immediates, so convert that first
-                imm_val = self._convert_label_or_imm(
-                    instruction_parsed,
-                    labels,
-                    address_count,
-                    line_number=line_number,
-                    line=line,
-                )
-
-                instructions.append(
-                    instruction_class(
-                        rs1=self._convert_register_name(instruction_parsed.reg1),
-                        rs2=self._convert_register_name(instruction_parsed.reg2),
-                        imm=imm_val,
-                    )
-                )
-            elif issubclass(instruction_class, instruction_types.UTypeInstruction):
-                instructions.append(
-                    instruction_class(
-                        rd=self._convert_register_name(instruction_parsed.rd),
-                        imm=int(instruction_parsed.imm, base=0),
-                    )
-                )
-            elif issubclass(instruction_class, instruction_types.JTypeInstruction):
-                # J-Types can use labels or numerical immediates, so convert that first
-                imm_val = self._convert_label_or_imm(
-                    instruction_parsed,
-                    labels,
-                    address_count,
-                    line_number=line_number,
-                    line=line,
-                )
-
-                instructions.append(
-                    instruction_class(
-                        rd=self._convert_register_name(instruction_parsed.rd),
-                        imm=imm_val,
-                    )
-                )
-            elif issubclass(instruction_class, instruction_types.CSRTypeInstruction):
-                instructions.append(
-                    instruction_class(
-                        rd=self._convert_register_name(instruction_parsed.rd),
-                        csr=int(instruction_parsed.csr, base=0),
-                        rs1=self._convert_register_name(instruction_parsed.rs1),
-                    )
-                )
-            elif issubclass(instruction_class, instruction_types.CSRITypeInstruction):
-                # TODO: Add parser element for this type
-                instructions.append(
-                    instruction_class(
-                        rd=self._convert_register_name(instruction_parsed.rd),
-                        csr=int(instruction_parsed.csr, base=0),
-                        uimm=int(instruction_parsed.uimm, base=0),
-                    )
-                )
-            elif issubclass(instruction_class, instruction_types.FenceTypeInstruction):
-                # TODO: Change me, if Fence gets implemented
-                instructions.append(FENCE())
-            address_count += instruction_map[instruction_parsed.mnemonic.lower()].length
-        return instructions
-
-    def parse(self, program: str, start_address: int = 0) -> list[RiscvInstruction]:
-        """Turn assembly code into a list of executable instructions.
-
-        Args:
-            assembly (str): Text assembly which may contain labels and comments.
-
-        Returns:
-            list[Instructions]: List of executable instructions.
-        """
-        parsed = self._tokenize_assembly(program)
-        return self._tokens_to_instructions(parsed, start_address=start_address)
 
 
 @dataclass
@@ -489,3 +751,39 @@ class ParserOddImmediateException(ParserException):
 
     def __repr__(self) -> str:
         return f"Immediate has to be even in line {self.line_number}: {self.line}"
+
+
+@dataclass
+class ParserDirectiveException(ParserException):
+    """An exception that can be raised when an illegal directive is used."""
+
+    def __repr__(self) -> str:
+        return f"Illegal directive in line {self.line_number}: {self.line}"
+
+
+@dataclass
+class ParserDataSyntaxException(ParserException):
+    """An exception that can be raised when syntax inside a data segment is incorrect."""
+
+    def __repr__(self) -> str:
+        return f"Syntax error in .data segment in line {self.line_number}: {self.line}"
+
+
+@dataclass
+class ParserDataDuplicateException(ParserException):
+    """An exception that can be raised when a duplicate variable name is used inside a data segment."""
+
+    name: str
+
+    def __repr__(self) -> str:
+        return f"Redefinition of variable {self.name} in line {self.line_number}: {self.line}"
+
+
+@dataclass
+class ParserVariableException(ParserException):
+    """An exception that can be raised when a variable is used but not defined."""
+
+    name: str
+
+    def __repr__(self) -> str:
+        return f"Variable {self.name} is not defined in line {self.line_number}: {self.line}"

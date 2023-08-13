@@ -74,15 +74,7 @@ class RiscvSimulation:
         """Loads a text form program into the simulation.
 
         Args:
-            program (str): A program which complies with (a subset of) the toy syntax.
+            program (str): A program which complies with (a subset of) the RISC-V syntax.
         """
         parser = RiscvParser()
-        # Required to compute labels TODO: Actually, I think this is not needed, because instructions always use relative addresses for jumping.
-        # The parser should get slightly reworked.
-        start_address = self.state.instruction_memory.address_range.start
-        self.state.instruction_memory.write_instructions(
-            parser.parse(
-                program=program,
-                start_address=start_address,
-            )
-        )
+        parser.parse(program=program, state=self.state)

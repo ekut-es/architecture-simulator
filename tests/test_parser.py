@@ -1,4 +1,5 @@
 import unittest
+import fixedint
 from architecture_simulator.isa.riscv.rv32i_instructions import (
     ADD,
     BEQ,
@@ -25,6 +26,10 @@ from architecture_simulator.isa.riscv.riscv_parser import (
     ParserLabelException,
     ParserOddImmediateException,
     ParserSyntaxException,
+    ParserDirectiveException,
+    ParserDataSyntaxException,
+    ParserDataDuplicateException,
+    ParserVariableException,
 )
 
 
@@ -114,9 +119,14 @@ beq zero, ra, Ban0n3
 
     def test_bnf(self):
         parser = RiscvParser()
-        instr = [
-            instr for line_num, line, instr in parser._tokenize_assembly(self.program)
-        ]
+        state = RiscvArchitecturalState()
+        parser.state = state
+        parser.start_address = 0
+        parser.program = self.program
+        parser._sanitize()
+        parser._tokenize()
+
+        instr = [instr for line_num, line, instr in parser.token_list]
         self.assertEqual(
             [result if type(result) == str else result.as_list() for result in instr],
             self.expected,
@@ -125,16 +135,15 @@ beq zero, ra, Ban0n3
         # self.assertEqual(instr[1].mnemonic, "")
 
         with self.assertRaises(ParserSyntaxException):
-            parser._tokenize_assembly(self.program_2)
+            parser.parse(self.program_2, state)
 
         with self.assertRaises(ParserSyntaxException):
-            parser._tokenize_assembly(self.program_3)
+            parser.parse(self.program_3, state)
 
         with self.assertRaises(ParserSyntaxException):
-            parser._tokenize_assembly(self.program_4)
+            parser.parse(self.program_4, state)
 
     def test_process_labels(self):
-        parser = RiscvParser()
         expected_labels = {
             "Ananas": 0,
             "Banane": 8,
@@ -142,9 +151,19 @@ beq zero, ra, Ban0n3
             "Chinakohl": 24,
             "Ban0n3": 60,
         }
-        bnf_result = parser._tokenize_assembly(self.program)
-        proc_labels = parser._compute_labels([result[2] for result in bnf_result], 0)
-        self.assertEqual(proc_labels, expected_labels)
+        parser = RiscvParser()
+        state = RiscvArchitecturalState()
+        parser.state = state
+        parser.start_address = 0
+        parser.program = self.program
+        parser._sanitize()
+        parser._tokenize()
+        parser._segment()
+        parser._write_data()
+        parser._process_pseudo_instructions()
+        parser._process_labels()
+
+        self.assertEqual(parser.labels, expected_labels)
 
     def assert_inst_values(self, instr):
         # add x0,x1,x2
@@ -234,20 +253,19 @@ beq zero, ra, Ban0n3
 
     def test_parser(self):
         parser = RiscvParser()
-        instr = parser._tokens_to_instructions(
-            parser._tokenize_assembly(self.program), start_address=0
-        )
+        state = RiscvArchitecturalState()
+
+        parser.parse(self.program, state)
+        instr = list(state.instruction_memory.instructions.values())
+
         self.assert_inst_values(instr)
 
+        parser = RiscvParser()
         with self.assertRaises(ParserSyntaxException):
-            parser._tokens_to_instructions(
-                parser._tokenize_assembly(self.program_4), start_address=0
-            )
+            parser.parse(self.program_4, state)
 
         parser = RiscvParser()
-        instr = parser._tokens_to_instructions(
-            parser._tokenize_assembly(self.program_5_abi), start_address=0
-        )
+        parser.parse(self.program_5_abi, state)
 
         self.assert_inst_values(instr)
 
@@ -440,7 +458,10 @@ fibonacci:
         jal zero, main
         """
         parser = RiscvParser()
-        instr = parser.parse(text, start_address=0)
+        state = RiscvArchitecturalState()
+        parser.parse(text, state)
+        instr = list(state.instruction_memory.instructions.values())
+
         self.assertEqual(instr[0].imm, -4)
         self.assertEqual(instr[1].imm, -4)
         self.assertEqual(instr[2].imm, 8)
@@ -460,7 +481,9 @@ fibonacci:
         csrrw sp, 0x448, s1
         csrrwi sp, 0x448, 0x1F"""
         parser = RiscvParser()
-        instr = parser.parse(text, start_address=0)
+        state = RiscvArchitecturalState()
+        parser.parse(text, state)
+        instr = list(state.instruction_memory.instructions.values())
 
         self.assertEqual(instr[0].imm, 0xFF)
         self.assertEqual(instr[1].imm, -15)
@@ -485,7 +508,10 @@ fibonacci:
         csrrw sp, 0b010001001000, s1
         csrrwi sp, 0b010001001000, 0b11111"""
         parser = RiscvParser()
-        instr = parser.parse(text, start_address=0)
+        state = RiscvArchitecturalState()
+        parser.parse(text, state)
+        instr = list(state.instruction_memory.instructions.values())
+
         self.assertEqual(instr[0].imm, 0xFF)
         self.assertEqual(instr[1].imm, -15)
         self.assertEqual(instr[2].imm, 0xA)
@@ -499,6 +525,7 @@ fibonacci:
 
     def test_reg_label_names(self):
         parser = RiscvParser()
+        state = RiscvArchitecturalState()
         program = """t0Test:
         sp3:
         zero_187_jo_do:
@@ -514,8 +541,12 @@ fibonacci:
         add x0, x1, x2
         jal x2, sp3
         """
+        parser.program = program
+        parser.state = state
+        parser._sanitize()
+        parser._tokenize()
 
-        parsed = [result[2] for result in parser._tokenize_assembly(program)]
+        parsed = [result[2] for result in parser.token_list]
         self.assertEqual(
             [result if type(result) == str else result.as_list() for result in parsed],
             [
@@ -541,8 +572,9 @@ fibonacci:
         subi x1, x0, 15
         """
         parser = RiscvParser()
+        state = RiscvArchitecturalState()
         with self.assertRaises(ParserSyntaxException) as cm:
-            parser.parse(false_code_1)
+            parser.parse(false_code_1, state)
         self.assertEqual(
             cm.exception, ParserSyntaxException(line_number=2, line="subi x1, x0, 15")
         )
@@ -551,7 +583,7 @@ fibonacci:
         t:
         beq x0, x0, tt"""
         with self.assertRaises(ParserLabelException) as cm:
-            parser.parse(false_code_2)
+            parser.parse(false_code_2, state)
         self.assertEqual(
             cm.exception,
             ParserLabelException(line_number=3, line="beq x0, x0, tt", label="tt"),
@@ -563,7 +595,7 @@ fibonacci:
         beq x0, x0, -1
         """
         with self.assertRaises(ParserOddImmediateException) as cm:
-            parser.parse(false_code_3)
+            parser.parse(false_code_3, state)
         self.assertEqual(
             cm.exception,
             ParserOddImmediateException(
@@ -578,7 +610,7 @@ fibonacci:
         beq x0, x0, 4
         """
         with self.assertRaises(ParserSyntaxException) as cm:
-            parser.parse(false_code_4)
+            parser.parse(false_code_4, state)
         self.assertEqual(
             cm.exception, ParserSyntaxException(line_number=3, line="jal x0, t1, -24")
         )
@@ -588,7 +620,7 @@ fibonacci:
         addi x0, x0, x0
         """
         with self.assertRaises(ParserSyntaxException) as cm:
-            parser.parse(false_code_5)
+            parser.parse(false_code_5, state)
         self.assertEqual(
             cm.exception, ParserSyntaxException(line_number=1, line="addi x1, x0, 0x-5")
         )
@@ -598,7 +630,7 @@ fibonacci:
         addi x1, x0, 0b5555 #asdad
         #ffff"""
         with self.assertRaises(ParserSyntaxException) as cm:
-            parser.parse(false_code_6)
+            parser.parse(false_code_6, state)
         self.assertEqual(
             cm.exception,
             ParserSyntaxException(line_number=3, line="addi x1, x0, 0b5555"),
@@ -609,7 +641,7 @@ fibonacci:
         # not a comment
         """
         with self.assertRaises(ParserSyntaxException) as cm:
-            parser.parse(false_code_7)
+            parser.parse(false_code_7, state)
         self.assertEqual(
             cm.exception, ParserSyntaxException(line_number=1, line="add x0, x5")
         )
@@ -621,7 +653,9 @@ fibonacci:
         beq x0, x0, toast+0x4"""
 
         parser = RiscvParser()
-        instr = parser.parse(program)
+        state = RiscvArchitecturalState()
+        parser.parse(program, state)
+        instr = list(state.instruction_memory.instructions.values())
         self.assertIsInstance(instr[0], BEQ)
         self.assertEqual(instr[0].rs1, 0)
         self.assertEqual(instr[0].rs2, 0)
@@ -639,7 +673,10 @@ fibonacci:
 
         program_2 = """lw x0, x1, 8
         lw x0, 8(x1)"""
-        instr_2 = parser.parse(program_2)
+        parser = RiscvParser()
+        state = RiscvArchitecturalState()
+        parser.parse(program_2, state)
+        instr_2 = list(state.instruction_memory.instructions.values())
         self.assertIsInstance(instr_2[0], LW)
         self.assertEqual(instr_2[0].rd, 0)
         self.assertEqual(instr_2[0].rs1, 1)
@@ -649,3 +686,525 @@ fibonacci:
         self.assertEqual(instr_2[1].rd, 0)
         self.assertEqual(instr_2[1].rs1, 1)
         self.assertEqual(instr_2[1].imm, 8)
+
+    def test_segmentation(self):
+        program = """.data
+        test: .byte 0
+        .text
+        addi x0, x0, 0
+        """
+
+        program2 = """.text
+        addi x0, x0, 0
+        .data
+        test: .byte 0
+        """
+
+        program3 = """addi x0, x0, 0
+        .data
+        test: .byte 0
+        """
+
+        program4 = """test: .byte 0
+        .text
+        addi x0, x0, 0
+        """
+
+        program5 = """.data
+        test: .byte 0
+        .data
+        test2: .byte 0
+        """
+
+        parser = RiscvParser()
+        state = RiscvArchitecturalState()
+        parser.parse(program, state)
+
+        parser = RiscvParser()
+        state = RiscvArchitecturalState()
+        parser.parse(program2, state)
+
+        parser = RiscvParser()
+        state = RiscvArchitecturalState()
+        parser.parse(program3, state)
+
+        parser = RiscvParser()
+        with self.assertRaises(ParserDirectiveException) as cm:
+            parser.parse(program4, state)
+
+        parser = RiscvParser()
+        with self.assertRaises(ParserDirectiveException) as cm:
+            parser.parse(program5, state)
+
+    def test_data_segment(self):
+        parser = RiscvParser()
+        state = RiscvArchitecturalState()
+        program = """.data
+        test1: .byte 42
+        test2: .half 0x5
+        test3: .word 0x2, 0b1011, -99
+        .text
+        addi x0, x0, 0
+        ori x0, x0, 0"""
+
+        parser.parse(program, state)
+        instr = list(state.instruction_memory.instructions.values())
+        self.assertEqual(instr.__len__(), 2)
+        self.assertEqual(instr[0].mnemonic, "addi")
+        self.assertEqual(instr[1].mnemonic, "ori")
+
+        program2 = """.data
+        test1: .byte 42
+        test2: .half 0x5
+        test3: .word 0x2, 0b1011, -99
+        addi x0, x0, 0
+        .text
+        ori x0, x0, 0"""
+
+        parser = RiscvParser()
+        with self.assertRaises(ParserDataSyntaxException) as cm:
+            parser.parse(program2, state)
+        self.assertEqual(
+            cm.exception,
+            ParserDataSyntaxException(line_number=5, line="addi x0, x0, 0"),
+        )
+
+        program3 = """.data
+        test1: .byte 42
+        test2: .half 0x5
+        .data
+        test3: .word 0x2, 0b1011, -99
+        .text
+        addi x0, x0, 0
+        ori x0, x0, 0"""
+
+        parser = RiscvParser()
+        with self.assertRaises(ParserDirectiveException) as cm:
+            parser.parse(program3, state)
+        self.assertEqual(
+            cm.exception,
+            ParserDirectiveException(line_number=4, line=".data"),
+        )
+
+        program4 = """.data
+        test1: .byte 42
+        test2: .half 0x5
+        test3: .word 0x2, 0b1011, -99
+        .text
+        addi x0, x0, 0
+        ori x0, x0, 0
+        .data"""
+
+        parser = RiscvParser()
+        with self.assertRaises(ParserDirectiveException) as cm:
+            parser.parse(program4, state)
+
+        program5 = """.data
+        test1: .byte 42
+        test2: .half 0x5
+        test3: .word 0x2, 0b1011, -99
+        .text
+        addi x0, x0, 0
+        ori x0, x0, 0
+        .text"""
+
+        parser = RiscvParser()
+        with self.assertRaises(ParserDirectiveException) as cm:
+            parser.parse(program4, state)
+
+        program6 = """.data
+        test1: .byte 42
+        test2: .half 0x5
+        .text
+        test3: .word 0x2, 0b1011, -99
+        addi x0, x0, 0
+        ori x0, x0, 0"""
+
+        parser = RiscvParser()
+        with self.assertRaises(ParserSyntaxException) as cm:
+            parser.parse(program6, state)
+
+    def test_pseudo_instructions_variables(self):
+        parser = RiscvParser()
+        state = RiscvArchitecturalState()
+        program = """.data
+        test1: .byte 42
+        test2: .half 0x5
+        test3: .word 0x2, 0b1011, -99
+        .text
+        lb x5, test1
+        lh x6, test2
+        lw x7, test3
+        lw x8, test3[2]"""
+
+        parser.parse(program, state)
+
+        self.assertEqual(
+            state.memory.read_byte(state.memory.min_bytes),
+            fixedint.MutableUInt8(42),
+        )
+        self.assertEqual(
+            state.memory.read_halfword(state.memory.min_bytes + 1),
+            fixedint.MutableUInt16(5),
+        )
+        self.assertEqual(
+            state.memory.read_word(state.memory.min_bytes + 3),
+            fixedint.MutableUInt32(0x2),
+        )
+        self.assertEqual(
+            state.memory.read_word(state.memory.min_bytes + 3 + 2 * 4),
+            fixedint.MutableUInt32(-99),
+        )
+        # out of bounds
+        self.assertEqual(
+            state.memory.read_word(state.memory.min_bytes + 3 + 2 * 4 + 4),
+            fixedint.MutableUInt32(0),
+        )
+
+        program2 = """.data
+        test1: .byte 42
+        test2: .half 0xA
+        test3: .word 0x2, 0b1011, 0, -555, -1
+        .text
+        la x5, test1
+        la x6, test2
+        la x7, test3
+        la x8, test3[0] # == test3
+        la x9, test3[1]
+        la x10, test3[2]
+        la x11, test3[3]
+        la x12, test3[4]
+        la x13, test3[5] # out of bounds"""
+
+        parser = RiscvParser()
+        state = RiscvArchitecturalState()
+        parser.parse(program2, state)
+        simulation = RiscvSimulation(state)
+        simulation.run_simulation()
+
+        self.assertEqual(
+            state.memory.read_byte(state.memory.min_bytes),
+            fixedint.MutableUInt32(42),
+        )
+        self.assertEqual(
+            state.memory.read_halfword(state.memory.min_bytes + 1),
+            fixedint.MutableUInt32(10),
+        )
+        self.assertEqual(
+            state.memory.read_word(state.memory.min_bytes + 3),
+            fixedint.MutableUInt32(2),
+        )
+        self.assertEqual(
+            state.memory.read_word(state.memory.min_bytes + 7),
+            fixedint.MutableUInt32(11),
+        )
+        self.assertEqual(
+            state.memory.read_word(state.memory.min_bytes + 11),
+            fixedint.MutableUInt32(0),
+        )
+        self.assertEqual(
+            state.memory.read_word(state.memory.min_bytes + 15),
+            fixedint.MutableUInt32(-555),
+        )
+        self.assertEqual(
+            state.memory.read_word(state.memory.min_bytes + 19),
+            fixedint.MutableUInt32(-1),
+        )
+
+        self.assertEqual(state.instruction_memory.read_instruction(0).mnemonic, "lui")
+        self.assertEqual(
+            state.instruction_memory.read_instruction(0).imm,
+            state.memory.min_bytes >> 12,
+        )
+        self.assertEqual(state.instruction_memory.read_instruction(0).rd, 5)
+        self.assertEqual(state.instruction_memory.read_instruction(4).mnemonic, "addi")
+        self.assertEqual(
+            state.instruction_memory.read_instruction(4).imm,
+            state.memory.min_bytes & 0xFFF,
+        )
+        self.assertEqual(state.instruction_memory.read_instruction(4).rs1, 5)
+
+        self.assertEqual(state.instruction_memory.read_instruction(48).mnemonic, "lui")
+        self.assertEqual(
+            state.instruction_memory.read_instruction(48).imm,
+            (state.memory.min_bytes + 15) >> 12,
+        )
+        self.assertEqual(state.instruction_memory.read_instruction(48).rd, 11)
+        self.assertEqual(state.instruction_memory.read_instruction(52).mnemonic, "addi")
+        self.assertEqual(
+            state.instruction_memory.read_instruction(52).imm,
+            (state.memory.min_bytes + 15) & 0xFFF,
+        )
+        self.assertEqual(state.instruction_memory.read_instruction(52).rs1, 11)
+
+        self.assertEqual(
+            state.register_file.registers[5],
+            state.memory.min_bytes,
+        )
+        self.assertEqual(
+            state.register_file.registers[6],
+            state.memory.min_bytes + 1,
+        )
+        self.assertEqual(
+            state.register_file.registers[7],
+            state.memory.min_bytes + 3,
+        )
+        self.assertEqual(
+            state.register_file.registers[8],
+            state.memory.min_bytes + 3,
+        )
+        self.assertEqual(
+            state.register_file.registers[9],
+            state.memory.min_bytes + 7,
+        )
+        self.assertEqual(
+            state.register_file.registers[10],
+            state.memory.min_bytes + 11,
+        )
+        self.assertEqual(
+            state.register_file.registers[12],
+            state.memory.min_bytes + 19,
+        )
+        self.assertEqual(
+            state.register_file.registers[13],
+            state.memory.min_bytes + 23,
+        )
+
+        program3 = """.data
+        test1: .byte 42
+        test2: .half 0xA
+        test3: .word 0x2, 0b1011, 0, -555, -1
+        .text
+        la x5, test2
+        lh x6, 0(x5)
+        la x7, test3
+        lw x8, 0(x7)
+        lw x9, 12(x7)
+        la x10, test3[3]
+        lw x11, 0(x10)"""
+
+        parser = RiscvParser()
+        state = RiscvArchitecturalState()
+        parser.parse(program3, state)
+        simulation = RiscvSimulation(state)
+        simulation.run_simulation()
+
+        self.assertEqual(state.register_file.registers[6], 10)
+        self.assertEqual(state.register_file.registers[8], 2)
+        self.assertEqual(state.register_file.registers[9], fixedint.MutableUInt32(-555))
+        self.assertEqual(
+            state.register_file.registers[11], fixedint.MutableUInt32(-555)
+        )
+
+        program4 = """.data
+        test1: .byte 42
+        test2: .half 0xA
+        .text
+        la x5, test1
+        la x6, test2
+        la x7, xxxxx"""
+
+        with self.assertRaises(ParserVariableException) as cm:
+            parser.parse(program4, state)
+        self.assertEqual(
+            cm.exception,
+            ParserVariableException(
+                line_number=7,
+                line="la x7, xxxxx",
+                name="xxxxx",
+            ),
+        )
+
+    def test_mem_immediate_pseudos(self):
+        program = """.data
+        test1: .byte 42
+        test2: .half 0xA
+        test3: .word 0x2, 0b1011, 0, -555, -1
+        .text
+        lb x5, test1
+        lh x6, test2
+        lw x7, test3
+        lw x8, test3[0]
+        lw x9, test3[1]
+        lw x10, test3[2]
+        lw x11, test3[3]
+        lw x12, test3[4]"""
+
+        parser = RiscvParser()
+        state = RiscvArchitecturalState()
+        parser.parse(program, state)
+        simulation = RiscvSimulation(state)
+        simulation.run_simulation()
+
+        length = 4
+        self.assertEqual(
+            state.instruction_memory.read_instruction(0 * length).mnemonic, "lui"
+        )
+        self.assertEqual(
+            state.instruction_memory.read_instruction(0 * length).imm,
+            state.memory.min_bytes >> 12,
+        )
+        self.assertEqual(state.instruction_memory.read_instruction(0 * length).rd, 5)
+        self.assertEqual(
+            state.instruction_memory.read_instruction(1 * length).mnemonic, "addi"
+        )
+        self.assertEqual(
+            state.instruction_memory.read_instruction(1 * length).imm,
+            state.memory.min_bytes & 0xFFF,
+        )
+        self.assertEqual(state.instruction_memory.read_instruction(1 * length).rs1, 5)
+        self.assertEqual(state.instruction_memory.read_instruction(1 * length).rd, 5)
+        self.assertEqual(
+            state.instruction_memory.read_instruction(2 * length).mnemonic, "lb"
+        )
+        self.assertEqual(state.instruction_memory.read_instruction(2 * length).imm, 0)
+        self.assertEqual(state.instruction_memory.read_instruction(2 * length).rs1, 5)
+        self.assertEqual(state.instruction_memory.read_instruction(2 * length).rd, 5)
+
+        self.assertEqual(
+            state.instruction_memory.read_instruction(3 * length).mnemonic, "lui"
+        )
+        self.assertEqual(
+            state.instruction_memory.read_instruction(3 * length).imm,
+            (state.memory.min_bytes + 1) >> 12,
+        )
+        self.assertEqual(state.instruction_memory.read_instruction(3 * length).rd, 6)
+        self.assertEqual(
+            state.instruction_memory.read_instruction(4 * length).mnemonic, "addi"
+        )
+        self.assertEqual(
+            state.instruction_memory.read_instruction(4 * length).imm,
+            (state.memory.min_bytes + 1) & 0xFFF,
+        )
+        self.assertEqual(state.instruction_memory.read_instruction(4 * length).rs1, 6)
+        self.assertEqual(state.instruction_memory.read_instruction(4 * length).rd, 6)
+        self.assertEqual(
+            state.instruction_memory.read_instruction(5 * length).mnemonic, "lh"
+        )
+        self.assertEqual(state.instruction_memory.read_instruction(5 * length).imm, 0)
+        self.assertEqual(state.instruction_memory.read_instruction(5 * length).rs1, 6)
+        self.assertEqual(state.instruction_memory.read_instruction(5 * length).rd, 6)
+
+        self.assertEqual(
+            state.instruction_memory.read_instruction(6 * length).mnemonic, "lui"
+        )
+        self.assertEqual(
+            state.instruction_memory.read_instruction(6 * length).imm,
+            (state.memory.min_bytes + 3) >> 12,
+        )
+        self.assertEqual(state.instruction_memory.read_instruction(6 * length).rd, 7)
+        self.assertEqual(
+            state.instruction_memory.read_instruction(7 * length).mnemonic, "addi"
+        )
+        self.assertEqual(
+            state.instruction_memory.read_instruction(7 * length).imm,
+            (state.memory.min_bytes + 3) & 0xFFF,
+        )
+        self.assertEqual(state.instruction_memory.read_instruction(7 * length).rs1, 7)
+        self.assertEqual(state.instruction_memory.read_instruction(7 * length).rd, 7)
+
+        self.assertEqual(
+            state.instruction_memory.read_instruction(8 * length).mnemonic, "lw"
+        )
+        self.assertEqual(state.instruction_memory.read_instruction(8 * length).imm, 0)
+        self.assertEqual(state.instruction_memory.read_instruction(8 * length).rs1, 7)
+        self.assertEqual(state.instruction_memory.read_instruction(8 * length).rd, 7)
+
+        self.assertEqual(
+            state.instruction_memory.read_instruction(9 * length).mnemonic, "lui"
+        )
+        self.assertEqual(
+            state.instruction_memory.read_instruction(9 * length).imm,
+            (state.memory.min_bytes + 11) >> 12,
+        )
+        self.assertEqual(state.instruction_memory.read_instruction(9 * length).rd, 8)
+        self.assertEqual(
+            state.instruction_memory.read_instruction(10 * length).mnemonic, "addi"
+        )
+        self.assertEqual(
+            state.instruction_memory.read_instruction(10 * length).imm,
+            (state.memory.min_bytes + 3) & 0xFFF,
+        )
+        self.assertEqual(state.instruction_memory.read_instruction(10 * length).rs1, 8)
+        self.assertEqual(state.instruction_memory.read_instruction(10 * length).rd, 8)
+        self.assertEqual(
+            state.instruction_memory.read_instruction(11 * length).mnemonic, "lw"
+        )
+        self.assertEqual(state.instruction_memory.read_instruction(11 * length).imm, 0)
+        self.assertEqual(state.instruction_memory.read_instruction(11 * length).rs1, 8)
+        self.assertEqual(state.instruction_memory.read_instruction(11 * length).rd, 8)
+
+        self.assertEqual(state.register_file.registers[5], fixedint.MutableUInt32(42))
+        self.assertEqual(state.register_file.registers[6], fixedint.MutableUInt32(10))
+        self.assertEqual(state.register_file.registers[7], fixedint.MutableUInt32(2))
+        self.assertEqual(state.register_file.registers[8], fixedint.MutableUInt32(2))
+        self.assertEqual(state.register_file.registers[9], fixedint.MutableUInt32(11))
+        self.assertEqual(state.register_file.registers[10], fixedint.MutableUInt32(0))
+        self.assertEqual(
+            state.register_file.registers[11], fixedint.MutableUInt32(-555)
+        )
+        self.assertEqual(state.register_file.registers[12], fixedint.MutableUInt32(-1))
+
+    def test_li(self):
+        program = """li x1, 0x0
+        li x2, 1
+        li x3, -1
+        li x4, 0xABCDEF
+        li x5, 0xFFFFFFFF
+        li x6, -1234567"""
+
+        parser = RiscvParser()
+        state = RiscvArchitecturalState()
+        parser.parse(program, state)
+        simulation = RiscvSimulation(state)
+        simulation.run_simulation()
+
+        length = 4
+        self.assertEqual(
+            state.instruction_memory.read_instruction(0 * length).mnemonic, "addi"
+        )
+        self.assertEqual(state.instruction_memory.read_instruction(0 * length).imm, 0)
+        self.assertEqual(state.instruction_memory.read_instruction(0 * length).rd, 1)
+        self.assertEqual(
+            state.instruction_memory.read_instruction(1 * length).mnemonic, "addi"
+        )
+        self.assertEqual(state.instruction_memory.read_instruction(1 * length).imm, 1)
+        self.assertEqual(state.instruction_memory.read_instruction(1 * length).rs1, 0)
+        self.assertEqual(state.instruction_memory.read_instruction(1 * length).rd, 2)
+        self.assertEqual(
+            state.instruction_memory.read_instruction(2 * length).mnemonic, "addi"
+        )
+        self.assertEqual(state.instruction_memory.read_instruction(2 * length).imm, -1)
+
+        self.assertEqual(
+            state.instruction_memory.read_instruction(3 * length).mnemonic, "lui"
+        )
+        self.assertEqual(
+            state.instruction_memory.read_instruction(3 * length).imm, 0xABC + 1
+        )
+        self.assertEqual(state.instruction_memory.read_instruction(3 * length).rd, 4)
+        self.assertEqual(
+            state.instruction_memory.read_instruction(4 * length).mnemonic, "addi"
+        )
+        self.assertEqual(
+            state.instruction_memory.read_instruction(4 * length).imm, 0xDEF - 4096
+        )
+        self.assertEqual(state.instruction_memory.read_instruction(4 * length).rs1, 4)
+        self.assertEqual(state.instruction_memory.read_instruction(4 * length).rd, 4)
+
+        self.assertEqual(state.register_file.registers[1], fixedint.MutableUInt32(0))
+        self.assertEqual(state.register_file.registers[2], fixedint.MutableUInt32(1))
+        self.assertEqual(state.register_file.registers[3], fixedint.MutableUInt32(-1))
+        self.assertEqual(
+            state.register_file.registers[4],
+            fixedint.MutableUInt32(0xABCDEF),
+        )
+        self.assertEqual(
+            state.register_file.registers[5],
+            fixedint.MutableUInt32(0xFFFFFFFF),
+        )
+        self.assertEqual(state.register_file.registers[5], fixedint.MutableUInt32(-1))
+        self.assertEqual(
+            state.register_file.registers[6],
+            fixedint.MutableUInt32(-1234567),
+        )
