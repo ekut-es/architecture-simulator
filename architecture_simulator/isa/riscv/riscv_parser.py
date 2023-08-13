@@ -449,9 +449,9 @@ class RiscvParser:
                         else "x" + line_parsed.rd[0][1]
                     )
                     imm = int(line_parsed.imm, base=0)
-                    lui_imm = int(fixedint.MutableUInt32(imm) >> 12)
+                    lui_imm = int(fixedint.MutableUInt32(imm)) >> 12
                     # get the 12 first bits
-                    addi_imm = int(fixedint.MutableUInt32(imm) & 0xFFF)
+                    addi_imm = int(fixedint.MutableUInt32(imm)) & 0xFFF
                     # compensate addi sign extension
                     if addi_imm > 2047 or addi_imm < -2048:
                         lui_imm += 1
@@ -509,9 +509,9 @@ class RiscvParser:
                         address = (
                             self.variables[line_parsed.variable.name][0] + array_index
                         )
-                        lui_imm = int(fixedint.MutableUInt32(address) >> 12)
+                        lui_imm = int(fixedint.MutableUInt32(address)) >> 12
                         # get the 12 first bits
-                        addi_imm = int(fixedint.MutableUInt32(address) & 0xFFF)
+                        addi_imm = int(fixedint.MutableUInt32(address)) & 0xFFF
                         # compensate addi sign extension
                         if addi_imm > 2047 or addi_imm < -2048:
                             lui_imm += 1
