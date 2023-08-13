@@ -332,14 +332,14 @@ async function main() {
     console.log(window.location.hostname);
     console.log(window.location.pathname);
     console.log(window.location.port);
-    if (window.location.href == "https://atreus.cs.uni-tuebingen.de/archsim/") {
+    if (window.location.origin == "http://127.0.0.1:3000") {
         await micropip.install(
-            window.location.href +
+            window.location.origin +
                 "/dist/architecture_simulator-0.1.0-py3-none-any.whl"
         );
     } else {
         await micropip.install(
-            window.location.origin +
+            window.location.href +
                 "/dist/architecture_simulator-0.1.0-py3-none-any.whl"
         );
     }
