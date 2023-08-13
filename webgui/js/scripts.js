@@ -88,10 +88,7 @@ window.addEventListener("DOMContentLoaded", function () {
             enable_step();
             enable_pipeline_switch();
             clearTimeout(input_timer);
-            input_timer = setTimeout(
-                finished_typing,
-                parse_sim_after_not_typing_for_n_ms
-            );
+            finished_typing();
         });
 
     function step_n_times() {
@@ -238,6 +235,14 @@ window.addEventListener("DOMContentLoaded", function () {
     editor.on("change", function () {
         synchronizeEditors(editor, editor_vis);
         editor.save();
+        for (let i = 0; i < editor.lineCount(); i++) {
+            editor.removeLineClass(i, "background", "highlight");
+            editor_vis.removeLineClass(i, "background", "highlight");
+        }
+        editor.refresh();
+        editor_vis.refresh();
+        editor.closeHint();
+        editor_vis.closeHint();
         // autoparse
         clearTimeout(input_timer);
         input_timer = setTimeout(

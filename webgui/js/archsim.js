@@ -15,6 +15,9 @@ const performance_metrics_vis = document.getElementById(
     "vis_performance_metrics"
 );
 
+var previous_registers = {};
+var previous_memory = {};
+
 function addToOutput(s) {
     output.value += ">>>" + input.value + "\n" + s + "\n";
     output.scrollTop = output.scrollHeight;
@@ -25,12 +28,18 @@ function addToOutput(s) {
 // Object containing functions to be exported to python
 const archsim_js = {
     update_register_table: function (reg, representations, abi_name) {
+        vis_highlight = false;
         tr = document.createElement("tr");
         td1 = document.createElement("td");
         td1.innerText = "x" + reg;
         td2 = document.createElement("td");
         td2.innerText = Array.from(representations)[reg_representation_mode];
         td2.id = "val_x" + reg;
+        if (previous_registers[reg] != Array.from(representations)[1]) {
+            td2.style.backgroundColor = "yellow";
+            previous_registers[reg] = Array.from(representations)[1];
+            vis_highlight = true;
+        }
         td3 = document.createElement("td");
         td3.innerText = abi_name;
         td3.id = abi_name;
@@ -46,6 +55,9 @@ const archsim_js = {
         td2_vis.innerText =
             Array.from(representations)[reg_representation_mode];
         td2_vis.id = "val_x" + reg;
+        if (vis_highlight) {
+            td2_vis.style.backgroundColor = "yellow";
+        }
         td3_vis = document.createElement("td");
         td3_vis.innerText = abi_name;
         td3_vis.id = abi_name;
@@ -58,6 +70,7 @@ const archsim_js = {
     //     document.getElementById("val_x"+reg).innerText = val
     // },
     update_memory_table: function (address, representations) {
+        vis_highlight = false;
         tr = document.createElement("tr");
         td1 = document.createElement("td");
         td1.innerText = address;
@@ -65,6 +78,11 @@ const archsim_js = {
         //alert(Array.from(representations))
         td2.innerText = Array.from(representations)[mem_representation_mode];
         td2.id = "memory" + address;
+        if (previous_memory[address] != Array.from(representations)[1]) {
+            td2.style.backgroundColor = "yellow";
+            previous_memory[address] = Array.from(representations)[1];
+            vis_highlight = true;
+        }
         tr.appendChild(td1);
         tr.appendChild(td2);
         memory.appendChild(tr);
@@ -77,6 +95,9 @@ const archsim_js = {
         td2_vis.innerText =
             Array.from(representations)[mem_representation_mode];
         td2_vis.id = "memory" + address;
+        if (vis_highlight) {
+            td2_vis.style.backgroundColor = "yellow";
+        }
         tr_vis.appendChild(td1_vis);
         tr_vis.appendChild(td2_vis);
         memory_vis.appendChild(tr_vis);
@@ -110,29 +131,29 @@ const archsim_js = {
         td3 = document.createElement("td");
         td3.innerText = stage;
         if (stage == "Single") {
-            td1.style.backgroundColor = "purple";
-            td2.style.backgroundColor = "purple";
-            td3.style.backgroundColor = "purple";
+            td1.style.backgroundColor = "#2DA800";
+            td2.style.backgroundColor = "#2DA800";
+            td3.style.backgroundColor = "#2DA800";
         } else if (stage == "IF") {
-            td1.style.backgroundColor = "red";
-            td2.style.backgroundColor = "red";
-            td3.style.backgroundColor = "red";
+            td1.style.backgroundColor = "#FFEC00";
+            td2.style.backgroundColor = "#FFEC00";
+            td3.style.backgroundColor = "#FFEC00";
         } else if (stage == "ID") {
-            td1.style.backgroundColor = "yellow";
-            td2.style.backgroundColor = "yellow";
-            td3.style.backgroundColor = "yellow";
+            td1.style.backgroundColor = "#FFC900";
+            td2.style.backgroundColor = "#FFC900";
+            td3.style.backgroundColor = "#FFC900";
         } else if (stage == "EX") {
-            td1.style.backgroundColor = "green";
-            td2.style.backgroundColor = "green";
-            td3.style.backgroundColor = "green";
-        } else if (stage == "MA") {
-            td1.style.backgroundColor = "aqua";
-            td2.style.backgroundColor = "aqua";
-            td3.style.backgroundColor = "aqua";
+            td1.style.backgroundColor = "#695CC4";
+            td2.style.backgroundColor = "#695CC4";
+            td3.style.backgroundColor = "#695CC4";
+        } else if (stage == "MEM") {
+            td1.style.backgroundColor = "#2A17B1";
+            td2.style.backgroundColor = "#2A17B1";
+            td3.style.backgroundColor = "#2A17B1";
         } else if (stage == "WB") {
-            td1.style.backgroundColor = "blue";
-            td2.style.backgroundColor = "blue";
-            td3.style.backgroundColor = "blue";
+            td1.style.backgroundColor = "#580EAD";
+            td2.style.backgroundColor = "#580EAD";
+            td3.style.backgroundColor = "#580EAD";
         }
         tr.appendChild(td1);
         tr.appendChild(td2);
@@ -149,25 +170,25 @@ const archsim_js = {
         td3_vis = document.createElement("td");
         td3_vis.innerText = stage;
         if (stage == "IF") {
-            td1_vis.style.backgroundColor = "red";
-            td2_vis.style.backgroundColor = "red";
-            td3_vis.style.backgroundColor = "red";
+            td1_vis.style.backgroundColor = "#FFEC00";
+            td2_vis.style.backgroundColor = "#FFEC00";
+            td3_vis.style.backgroundColor = "#FFEC00";
         } else if (stage == "ID") {
-            td1_vis.style.backgroundColor = "yellow";
-            td2_vis.style.backgroundColor = "yellow";
-            td3_vis.style.backgroundColor = "yellow";
+            td1_vis.style.backgroundColor = "#FFC900";
+            td2_vis.style.backgroundColor = "#FFC900";
+            td3_vis.style.backgroundColor = "#FFC900";
         } else if (stage == "EX") {
-            td1_vis.style.backgroundColor = "green";
-            td2_vis.style.backgroundColor = "green";
-            td3_vis.style.backgroundColor = "green";
-        } else if (stage == "MA") {
-            td1_vis.style.backgroundColor = "aqua";
-            td2_vis.style.backgroundColor = "aqua";
-            td3_vis.style.backgroundColor = "aqua";
+            td1_vis.style.backgroundColor = "#695CC4";
+            td2_vis.style.backgroundColor = "#695CC4";
+            td3_vis.style.backgroundColor = "#695CC4";
+        } else if (stage == "MEM") {
+            td1_vis.style.backgroundColor = "#2A17B1";
+            td2_vis.style.backgroundColor = "#2A17B1";
+            td3_vis.style.backgroundColor = "#2A17B1";
         } else if (stage == "WB") {
-            td1_vis.style.backgroundColor = "blue";
-            td2_vis.style.backgroundColor = "blue";
-            td3_vis.style.backgroundColor = "blue";
+            td1_vis.style.backgroundColor = "#580EAD";
+            td2_vis.style.backgroundColor = "#580EAD";
+            td3_vis.style.backgroundColor = "#580EAD";
         }
         tr_vis.appendChild(td1_vis);
         tr_vis.appendChild(td2_vis);
@@ -272,7 +293,7 @@ const archsim_js = {
         pc_plus_imm,
         control_unit_signals
     ) {},
-    update_MA_Stage: function (
+    update_MEM_Stage: function (
         memory_address,
         result,
         memory_write_data,
@@ -311,14 +332,14 @@ async function main() {
     console.log(window.location.hostname);
     console.log(window.location.pathname);
     console.log(window.location.port);
-    if (window.location.href == "https://atreus.cs.uni-tuebingen.de/archsim/") {
+    if (window.location.origin == "http://127.0.0.1:3000") {
         await micropip.install(
-            window.location.href +
+            window.location.origin +
                 "/dist/architecture_simulator-0.1.0-py3-none-any.whl"
         );
     } else {
         await micropip.install(
-            window.location.origin +
+            window.location.href +
                 "/dist/architecture_simulator-0.1.0-py3-none-any.whl"
         );
     }

@@ -159,7 +159,7 @@ def update_tables():
         InstructionFetchPipelineRegister: "IF",
         InstructionDecodePipelineRegister: "ID",
         ExecutePipelineRegister: "EX",
-        MemoryAccessPipelineRegister: "MA",
+        MemoryAccessPipelineRegister: "MEM",
         RegisterWritebackPipelineRegister: "WB",
     }
     pipeline_stages_addresses = dict()
@@ -249,28 +249,28 @@ def update_tables():
 
     # Update MA Stage
     try:
-        MA_pipeline_register = simulation.pipeline.pipeline_registers[3]
-        if isinstance(MA_pipeline_register, MemoryAccessPipelineRegister):
+        MEM_pipeline_register = simulation.pipeline.pipeline_registers[3]
+        if isinstance(MEM_pipeline_register, MemoryAccessPipelineRegister):
             control_unit_signals = [
-                MA_pipeline_register.control_unit_signals.alu_src_1,
-                MA_pipeline_register.control_unit_signals.alu_src_2,
-                MA_pipeline_register.control_unit_signals.wb_src,
-                MA_pipeline_register.control_unit_signals.reg_write,
-                MA_pipeline_register.control_unit_signals.mem_read,
-                MA_pipeline_register.control_unit_signals.mem_write,
-                MA_pipeline_register.control_unit_signals.branch,
-                MA_pipeline_register.control_unit_signals.jump,
-                MA_pipeline_register.control_unit_signals.alu_op,
-                MA_pipeline_register.control_unit_signals.alu_to_pc,
+                MEM_pipeline_register.control_unit_signals.alu_src_1,
+                MEM_pipeline_register.control_unit_signals.alu_src_2,
+                MEM_pipeline_register.control_unit_signals.wb_src,
+                MEM_pipeline_register.control_unit_signals.reg_write,
+                MEM_pipeline_register.control_unit_signals.mem_read,
+                MEM_pipeline_register.control_unit_signals.mem_write,
+                MEM_pipeline_register.control_unit_signals.branch,
+                MEM_pipeline_register.control_unit_signals.jump,
+                MEM_pipeline_register.control_unit_signals.alu_op,
+                MEM_pipeline_register.control_unit_signals.alu_to_pc,
             ]
-            archsim_js.update_MA_Stage(
-                memory_address=MA_pipeline_register.memory_address,
-                result=MA_pipeline_register.result,
-                memory_write_data=MA_pipeline_register.memory_write_data,
-                memory_read_data=MA_pipeline_register.memory_read_data,
-                comparison=MA_pipeline_register.comparison,
-                comparison_or_jump=MA_pipeline_register.comparison_or_jump,
-                pc_plus_imm=MA_pipeline_register.pc_plus_imm,
+            archsim_js.update_MEM_Stage(
+                memory_address=MEM_pipeline_register.memory_address,
+                result=MEM_pipeline_register.result,
+                memory_write_data=MEM_pipeline_register.memory_write_data,
+                memory_read_data=MEM_pipeline_register.memory_read_data,
+                comparison=MEM_pipeline_register.comparison,
+                comparison_or_jump=MEM_pipeline_register.comparison_or_jump,
+                pc_plus_imm=MEM_pipeline_register.pc_plus_imm,
                 control_unit_signals=control_unit_signals,
             )
     except:
