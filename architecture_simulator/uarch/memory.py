@@ -37,6 +37,8 @@ class Memory:
         for address in self.memory_file.keys():
             if address % number_of_bytes == 0:
                 word = self.read_word(address=address)
+                val = int(word)
+                signed_decimal = val - 2**32 if val >= 2**31 else val
                 bin_word = "{:032b}".format(int(word))
                 hex_word = "{:08X}".format(int(word))
                 bin_word_with_spaces = (
@@ -61,9 +63,12 @@ class Memory:
                     bin_word_with_spaces,
                     int(word),
                     hex_word_with_spaces,
+                    signed_decimal,
                 )
             elif address % number_of_bytes == 1:
                 word = self.read_word(address=address - 1)
+                val = int(word)
+                signed_decimal = val - 2**32 if val >= 2**31 else val
                 bin_word = "{:032b}".format(int(word))
                 hex_word = "{:08X}".format(int(word))
                 bin_word_with_spaces = (
@@ -88,9 +93,12 @@ class Memory:
                     bin_word_with_spaces,
                     int(word),
                     hex_word_with_spaces,
+                    signed_decimal,
                 )
             elif address % number_of_bytes == 2:
                 word = self.read_word(address=address - 2)
+                val = int(word)
+                signed_decimal = val - 2**32 if val >= 2**31 else val
                 bin_word = "{:032b}".format(int(word))
                 hex_word = "{:08X}".format(int(word))
                 bin_word_with_spaces = (
@@ -115,9 +123,12 @@ class Memory:
                     bin_word_with_spaces,
                     int(word),
                     hex_word_with_spaces,
+                    signed_decimal,
                 )
             elif address % number_of_bytes == 3:
                 word = self.read_word(address=address - 3)
+                val = int(word)
+                signed_decimal = val - 2**32 if val >= 2**31 else val
                 bin_word = "{:032b}".format(int(word))
                 hex_word = "{:08X}".format(int(word))
                 bin_word_with_spaces = (
@@ -142,6 +153,7 @@ class Memory:
                     bin_word_with_spaces,
                     int(word),
                     hex_word_with_spaces,
+                    signed_decimal,
                 )
         return wordwise_mem
 

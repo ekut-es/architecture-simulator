@@ -38,6 +38,8 @@ class RegisterFile:
         reg_repr: dict[int, tuple] = dict()
         index = 0
         for reg in self.registers:
+            val = int(reg)
+            signed_decimal = val - 2**32 if val >= 2**31 else val
             bin_reg = "{:032b}".format(int(reg))
             hex_reg = "{:08X}".format(int(reg))
             bin_reg_with_spaces = (
@@ -62,6 +64,7 @@ class RegisterFile:
                 bin_reg_with_spaces,
                 int(reg),
                 hex_reg_with_spaces,
+                signed_decimal,
             )
             index += 1
         return reg_repr

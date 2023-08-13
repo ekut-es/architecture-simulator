@@ -348,10 +348,10 @@
                                 class="container-fluid table-responsive justify-content-around align-items-center overflow-hidden mx-2 px-1"
                             >
                                 <div class="row">
-                                    <div class="col-3">
+                                    <div class="col-md-3 table-responsive">
                                         <div class="row">
                                             <div
-                                                class="col-12 container-fluid row align-items-center justify-content-center my-2"
+                                                class="col-12 container-fluid row align-items-center justify-content-center my-2 table-responsive"
                                             >
                                                 <div
                                                     class="btn-group button-group"
@@ -632,6 +632,18 @@
                                                 <input
                                                     type="radio"
                                                     name="reg_representation"
+                                                    id="reg_button_signed_decimal_representation_id"
+                                                    title="switch to signed decimal representation"
+                                                    autocomplete="off"
+                                                />
+                                                signed decimal
+                                            </label>
+                                            <label
+                                                class="button_switch_representation"
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="reg_representation"
                                                     id="reg_button_hexa_representation_id"
                                                     title="switch to hexadecimal representation"
                                                 />
@@ -678,6 +690,18 @@
                                                     checked
                                                 />
                                                 decimal
+                                            </label>
+                                            <label
+                                                class="button_switch_representation"
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="mem_representation"
+                                                    id="mem_button_signed_decimal_representation_id"
+                                                    title="switch to signed decimal representation"
+                                                    autocomplete="off"
+                                                />
+                                                signed decimal
                                             </label>
                                             <label
                                                 class="button_switch_representation"

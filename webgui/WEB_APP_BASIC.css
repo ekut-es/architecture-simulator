@@ -107,6 +107,11 @@ body {
     height: calc(100vh-20px);
     overflow: hidden;
 }
+@media (max-width: 850px) {
+    body {
+        overflow: auto;
+    }
+}
 
 body header {
     background-color: var(--app_header_bg_color);

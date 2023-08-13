@@ -1,6 +1,7 @@
 const binary_representation = 0;
 const decimal_representation = 1;
 const hexa_representation = 2;
+const signed_decimal_representation = 3;
 //change steps_per_interval if you want to change the amount of times evaluatePython_step_sim() is called per interval (10ms)
 //the higher this number the less responsive the ui gets, at 200 it starts to get a bit too unresponsive. 100 feels acceptable
 const steps_per_interval = 100;
@@ -130,6 +131,13 @@ window.addEventListener("DOMContentLoaded", function () {
         });
 
     document
+        .getElementById("reg_button_signed_decimal_representation_id")
+        .addEventListener("click", () => {
+            reg_representation_mode = signed_decimal_representation;
+            evaluatePython_update_tables();
+        });
+
+    document
         .getElementById("reg_button_hexa_representation_id")
         .addEventListener("click", () => {
             reg_representation_mode = hexa_representation;
@@ -191,6 +199,13 @@ window.addEventListener("DOMContentLoaded", function () {
             //document
             //  .getElementById("button_binary_representation_id")
             //.classList.remove("active");
+        });
+
+    document
+        .getElementById("mem_button_signed_decimal_representation_id")
+        .addEventListener("click", () => {
+            mem_representation_mode = signed_decimal_representation;
+            evaluatePython_update_tables();
         });
 
     document
