@@ -904,7 +904,7 @@ const archsim_js = {
 output.value = "Output \n\nInitializing... ";
 output_vis.value = "Output \n\nInitializing... ";
 
-input.value = "add x1, x2, x3 \nlui x1, 1";
+input.value = "";
 performance_metrics.value = "Performance Metrics";
 performance_metrics_vis.value = "Performance Metrics";
 /**
