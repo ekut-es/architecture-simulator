@@ -824,6 +824,46 @@ fibonacci:
         with self.assertRaises(ParserSyntaxException) as cm:
             parser.parse(program6, state)
 
+    def test_string(self):
+        program = """.data
+        dummy: .word 0
+        test1: .string "Hello, World!"
+        test2: .string "a"
+        .text
+        lb x1, test1     # = H
+        lb x2, test1[1]  # = e
+        lb x3, test1[12] # = !
+        lb x4, test1[13] # = 0x0 (null terminator)
+        lb x5, test2
+        """
+
+        parser = RiscvParser()
+        state = RiscvArchitecturalState()
+        parser.parse(program, state)
+        simulation = RiscvSimulation(state=state)
+        simulation.run_simulation()
+
+        self.assertEqual(
+            state.register_file.registers[1],
+            fixedint.MutableUInt32(ord("H")),
+        )
+        self.assertEqual(
+            state.register_file.registers[2],
+            fixedint.MutableUInt32(ord("e")),
+        )
+        self.assertEqual(
+            state.register_file.registers[3],
+            fixedint.MutableUInt32(ord("!")),
+        )
+        self.assertEqual(
+            state.register_file.registers[4],
+            fixedint.MutableUInt32(0),
+        )
+        self.assertEqual(
+            state.register_file.registers[5],
+            fixedint.MutableUInt32(ord("a")),
+        )
+
     def test_pseudo_instructions_variables(self):
         parser = RiscvParser()
         state = RiscvArchitecturalState()

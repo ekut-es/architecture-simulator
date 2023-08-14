@@ -108,7 +108,6 @@ class RiscvParser:
     _Bracket_L = pp.Literal("[").suppress()
     _D_COL = pp.Literal(":").suppress()
     _PLUS = pp.Literal("+").suppress()
-    _QUOTE = pp.Literal('"').suppress()
 
     _pattern_directive = pp.Group(_DOT + pp.oneOf(_directives)("directive"))
 
