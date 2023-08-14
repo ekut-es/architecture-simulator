@@ -151,9 +151,9 @@ const archsim_js = {
             td2.style.backgroundColor = "#A37FFF";
             td3.style.backgroundColor = "#A37FFF";
         } else if (stage == "WB") {
-            td1.style.backgroundColor = "#5A1BFF";
-            td2.style.backgroundColor = "#5A1BFF";
-            td3.style.backgroundColor = "#5A1BFF";
+            td1.style.backgroundColor = "#7283FF";
+            td2.style.backgroundColor = "#7283FF";
+            td3.style.backgroundColor = "#7283FF";
         }
         tr.appendChild(td1);
         tr.appendChild(td2);

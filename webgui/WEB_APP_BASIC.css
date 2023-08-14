@@ -397,7 +397,7 @@ body main #vis_performance_metrics {
 }
 
 .highlight {
-    background-color: yellow;
+    background-color: #ff6363;
 }
 
 .CodeMirror-hints {
