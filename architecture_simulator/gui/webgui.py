@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
 import archsim_js
-import pyodide.ffi
+import pyodide.ffi  # type: ignore
 from architecture_simulator.isa.parser_exceptions import ParserException
 from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 from architecture_simulator.simulation.toy_simulation import ToySimulation
