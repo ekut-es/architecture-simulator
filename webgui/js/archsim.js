@@ -351,9 +351,12 @@ const archsim_js = {
         );
         i_length = parameters.get("i-length");
         // Update the mnemonic
-        set_svg_text_complex("Fetch", mnemonic);
+        set_svg_text_complex_middle_align("Fetch", mnemonic);
         // Update Instr[31-0]
-        set_svg_text_complex("InstructionMemoryInstrText", instruction);
+        set_svg_text_complex_right_align(
+            "InstructionMemoryInstrText",
+            instruction
+        );
         if (instruction != "" && instruction != undefined) {
             set_svg_colour("InstructionMemory", "blue");
         } else {
@@ -362,12 +365,15 @@ const archsim_js = {
 
         // Updates the Read Adress in the instr memory, it is a value if the reset is not pressed, otherwise undefined
         if (address_of_instruction != "reset") {
-            set_svg_text_complex(
+            set_svg_text_complex_left_align(
                 "InstructionReadAddressText",
                 address_of_instruction
             );
         } else {
-            set_svg_text_complex("InstructionReadAddressText", undefined);
+            set_svg_text_complex_left_align(
+                "InstructionReadAddressText",
+                undefined
+            );
         }
 
         // Updates the PC value:
@@ -379,15 +385,12 @@ const archsim_js = {
             address_of_instruction != "reset" &&
             address_of_instruction != "flush"
         ) {
-            set_svg_text_complex(
-                "InstructionReadAddressText-2",
-                address_of_instruction
-            );
+            set_svg_text_complex_middle_align("PC", address_of_instruction);
             previous_pc = address_of_instruction;
         } else if (address_of_instruction == "flush") {
-            set_svg_text_complex("InstructionReadAddressText-2", previous_pc);
+            set_svg_text_complex_middle_align("PC", previous_pc);
         } else if (address_of_instruction == "reset") {
-            set_svg_text_complex("InstructionReadAddressText-2", 0);
+            set_svg_text_complex_middle_align("PC", 0);
         }
         if (Number.isInteger(address_of_instruction)) {
             set_svg_colour("FetchPCOut", "blue");
@@ -396,14 +399,17 @@ const archsim_js = {
         }
 
         // Updates the result of the Adder that adds pc and instr lenght
-        set_svg_text_complex("FetchAddOutText", pc_plus_instruction_length);
+        set_svg_text_complex_middle_align(
+            "FetchAddOutText",
+            pc_plus_instruction_length
+        );
         if (Number.isInteger(pc_plus_instruction_length)) {
             set_svg_colour("FetchAddOut", "blue");
         } else {
             set_svg_colour("FetchAddOut", "black");
         }
 
-        set_svg_text_complex("FetchI-LengthText", i_length);
+        set_svg_text_complex_middle_align("I-LengthText", i_length);
         if (Number.isInteger(i_length)) {
             set_svg_colour("FetchI-Length", "blue");
         } else {
@@ -439,9 +445,9 @@ const archsim_js = {
         );
         address_of_instruction = parameters.get("address_of_instruction");
 
-        set_svg_text_complex("Decode", mnemonic);
+        set_svg_text_complex_middle_align("Decode", mnemonic);
 
-        set_svg_text_complex(
+        set_svg_text_complex_left_align(
             "RegisterFileReadAddress1Text",
             register_read_addr_1
         );
@@ -451,7 +457,7 @@ const archsim_js = {
             set_svg_colour("DecodeInstructionMemory1", "black");
         }
 
-        set_svg_text_complex(
+        set_svg_text_complex_left_align(
             "RegisterFileReadAddress2Text",
             register_read_addr_2
         );
@@ -461,25 +467,31 @@ const archsim_js = {
             set_svg_colour("DecodeInstructionMemory2", "black");
         }
 
-        set_svg_text_complex("RegisterFileReadData1Text", register_read_data_1);
+        set_svg_text_complex_right_align(
+            "RegisterFileReadData1Text",
+            register_read_data_1
+        );
         if (Number.isInteger(register_read_data_1)) {
             set_svg_colour("RegisterFileReadData1", "blue");
         } else {
             set_svg_colour("RegisterFileReadData1", "black");
         }
 
-        set_svg_text_complex("RegisterFileReadData2Text", register_read_data_2);
+        set_svg_text_complex_right_align(
+            "RegisterFileReadData2Text",
+            register_read_data_2
+        );
         if (Number.isInteger(register_read_data_2)) {
             set_svg_colour("RegisterFileReadData2", "blue");
         } else {
             set_svg_colour("RegisterFileReadData2", "black");
         }
 
-        set_svg_text_simple("ImmGen", imm);
+        set_svg_text_complex_middle_align("ImmGenText", imm);
         if (Number.isInteger(imm)) {
-            set_svg_colour("g42637", "blue");
+            set_svg_colour("ImmGenOut", "blue");
         } else {
-            set_svg_colour("g42637", "black");
+            set_svg_colour("ImmGenOut", "black");
         }
         if (Number.isInteger(imm)) {
             set_svg_colour("DecodeInstructionMemory3", "blue");
@@ -487,14 +499,17 @@ const archsim_js = {
             set_svg_colour("DecodeInstructionMemory3", "black");
         }
 
-        set_svg_text_complex("DecodeInstructionMemory4Text", write_register);
+        set_svg_text_complex_middle_align(
+            "DecodeInstructionMemory4Text",
+            write_register
+        );
         if (Number.isInteger(write_register)) {
             set_svg_colour("DecodeInstructionMemory4", "blue");
         } else {
             set_svg_colour("DecodeInstructionMemory4", "black");
         }
 
-        set_svg_text_complex(
+        set_svg_text_complex_middle_align(
             "DecodeFetchAddOutText",
             pc_plus_instruction_length
         );
@@ -504,11 +519,11 @@ const archsim_js = {
             set_svg_colour("DecodeFetchAddOut", "black");
         }
 
-        set_svg_text_complex(
+        set_svg_text_complex_middle_align(
             "DecodeUpperFetchPCOutText",
             address_of_instruction
         );
-        set_svg_text_complex(
+        set_svg_text_complex_middle_align(
             "DecodeLowerFetchPCOutText",
             address_of_instruction
         );
@@ -560,16 +575,16 @@ const archsim_js = {
         alu_src_2 = control_unit_signals.get("alu_src_2");
         alu_op = control_unit_signals.get("alu_op");
 
-        set_svg_text_complex("Execute", mnemonic);
+        set_svg_text_complex_middle_align("Execute", mnemonic);
 
-        set_svg_text_complex("ExecuteRightMuxOutText", alu_in_1);
+        set_svg_text_complex_middle_align("ExecuteRightMuxOutText", alu_in_1);
         if (Number.isInteger(alu_in_1)) {
             set_svg_colour("ExecuteRightMuxOut", "blue");
         } else {
             set_svg_colour("ExecuteRightMuxOut", "black");
         }
 
-        set_svg_text_complex("ExecuteLeftMuxOutText", alu_in_2);
+        set_svg_text_complex_middle_align("ExecuteLeftMuxOutText", alu_in_2);
         if (Number.isInteger(alu_in_2)) {
             set_svg_colour("ExecuteLeftMuxOut", "blue");
         } else {
@@ -582,7 +597,7 @@ const archsim_js = {
             set_svg_colour("ExecuteRegisterFileReadData1", "black");
         }
 
-        set_svg_text_complex(
+        set_svg_text_complex_middle_align(
             "ExecuteRegisterFileReadData2Text2",
             register_read_data_2
         );
@@ -592,36 +607,39 @@ const archsim_js = {
             set_svg_colour("ExecuteRegisterFileReadData2", "black");
         }
 
-        set_svg_text_complex("ExecuteImmGenText1", imm);
-        set_svg_text_complex("ExecuteImmGenText3", imm);
+        set_svg_text_complex_middle_align("ExecuteImmGenText1", imm);
+        set_svg_text_complex_middle_align("ExecuteImmGenText3", imm);
         if (Number.isInteger(imm)) {
             set_svg_colour("ExecuteImmGen", "blue");
         } else {
             set_svg_colour("ExecuteImmGen", "black");
         }
 
-        set_svg_text_complex("ALUResultText", result);
+        set_svg_text_complex_left_align("ALUResultText", result);
         if (Number.isInteger(result)) {
             set_svg_colour("ExecuteAluResult", "blue");
         } else {
             set_svg_colour("ExecuteAluResult", "black");
         }
 
-        set_svg_text_complex("ExecuteInstructionMemory4Text", write_register);
+        set_svg_text_complex_middle_align(
+            "ExecuteInstructionMemory4Text",
+            write_register
+        );
         if (Number.isInteger(write_register)) {
             set_svg_colour("ExecuteInstructionMemory4", "blue");
         } else {
             set_svg_colour("ExecuteInstructionMemory4", "black");
         }
 
-        set_svg_text_complex("ExecuteAddText", pc_plus_imm);
+        set_svg_text_complex_middle_align("ExecuteAddText", pc_plus_imm);
         if (Number.isInteger(pc_plus_imm)) {
             set_svg_colour("ExecuteAdd", "blue");
         } else {
             set_svg_colour("ExecuteAdd", "black");
         }
 
-        set_svg_text_complex(
+        set_svg_text_complex_middle_align(
             "ExecuteFetchAddOutText",
             pc_plus_instruction_length
         );
@@ -631,7 +649,7 @@ const archsim_js = {
             set_svg_colour("ExecuteFetchAddOut", "black");
         }
 
-        set_svg_text_complex(
+        set_svg_text_complex_middle_align(
             "ExecuteUpperFetchPCOutText",
             address_of_instruction
         );
@@ -704,32 +722,47 @@ const archsim_js = {
         jump = control_unit_signals.get("jump");
         alu_to_pc = control_unit_signals.get("alu_to_pc");
 
-        set_svg_text_complex("Memory", mnemonic);
+        set_svg_text_complex_middle_align("Memory", mnemonic);
 
-        set_svg_text_complex("DataMemoryAddressText", memory_address);
-        set_svg_text_complex("FetchLeftMuxInZeroText", result);
-        set_svg_text_complex("MemoryExecuteAluResultText2", result);
+        set_svg_text_complex_left_align(
+            "DataMemoryAddressText",
+            memory_address
+        );
+        set_svg_text_complex_middle_align("MemoryExecuteAluResultText", result);
+        set_svg_text_complex_middle_align(
+            "MemoryExecuteAluResultText2",
+            result
+        );
         if (Number.isInteger(result) && Number.isInteger(memory_address)) {
             set_svg_colour("MemoryExecuteAluResult", "blue");
         } else {
             set_svg_colour("MemoryExecuteAluResult", "black");
         }
 
-        set_svg_text_complex("DataMemoryWriteDataText", memory_write_data);
+        set_svg_text_complex_left_align(
+            "DataMemoryWriteDataText",
+            memory_write_data
+        );
         if (Number.isInteger(memory_write_data)) {
             set_svg_colour("MemoryRegisterFileReadData2", "blue");
         } else {
             set_svg_colour("MemoryRegisterFileReadData2", "black");
         }
 
-        set_svg_text_complex("DataMemoryReadDataText", memory_read_data);
+        set_svg_text_complex_right_align(
+            "DataMemoryReadDataText",
+            memory_read_data
+        );
         if (Number.isInteger(memory_read_data)) {
             set_svg_colour("DataMemoryReadData", "blue");
         } else {
             set_svg_colour("DataMemoryReadData", "black");
         }
 
-        set_svg_text_complex("MemoryInstructionMemory4Text", write_register);
+        set_svg_text_complex_middle_align(
+            "MemoryInstructionMemory4Text",
+            write_register
+        );
         if (Number.isInteger(write_register)) {
             set_svg_colour("MemoryInstructionMemory4", "blue");
         } else {
@@ -748,14 +781,17 @@ const archsim_js = {
             set_svg_colour("MemoryJumpOut", "black");
         }
 
-        set_svg_text_complex("MemoryExecuteAddOutText", pc_plus_imm);
+        set_svg_text_complex_middle_align(
+            "MemoryExecuteAddOutText",
+            pc_plus_imm
+        );
         if (Number.isInteger(pc_plus_imm)) {
             set_svg_colour("MemoryExecuteAddOut", "blue");
         } else {
             set_svg_colour("MemoryExecuteAddOut", "black");
         }
 
-        set_svg_text_complex(
+        set_svg_text_complex_middle_align(
             "MemoryFetchAddOutText",
             pc_plus_instruction_length
         );
@@ -765,7 +801,7 @@ const archsim_js = {
             set_svg_colour("MemoryFetchAddOut", "black");
         }
 
-        set_svg_text_complex("MemoryImmGenText", imm);
+        set_svg_text_complex_middle_align("MemoryImmGenText", imm);
         if (Number.isInteger(imm)) {
             set_svg_colour("MemoryImmGen", "blue");
         } else {
@@ -810,23 +846,29 @@ const archsim_js = {
         imm = parameters.get("imm");
         wbsrc = control_unit_signals.get("wb_src");
 
-        set_svg_text_complex("WriteBack", mnemonic);
+        set_svg_text_complex_middle_align("WriteBack", mnemonic);
 
-        set_svg_text_complex("RegisterFileWriteDataText", register_write_data);
+        set_svg_text_complex_left_align(
+            "RegisterFileWriteDataText",
+            register_write_data
+        );
         if (Number.isInteger(register_write_data)) {
             set_svg_colour("WriteBackMuxOut", "blue");
         } else {
             set_svg_colour("WriteBackMuxOut", "black");
         }
 
-        set_svg_text_complex("RegisterFileWriteRegisterText", write_register);
+        set_svg_text_complex_left_align(
+            "RegisterFileWriteRegisterText",
+            write_register
+        );
         if (Number.isInteger(write_register)) {
             set_svg_colour("WriteBackInstructionMemory4", "blue");
         } else {
             set_svg_colour("WriteBackInstructionMemory4", "black");
         }
 
-        set_svg_text_complex(
+        set_svg_text_complex_middle_align(
             "WriteBackDataMemoryReadDataText",
             memory_read_data
         );
@@ -836,14 +878,17 @@ const archsim_js = {
             set_svg_colour("WriteBackDataMemoryReadData", "black");
         }
 
-        set_svg_text_complex("WriteBackExecuteAluResultText", alu_result);
+        set_svg_text_complex_middle_align(
+            "WriteBackExecuteAluResultText",
+            alu_result
+        );
         if (Number.isInteger(alu_result)) {
             set_svg_colour("WriteBackExecuteAluResult", "blue");
         } else {
             set_svg_colour("WriteBackExecuteAluResult", "black");
         }
 
-        set_svg_text_complex(
+        set_svg_text_complex_middle_align(
             "WriteBackFetchAddOutText",
             pc_plus_instruction_length
         );
@@ -853,14 +898,14 @@ const archsim_js = {
             set_svg_colour("WriteBackFetchAddOut", "black");
         }
 
-        set_svg_text_complex("WriteBackImmGenText", imm);
+        set_svg_text_complex_middle_align("WriteBackImmGenText", imm);
         if (Number.isInteger(imm)) {
             set_svg_colour("WriteBackImmGen", "blue");
         } else {
             set_svg_colour("WriteBackImmGen", "black");
         }
 
-        set_svg_text_complex("wbsrc", wbsrc);
+        set_svg_text_complex_middle_align("wbsrc", wbsrc);
         if (Number.isInteger(wbsrc)) {
             set_svg_colour("ControlUnitLeftRight2", "blue");
         } else {
@@ -871,11 +916,11 @@ const archsim_js = {
         pc_plus_imm_or_pc_plus_instruction_length,
         pc_plus_imm_or_pc_plus_instruction_length_or_ALU_result
     ) {
-        set_svg_text_complex(
+        set_svg_text_complex_middle_align(
             "FetchRightMuxOutText",
             pc_plus_imm_or_pc_plus_instruction_length
         );
-        set_svg_text_complex(
+        set_svg_text_complex_middle_align(
             "FetchLeftMuxOutText",
             pc_plus_imm_or_pc_plus_instruction_length_or_ALU_result
         );
@@ -950,7 +995,7 @@ async function evaluatePython_step_sim() {
     input_str = input.value;
     try {
         step_sim = pyodide.globals.get("step_sim");
-        let output_repr = Array.from(step_sim(input_str));
+        let output_repr = Array.from(step_sim(input_str, is_run_simulation));
         if (output_repr[1] == false) {
             stop_timer();
             stop_loading_animation();
@@ -969,6 +1014,11 @@ async function evaluatePython_step_sim() {
         disable_run();
         clearInterval(run);
     }
+}
+async function update_ui_async() {
+    let pyodide = await pyodideReadyPromise;
+    update_ui = pyodide.globals.get("update_ui");
+    update_ui();
 }
 
 /**

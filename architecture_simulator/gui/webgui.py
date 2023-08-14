@@ -41,11 +41,12 @@ def sim_init() -> RiscvSimulation:
     return simulation
 
 
-def step_sim(program: str) -> tuple[str, bool]:
+def step_sim(program: str, is_run_simulation: bool) -> tuple[str, bool]:
     """Executes one step in the simulation. First loads the given program in case there are no instructions in the instruction memory yet. Also updates the UI elements.
 
     Args:
         program (str): text format assembly program.
+        is_run_simulation (bool): whether the simulation is currently in play mode
 
     Raises:
         StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
@@ -66,14 +67,15 @@ def step_sim(program: str) -> tuple[str, bool]:
 
     # step the simulation
     try:
-        simulation_not_ended_flag = simulation.step()
-        update_ui()
+        simulation_ended_flag = simulation.step_simulation()
+        if not is_run_simulation:
+            update_ui()
     except InstructionExecutionException as e:
         archsim_js.highlight_cmd_table(e.address)
         archsim_js.set_output(e.__repr__())
         simulation_not_ended_flag = False
 
-    return (str(simulation.get_performance_metrics()), simulation_not_ended_flag)
+    return (str(simulation.get_performance_metrics()), simulation_ended_flag)
 
 
 def resume_timer():

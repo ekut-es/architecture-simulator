@@ -20,6 +20,7 @@ let reg_representation_mode = decimal_representation; //change this to set anoth
 let mem_representation_mode = decimal_representation;
 
 var run;
+var is_run_simulation = false;
 var pipeline_mode = "single_stage_pipeline";
 window.addEventListener("DOMContentLoaded", function () {
     clearTimeout(input_timer);
@@ -30,6 +31,7 @@ window.addEventListener("DOMContentLoaded", function () {
     document
         .getElementById("button_simulation_start_id")
         .addEventListener("click", () => {
+            is_run_simulation = true;
             editor.save();
             //finished_typing(); FIXME: The input should get parsed after clicking the button in case the auto parsing wasn't triggered yet.
             // But this should only happen if the input has changed and not after the user has already started the simulation.
@@ -50,11 +52,14 @@ window.addEventListener("DOMContentLoaded", function () {
             enable_pause();
             disable_step();
             disable_pipeline_switch();
+            update_ui_async();
         });
 
     document
         .getElementById("button_simulation_pause_id")
         .addEventListener("click", () => {
+            update_ui_async();
+            is_run_simulation = false;
             document.getElementById("input").disabled = true;
             document.getElementById("vis_input").disabled = true;
             stop_timer();
@@ -70,6 +75,7 @@ window.addEventListener("DOMContentLoaded", function () {
     document
         .getElementById("button_simulation_next_id")
         .addEventListener("click", () => {
+            is_run_simulation = false;
             editor.save();
             //finished_typing(); FIXME: The input should get parsed after clicking the button in case the auto parsing wasn't triggered yet.
             // But this should only happen if the input has changed and not after the user has already started the simulation.
@@ -86,6 +92,7 @@ window.addEventListener("DOMContentLoaded", function () {
     document
         .getElementById("button_simulation_refresh_id")
         .addEventListener("click", () => {
+            is_run_simulation = false;
             document.getElementById("input").disabled = true;
             document.getElementById("vis_input").disabled = true;
             clearInterval(run);
@@ -101,11 +108,16 @@ window.addEventListener("DOMContentLoaded", function () {
         });
 
     function step_n_times() {
-        //resume_timer()
+        let startTime = performance.now(); // get the start time
         for (i = 0; i < steps_per_interval; i++) {
-            evaluatePython_step_sim(false);
+            // do some task
+            let endTime = performance.now(); // get the end time
+            let timeElapsed = endTime - startTime; // calculate the time elapsed
+            if (timeElapsed >= 10) {
+                break;
+            }
+            evaluatePython_step_sim();
         }
-        //stop_timer()
     }
 
     // select isa button listeners
@@ -547,19 +559,40 @@ function set_svg_text_simple(id, str) {
 //     pipeline_svg.getElementById(id).setAttribute("text-anchor", "start");
 // }
 
-function set_svg_text_complex(id, str) {
+function set_svg_text_complex_right_align(id, str) {
     const pipeline_svg = document.getElementById(
         "visualization_pipeline"
     ).contentDocument;
+    pipeline_svg.getElementById(id).firstChild.nextSibling.style.fontSize =
+        "15px";
     pipeline_svg.getElementById(id).firstChild.nextSibling.textContent = str;
-    //pipeline_svg.getElementById(id).firstChild.nextSibling.setAttribute("text-anchor", "end");
-    //     let bbox = pipeline_svg.getElementById(id).firstChild.nextSibling.getBBox();
-    //     let newX = (100 - bbox.width) / 2;
+    pipeline_svg
+        .getElementById(id)
+        .firstChild.nextSibling.setAttribute("text-anchor", "end");
+}
 
-    // // Change its x attribute to the new value
-    //     pipeline_svg.getElementById(id).firstChild.nextSibling.setAttribute("x", newX);
-    // pipeline_svg.getElementById(id).firstChild.nextSibling.setAttribute("text-anchor", "middle");
-    // pipeline_svg.getElementById(id).firstChild.nextSibling.setAttribute("transform", "translate(100,-50)")
+function set_svg_text_complex_left_align(id, str) {
+    const pipeline_svg = document.getElementById(
+        "visualization_pipeline"
+    ).contentDocument;
+    pipeline_svg.getElementById(id).firstChild.nextSibling.style.fontSize =
+        "15px";
+    pipeline_svg.getElementById(id).firstChild.nextSibling.textContent = str;
+    pipeline_svg
+        .getElementById(id)
+        .firstChild.nextSibling.setAttribute("text-anchor", "start");
+}
+
+function set_svg_text_complex_middle_align(id, str) {
+    const pipeline_svg = document.getElementById(
+        "visualization_pipeline"
+    ).contentDocument;
+    pipeline_svg.getElementById(id).firstChild.nextSibling.style.fontSize =
+        "15px";
+    pipeline_svg.getElementById(id).firstChild.nextSibling.textContent = str;
+    pipeline_svg
+        .getElementById(id)
+        .firstChild.nextSibling.setAttribute("text-anchor", "middle");
 }
 
 function set_svg_colour(id, str) {
