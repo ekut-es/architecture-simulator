@@ -67,16 +67,26 @@ class TestToyArchitecture(unittest.TestCase):
         with self.assertRaises(MemoryAddressError):
             state.instruction_memory.read_instruction(address=1024)
 
-    def test_memory_get_entries(self):
+    def test_memory_repr(self):
         state = ToyArchitecturalState()
         state.data_memory.write_halfword(address=1024, value=MutableUInt16(0))
         state.data_memory.write_halfword(address=1025, value=MutableUInt16(0xFFFF))
         state.data_memory.write_halfword(address=2000, value=MutableUInt16(0x0F0F))
         state.data_memory.write_halfword(address=4094, value=MutableUInt16(0xDEAD))
         state.data_memory.write_halfword(address=4095, value=MutableUInt16(0x123A))
-        entries = state.data_memory.get_entries()
-        self.assertEqual(entries[1024], ("0000 0000 0000 0000", "0", "0000"))
-        self.assertEqual(entries[1025], ("1111 1111 1111 1111", "65535", "FFFF"))
-        self.assertEqual(entries[2000], ("0000 1111 0000 1111", "3855", "0F0F"))
-        self.assertEqual(entries[4094], ("1101 1110 1010 1101", "57005", "DEAD"))
-        self.assertEqual(entries[4095], ("0001 0010 0011 1010", "4666", "123A"))
+        entries = state.data_memory.memory_repr()
+        self.assertEqual(entries[1024], ("00000000 00000000", "0", "00 00", "0"))
+        self.assertEqual(entries[1025], ("11111111 11111111", "65535", "FF FF", "-1"))
+        self.assertEqual(entries[2000], ("00001111 00001111", "3855", "0F 0F", "3855"))
+        self.assertEqual(
+            entries[4094], ("11011110 10101101", "57005", "DE AD", "-8531")
+        )
+        self.assertEqual(entries[4095], ("00010010 00111010", "4666", "12 3A", "4666"))
+
+    def test_accu_repr(self):
+        state = ToyArchitecturalState()
+        state.accu = MutableUInt16(0x6AFE)
+        self.assertEqual(
+            state.get_accu_representation(),
+            ("01101010 11111110", "27390", "6A FE", "27390"),
+        )

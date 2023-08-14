@@ -1,4 +1,6 @@
+from __future__ import annotations
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 from .pipeline_registers import (
     PipelineRegister,
@@ -8,13 +10,18 @@ from .pipeline_registers import (
     MemoryAccessPipelineRegister,
     RegisterWritebackPipelineRegister,
 )
-from .riscv_architectural_state import RiscvArchitecturalState
+
 from architecture_simulator.isa.riscv.instruction_types import (
     BTypeInstruction,
     EmptyInstruction,
 )
 from architecture_simulator.isa.riscv.rv32i_instructions import JAL
 from .pipeline import InstructionExecutionException
+
+if TYPE_CHECKING:
+    from architecture_simulator.uarch.riscv.riscv_architectural_state import (
+        RiscvArchitecturalState,
+    )
 
 
 class Stage:

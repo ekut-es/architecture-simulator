@@ -29,13 +29,13 @@ class RegisterFile:
         default_factory=lambda: Registers([fixedint.MutableUInt32(0)] * 32)
     )
 
-    def reg_repr(self) -> dict[int, tuple]:
-        """Returns the contents of the register file as binary, decimal and hexadecimal values.
+    def reg_repr(self) -> dict[int, tuple[str, str, str, str]]:
+        """Returns the contents of the register file as binary, unsigned decimal, hexadecimal, signed decimal values.
 
         Returns:
-            dict[int, tuple]: keys: register indices. Values: Register values as tuple of (binary, decimal, hexadecimal)
+            dict[int, tuple[str, str, str, str]]: keys: register indices. Values: Register values as tuple of (binary, unsigned decimal, hexadecimal, signed decimal)
         """
-        reg_repr: dict[int, tuple] = dict()
+        reg_repr: dict[int, tuple[str, str, str, str]] = dict()
         index = 0
         for reg in self.registers:
             val = int(reg)
@@ -62,9 +62,9 @@ class RegisterFile:
             )
             reg_repr[index] = (
                 bin_reg_with_spaces,
-                int(reg),
+                str(reg),
                 hex_reg_with_spaces,
-                signed_decimal,
+                str(signed_decimal),
             )
             index += 1
         return reg_repr

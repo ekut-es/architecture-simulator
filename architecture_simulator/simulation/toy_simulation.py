@@ -1,12 +1,17 @@
-from typing import Optional
+from __future__ import annotations
+from typing import Optional, TYPE_CHECKING
 
 from architecture_simulator.uarch.toy.toy_architectural_state import (
     ToyArchitecturalState,
 )
 from architecture_simulator.isa.toy.toy_parser import ToyParser
+from .simulation import Simulation
+
+if TYPE_CHECKING:
+    from architecture_simulator.uarch.performance_metrics import PerformanceMetrics
 
 
-class ToySimulation:
+class ToySimulation(Simulation):
     def __init__(
         self,
         instruction_memory_range: Optional[range] = None,
@@ -18,29 +23,33 @@ class ToySimulation:
         )
 
     def step(self):
-        """Executes the next instruction and updates the performance metrics accordingly."""
-        self.state.performance_metrics.resume_timer()
-        self.state.instruction_memory.read_instruction(
-            int(self.state.program_counter)
-        ).behavior(self.state)
-        self.state.performance_metrics.stop_timer()
-        self.state.performance_metrics.instruction_count += 1
-        self.state.performance_metrics.cycles += 1
+        if not self.is_done():
+            self.state.instruction_memory.read_instruction(
+                int(self.state.program_counter)
+            ).behavior(self.state)
+            self.state.performance_metrics.instruction_count += 1
+            self.state.performance_metrics.cycles += 1
+        return not self.is_done()
 
     def is_done(self) -> bool:
-        """Return whether the simulation is done because there is no instruction at the current program counter.
-
-        Returns:
-            bool: whether the simulation is done because there is no instruction at the current program counter.
-        """
         return not self.state.instruction_at_pc()
 
     def run(self):
-        """Step through the simulation until it terminates (which it might not if there is an infinite loop in the program)"""
+        self.state.performance_metrics.resume_timer()
         while not self.is_done():
             self.step()
+        self.state.performance_metrics.stop_timer()
 
     def load_program(self, program: str):
+        self.state = ToyArchitecturalState(
+            instruction_memory_range=self.state.instruction_memory.address_range,
+            data_memory_range=self.state.data_memory.address_range,
+        )
         parser = ToyParser()
-        instructions = parser.parse(program)
-        self.state.instruction_memory.write_instructions(instructions)
+        parser.parse(program=program, state=self.state)
+
+    def has_instructions(self) -> bool:
+        return bool(self.state.instruction_memory)
+
+    def get_performance_metrics(self) -> PerformanceMetrics:
+        return self.state.performance_metrics

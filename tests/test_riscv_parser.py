@@ -21,8 +21,8 @@ from architecture_simulator.uarch.riscv.riscv_architectural_state import (
 )
 from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 from architecture_simulator.uarch.memory import Memory
-from architecture_simulator.isa.riscv.riscv_parser import (
-    RiscvParser,
+from architecture_simulator.isa.riscv.riscv_parser import RiscvParser
+from architecture_simulator.isa.parser_exceptions import (
     ParserLabelException,
     ParserOddImmediateException,
     ParserSyntaxException,
@@ -33,7 +33,7 @@ from architecture_simulator.isa.riscv.riscv_parser import (
 )
 
 
-class TestParser(unittest.TestCase):
+class TestRiscvParser(unittest.TestCase):
     program = """
 
 Ananas:#dfsdfsdf
@@ -309,7 +309,7 @@ beq zero, ra, Ban0n3
         simulation.load_program(self.fibonacci)
         # print(simulation.instructions)
         while simulation.state.program_counter < 104:
-            simulation.step_simulation()
+            simulation.step()
         self.assertEqual(int(simulation.state.register_file.registers[10]), 55)
 
     fibonacci_c = """main:
@@ -362,7 +362,7 @@ fibonacci:
         simulation.load_program(self.fibonacci_c)
         # print(simulation.instructions)
         while simulation.state.program_counter != 24:
-            simulation.step_simulation()
+            simulation.step()
             simulation.state.register_file.registers[0] = 0
         self.assertEqual(int(simulation.state.register_file.registers[15]), 55)
 
@@ -390,7 +390,7 @@ fibonacci:
         simulation.load_program(self.add_c)
         # print(simulation.instructions)
         while simulation.state.program_counter < 60:
-            simulation.step_simulation()
+            simulation.step()
             simulation.state.register_file.registers[0] = 0
         self.assertEqual(int(simulation.state.memory.read_word(4294967268)), 65)
 
@@ -443,7 +443,7 @@ fibonacci:
         simulation.load_program(self.fibonacci_c_abi)
         # print(simulation.instructions)
         while simulation.state.program_counter != 24:
-            simulation.step_simulation()
+            simulation.step()
             simulation.state.register_file.registers[0] = 0
         self.assertEqual(int(simulation.state.register_file.registers[15]), 55)
 
@@ -880,7 +880,7 @@ fibonacci:
         state = RiscvArchitecturalState()
         parser.parse(program2, state)
         simulation = RiscvSimulation(state)
-        simulation.run_simulation()
+        simulation.run()
 
         self.assertEqual(
             state.memory.read_byte(state.memory.min_bytes),
@@ -987,7 +987,7 @@ fibonacci:
         state = RiscvArchitecturalState()
         parser.parse(program3, state)
         simulation = RiscvSimulation(state)
-        simulation.run_simulation()
+        simulation.run()
 
         self.assertEqual(state.register_file.registers[6], 10)
         self.assertEqual(state.register_file.registers[8], 2)
@@ -1034,7 +1034,7 @@ fibonacci:
         state = RiscvArchitecturalState()
         parser.parse(program, state)
         simulation = RiscvSimulation(state)
-        simulation.run_simulation()
+        simulation.run()
 
         length = 4
         self.assertEqual(
@@ -1157,7 +1157,7 @@ fibonacci:
         state = RiscvArchitecturalState()
         parser.parse(program, state)
         simulation = RiscvSimulation(state)
-        simulation.run_simulation()
+        simulation.run()
 
         length = 4
         self.assertEqual(

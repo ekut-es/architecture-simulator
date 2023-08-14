@@ -1,12 +1,12 @@
 import unittest
 
-from tests.py_programs.fibonacci_recursive import (
+from tests.riscv_programs.fibonacci_recursive import (
     fibonacci_recursive,
     fibonacci_recursive_2,
 )
 
 
-class TestPrograms(unittest.TestCase):
+class TestRiscvPrograms(unittest.TestCase):
     def test_fibonacci_recursive(self):
         self.assertEqual(int(fibonacci_recursive(-5)), 0)
         self.assertEqual(int(fibonacci_recursive(0)), 0)

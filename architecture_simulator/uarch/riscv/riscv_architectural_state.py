@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from typing import Optional
 
 from ..performance_metrics import PerformanceMetrics
 from .register_file import RegisterFile
@@ -6,20 +6,48 @@ from ..memory import Memory
 from ..instruction_memory import InstructionMemory
 from .csr_registers import CsrRegisterFile
 from architecture_simulator.isa.riscv.instruction_types import RiscvInstruction
+from .stages import (
+    SingleStage,
+    InstructionFetchStage,
+    InstructionDecodeStage,
+    ExecuteStage,
+    MemoryAccessStage,
+    RegisterWritebackStage,
+)
+from .pipeline import Pipeline
 
 
-@dataclass
 class RiscvArchitecturalState:
     """The Architectural State for the RISC-V architecture."""
 
-    instruction_memory: InstructionMemory = field(
-        default_factory=InstructionMemory[RiscvInstruction]
-    )
-    register_file: RegisterFile = field(default_factory=RegisterFile)
-    memory: Memory = field(default_factory=Memory)
-    csr_registers: CsrRegisterFile = field(default_factory=CsrRegisterFile)
-    program_counter: int = 0
-    performance_metrics: PerformanceMetrics = field(default_factory=PerformanceMetrics)
+    def __init__(
+        self,
+        pipeline_mode: str = "single_stage_pipeline",
+        detect_data_hazards: bool = True,
+        memory: Optional[Memory] = None,
+        register_file: Optional[RegisterFile] = None,
+    ):
+        if pipeline_mode == "five_stage_pipeline":
+            stages = [
+                InstructionFetchStage(),
+                InstructionDecodeStage(detect_data_hazards=detect_data_hazards),
+                ExecuteStage(),
+                MemoryAccessStage(),
+                RegisterWritebackStage(),
+            ]
+            execution_ordering = [0, 4, 1, 2, 3]
+        else:
+            stages = [SingleStage()]
+            execution_ordering = [0]
+        self.pipeline = Pipeline(
+            stages=stages, execution_ordering=execution_ordering, state=self
+        )
+        self.instruction_memory = InstructionMemory[RiscvInstruction]()
+        self.memory = Memory() if memory is None else memory
+        self.register_file = RegisterFile() if register_file is None else register_file
+        self.csr_registers = CsrRegisterFile()
+        self.program_counter = 0
+        self.performance_metrics = PerformanceMetrics()
 
     def change_privilege_level(self, level: int):
         if not level < 0 and not level > 3:
@@ -30,4 +58,4 @@ class RiscvArchitecturalState:
 
     def instruction_at_pc(self) -> bool:
         """Return whether there is an instruction at the current program counter."""
-        return self.program_counter in self.instruction_memory.instructions
+        return self.instruction_memory.instruction_at_address(self.program_counter)

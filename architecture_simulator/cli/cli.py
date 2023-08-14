@@ -10,8 +10,8 @@ from architecture_simulator.uarch.riscv.pipeline import (
     InstructionExecutionException,
 )
 from architecture_simulator.isa.riscv.instruction_types import EmptyInstruction
-from architecture_simulator.isa.riscv.riscv_parser import ParserException
-from fixedint import MutableInt32, MutableInt16
+from architecture_simulator.isa.parser_exceptions import ParserException
+from fixedint import MutableInt16
 from abc import ABC, abstractmethod
 import os.path
 
@@ -82,7 +82,7 @@ def main():
     print(logo)
     print(greetings)
 
-    sim: Optional[Union[RiscvSimulation, ToySimulation]] = None
+    sim: Optional[Union[ToySimulation, RiscvSimulation]] = None
     display_mode = "sdec"
     list_of_commands: list[Command] = [
         HelpCommand(),
@@ -140,7 +140,7 @@ def resolve_file_path(file_path):
         return os.path.join(cwd, expanded)
 
 
-def display(sim: Union[RiscvSimulation, ToySimulation], display_mode: str) -> str:
+def display(sim: Union[ToySimulation, RiscvSimulation], display_mode: str) -> str:
     """
     Produces a representation of the architectural state of a toy or risv Simulation.
 
@@ -160,7 +160,7 @@ def display(sim: Union[RiscvSimulation, ToySimulation], display_mode: str) -> st
         res += memory_repr(sim.state.memory, display_mode)
         res += hline
         if sim.mode == "five_stage_pipeline":
-            res += five_stage_pipeline_repr(sim.pipeline.pipeline_registers)
+            res += five_stage_pipeline_repr(sim.state.pipeline.pipeline_registers)
             res += hline
         res += f"PC: {sim.state.program_counter} | Instruction at PC: {'#####' if not sim.state.instruction_at_pc() else str(sim.state.instruction_memory.read_instruction(sim.state.program_counter))}\n"
         res += hline
@@ -257,11 +257,9 @@ def dec_reg_file_repr(register_file: RegisterFile, signed: bool) -> str:
     repr_dict = register_file.reg_repr()
     res = ""
     for i in range(height):
-        num_left = 0
-        num_right = 0
         if signed:
-            num_left = int(MutableInt32(repr_dict[i][1]))
-            num_right = int(MutableInt32(repr_dict[i + height][1]))
+            num_left = repr_dict[i][3]
+            num_right = repr_dict[i + height][3]
         else:
             num_left = repr_dict[i][1]
             num_right = repr_dict[i + height][1]
@@ -269,16 +267,15 @@ def dec_reg_file_repr(register_file: RegisterFile, signed: bool) -> str:
     return res
 
 
-def pad_num(num: int, length: int) -> str:
-    """
-    Converts a int into a string, that is padded to have a given length.
+def pad_num(num: Union[int, str], length: int) -> str:
+    """Converts num to a string if it is not already a string and pads it to have a given length.
 
-    Parameters:
-    num : int
-    length: int
+    Args:
+        num (Union[int, str]): the number or string to be padded.
+        length (int): the desired length of the padded string.
 
     Returns:
-    str
+        str: a padded string.
     """
     return " " * (length - len(str(num))) + str(num)
 
@@ -315,7 +312,7 @@ def memory_repr(mem: Memory, display_mode: str) -> str:
         key_hex = (str(hex(key))[2:]).upper()
         key_repr = "0" * (8 - len(key_hex)) + key_hex
         if display_mode == "sdec":
-            res += f"{key_repr} {pad_num(int(MutableInt32(repr_dict[key][1])), 12)}\n"
+            res += f"{key_repr} {pad_num(repr_dict[key][3], 12)}\n"
         elif display_mode == "udec":
             res += f"{key_repr} {pad_num(repr_dict[key][1], 12)}\n"
         elif display_mode == "hex":
@@ -373,7 +370,7 @@ def toy_memory_repr(mem: ToyMemory, display_mode: str) -> str:
         key_hex = (str(hex(key))[2:]).upper()
         key_repr = "0" * (8 - len(key_hex)) + key_hex
         if display_mode == "sdec":
-            res += f"{key_repr}    {pad_num(int(MutableInt16(repr_dict[key][1])), 6)}\n"
+            res += f"{key_repr}    {pad_num(repr_dict[key][3], 6)}\n"
         elif display_mode == "udec":
             res += f"{key_repr}    {pad_num(repr_dict[key][1], 6)}\n"
         elif display_mode == "hex":
@@ -385,7 +382,7 @@ def toy_memory_repr(mem: ToyMemory, display_mode: str) -> str:
 
 
 def step(
-    sim: Union[RiscvSimulation, ToySimulation], num_str: str, display_mode: str
+    sim: Union[ToySimulation, RiscvSimulation], num_str: str, display_mode: str
 ) -> str:
     """
     Implements the functionality of the step command.
@@ -393,7 +390,7 @@ def step(
     This function does all error handling and will stop, if the simulation is done early.
 
         Parameters:
-        sim: Union[RiscvSimulation, ToySimulation]
+        sim: Union[ToySimulation, RiscvSimulation]
         num_str: str
         display_mode: str
 
@@ -408,15 +405,9 @@ def step(
         return f"{num_str} could not be cast to an int."
     for i in range(1, num_int + 1):
         try:
-            if isinstance(sim, RiscvSimulation):
-                if not sim.step_simulation():
-                    res += f"Simulation done after {i} steps.\n"
-                    break
-            if isinstance(sim, ToySimulation):
-                sim.step()
-                if sim.is_done():
-                    res += f"Simulation done after {i} steps.\n"
-                    break
+            if not sim.step():
+                res += f"Simulation done after {i} steps.\n"
+                break
         except InstructionExecutionException as e:
             res = (
                 f"After {i-1} successful steps this exception occured:\n"
@@ -661,10 +652,7 @@ class RunCommand(Command):
             )
         output = ""
         try:
-            if isinstance(sim, ToySimulation):
-                sim.run()
-            else:
-                sim.run_simulation()
+            sim.run()
         except KeyboardInterrupt:
             output += "Simulation aborted!\n"
         except InstructionExecutionException as e:

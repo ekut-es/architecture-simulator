@@ -1,0 +1,17 @@
+# computes the sum of the numbers from 1 to n
+# result gets saved in RAM[1025]
+Loopcount = $400
+Result = $401
+:$400:20 # enter n here
+
+loop:
+LDA Result
+ADD Loopcount
+STO Result
+LDA Loopcount
+DEC
+STO Loopcount
+BRZ end
+ZRO
+BRZ loop
+end:

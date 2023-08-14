@@ -5,12 +5,18 @@ const signed_decimal_representation = 3;
 //change steps_per_interval if you want to change the amount of times evaluatePython_step_sim() is called per interval (10ms)
 //the higher this number the less responsive the ui gets, at 200 it starts to get a bit too unresponsive. 100 feels acceptable
 const steps_per_interval = 100;
+
 //set use_more_than_one_step_per_10ms to false if you only want to call up evaluatePython_step_sim() more than once per interval (10ms)
 const use_more_than_one_step_per_10ms = true;
 const parse_sim_after_not_typing_for_n_ms = 500;
+
 var input_timer;
+
+let selected_isa = "riscv";
+
 let reg_representation_mode = decimal_representation; //change this to set another default repr.
 let mem_representation_mode = decimal_representation;
+
 var run;
 var pipeline_mode = "single_stage_pipeline";
 window.addEventListener("DOMContentLoaded", function () {
@@ -23,8 +29,9 @@ window.addEventListener("DOMContentLoaded", function () {
         .getElementById("button_simulation_start_id")
         .addEventListener("click", () => {
             editor.save();
-            finished_typing();
-            document.getElementById("input").disabled = true;
+            //finished_typing(); FIXME: The input should get parsed after clicking the button in case the auto parsing wasn't triggered yet.
+            // But this should only happen if the input has changed and not after the user has already started the simulation.
+            document.getElementById("input").disabled = true; // I dont think this does anything. But codemirror provides a function "readOnly" that we could use.
             document.getElementById("vis_input").disabled = true;
             if (run) {
                 stop_loading_animation();
@@ -33,9 +40,9 @@ window.addEventListener("DOMContentLoaded", function () {
             start_loading_animation();
             resume_timer();
             if (use_more_than_one_step_per_10ms) {
-                run = setInterval(step_n_times, 1); //minimum is 10ms but we use 1ms in case it gets changed in the future
+                run = setInterval(step_n_times, 1);
             } else {
-                run = setInterval(evaluatePython_step_sim, 1);
+                run = setInterval(evaluatePython_step_sim, 10);
             }
             disable_run();
             enable_pause();
@@ -48,8 +55,8 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             document.getElementById("input").disabled = true;
             document.getElementById("vis_input").disabled = true;
-            clearInterval(run);
             stop_timer();
+            clearInterval(run);
             update_performance_metrics();
             enable_run();
             disable_pause();
@@ -62,12 +69,11 @@ window.addEventListener("DOMContentLoaded", function () {
         .getElementById("button_simulation_next_id")
         .addEventListener("click", () => {
             editor.save();
-            finished_typing();
+            //finished_typing(); FIXME: The input should get parsed after clicking the button in case the auto parsing wasn't triggered yet.
+            // But this should only happen if the input has changed and not after the user has already started the simulation.
             document.getElementById("input").disabled = true;
             document.getElementById("vis_input").disabled = true;
-            resume_timer();
             evaluatePython_step_sim();
-            stop_timer();
             update_performance_metrics();
             enable_run();
             disable_pause();
@@ -81,7 +87,7 @@ window.addEventListener("DOMContentLoaded", function () {
             document.getElementById("input").disabled = true;
             document.getElementById("vis_input").disabled = true;
             clearInterval(run);
-            evaluatePython_reset_sim(pipeline_mode);
+            evaluatePython_reset_sim();
             document.getElementById("input").disabled = false;
             document.getElementById("input").disabled = false;
             enable_run();
@@ -93,25 +99,32 @@ window.addEventListener("DOMContentLoaded", function () {
         });
 
     function step_n_times() {
+        //resume_timer()
         for (i = 0; i < steps_per_interval; i++) {
-            evaluatePython_step_sim();
+            evaluatePython_step_sim(false);
         }
+        //stop_timer()
     }
 
+    // select isa button listeners
+    document
+        .getElementById("isa_button_riscv_id")
+        .addEventListener("click", () => {
+            selected_isa = "riscv";
+        });
+
+    document
+        .getElementById("isa_button_toy_id")
+        .addEventListener("click", () => {
+            selected_isa = "toy";
+        });
+
+    // register representation button listeners
     document
         .getElementById("reg_button_binary_representation_id")
         .addEventListener("click", () => {
             reg_representation_mode = binary_representation;
             evaluatePython_update_tables();
-            //document
-            //  .getElementById("button_binary_representation_id")
-            // .classList.add("checked");
-            //document
-            //  .getElementById("button_decimal_representation_id")
-            //.classList.remove("checked");
-            //document
-            //  .getElementById("button_hexa_representation_id")
-            //.classList.remove("checked");
         });
 
     document
@@ -119,15 +132,6 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             reg_representation_mode = decimal_representation;
             evaluatePython_update_tables();
-            //document
-            //.getElementById("button_decimal_representation_id")
-            //.classList.add("active");
-            //document
-            //  .getElementById("button_binary_representation_id")
-            //.classList.remove("active");
-            //document
-            //  .getElementById("button_hexa_representation_id")
-            //.classList.remove("active");
         });
 
     document
@@ -142,31 +146,14 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             reg_representation_mode = hexa_representation;
             evaluatePython_update_tables();
-            //document
-            //.getElementById("button_hexa_representation_id")
-            //.classList.add("active");
-            //document
-            //  .getElementById("button_decimal_representation_id")
-            //.classList.remove("active");
-            //document
-            //  .getElementById("button_binary_representation_id")
-            //.classList.remove("active");
         });
 
+    // memory representation button listeners
     document
         .getElementById("mem_button_binary_representation_id")
         .addEventListener("click", () => {
             mem_representation_mode = binary_representation;
             evaluatePython_update_tables();
-            //document
-            //  .getElementById("button_binary_representation_id")
-            // .classList.add("checked");
-            //document
-            //  .getElementById("button_decimal_representation_id")
-            //.classList.remove("checked");
-            //document
-            //  .getElementById("button_hexa_representation_id")
-            //.classList.remove("checked");
         });
 
     document
@@ -174,15 +161,6 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             mem_representation_mode = decimal_representation;
             evaluatePython_update_tables();
-            //document
-            //.getElementById("button_decimal_representation_id")
-            //.classList.add("active");
-            //document
-            //  .getElementById("button_binary_representation_id")
-            //.classList.remove("active");
-            //document
-            //  .getElementById("button_hexa_representation_id")
-            //.classList.remove("active");
         });
 
     document
@@ -190,17 +168,9 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             mem_representation_mode = hexa_representation;
             evaluatePython_update_tables();
-            //document
-            //.getElementById("button_hexa_representation_id")
-            //.classList.add("active");
-            //document
-            //  .getElementById("button_decimal_representation_id")
-            //.classList.remove("active");
-            //document
-            //  .getElementById("button_binary_representation_id")
-            //.classList.remove("active");
         });
 
+    // pipeline mode button listeners
     document
         .getElementById("mem_button_signed_decimal_representation_id")
         .addEventListener("click", () => {
@@ -212,7 +182,7 @@ window.addEventListener("DOMContentLoaded", function () {
         .getElementById("button_SingleStage")
         .addEventListener("click", () => {
             pipeline_mode = "single_stage_pipeline";
-            evaluatePython_reset_sim(pipeline_mode);
+            evaluatePython_reset_sim();
             input_timer = setTimeout(
                 finished_typing,
                 parse_sim_after_not_typing_for_n_ms
@@ -224,27 +194,17 @@ window.addEventListener("DOMContentLoaded", function () {
             document.getElementById("MainContent").style.display = "block";
             document.getElementById("button_tab_visualization").textContent =
                 "Visualization";
-            //document
-            //  .getElementById("button_SingleStage")
-            //.classList.add("active");
-            //document
-            //  .getElementById("button_5-Stage")
-            //.classList.remove("active");
         });
 
     document.getElementById("button_5-Stage").addEventListener("click", () => {
         pipeline_mode = "five_stage_pipeline";
-        evaluatePython_reset_sim(pipeline_mode);
+        evaluatePython_reset_sim();
         input_timer = setTimeout(
             finished_typing,
             parse_sim_after_not_typing_for_n_ms
         );
         document.getElementById("button_tab_visualization").style.display =
             "block";
-        //document.getElementById("button_5-Stage").classList.add("active");
-        //document
-        //  .getElementById("button_SingleStage")
-        //.classList.remove("active");
     });
 
     editor.on("change", function () {
@@ -276,21 +236,6 @@ window.addEventListener("DOMContentLoaded", function () {
             parse_sim_after_not_typing_for_n_ms
         );
     });
-
-    /*document.getElementById("input").addEventListener("keyup", () => {
-        editor.save();
-        editor.change()
-        // autoparse
-        clearTimeout(input_timer);
-        input_timer = setTimeout(
-            finished_typing,
-            parse_sim_after_not_typing_for_n_ms
-        );
-    });
-
-    document.getElementById("input").addEventListener("keydown", () => {
-        clearTimeout(input_timer);
-    });*/
 
     function finished_typing() {
         evaluatePython_parse_input();

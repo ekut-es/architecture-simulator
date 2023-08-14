@@ -17,6 +17,7 @@ class ToyInstruction(Instruction):
     length: int = 1
 
     def __init__(self, **kwargs):
+        """"""
         """NOTE: I use **kwargs here because otherwise, the parser has to create objects from the 'class objects'.
         Since it only knows if the instruction it is currently looking at is an AddressTypeInstruction or a
         normal ToyInstruction and since it doesnt know which exact subclass it is, it can not know which
@@ -24,7 +25,7 @@ class ToyInstruction(Instruction):
         need to fill in in the parser. If you have a better solution (that does not involve creating a separate
         if-case for each instruction), go ahead and change this."""
         self.mnemonic = kwargs["mnemonic"].upper()
-        self.opcode = kwargs["opcode"] % 16
+        self.opcode = int(kwargs["opcode"]) % 16
 
     def __repr__(self):
         return self.mnemonic.upper()
@@ -34,7 +35,75 @@ class ToyInstruction(Instruction):
 
     def __eq__(self, other):
         """Useful for testing, since you can directly compare instructions."""
-        return self.opcode == other.opcode
+        if isinstance(other, ToyInstruction):
+            return self.opcode == other.opcode
+        return False
+
+    def to_integer(self) -> int:
+        """Get the machine code of the instruction as integer value.
+
+        Returns:
+            int: machine code
+        """
+        return self.opcode << 12
+
+    def __int__(self) -> int:
+        return self.to_integer()
+
+    def to_binary(self) -> str:
+        """Get the machine code of the instrution as 16 digit binary string.
+
+        Returns:
+            str: A 16 digit long binary string.
+        """
+        return "{:016b}".format(int(self))
+
+    def to_hex(self) -> str:
+        """Get the machine code of the instruction as 4 digit hexadecimal string.
+
+        Returns:
+            str: A 4 digit long hexadecimal string.
+        """
+        return "{:04X}".format(int(self))
+
+    @classmethod
+    def from_integer(cls, integer_instruction: int) -> ToyInstruction:
+        """Turn a machine code integer into the corresponding instruction object.
+
+        Args:
+            integer_instruction (int): machine code of the instruction.
+
+        Returns:
+            ToyInstruction: The corresponding instruction object.
+        """
+        opcode = opcode = (integer_instruction >> 12) & 0xF
+        address = integer_instruction & 0xFFF
+        if opcode == 0:
+            return STO(address)
+        elif opcode == 1:
+            return LDA(address)
+        elif opcode == 2:
+            return BRZ(address)
+        elif opcode == 3:
+            return ADD(address)
+        elif opcode == 4:
+            return SUB(address)
+        elif opcode == 5:
+            return OR(address)
+        elif opcode == 6:
+            return AND(address)
+        elif opcode == 7:
+            return XOR(address)
+        elif opcode == 8:
+            return NOT()
+        elif opcode == 9:
+            return INC()
+        elif opcode == 10:
+            return DEC()
+        elif opcode == 11:
+            return ZRO()
+        else:
+            return NOP()
 
 
 class AddressTypeInstruction(ToyInstruction):
@@ -48,7 +117,12 @@ class AddressTypeInstruction(ToyInstruction):
         return f"{self.mnemonic.upper()} ${self.address:03X}"
 
     def __eq__(self, other):
-        return super().__eq__(other) and self.address == other.address
+        if isinstance(other, AddressTypeInstruction):
+            return super().__eq__(other) and self.address == other.address
+        return False
+
+    def to_integer(self):
+        return (self.opcode << 12) + self.address
 
 
 class STO(AddressTypeInstruction):

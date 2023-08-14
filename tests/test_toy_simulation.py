@@ -73,3 +73,48 @@ class TestToySimulation(unittest.TestCase):
         self.assertEqual(simulation.state.performance_metrics.cycles, 13)
         self.assertEqual(simulation.state.performance_metrics.branch_count, 3)
         self.assertGreater(simulation.state.performance_metrics.execution_time_s, 0)
+
+    def test_program(self):
+        simulation = ToySimulation()
+        program = """# computes the sum of the numbers from 1 to n
+# result gets saved in RAM[1025]
+Loopcount = $400
+Result = $401
+:$400:20 # enter n here
+
+loop:
+LDA Result
+ADD Loopcount
+STO Result
+LDA Loopcount
+DEC
+STO Loopcount
+BRZ end
+ZRO
+BRZ loop
+end:"""
+        simulation.load_program(program)
+        simulation.run()
+        self.assertEqual(simulation.state.data_memory.read_halfword(1025), 210)
+
+    def test_memory_issue(self):
+        program = """INC
+STO $400
+INC"""
+        simulation = ToySimulation()
+        simulation.load_program(program)
+        simulation.run()
+        self.assertEqual(simulation.state.accu, 2)
+        self.assertEqual(simulation.state.data_memory.memory_file[1024], 1)
+        self.assertEqual(simulation.state.data_memory.read_halfword(1024), 1)
+
+        program = """INC
+STO $400
+LDA $400
+INC"""
+        simulation = ToySimulation()
+        simulation.load_program(program)
+        simulation.run()
+        self.assertEqual(simulation.state.accu, 2)
+        self.assertEqual(simulation.state.data_memory.memory_file[1024], 1)
+        self.assertEqual(simulation.state.data_memory.read_halfword(1024), 1)

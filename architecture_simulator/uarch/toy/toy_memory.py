@@ -35,7 +35,7 @@ class ToyMemory:
         """
         self.assert_address_in_range(address)
         try:
-            return self.memory_file[address]
+            return MutableUInt16(int(self.memory_file[address]))
         except KeyError:
             return MutableUInt16(0)
 
@@ -56,31 +56,27 @@ class ToyMemory:
                 memory_type="data memory",
             )
 
-    def get_entries(self) -> dict[int, tuple]:
-        """Returns the contents of the memory as binary, decimal and hexadecimal numbers.
-
-        Returns:
-            dict[int, tuple]: keys: Addresses. Values: tuples of (binary, decimal, hexadecimal) strings.
-        """
-        entries: dict[int, tuple] = {}
-        for address, value in self.memory_file.items():
-            bin_value = "{:019_b}".format(int(value)).replace("_", " ")
-            dec_value = str(int(value))
-            hex_value = "{:04X}".format(int(value))
-            entries[address] = bin_value, dec_value, hex_value
-        return entries
-
-    def memory_repr(self) -> dict[int, tuple]:
+    def memory_repr(self) -> dict[int, tuple[str, str, str, str]]:
         """Returns the contents of the memory as binary, decimal and hexadecimal values, all nicely formatted.
 
         Returns:
-            dict[int, tuple]: keys: addresses. Values: Tuples of (binary, decimal, hexadecimal) strings.
+            dict[int, tuple[str,str,str,str]]: keys: addresses. Values: Tuples of (binary, unsigned decimal, hexadecimal, signed decimal) strings.
         """
-        res: dict[int, tuple] = {}
+        res: dict[int, tuple[str, str, str, str]] = {}
         for key in self.memory_file.keys():
             word = self.memory_file[key]
-            dec = int(word)
+            unsigned_decimal = int(word)
+            signed_decimal = (
+                unsigned_decimal - 2**16
+                if unsigned_decimal >= 2**15
+                else unsigned_decimal
+            )
             bin = "{:016b}".format(int(word))
             hex = "{:04X}".format(int(word))
-            res[key] = (bin[0:8] + " " + bin[8:16], dec, hex[0:2] + " " + hex[2:4])
+            res[key] = (
+                bin[0:8] + " " + bin[8:16],
+                str(unsigned_decimal),
+                hex[0:2] + " " + hex[2:4],
+                str(signed_decimal),
+            )
         return res

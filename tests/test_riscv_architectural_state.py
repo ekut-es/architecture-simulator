@@ -7,9 +7,10 @@ from architecture_simulator.uarch.riscv.riscv_architectural_state import (
     RiscvArchitecturalState,
 )
 from architecture_simulator.isa.riscv.rv32i_instructions import ADD, SLL
+from architecture_simulator.uarch.instruction_memory import InstructionMemoryKeyError
 
 
-class TestArchitecture(unittest.TestCase):
+class TestRiscvArchitecture(unittest.TestCase):
     def test_register(self):
         # x0 can not be changed
         state = RiscvArchitecturalState(register_file=RegisterFile())
@@ -55,19 +56,19 @@ class TestArchitecture(unittest.TestCase):
             state.register_file.reg_repr()[1][0],
             "00000000 00000000 00000000 00000001",
         )
-        self.assertEqual(state.register_file.reg_repr()[1][1], 1)
+        self.assertEqual(state.register_file.reg_repr()[1][1], "1")
         self.assertEqual(state.register_file.reg_repr()[1][2], "00 00 00 01")
         self.assertEqual(
             state.register_file.reg_repr()[2][0],
             "11111111 11111111 11111111 11111111",
         )
-        self.assertEqual(state.register_file.reg_repr()[2][1], 4294967295)
+        self.assertEqual(state.register_file.reg_repr()[2][1], "4294967295")
         self.assertEqual(state.register_file.reg_repr()[2][2], "FF FF FF FF")
         self.assertEqual(
             state.register_file.reg_repr()[3][0],
             "00000000 00000000 00000000 00000011",
         )
-        self.assertEqual(state.register_file.reg_repr()[3][1], 3)
+        self.assertEqual(state.register_file.reg_repr()[3][1], "3")
         self.assertEqual(state.register_file.reg_repr()[3][2], "00 00 00 03")
 
     def test_mem(self):
@@ -80,25 +81,25 @@ class TestArchitecture(unittest.TestCase):
             state.memory.memory_wordwise_repr()[0][0],
             "00000000 00000000 00000000 00000001",
         )
-        self.assertEqual(state.memory.memory_wordwise_repr()[0][1], 1)
+        self.assertEqual(state.memory.memory_wordwise_repr()[0][1], "1")
         self.assertEqual(state.memory.memory_wordwise_repr()[0][2], "00 00 00 01")
         self.assertEqual(
             state.memory.memory_wordwise_repr()[4][0],
             "00000000 00000110 00000000 00000000",
         )
-        self.assertEqual(state.memory.memory_wordwise_repr()[4][1], 6 << 16)
+        self.assertEqual(state.memory.memory_wordwise_repr()[4][1], str(6 << 16))
         self.assertEqual(state.memory.memory_wordwise_repr()[4][2], "00 06 00 00")
         self.assertEqual(
             state.memory.memory_wordwise_repr()[8][0],
             "00000000 00000000 00000000 00000000",
         )
-        self.assertEqual(state.memory.memory_wordwise_repr()[8][1], 0)
+        self.assertEqual(state.memory.memory_wordwise_repr()[8][1], "0")
         self.assertEqual(state.memory.memory_wordwise_repr()[8][2], "00 00 00 00")
         self.assertEqual(
             state.memory.memory_wordwise_repr()[20][0],
             "00000000 00000000 00010100 00000000",
         )
-        self.assertEqual(state.memory.memory_wordwise_repr()[20][1], 20 << 8)
+        self.assertEqual(state.memory.memory_wordwise_repr()[20][1], str(20 << 8))
         self.assertEqual(state.memory.memory_wordwise_repr()[20][2], "00 00 14 00")
 
         state = RiscvArchitecturalState(
@@ -273,3 +274,9 @@ class TestArchitecture(unittest.TestCase):
                 memory_type="data memory",
             ),
         )
+
+    def test_instruction_memory(self):
+        state = RiscvArchitecturalState()
+        with self.assertRaises(InstructionMemoryKeyError) as cm:
+            state.instruction_memory.read_instruction(1)
+        self.assertEqual(cm.exception, InstructionMemoryKeyError(1))
