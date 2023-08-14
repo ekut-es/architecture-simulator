@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Optional
-
 import archsim_js
 import pyodide.ffi
 from architecture_simulator.isa.parser_exceptions import ParserException
@@ -281,21 +280,36 @@ def update_tables():
                 "instruction": IF_pipeline_register.instruction.__repr__(),
                 "address_of_instruction": IF_pipeline_register.address_of_instruction,
                 "pc_plus_instruction_length": IF_pipeline_register.pc_plus_instruction_length,
+                "i-length": IF_pipeline_register.instruction.length,
             }
             parameters_js = pyodide.ffi.to_js(parameters)
             archsim_js.update_IF_Stage(parameters_js)
-        # this case only applies if the Pipeline Register is flushed or reset
+        # this case only applies if the Pipeline Register is flushed
         elif (
             isinstance(IF_pipeline_register, PipelineRegister)
             and len(simulation.pipeline.pipeline_registers) != 1
             and simulation.pipeline.pipeline_registers[3].flush_signal is not None
         ):
+            parameters_2 = vars(IF_pipeline_register)
             parameters = dict()
+            parameters["mnemonic"] = parameters_2["instruction"].mnemonic
+            parameters["address_of_instruction"] = "flush"
+            parameters_js = pyodide.ffi.to_js(parameters)
+            archsim_js.update_IF_Stage(parameters_js)
+        elif (
+            isinstance(IF_pipeline_register, PipelineRegister)
+            and len(simulation.pipeline.pipeline_registers) != 1
+        ):
+            parameters_2 = vars(IF_pipeline_register)
+            parameters = dict()
+            parameters["mnemonic"] = parameters_2["instruction"].mnemonic
             parameters["address_of_instruction"] = "reset"
             parameters_js = pyodide.ffi.to_js(parameters)
             archsim_js.update_IF_Stage(parameters_js)
         else:
+            parameters_2 = vars(IF_pipeline_register)
             parameters = dict()
+            parameters["mnemonic"] = parameters_2["instruction"].mnemonic
             parameters["address_of_instruction"] = None
             parameters["pc_plus_instruction_length"] = None
             parameters_js = pyodide.ffi.to_js(parameters)

@@ -531,21 +531,21 @@ function set_svg_text_simple(id, str) {
     pipeline_svg.getElementById(id).textContent = str;
 }
 
-function set_svg_text_simple_right_align(id, str) {
-    const pipeline_svg = document.getElementById(
-        "visualization_pipeline"
-    ).contentDocument;
-    pipeline_svg.getElementById(id).textContent = str;
-    pipeline_svg.getElementById(id).setAttribute("text-anchor", "end");
-}
+// function set_svg_text_simple_right_align(id, str) {
+//     const pipeline_svg = document.getElementById(
+//         "visualization_pipeline"
+//     ).contentDocument;
+//     pipeline_svg.getElementById(id).textContent = str;
+//     pipeline_svg.getElementById(id).setAttribute("text-anchor", "end");
+// }
 
-function set_svg_text_simple_left_align(id, str) {
-    const pipeline_svg = document.getElementById(
-        "visualization_pipeline"
-    ).contentDocument;
-    pipeline_svg.getElementById(id).textContent = str;
-    pipeline_svg.getElementById(id).setAttribute("text-anchor", "start");
-}
+// function set_svg_text_simple_left_align(id, str) {
+//     const pipeline_svg = document.getElementById(
+//         "visualization_pipeline"
+//     ).contentDocument;
+//     pipeline_svg.getElementById(id).textContent = str;
+//     pipeline_svg.getElementById(id).setAttribute("text-anchor", "start");
+// }
 
 function set_svg_text_complex(id, str) {
     const pipeline_svg = document.getElementById(

@@ -349,6 +349,7 @@ const archsim_js = {
         pc_plus_instruction_length = parameters.get(
             "pc_plus_instruction_length"
         );
+        i_length = parameters.get("i-length");
         // Update the mnemonic
         set_svg_text_complex("Fetch", mnemonic);
         // Update Instr[31-0]
@@ -375,17 +376,18 @@ const archsim_js = {
         // Else set the PC to the previous PC. This way there is ALWAYS something in PC
         if (
             address_of_instruction != undefined &&
-            address_of_instruction != "reset"
+            address_of_instruction != "reset" &&
+            address_of_instruction != "flush"
         ) {
             set_svg_text_complex(
                 "InstructionReadAddressText-2",
                 address_of_instruction
             );
             previous_pc = address_of_instruction;
+        } else if (address_of_instruction == "flush") {
+            set_svg_text_complex("InstructionReadAddressText-2", previous_pc);
         } else if (address_of_instruction == "reset") {
             set_svg_text_complex("InstructionReadAddressText-2", 0);
-        } else {
-            set_svg_text_complex("InstructionReadAddressText-2", previous_pc);
         }
         if (Number.isInteger(address_of_instruction)) {
             set_svg_colour("FetchPCOut", "blue");
@@ -399,6 +401,13 @@ const archsim_js = {
             set_svg_colour("FetchAddOut", "blue");
         } else {
             set_svg_colour("FetchAddOut", "black");
+        }
+
+        set_svg_text_complex("FetchI-LengthText", i_length);
+        if (Number.isInteger(i_length)) {
+            set_svg_colour("FetchI-Length", "blue");
+        } else {
+            set_svg_colour("FetchI-Length", "black");
         }
     },
     /**Update ID Stage:
