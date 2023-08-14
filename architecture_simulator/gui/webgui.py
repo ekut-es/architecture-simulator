@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 import archsim_js
+import pyodide.ffi
 from architecture_simulator.isa.parser_exceptions import ParserException
 from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 from architecture_simulator.simulation.toy_simulation import ToySimulation
@@ -273,32 +274,32 @@ def update_tables():
     """
     try:
         IF_pipeline_register = simulation.pipeline.pipeline_registers[0]
+        # parameters = vars(IF_pipeline_register)
         if isinstance(IF_pipeline_register, InstructionFetchPipelineRegister):
-            archsim_js.update_IF_Stage(
-                IF_pipeline_register.instruction.mnemonic,
-                IF_pipeline_register.instruction.__repr__(),
-                IF_pipeline_register.address_of_instruction,
-                IF_pipeline_register.pc_plus_instruction_length,
-            )
+            parameters = {
+                "mnemonic": IF_pipeline_register.instruction.mnemonic,
+                "instruction": IF_pipeline_register.instruction.__repr__(),
+                "address_of_instruction": IF_pipeline_register.address_of_instruction,
+                "pc_plus_instruction_length": IF_pipeline_register.pc_plus_instruction_length,
+            }
+            parameters_js = pyodide.ffi.to_js(parameters)
+            archsim_js.update_IF_Stage(parameters_js)
         # this case only applies if the Pipeline Register is flushed or reset
         elif (
             isinstance(IF_pipeline_register, PipelineRegister)
             and len(simulation.pipeline.pipeline_registers) != 1
             and simulation.pipeline.pipeline_registers[3].flush_signal is not None
         ):
-            archsim_js.update_IF_Stage(
-                IF_pipeline_register.instruction.mnemonic,
-                IF_pipeline_register.instruction.__repr__(),
-                "reset",
-                None,
-            )
+            parameters = dict()
+            parameters["address_of_instruction"] = "reset"
+            parameters_js = pyodide.ffi.to_js(parameters)
+            archsim_js.update_IF_Stage(parameters_js)
         else:
-            archsim_js.update_IF_Stage(
-                IF_pipeline_register.instruction.mnemonic,
-                IF_pipeline_register.instruction.__repr__(),
-                None,
-                None,
-            )
+            parameters = dict()
+            parameters["address_of_instruction"] = None
+            parameters["pc_plus_instruction_length"] = None
+            parameters_js = pyodide.ffi.to_js(parameters)
+            archsim_js.update_IF_Stage(parameters_js)
     except:
         ...
 
@@ -309,43 +310,25 @@ def update_tables():
     try:
         ID_pipeline_register = simulation.pipeline.pipeline_registers[1]
         if isinstance(ID_pipeline_register, InstructionDecodePipelineRegister):
-            control_unit_signals = [
-                ID_pipeline_register.control_unit_signals.alu_src_1,
-                ID_pipeline_register.control_unit_signals.alu_src_2,
-                ID_pipeline_register.control_unit_signals.wb_src,
-                ID_pipeline_register.control_unit_signals.reg_write,
-                ID_pipeline_register.control_unit_signals.mem_read,
-                ID_pipeline_register.control_unit_signals.mem_write,
-                ID_pipeline_register.control_unit_signals.branch,
-                ID_pipeline_register.control_unit_signals.jump,
-                ID_pipeline_register.control_unit_signals.alu_op,
-                ID_pipeline_register.control_unit_signals.alu_to_pc,
-            ]
+            control_unit_signals = vars(ID_pipeline_register.control_unit_signals)
+            parameters = vars(ID_pipeline_register)
+            parameters["mnemonic"] = ID_pipeline_register.instruction.mnemonic
+            parameters_js = pyodide.ffi.to_js(parameters)
+            control_unit_signals_js = pyodide.ffi.to_js(control_unit_signals)
             archsim_js.update_ID_Stage(
-                ID_pipeline_register.instruction.mnemonic,
-                ID_pipeline_register.register_read_addr_1,
-                ID_pipeline_register.register_read_addr_2,
-                ID_pipeline_register.register_read_data_1,
-                ID_pipeline_register.register_read_data_2,
-                ID_pipeline_register.imm,
-                ID_pipeline_register.write_register,
-                ID_pipeline_register.pc_plus_instruction_length,
-                ID_pipeline_register.address_of_instruction,
-                control_unit_signals=control_unit_signals,
+                parameters_js,
+                control_unit_signals_js,
             )
         # this case only applies if the Pipeline Register is flushed or reset
         elif isinstance(ID_pipeline_register, PipelineRegister):
+            parameters = vars(ID_pipeline_register)
+            control_unit_signals = dict()
+            parameters["mnemonic"] = ID_pipeline_register.instruction.mnemonic
+            parameters_js = pyodide.ffi.to_js(parameters)
+            control_unit_signals_js = pyodide.ffi.to_js(control_unit_signals)
             archsim_js.update_ID_Stage(
-                ID_pipeline_register.instruction.mnemonic,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                [],
+                parameters_js,
+                control_unit_signals_js,
             )
     except:
         ...
@@ -357,50 +340,20 @@ def update_tables():
     try:
         EX_pipeline_register = simulation.pipeline.pipeline_registers[2]
         if isinstance(EX_pipeline_register, ExecutePipelineRegister):
-            control_unit_signals = [
-                EX_pipeline_register.control_unit_signals.alu_src_1,
-                EX_pipeline_register.control_unit_signals.alu_src_2,
-                EX_pipeline_register.control_unit_signals.wb_src,
-                EX_pipeline_register.control_unit_signals.reg_write,
-                EX_pipeline_register.control_unit_signals.mem_read,
-                EX_pipeline_register.control_unit_signals.mem_write,
-                EX_pipeline_register.control_unit_signals.branch,
-                EX_pipeline_register.control_unit_signals.jump,
-                EX_pipeline_register.control_unit_signals.alu_op,
-                EX_pipeline_register.control_unit_signals.alu_to_pc,
-            ]
-            archsim_js.update_EX_Stage(
-                EX_pipeline_register.instruction.mnemonic,
-                EX_pipeline_register.alu_in_1,
-                EX_pipeline_register.alu_in_2,
-                EX_pipeline_register.register_read_data_1,
-                EX_pipeline_register.register_read_data_2,
-                EX_pipeline_register.imm,
-                EX_pipeline_register.result,
-                EX_pipeline_register.write_register,
-                EX_pipeline_register.comparison,
-                EX_pipeline_register.pc_plus_imm,
-                EX_pipeline_register.pc_plus_instruction_length,
-                EX_pipeline_register.address_of_instruction,
-                control_unit_signals,
-            )
+            control_unit_signals = vars(EX_pipeline_register.control_unit_signals)
+            parameters = vars(EX_pipeline_register)
+            parameters["mnemonic"] = EX_pipeline_register.instruction.mnemonic
+            parameters_js = pyodide.ffi.to_js(parameters)
+            control_unit_signals_js = pyodide.ffi.to_js(control_unit_signals)
+            archsim_js.update_EX_Stage(parameters_js, control_unit_signals_js)
         # this case only applies if the Pipeline Register is flushed or reset
         elif isinstance(EX_pipeline_register, PipelineRegister):
-            archsim_js.update_EX_Stage(
-                EX_pipeline_register.instruction.mnemonic,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                [],
-            )
+            parameters = vars(EX_pipeline_register)
+            control_unit_signals = dict()
+            parameters["mnemonic"] = EX_pipeline_register.instruction.mnemonic
+            parameters_js = pyodide.ffi.to_js(parameters)
+            control_unit_signals_js = pyodide.ffi.to_js(control_unit_signals)
+            archsim_js.update_EX_Stage(parameters_js, control_unit_signals_js)
     except:
         ...
 
@@ -411,47 +364,25 @@ def update_tables():
     try:
         MA_pipeline_register = simulation.pipeline.pipeline_registers[3]
         if isinstance(MA_pipeline_register, MemoryAccessPipelineRegister):
-            control_unit_signals = [
-                MA_pipeline_register.control_unit_signals.alu_src_1,
-                MA_pipeline_register.control_unit_signals.alu_src_2,
-                MA_pipeline_register.control_unit_signals.wb_src,
-                MA_pipeline_register.control_unit_signals.reg_write,
-                MA_pipeline_register.control_unit_signals.mem_read,
-                MA_pipeline_register.control_unit_signals.mem_write,
-                MA_pipeline_register.control_unit_signals.branch,
-                MA_pipeline_register.control_unit_signals.jump,
-                MA_pipeline_register.control_unit_signals.alu_op,
-                MA_pipeline_register.control_unit_signals.alu_to_pc,
-            ]
+            control_unit_signals = vars(MA_pipeline_register.control_unit_signals)
+            parameters = vars(MA_pipeline_register)
+            parameters["mnemonic"] = MA_pipeline_register.instruction.mnemonic
+            parameters_js = pyodide.ffi.to_js(parameters)
+            control_unit_signals_js = pyodide.ffi.to_js(control_unit_signals)
             archsim_js.update_MA_Stage(
-                MA_pipeline_register.instruction.mnemonic,
-                MA_pipeline_register.memory_address,
-                MA_pipeline_register.result,
-                MA_pipeline_register.memory_write_data,
-                MA_pipeline_register.memory_read_data,
-                MA_pipeline_register.write_register,
-                MA_pipeline_register.comparison,
-                MA_pipeline_register.comparison_or_jump,
-                MA_pipeline_register.pc_plus_imm,
-                MA_pipeline_register.pc_plus_instruction_length,
-                MA_pipeline_register.imm,
-                control_unit_signals,
+                parameters_js,
+                control_unit_signals_js,
             )
         # this case only applies if the Pipeline Register is flushed or reset
         elif isinstance(MA_pipeline_register, PipelineRegister):
+            parameters = vars(MA_pipeline_register)
+            control_unit_signals = dict()
+            parameters["mnemonic"] = MA_pipeline_register.instruction.mnemonic
+            parameters_js = pyodide.ffi.to_js(parameters)
+            control_unit_signals_js = pyodide.ffi.to_js(control_unit_signals)
             archsim_js.update_MA_Stage(
-                MA_pipeline_register.instruction.mnemonic,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                [],
+                parameters_js,
+                control_unit_signals_js,
             )
     except:
         ...
@@ -463,39 +394,25 @@ def update_tables():
     try:
         WB_pipeline_register = simulation.pipeline.pipeline_registers[4]
         if isinstance(WB_pipeline_register, RegisterWritebackPipelineRegister):
-            control_unit_signals = [
-                WB_pipeline_register.control_unit_signals.alu_src_1,
-                WB_pipeline_register.control_unit_signals.alu_src_2,
-                WB_pipeline_register.control_unit_signals.wb_src,
-                WB_pipeline_register.control_unit_signals.reg_write,
-                WB_pipeline_register.control_unit_signals.mem_read,
-                WB_pipeline_register.control_unit_signals.mem_write,
-                WB_pipeline_register.control_unit_signals.branch,
-                WB_pipeline_register.control_unit_signals.jump,
-                WB_pipeline_register.control_unit_signals.alu_op,
-                WB_pipeline_register.control_unit_signals.alu_to_pc,
-            ]
+            control_unit_signals = vars(WB_pipeline_register.control_unit_signals)
+            parameters = vars(WB_pipeline_register)
+            parameters["mnemonic"] = WB_pipeline_register.instruction.mnemonic
+            parameters_js = pyodide.ffi.to_js(parameters)
+            control_unit_signals_js = pyodide.ffi.to_js(control_unit_signals)
             archsim_js.update_WB_Stage(
-                WB_pipeline_register.instruction.mnemonic,
-                WB_pipeline_register.register_write_data,
-                WB_pipeline_register.write_register,
-                WB_pipeline_register.memory_read_data,
-                WB_pipeline_register.alu_result,
-                WB_pipeline_register.pc_plus_instruction_length,
-                WB_pipeline_register.imm,
-                control_unit_signals,
+                parameters_js,
+                control_unit_signals_js,
             )
         # this case only applies if the Pipeline Register is flushed or reset
         elif isinstance(WB_pipeline_register, PipelineRegister):
+            parameters = vars(WB_pipeline_register)
+            control_unit_signals = dict()
+            parameters["mnemonic"] = WB_pipeline_register.instruction.mnemonic
+            parameters_js = pyodide.ffi.to_js(parameters)
+            control_unit_signals_js = pyodide.ffi.to_js(control_unit_signals)
             archsim_js.update_WB_Stage(
-                WB_pipeline_register.instruction.mnemonic,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                [],
+                parameters_js,
+                control_unit_signals_js,
             )
     except:
         ...
