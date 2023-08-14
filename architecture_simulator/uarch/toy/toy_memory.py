@@ -69,3 +69,18 @@ class ToyMemory:
             hex_value = "{:04X}".format(int(value))
             entries[address] = bin_value, dec_value, hex_value
         return entries
+
+    def memory_repr(self) -> dict[int, tuple]:
+        """Returns the contents of the memory as binary, decimal and hexadecimal values, all nicely formatted.
+
+        Returns:
+            dict[int, tuple]: keys: addresses. Values: Tuples of (binary, decimal, hexadecimal) strings.
+        """
+        res: dict[int, tuple] = {}
+        for key in self.memory_file.keys():
+            word = self.memory_file[key]
+            dec = int(word)
+            bin = "{:016b}".format(int(word))
+            hex = "{:04X}".format(int(word))
+            res[key] = (bin[0:8] + " " + bin[8:16], dec, hex[0:2] + " " + hex[2:4])
+        return res
