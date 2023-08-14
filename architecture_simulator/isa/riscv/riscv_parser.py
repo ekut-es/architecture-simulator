@@ -108,6 +108,7 @@ class RiscvParser:
     _Bracket_L = pp.Literal("[").suppress()
     _D_COL = pp.Literal(":").suppress()
     _PLUS = pp.Literal("+").suppress()
+    _QUOTE = pp.Literal('"').suppress()
 
     _pattern_directive = pp.Group(_DOT + pp.oneOf(_directives)("directive"))
 
@@ -145,6 +146,13 @@ class RiscvParser:
         + _D_COL
         + _pattern_type_directive("type")
         + pp.delimitedList(_pattern_imm, delim=",")("values")
+    )
+
+    _pattern_string_declaration = pp.Group(
+        _pattern_label("name")
+        + _D_COL
+        + pp.Group(_DOT + pp.Literal("string")("type"))("type")
+        + pp.quoted_string("string")
     )
 
     # R-Types
@@ -278,6 +286,7 @@ class RiscvParser:
         (
             _pattern_directive
             ^ _pattern_variable_declaration("variable_declaration")
+            ^ _pattern_string_declaration("variable_declaration")
             ^ _pattern_r_type_instruction
             ^ _pattern_u_type_instruction
             ^ _pattern_b_type_instruction
@@ -352,6 +361,9 @@ class RiscvParser:
 
         self.data: list[tuple[int, str, pp.ParseResults]] = []
         self.text: list[tuple[int, str, pp.ParseResults]] = []
+
+        if self.token_list == []:
+            return
 
         data_exists = False
         text_exists = True
@@ -433,6 +445,21 @@ class RiscvParser:
                             address_counter, fixedint.MutableUInt32(int(val, base=0))
                         )
                         address_counter += 4
+                # strings are saved as byte arrays
+                elif line_parsed.type.type == "string":
+                    self.variables.update(
+                        {line_parsed.get("name"): (address_counter, 1)}
+                    )
+                    for char in line_parsed.string[1:-1]:
+                        self.state.memory.write_byte(
+                            address_counter, fixedint.MutableUInt8(ord(char))
+                        )
+                        address_counter += 1
+                    # write null terminator
+                    self.state.memory.write_byte(
+                        address_counter, fixedint.MutableUInt8(0)
+                    )
+                    address_counter += 1
 
     def _process_pseudo_instructions(self) -> None:
         """Converts pseudo instructions in self.text into regular instructions, and variables into addresses."""
