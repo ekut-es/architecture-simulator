@@ -494,46 +494,13 @@ window.addEventListener("load", function () {
     const pipeline_svg = document.getElementById(
         "visualization_pipeline"
     ).contentDocument;
-    //pipeline_svg.getElementById("FetchLeftMuxInZeroText").textContent = "test";
-    //console.log(pipeline_svg.getElementById("FetchLeftMuxInZeroText").textContent)
-    pipeline_svg.getElementById("FetchPCOut").firstChild.style.stroke = "red";
-    // pipeline_svg.getElementById("ExecuteRightMuxOut").setAttribute("stroke", "#FFFFFF");
-    console.log(pipeline_svg.getElementById("g42637"));
-    // console.log(pipeline_svg.getElementById("WriteBackDataMemoryReadData").style.stroke)
-    console.log(pipeline_svg.getElementById("FetchText"));
 
-    pipeline_svg
-        .getElementById("DecodeInstructionMemory1Text")
-        .setAttribute("visibility", "hidden");
-    pipeline_svg
-        .getElementById("DecodeInstructionMemory2Text")
-        .setAttribute("visibility", "hidden");
-    pipeline_svg
-        .getElementById("WriteBackInstructionMemory4Text")
-        .setAttribute("visibility", "hidden");
-    pipeline_svg
-        .getElementById("WriteBackMuxOutText")
-        .setAttribute("visibility", "hidden");
     pipeline_svg
         .getElementById("MemoryExecuteAluResultText1")
         .setAttribute("visibility", "hidden");
     pipeline_svg
         .getElementById("MemoryRegisterFileReadData2Text")
         .setAttribute("visibility", "hidden");
-    pipeline_svg
-        .getElementById("DecodeInstructionMemory3Text")
-        .setAttribute("visibility", "hidden");
-    pipeline_svg
-        .getElementById("DecodeInstructionMemoryText")
-        .setAttribute("visibility", "hidden");
-    // let transformList = pipeline_svg.getElementById("InstructionMemoryInstrText").firstChild.nextSibling.transform.baseVal;
-
-    // // Create a new SVGTransform object that moves it 15 units up
-    // let newTransform = pipeline_svg.getElementById("InstructionMemoryInstrText").firstChild.nextSibling.ownerSVGElement.createSVGTransform();
-    // newTransform.setTranslate(50, 0);
-
-    // // Add it to the transform list
-    // transformList.appendItem(newTransform);
 });
 
 function set_svg_text_simple(id, str) {

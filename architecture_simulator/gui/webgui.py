@@ -176,6 +176,13 @@ def parse_input(instr: str):
 def update_ui():
     """Updates all UI elements based on the current simulation and architectural state."""
     update_tables()
+    update_IF_Stage()
+    update_ID_Stage()
+    update_EX_Stage()
+    update_MA_Stage()
+    update_WB_Stage()
+    update_visualization()
+    # update_performance_metrics()
 
 
 # FIXME: this function is way too long. See the suggested fixes above and below.
@@ -269,6 +276,12 @@ def update_tables():
                 # if the instruction is not in one of the stages
                 archsim_js.update_instruction_table(hex(address), cmd.__repr__(), "")
 
+
+def update_IF_Stage():
+    global simulation
+    if simulation is None:
+        raise StateNotInitializedError()
+
     """Update IF Stage:
     Updates the IF Stage of the visualization and all elements withing this Stage.
     To do this the archsim.js function update_IF_Stage is called with all relevant arguments.
@@ -281,44 +294,28 @@ def update_tables():
                 "mnemonic": IF_pipeline_register.instruction.mnemonic,
                 "instruction": IF_pipeline_register.instruction.__repr__(),
                 "address_of_instruction": IF_pipeline_register.address_of_instruction,
+                "PC": simulation.state.program_counter,
                 "pc_plus_instruction_length": IF_pipeline_register.pc_plus_instruction_length,
                 "i-length": IF_pipeline_register.instruction.length,
             }
             parameters_js = pyodide.ffi.to_js(parameters)
             archsim_js.update_IF_Stage(parameters_js)
         # this case only applies if the Pipeline Register is flushed
-        elif (
-            isinstance(IF_pipeline_register, PipelineRegister)
-            and len(simulation.pipeline.pipeline_registers) != 1
-            and simulation.pipeline.pipeline_registers[3].flush_signal is not None
-        ):
+        elif isinstance(IF_pipeline_register, PipelineRegister):
             parameters_2 = vars(IF_pipeline_register)
             parameters = dict()
+            parameters["PC"] = simulation.state.program_counter
             parameters["mnemonic"] = parameters_2["instruction"].mnemonic
-            parameters["address_of_instruction"] = "flush"
-            parameters_js = pyodide.ffi.to_js(parameters)
-            archsim_js.update_IF_Stage(parameters_js)
-        elif (
-            isinstance(IF_pipeline_register, PipelineRegister)
-            and len(simulation.pipeline.pipeline_registers) != 1
-        ):
-            parameters_2 = vars(IF_pipeline_register)
-            parameters = dict()
-            parameters["mnemonic"] = parameters_2["instruction"].mnemonic
-            parameters["address_of_instruction"] = "reset"
-            parameters_js = pyodide.ffi.to_js(parameters)
-            archsim_js.update_IF_Stage(parameters_js)
-        else:
-            parameters_2 = vars(IF_pipeline_register)
-            parameters = dict()
-            parameters["mnemonic"] = parameters_2["instruction"].mnemonic
-            parameters["address_of_instruction"] = None
-            parameters["pc_plus_instruction_length"] = None
             parameters_js = pyodide.ffi.to_js(parameters)
             archsim_js.update_IF_Stage(parameters_js)
     except:
         ...
 
+
+def update_ID_Stage():
+    global simulation
+    if simulation is None:
+        raise StateNotInitializedError()
     """Update ID Stage:
     Updates the ID Stage of the visualization and all elements withing this Stage.
     To do this the archsim.js function update_ID_Stage is called with all relevant arguments.
@@ -349,10 +346,15 @@ def update_tables():
     except:
         ...
 
+
+def update_EX_Stage():
+    global simulation
+    if simulation is None:
+        raise StateNotInitializedError()
     """Update EX Stage:
-    Updates the EX Stage of the visualization and all elements withing this Stage.
-    To do this the archsim.js function update_EX_Stage is called with all relevant arguments.
-    """
+        Updates the EX Stage of the visualization and all elements withing this Stage.
+        To do this the archsim.js function update_EX_Stage is called with all relevant arguments.
+        """
     try:
         EX_pipeline_register = simulation.pipeline.pipeline_registers[2]
         if isinstance(EX_pipeline_register, ExecutePipelineRegister):
@@ -373,10 +375,15 @@ def update_tables():
     except:
         ...
 
+
+def update_MA_Stage():
+    global simulation
+    if simulation is None:
+        raise StateNotInitializedError()
     """Update MEM Stage:
-    Updates the MEM Stage of the visualization and all elements withing this Stage.
-    To do this the archsim.js function update_MA_Stage is called with all relevant arguments.
-    """
+        Updates the MEM Stage of the visualization and all elements withing this Stage.
+        To do this the archsim.js function update_MA_Stage is called with all relevant arguments.
+        """
     try:
         MA_pipeline_register = simulation.pipeline.pipeline_registers[3]
         if isinstance(MA_pipeline_register, MemoryAccessPipelineRegister):
@@ -403,10 +410,15 @@ def update_tables():
     except:
         ...
 
+
+def update_WB_Stage():
+    global simulation
+    if simulation is None:
+        raise StateNotInitializedError()
     """Update WB Stage:
-    Updates the WB Stage of the visualization and all elements withing this Stage.
-    To do this the archsim.js function update_WB_Stage is called with all relevant arguments.
-    """
+        Updates the WB Stage of the visualization and all elements withing this Stage.
+        To do this the archsim.js function update_WB_Stage is called with all relevant arguments.
+        """
     try:
         WB_pipeline_register = simulation.pipeline.pipeline_registers[4]
         if isinstance(WB_pipeline_register, RegisterWritebackPipelineRegister):
@@ -432,9 +444,15 @@ def update_tables():
             )
     except:
         ...
+
+
+def update_visualization():
+    global simulation
+    if simulation is None:
+        raise StateNotInitializedError()
     """Update visualization:
-    Updates the Elements of the visualization which need information from more than one stage.
-    """
+        Updates the Elements of the visualization which need information from more than one stage.
+        """
     if len(simulation.pipeline.pipeline_registers) > 1:
         IF_pipeline_register = simulation.pipeline.pipeline_registers[0]
         MA_pipeline_register = simulation.pipeline.pipeline_registers[3]
@@ -464,6 +482,13 @@ def update_tables():
                 if MA_pipeline_register.control_unit_signals.alu_to_pc
                 else pc_plus_imm_or_pc_plus_instruction_length
             )
+        elif isinstance(MA_pipeline_register, MemoryAccessPipelineRegister):
+            pc_plus_imm_or_pc_plus_instruction_length_or_ALU_result = (
+                MA_pipeline_register.result
+                if MA_pipeline_register.control_unit_signals.alu_to_pc
+                else None
+            )
+
         else:
             pc_plus_imm_or_pc_plus_instruction_length_or_ALU_result = None
 

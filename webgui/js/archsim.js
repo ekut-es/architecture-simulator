@@ -346,6 +346,7 @@ const archsim_js = {
         mnemonic = parameters.get("mnemonic");
         instruction = parameters.get("instruction");
         address_of_instruction = parameters.get("address_of_instruction");
+        pc = parameters.get("PC");
         pc_plus_instruction_length = parameters.get(
             "pc_plus_instruction_length"
         );
@@ -364,34 +365,14 @@ const archsim_js = {
         }
 
         // Updates the Read Adress in the instr memory, it is a value if the reset is not pressed, otherwise undefined
-        if (address_of_instruction != "reset") {
-            set_svg_text_complex_left_align(
-                "InstructionReadAddressText",
-                address_of_instruction
-            );
-        } else {
-            set_svg_text_complex_left_align(
-                "InstructionReadAddressText",
-                undefined
-            );
-        }
+        set_svg_text_complex_left_align(
+            "InstructionReadAddressText",
+            address_of_instruction
+        );
 
         // Updates the PC value:
-        // If the PC is not undefined and there is no reset, update normally and save current pc in previous_pc
-        // If there is a reset, set the PC to 0
-        // Else set the PC to the previous PC. This way there is ALWAYS something in PC
-        if (
-            address_of_instruction != undefined &&
-            address_of_instruction != "reset" &&
-            address_of_instruction != "flush"
-        ) {
-            set_svg_text_complex_middle_align("PC", address_of_instruction);
-            previous_pc = address_of_instruction;
-        } else if (address_of_instruction == "flush") {
-            set_svg_text_complex_middle_align("PC", previous_pc);
-        } else if (address_of_instruction == "reset") {
-            set_svg_text_complex_middle_align("PC", 0);
-        }
+        set_svg_text_complex_middle_align("PC", previous_pc);
+        previous_pc = pc;
         if (Number.isInteger(address_of_instruction)) {
             set_svg_colour("FetchPCOut", "blue");
         } else {
@@ -705,7 +686,6 @@ const archsim_js = {
      * @param control_unit_signals - The control unit signals
      */
     update_MA_Stage: function (parameters, control_unit_signals) {
-        console.log(parameters);
         mnemonic = parameters.get("mnemonic");
         memory_address = parameters.get("memory_address");
         result = parameters.get("result");
@@ -1059,6 +1039,7 @@ async function evaluatePython_reset_sim(pipeline_mode) {
     let pyodide = await pyodideReadyPromise;
     stop_loading_animation();
     try {
+        previous_pc = 0; // resets the PC for the visualization
         reset_sim = pyodide.globals.get("reset_sim");
         reset_sim();
         output.value = "";
@@ -1078,6 +1059,10 @@ async function evaluatePython_update_tables() {
     try {
         update_tables = pyodide.globals.get("update_tables");
         update_tables();
+        /*let output = update_tables();
+        var table = document.getElementById("gui_cmd_table_id");
+        var rows = table.rows;
+        rows[0].classList.add("highlight");*/
     } catch (err) {
         addToOutput(err);
     }
