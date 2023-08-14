@@ -716,6 +716,26 @@ fibonacci:
         test2: .byte 0
         """
 
+        program6 = """.data
+        test: .byte 0
+        """
+
+        program7 = """.data
+        test: .byte 0
+        .text
+        """
+
+        program8 = """.text
+        addi x1, x1, 1
+        addi x2, x2, 2
+        """
+
+        program9 = """.text
+        addi x1, x1, 1
+        addi x2, x2, 2
+        .data
+        """
+
         parser = RiscvParser()
         state = RiscvArchitecturalState()
         parser.parse(program, state)
@@ -735,6 +755,22 @@ fibonacci:
         parser = RiscvParser()
         with self.assertRaises(ParserDirectiveException) as cm:
             parser.parse(program5, state)
+
+        parser = RiscvParser()
+        state = RiscvArchitecturalState()
+        parser.parse(program6, state)
+
+        parser = RiscvParser()
+        state = RiscvArchitecturalState()
+        parser.parse(program7, state)
+
+        parser = RiscvParser()
+        state = RiscvArchitecturalState()
+        parser.parse(program8, state)
+
+        parser = RiscvParser()
+        state = RiscvArchitecturalState()
+        parser.parse(program9, state)
 
     def test_data_segment(self):
         parser = RiscvParser()
