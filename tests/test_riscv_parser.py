@@ -877,7 +877,7 @@ fibonacci:
         state = RiscvArchitecturalState()
         parser.parse(program, state)
         simulation = RiscvSimulation(state=state)
-        simulation.run_simulation()
+        simulation.run()
 
         self.assertEqual(
             state.register_file.registers[1],
@@ -1326,7 +1326,7 @@ fibonacci:
         )
 
         simulation = RiscvSimulation(state=state)
-        simulation.run_simulation()
+        simulation.run()
 
         self.assertEqual(
             state.memory.read_byte(state.memory.min_bytes),
