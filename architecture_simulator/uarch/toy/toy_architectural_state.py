@@ -18,6 +18,7 @@ class ToyArchitecturalState:
         self.program_counter = MutableUInt16(
             instruction_memory_range.start if instruction_memory_range else 0
         )
+        self.previous_program_counter: Optional[MutableUInt16] = None
         self.accu = MutableUInt16(0)
         self.instruction_memory = InstructionMemory[ToyInstruction](
             address_range=(
@@ -33,7 +34,17 @@ class ToyArchitecturalState:
 
     def increment_pc(self):
         """Increment program counter by 1."""
+        self.previous_program_counter = MutableUInt16(int(self.program_counter))
         self.program_counter += MutableUInt16(1)
+
+    def set_pc(self, address: MutableUInt16):
+        """Sets the program counter to the specified address.
+
+        Args:
+            address (MutableUInt16): Address for the program counter.
+        """
+        self.previous_program_counter = MutableUInt16(int(self.program_counter))
+        self.program_counter = MutableUInt16(int(address))
 
     def instruction_at_pc(self) -> bool:
         """Return whether there is an instruction in the instruction memory at the current program counter.
