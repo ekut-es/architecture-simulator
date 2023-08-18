@@ -4,7 +4,7 @@ from typing import Optional
 from .toy_memory import ToyMemory
 from ..instruction_memory import InstructionMemory
 from architecture_simulator.isa.toy.toy_instructions import ToyInstruction
-from ..performance_metrics import PerformanceMetrics
+from .toy_performance_metrics import ToyPerformanceMetrics
 
 
 class ToyArchitecturalState:
@@ -30,7 +30,7 @@ class ToyArchitecturalState:
                 data_memory_range if data_memory_range else range(1024, 4096)
             )
         )
-        self.performance_metrics = PerformanceMetrics()
+        self.performance_metrics = ToyPerformanceMetrics()
 
     def increment_pc(self):
         """Increment program counter by 1."""

@@ -8,7 +8,9 @@ from architecture_simulator.isa.toy.toy_parser import ToyParser
 from .simulation import Simulation
 
 if TYPE_CHECKING:
-    from architecture_simulator.uarch.performance_metrics import PerformanceMetrics
+    from architecture_simulator.uarch.toy.toy_performance_metrics import (
+        ToyPerformanceMetrics,
+    )
 
 
 class ToySimulation(Simulation):
@@ -28,7 +30,6 @@ class ToySimulation(Simulation):
                 int(self.state.program_counter)
             ).behavior(self.state)
             self.state.performance_metrics.instruction_count += 1
-            self.state.performance_metrics.cycles += 1
         return not self.is_done()
 
     def is_done(self) -> bool:
@@ -51,5 +52,5 @@ class ToySimulation(Simulation):
     def has_instructions(self) -> bool:
         return bool(self.state.instruction_memory)
 
-    def get_performance_metrics(self) -> PerformanceMetrics:
+    def get_performance_metrics(self) -> ToyPerformanceMetrics:
         return self.state.performance_metrics
