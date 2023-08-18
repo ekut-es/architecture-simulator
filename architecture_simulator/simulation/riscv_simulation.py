@@ -8,7 +8,9 @@ from architecture_simulator.isa.riscv.riscv_parser import RiscvParser
 from .simulation import Simulation
 
 if TYPE_CHECKING:
-    from architecture_simulator.uarch.performance_metrics import PerformanceMetrics
+    from architecture_simulator.uarch.riscv.riscv_performance_metrics import (
+        RiscvPerformanceMetrics,
+    )
 
 
 class RiscvSimulation(Simulation):
@@ -67,5 +69,5 @@ class RiscvSimulation(Simulation):
     def has_instructions(self) -> bool:
         return bool(self.state.instruction_memory)
 
-    def get_performance_metrics(self) -> PerformanceMetrics:
+    def get_performance_metrics(self) -> RiscvPerformanceMetrics:
         return self.state.performance_metrics

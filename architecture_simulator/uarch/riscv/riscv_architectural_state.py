@@ -1,6 +1,6 @@
 from typing import Optional
 
-from ..performance_metrics import PerformanceMetrics
+from .riscv_performance_metrics import RiscvPerformanceMetrics
 from .register_file import RegisterFile
 from ..memory import Memory
 from ..instruction_memory import InstructionMemory
@@ -47,7 +47,7 @@ class RiscvArchitecturalState:
         self.register_file = RegisterFile() if register_file is None else register_file
         self.csr_registers = CsrRegisterFile()
         self.program_counter = 0
-        self.performance_metrics = PerformanceMetrics()
+        self.performance_metrics = RiscvPerformanceMetrics()
 
     def change_privilege_level(self, level: int):
         if not level < 0 and not level > 3:
