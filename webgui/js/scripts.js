@@ -197,8 +197,9 @@ window.addEventListener("DOMContentLoaded", function () {
             document.getElementById("button_tab_visualization").textContent =
                 "Visualization";
 
-            document.getElementById("button_HazardDetection").checked = true;
-            hazard_detection = true;
+            if (!document.getElementById("button_HazardDetection").checked) {
+                document.getElementById("button_HazardDetection").click();
+            }
             document.getElementById("button_HazardDetection").disabled = true;
         });
 
@@ -213,8 +214,6 @@ window.addEventListener("DOMContentLoaded", function () {
         document.getElementById("button_tab_visualization").style.display =
             "block";
 
-        document.getElementById("button_HazardDetection").title =
-            "disable hazard detection";
         document.getElementById("button_HazardDetection").disabled = false;
     });
 
