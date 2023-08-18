@@ -38,6 +38,9 @@ const archsim_js = {
     get_pipeline_mode: function () {
         return pipeline_mode;
     },
+    get_hazard_detection: function () {
+        return hazard_detection;
+    },
     /**
      * Appends one row to the register table.
      *

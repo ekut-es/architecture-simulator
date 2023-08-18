@@ -135,7 +135,10 @@ def reset_sim() -> Simulation:
     isa = archsim_js.get_selected_isa()
     if isa == "riscv":
         pipeline_mode = archsim_js.get_pipeline_mode()
-        simulation = RiscvSimulation(mode=pipeline_mode)
+        hazard_detection = archsim_js.get_hazard_detection()
+        simulation = RiscvSimulation(
+            mode=pipeline_mode, detect_data_hazards=hazard_detection
+        )
     elif isa == "toy":
         simulation = ToySimulation()
     update_ui()

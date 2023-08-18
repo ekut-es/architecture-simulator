@@ -177,6 +177,7 @@
                     <div
                         class="flex-grow container-fluid bg-transparent overflow-hidden m-0 p-0"
                     >
+                        <!--Main Tab-->
                         <div id="MainContent" class="tabcontent">
                             <div
                                 id="gui_base_div_id"
@@ -339,6 +340,8 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!--Visualization Tab-->
                         <div
                             id="VisualizationTabContent"
                             class="tabcontent"
@@ -560,7 +563,7 @@
                     </div>
                 </main>
             </div>
-            <dialog id="webapp_dialog_AppHelpID"></dialog>
+
             <!--Settings Modal-->
             <div
                 class="modal fade"
@@ -620,7 +623,8 @@
                                 </div>
                                 <div class="row">
                                     <div
-                                        class="modal_header_switch_representation h5 mt-2"
+                                        id="modal_header_switch_representation"
+                                        class="h5 mt-2"
                                     >
                                         Representation Mode
                                     </div>
@@ -792,6 +796,23 @@
                                                     autocomplete="off"
                                                 />
                                                 5-Stage
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input
+                                                class="form-check-input"
+                                                type="checkbox"
+                                                id="button_HazardDetection"
+                                                title="disable hazard detection"
+                                                checked
+                                                disabled
+                                            />
+                                            <label
+                                                class="form-check-label"
+                                                type="checkbox"
+                                                for="button_HazardDetection"
+                                            >
+                                                Hazard Detection
                                             </label>
                                         </div>
                                     </div>
