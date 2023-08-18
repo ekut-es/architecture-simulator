@@ -11,9 +11,10 @@ from architecture_simulator.uarch.riscv.pipeline import (
 )
 from architecture_simulator.isa.riscv.instruction_types import EmptyInstruction
 from architecture_simulator.isa.parser_exceptions import ParserException
-from fixedint import MutableInt16
 from abc import ABC, abstractmethod
 import os.path
+from prompt_toolkit.history import InMemoryHistory
+from prompt_toolkit import PromptSession
 
 logo = """==========================================================================================
   _____  _____  _____  _____   __      __   _____ _                 _       _
@@ -94,10 +95,18 @@ def main():
     ]
     list_of_command_names = [cmd.get_name() for cmd in list_of_commands]
     stop_flag = False
+
+    history = (
+        InMemoryHistory()
+    )  # enables use of arrow keys, to see previously entered commands
+    session = PromptSession(
+        history=history, completer=LoadCommandCompleter()
+    )  # LoadCommandCompleter provides auto completion for the file path in the load command
+
     while True:
         read_command = []
         try:
-            read_command = input(">>>").strip().lower().split()
+            read_command = session.prompt(">>>").strip().lower().split()
         except KeyboardInterrupt:
             break
         if len(read_command) == 0:
@@ -770,4 +779,44 @@ class ExitCommand(Command):
         return CommandResult(output, None, stop)
 
 
-main()
+from prompt_toolkit import PromptSession
+from prompt_toolkit.completion import Completer, Completion, PathCompleter
+from prompt_toolkit.document import Document
+
+
+class LoadCommandCompleter(Completer):
+    """
+    Implements a Completer, that provides file path completion for the load command.
+    """
+
+    def get_completions(self, document, complete_event):
+        if (
+            document.text
+            and document.text.startswith("load ")
+            and len(document.text.split()) <= 2
+            and not (len(document.text.split()) == 2 and document.text.endswith(" "))
+        ):
+            prefix = ""
+            if len(document.text.split()) == 2:
+                prefix = document.text.split()[1]
+            completions = []
+            for suggestion in self.generate_suggestions(prefix):
+                completions.append(Completion(suggestion, start_position=-len(prefix)))
+            return completions  # Return the list of completions
+        else:
+            return []  # Return an empty list if conditions are not met
+
+    def generate_suggestions(self, prefix):
+        # Generate suggestions using the PathCompleter and the prefix.
+        if prefix == "":
+            prefix = os.path.expanduser("~")
+        path_completer = PathCompleter()
+        for completion in path_completer.get_completions(
+            Document(prefix), complete_event=None
+        ):
+            suggestion = prefix + completion.text
+            yield suggestion
+
+
+if __name__ == "__main__":
+    main()
