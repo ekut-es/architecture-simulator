@@ -12,6 +12,8 @@ const parse_sim_after_not_typing_for_n_ms = 500;
 
 var input_timer;
 
+let hazard_detection = true;
+
 let selected_isa = "riscv";
 
 let reg_representation_mode = decimal_representation; //change this to set another default repr.
@@ -170,7 +172,6 @@ window.addEventListener("DOMContentLoaded", function () {
             evaluatePython_update_tables();
         });
 
-    // pipeline mode button listeners
     document
         .getElementById("mem_button_signed_decimal_representation_id")
         .addEventListener("click", () => {
@@ -178,6 +179,7 @@ window.addEventListener("DOMContentLoaded", function () {
             evaluatePython_update_tables();
         });
 
+    // pipeline mode button listeners
     document
         .getElementById("button_SingleStage")
         .addEventListener("click", () => {
@@ -194,6 +196,10 @@ window.addEventListener("DOMContentLoaded", function () {
             document.getElementById("MainContent").style.display = "block";
             document.getElementById("button_tab_visualization").textContent =
                 "Visualization";
+
+            document.getElementById("button_HazardDetection").checked = true;
+            hazard_detection = true;
+            document.getElementById("button_HazardDetection").disabled = true;
         });
 
     document.getElementById("button_5-Stage").addEventListener("click", () => {
@@ -203,9 +209,28 @@ window.addEventListener("DOMContentLoaded", function () {
             finished_typing,
             parse_sim_after_not_typing_for_n_ms
         );
+
         document.getElementById("button_tab_visualization").style.display =
             "block";
+
+        document.getElementById("button_HazardDetection").title =
+            "disable hazard detection";
+        document.getElementById("button_HazardDetection").disabled = false;
     });
+
+    // hazard detection button listener
+    document
+        .getElementById("button_HazardDetection")
+        .addEventListener("click", () => {
+            var button = document.getElementById("button_HazardDetection");
+            if (button.checked) {
+                hazard_detection = true;
+                button.title = "disable hazard detection";
+            } else {
+                hazard_detection = false;
+                button.title = "enable hazard detection";
+            }
+        });
 
     editor.on("change", function () {
         synchronizeEditors(editor, editor_vis);
@@ -451,6 +476,5 @@ function synchronizeEditors(sEditor, tEditor) {
     const content = sEditor.getValue();
     if (content !== tEditor.getValue()) {
         tEditor.setValue(content);
-        //sEditor.setValue("");
     }
 }
