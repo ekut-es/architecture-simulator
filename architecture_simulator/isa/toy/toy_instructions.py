@@ -156,7 +156,7 @@ class BRZ(AddressTypeInstruction):
         else:
             # NOTE: sets the pc to self.address without additionally increasing the program counter.
             # But I dont think this should cause any problems.
-            state.program_counter = MutableUInt16(self.address)
+            state.set_pc(MutableUInt16(self.address))
             state.performance_metrics.branch_count += 1
 
 

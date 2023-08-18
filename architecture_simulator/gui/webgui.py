@@ -199,7 +199,10 @@ def update_tables():
             simulation.state.instruction_memory.instructions.items(),
             key=lambda item: item[0],
         ):
-            archsim_js.update_instruction_table(hex(address), cmd.__repr__(), "")
+            stage = (
+                "Single" if address == simulation.state.previous_program_counter else ""
+            )
+            archsim_js.update_instruction_table(hex(address), cmd.__repr__(), stage)
 
         # memory table
         representations = simulation.state.data_memory.memory_repr()
