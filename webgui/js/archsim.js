@@ -315,12 +315,10 @@ const archsim_js = {
         table = document.getElementById("gui_cmd_table_id");
         table.rows[position + 1].cells[0].style.backgroundColor = "yellow";
         table.rows[position + 1].cells[1].style.backgroundColor = "yellow";
-        console.log(table.innerHTML);
 
         table2 = document.getElementById("vis_gui_cmd_table_id");
         table2.rows[position + 1].cells[0].style.backgroundColor = "yellow";
         table2.rows[position + 1].cells[1].style.backgroundColor = "yellow";
-        console.log(table2.innerHTML);
     },
     update_IF_Stage: function (instruction, address_of_instruction) {},
     update_ID_Stage: function (
@@ -375,15 +373,6 @@ async function main() {
     let pyodide = await loadPyodide();
     await pyodide.loadPackage("micropip");
     const micropip = pyodide.pyimport("micropip");
-    // FIXME: This stuff should probably not be printed any more.
-    console.log(window.location.protocol);
-    console.log(window.location.href);
-    console.log(window.location.origin);
-    console.log(window.location.hash);
-    console.log(window.location.host);
-    console.log(window.location.hostname);
-    console.log(window.location.pathname);
-    console.log(window.location.port);
     if (window.location.origin == "http://127.0.0.1:3000") {
         await micropip.install(
             window.location.origin +
@@ -495,12 +484,7 @@ async function evaluatePython_update_tables() {
     let pyodide = await pyodideReadyPromise;
     try {
         update_tables = pyodide.globals.get("update_tables");
-        let output = update_tables();
-        var table = document.getElementById("gui_cmd_table_id");
-        var rows = table.rows;
-        rows[0].classList.add("highlight");
-        console.log(rows[2].classList);
-        console.log(table.innerHTML);
+        update_tables();
     } catch (err) {
         addToOutput(err);
     }
