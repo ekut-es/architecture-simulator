@@ -19,6 +19,7 @@ from architecture_simulator.uarch.riscv.pipeline_registers import (
 from architecture_simulator.uarch.riscv.pipeline import InstructionExecutionException
 
 simulation: Optional[Simulation] = None
+first_refresh: bool = True
 
 
 @dataclass
