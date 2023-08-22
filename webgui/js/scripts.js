@@ -118,6 +118,7 @@ window.addEventListener("DOMContentLoaded", function () {
             }
             evaluatePython_step_sim();
         }
+        update_ui_async();
     }
 
     // select isa button listeners
@@ -275,6 +276,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
     function finished_typing() {
         evaluatePython_parse_input();
+        update_ui_async();
     }
 });
 // ask if you really wanna leave the site
