@@ -75,23 +75,25 @@ class TestToySimulation(unittest.TestCase):
 
     def test_program(self):
         simulation = ToySimulation()
-        program = """# computes the sum of the numbers from 1 to n
-# result gets saved in RAM[1025]
-Loopcount = $400
-Result = $401
-:$400:20 # enter n here
+        program = """    # computes the sum of the numbers from 1 to n
+    # result gets saved in MEM[1025]
+    Loopcount = $400
+    Result = $401
+    :$400:20 # enter n here
 
-loop:
-LDA Result
-ADD Loopcount
-STO Result
-LDA Loopcount
-DEC
-STO Loopcount
-BRZ end
-ZRO
-BRZ loop
-end:"""
+    LDA Loopcount # skip to the end if n=0
+    BRZ end
+    loop:
+        LDA Result
+        ADD Loopcount
+        STO Result
+        LDA Loopcount
+        DEC
+        STO Loopcount
+        BRZ end
+        ZRO
+        BRZ loop
+    end:"""
         simulation.load_program(program)
         simulation.run()
         self.assertEqual(simulation.state.data_memory.read_halfword(1025), 210)
