@@ -21,6 +21,7 @@ let mem_representation_mode = decimal_representation;
 
 var run;
 var is_run_simulation = false;
+var manual_run = false;
 var pipeline_mode = "single_stage_pipeline";
 window.addEventListener("DOMContentLoaded", function () {
     clearTimeout(input_timer);
@@ -32,6 +33,7 @@ window.addEventListener("DOMContentLoaded", function () {
         .getElementById("button_simulation_start_id")
         .addEventListener("click", () => {
             is_run_simulation = true;
+            manual_run = true;
             editor.save();
             //finished_typing(); FIXME: The input should get parsed after clicking the button in case the auto parsing wasn't triggered yet.
             // But this should only happen if the input has changed and not after the user has already started the simulation.
@@ -76,6 +78,7 @@ window.addEventListener("DOMContentLoaded", function () {
         .getElementById("button_simulation_next_id")
         .addEventListener("click", () => {
             is_run_simulation = false;
+            manual_run = true;
             editor.save();
             //finished_typing(); FIXME: The input should get parsed after clicking the button in case the auto parsing wasn't triggered yet.
             // But this should only happen if the input has changed and not after the user has already started the simulation.
@@ -93,6 +96,7 @@ window.addEventListener("DOMContentLoaded", function () {
         .getElementById("button_simulation_refresh_id")
         .addEventListener("click", () => {
             is_run_simulation = false;
+            manual_run = false;
             document.getElementById("input").disabled = true;
             document.getElementById("vis_input").disabled = true;
             clearInterval(run);
@@ -257,10 +261,12 @@ window.addEventListener("DOMContentLoaded", function () {
         editor_vis.closeHint();
         // autoparse
         clearTimeout(input_timer);
-        input_timer = setTimeout(
-            finished_typing,
-            parse_sim_after_not_typing_for_n_ms
-        );
+        if (!manual_run) {
+            input_timer = setTimeout(
+                finished_typing,
+                parse_sim_after_not_typing_for_n_ms
+            );
+        }
     });
 
     editor_vis.on("change", function () {
@@ -268,10 +274,12 @@ window.addEventListener("DOMContentLoaded", function () {
         editor_vis.save();
         // autoparse
         clearTimeout(input_timer);
-        input_timer = setTimeout(
-            finished_typing,
-            parse_sim_after_not_typing_for_n_ms
-        );
+        if (!manual_run) {
+            input_timer = setTimeout(
+                finished_typing,
+                parse_sim_after_not_typing_for_n_ms
+            );
+        }
     });
 
     function finished_typing() {
