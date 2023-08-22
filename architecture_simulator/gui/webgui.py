@@ -36,6 +36,8 @@ def sim_init() -> RiscvSimulation:
         RiscvSimulation: The new simulation.
     """
     global simulation
+    global first_refresh
+    first_refresh = True
     simulation = RiscvSimulation()
     update_ui()
     return simulation
@@ -62,7 +64,7 @@ def step_sim(program: str, is_run_simulation: bool) -> tuple[str, bool]:
     if not simulation.has_instructions():
         try:
             simulation.load_program(program)
-            archsim_js.set_output(" ")
+            # archsim_js.set_output(" ")
         except ParserException as Parser_Exception:
             archsim_js.set_output(Parser_Exception.__repr__())
 
@@ -157,6 +159,7 @@ def parse_input(instr: str):
         StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
     """
     global simulation
+    global first_refresh
     if simulation is None:
         raise StateNotInitializedError()
     # reset the whole simulation because there might be things like a data section that also modify the data memory
@@ -166,7 +169,9 @@ def parse_input(instr: str):
     try:
         simulation.load_program(instr)
         archsim_js.remove_all_highlights()
-        archsim_js.set_output(" ")
+        if not first_refresh:
+            archsim_js.set_output("TODO no error message")
+        first_refresh = False
     except ParserException as Parser_Exception:
         archsim_js.set_output(Parser_Exception.__repr__())
         archsim_js.highlight(
