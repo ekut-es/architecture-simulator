@@ -16,8 +16,8 @@ let hazard_detection = true;
 
 let selected_isa = "riscv";
 
-let reg_representation_mode = signed_decimal_representation; //change this to set another default repr.
-let mem_representation_mode = signed_decimal_representation;
+let reg_representation_mode = decimal_representation; //change this to set another default repr.
+let mem_representation_mode = decimal_representation;
 
 var run;
 var is_run_simulation = false;
@@ -37,28 +37,28 @@ window.addEventListener("DOMContentLoaded", function () {
 
     function play_button() {
         is_run_simulation = true;
-            manual_run = true;
-            editor.save();
-            //finished_typing(); FIXME: The input should get parsed after clicking the button in case the auto parsing wasn't triggered yet.
-            // But this should only happen if the input has changed and not after the user has already started the simulation.
-            document.getElementById("input").disabled = true; // I dont think this does anything. But codemirror provides a function "readOnly" that we could use.
-            document.getElementById("vis_input").disabled = true;
-            if (run) {
-                stop_loading_animation();
-                clearInterval(run);
-            }
-            start_loading_animation();
-            resume_timer();
-            if (use_more_than_one_step_per_10ms) {
-                run = setInterval(step_n_times, 1);
-            } else {
-                run = setInterval(evaluatePython_step_sim, 10);
-            }
-            disable_run();
-            enable_pause();
-            disable_step();
-            disable_pipeline_switch();
-            update_ui_async();
+        manual_run = true;
+        editor.save();
+        //finished_typing(); FIXME: The input should get parsed after clicking the button in case the auto parsing wasn't triggered yet.
+        // But this should only happen if the input has changed and not after the user has already started the simulation.
+        document.getElementById("input").disabled = true; // I dont think this does anything. But codemirror provides a function "readOnly" that we could use.
+        document.getElementById("vis_input").disabled = true;
+        if (run) {
+            stop_loading_animation();
+            clearInterval(run);
+        }
+        start_loading_animation();
+        resume_timer();
+        if (use_more_than_one_step_per_10ms) {
+            run = setInterval(step_n_times, 1);
+        } else {
+            run = setInterval(evaluatePython_step_sim, 10);
+        }
+        disable_run();
+        enable_pause();
+        disable_step();
+        disable_pipeline_switch();
+        update_ui_async();
     }
 
     document
@@ -69,17 +69,17 @@ window.addEventListener("DOMContentLoaded", function () {
 
     function pause_button() {
         update_ui_async();
-            is_run_simulation = false;
-            document.getElementById("input").disabled = true;
-            document.getElementById("vis_input").disabled = true;
-            stop_timer();
-            clearInterval(run);
-            update_performance_metrics();
-            enable_run();
-            disable_pause();
-            enable_step();
-            stop_loading_animation();
-            disable_pipeline_switch();
+        is_run_simulation = false;
+        document.getElementById("input").disabled = true;
+        document.getElementById("vis_input").disabled = true;
+        stop_timer();
+        clearInterval(run);
+        update_performance_metrics();
+        enable_run();
+        disable_pause();
+        enable_step();
+        stop_loading_animation();
+        disable_pipeline_switch();
     }
 
     document
