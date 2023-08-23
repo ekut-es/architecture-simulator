@@ -309,16 +309,22 @@ const archsim_js = {
     /**
      * Highlights one row in the instruction table.
      *
-     * @param {number} position - position of the instruction to be highlighted.
+     * @param {number} address - address of the instruction to highlight (which is not necessarily the same as the position in the table)
      */
-    highlight_cmd_table: function (position) {
+    highlight_cmd_table: function (address) {
         table = document.getElementById("gui_cmd_table_id");
-        table.rows[position + 1].cells[0].style.backgroundColor = "yellow";
-        table.rows[position + 1].cells[1].style.backgroundColor = "yellow";
+        position = 1;
+        for (; position < table.rows.length; position++) {
+            if (Number(table.rows[position].cells[0].innerHTML) == address) {
+                break;
+            }
+        }
+        table.rows[position].cells[0].style.backgroundColor = "yellow";
+        table.rows[position].cells[1].style.backgroundColor = "yellow";
 
         table2 = document.getElementById("vis_gui_cmd_table_id");
-        table2.rows[position + 1].cells[0].style.backgroundColor = "yellow";
-        table2.rows[position + 1].cells[1].style.backgroundColor = "yellow";
+        table2.rows[position].cells[0].style.backgroundColor = "yellow";
+        table2.rows[position].cells[1].style.backgroundColor = "yellow";
     },
     update_IF_Stage: function (instruction, address_of_instruction) {},
     update_ID_Stage: function (
