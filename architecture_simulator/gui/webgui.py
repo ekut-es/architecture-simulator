@@ -69,9 +69,8 @@ def step_sim(program: str) -> tuple[str, bool]:
         simulation_not_ended_flag = simulation.step()
         update_ui()
     except InstructionExecutionException as e:
-        archsim_js.highlight_cmd_table(
-            int(e.address / 4)
-        )  # FIXME: Needs to be changed if compressed instructions get implemented
+        archsim_js.highlight_cmd_table(e.address)
+        archsim_js.set_output(e.__repr__())
         simulation_not_ended_flag = False
 
     return (str(simulation.get_performance_metrics()), simulation_not_ended_flag)

@@ -1,6 +1,9 @@
 import unittest
 from architecture_simulator.simulation.toy_simulation import ToySimulation
 from architecture_simulator.isa.toy.toy_instructions import ADD, INC, STO, LDA
+from architecture_simulator.simulation.runtime_errors import (
+    InstructionExecutionException,
+)
 
 
 class TestToySimulation(unittest.TestCase):
@@ -119,3 +122,18 @@ INC"""
         self.assertEqual(simulation.state.accu, 2)
         self.assertEqual(simulation.state.data_memory.memory_file[1024], 1)
         self.assertEqual(simulation.state.data_memory.read_halfword(1024), 1)
+
+    def test_instruction_execution_exception(self):
+        simulation = ToySimulation()
+        simulation.load_program(
+            """INC
+                                DEC
+                                DEC
+                                LDA 0
+                                INC
+                                INC"""
+        )
+        with self.assertRaises(InstructionExecutionException) as cm:
+            simulation.run()
+        self.assertEqual(cm.exception.address, 3)
+        self.assertEqual(cm.exception.instruction_repr, "LDA $000")

@@ -6,6 +6,7 @@ from architecture_simulator.uarch.toy.toy_architectural_state import (
 )
 from architecture_simulator.isa.toy.toy_parser import ToyParser
 from .simulation import Simulation
+from .runtime_errors import InstructionExecutionException
 
 if TYPE_CHECKING:
     from architecture_simulator.uarch.toy.toy_performance_metrics import (
@@ -26,10 +27,19 @@ class ToySimulation(Simulation):
 
     def step(self):
         if not self.is_done():
-            self.state.instruction_memory.read_instruction(
-                int(self.state.program_counter)
-            ).behavior(self.state)
-            self.state.performance_metrics.instruction_count += 1
+            program_counter = self.state.program_counter
+            instruction = self.state.instruction_memory.read_instruction(
+                int(program_counter)
+            )
+            try:
+                instruction.behavior(self.state)
+                self.state.performance_metrics.instruction_count += 1
+            except Exception as e:
+                raise InstructionExecutionException(
+                    address=int(program_counter),
+                    instruction_repr=str(instruction),
+                    error_message=e.__repr__(),
+                )
         return not self.is_done()
 
     def is_done(self) -> bool:

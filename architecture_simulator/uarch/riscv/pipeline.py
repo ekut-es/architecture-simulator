@@ -1,6 +1,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from dataclasses import dataclass
+from architecture_simulator.simulation.runtime_errors import (
+    InstructionExecutionException,
+)
 
 from ...isa.riscv.instruction_types import EmptyInstruction
 
@@ -103,13 +105,3 @@ class Pipeline:
             bool: if the pipeline has finished
         """
         return self.is_empty() and not self.state.instruction_at_pc()
-
-
-@dataclass
-class InstructionExecutionException(RuntimeError):
-    address: int
-    instruction_repr: str
-    error_message: str
-
-    def __repr__(self):
-        return f"There was an error executing the instruction at address '{self.address}': '{self.instruction_repr}':\n{self.error_message}"
