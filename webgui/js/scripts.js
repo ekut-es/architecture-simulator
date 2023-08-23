@@ -147,6 +147,9 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             selected_isa = "riscv";
             refresh_button();
+            document.getElementById("HelpHeader").textContent = "RISC-V";
+            RiscvHelp.style.display = "block";
+            ToyHelp.style.display = "none";
         });
 
     document
@@ -154,6 +157,9 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             selected_isa = "toy";
             refresh_button();
+            document.getElementById("HelpHeader").textContent = "Toy";
+            RiscvHelp.style.display = "none";
+            ToyHelp.style.display = "block";
         });
 
     // register representation button listeners
