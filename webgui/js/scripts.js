@@ -32,84 +32,100 @@ window.addEventListener("DOMContentLoaded", function () {
     document
         .getElementById("button_simulation_start_id")
         .addEventListener("click", () => {
-            is_run_simulation = true;
-            manual_run = true;
-            editor.save();
-            //finished_typing(); FIXME: The input should get parsed after clicking the button in case the auto parsing wasn't triggered yet.
-            // But this should only happen if the input has changed and not after the user has already started the simulation.
-            document.getElementById("input").disabled = true; // I dont think this does anything. But codemirror provides a function "readOnly" that we could use.
-            document.getElementById("vis_input").disabled = true;
-            if (run) {
-                stop_loading_animation();
-                clearInterval(run);
-            }
-            start_loading_animation();
-            resume_timer();
-            if (use_more_than_one_step_per_10ms) {
-                run = setInterval(step_n_times, 1);
-            } else {
-                run = setInterval(evaluatePython_step_sim, 10);
-            }
-            disable_run();
-            enable_pause();
-            disable_step();
-            disable_pipeline_switch();
-            update_ui_async();
+            play_button();
         });
+
+    function play_button() {
+        is_run_simulation = true;
+        manual_run = true;
+        editor.save();
+        //finished_typing(); FIXME: The input should get parsed after clicking the button in case the auto parsing wasn't triggered yet.
+        // But this should only happen if the input has changed and not after the user has already started the simulation.
+        document.getElementById("input").disabled = true; // I dont think this does anything. But codemirror provides a function "readOnly" that we could use.
+        document.getElementById("vis_input").disabled = true;
+        if (run) {
+            stop_loading_animation();
+            clearInterval(run);
+        }
+        start_loading_animation();
+        resume_timer();
+        if (use_more_than_one_step_per_10ms) {
+            run = setInterval(step_n_times, 1);
+        } else {
+            run = setInterval(evaluatePython_step_sim, 10);
+        }
+        disable_run();
+        enable_pause();
+        disable_step();
+        disable_pipeline_switch();
+        update_ui_async();
+    }
 
     document
         .getElementById("button_simulation_pause_id")
         .addEventListener("click", () => {
-            update_ui_async();
-            is_run_simulation = false;
-            document.getElementById("input").disabled = true;
-            document.getElementById("vis_input").disabled = true;
-            stop_timer();
-            clearInterval(run);
-            update_performance_metrics();
-            enable_run();
-            disable_pause();
-            enable_step();
-            stop_loading_animation();
-            disable_pipeline_switch();
+            pause_button();
         });
+
+    function pause_button() {
+        update_ui_async();
+        is_run_simulation = false;
+        document.getElementById("input").disabled = true;
+        document.getElementById("vis_input").disabled = true;
+        stop_timer();
+        clearInterval(run);
+        update_performance_metrics();
+        enable_run();
+        disable_pause();
+        enable_step();
+        stop_loading_animation();
+        disable_pipeline_switch();
+    }
 
     document
         .getElementById("button_simulation_next_id")
         .addEventListener("click", () => {
-            is_run_simulation = false;
-            manual_run = true;
-            editor.save();
-            //finished_typing(); FIXME: The input should get parsed after clicking the button in case the auto parsing wasn't triggered yet.
-            // But this should only happen if the input has changed and not after the user has already started the simulation.
-            document.getElementById("input").disabled = true;
-            document.getElementById("vis_input").disabled = true;
-            evaluatePython_step_sim();
-            update_performance_metrics();
-            enable_run();
-            disable_pause();
-            enable_step();
-            disable_pipeline_switch();
+            next_button();
         });
+
+    function next_button() {
+        is_run_simulation = false;
+        manual_run = true;
+        editor.save();
+        //finished_typing(); FIXME: The input should get parsed after clicking the button in case the auto parsing wasn't triggered yet.
+        // But this should only happen if the input has changed and not after the user has already started the simulation.
+        document.getElementById("input").disabled = true;
+        document.getElementById("vis_input").disabled = true;
+        evaluatePython_step_sim();
+        update_performance_metrics();
+        enable_run();
+        disable_pause();
+        enable_step();
+        disable_pipeline_switch();
+    }
 
     document
         .getElementById("button_simulation_refresh_id")
         .addEventListener("click", () => {
-            is_run_simulation = false;
-            manual_run = false;
-            document.getElementById("input").disabled = true;
-            document.getElementById("vis_input").disabled = true;
-            clearInterval(run);
-            evaluatePython_reset_sim();
-            document.getElementById("input").disabled = false;
-            document.getElementById("input").disabled = false;
-            enable_run();
-            disable_pause();
-            enable_step();
-            enable_pipeline_switch();
-            clearTimeout(input_timer);
-            finished_typing();
+            refresh_button();
         });
+
+    function refresh_button() {
+        is_run_simulation = false;
+        manual_run = false;
+        document.getElementById("input").disabled = true;
+        document.getElementById("vis_input").disabled = true;
+        clearInterval(run);
+        evaluatePython_reset_sim();
+        document.getElementById("input").disabled = false;
+        document.getElementById("input").disabled = false;
+        enable_run();
+        disable_pause();
+        enable_step();
+        enable_pipeline_switch();
+        clearTimeout(input_timer);
+        finished_typing();
+    }
 
     function step_n_times() {
         let startTime = performance.now(); // get the start time
@@ -130,12 +146,14 @@ window.addEventListener("DOMContentLoaded", function () {
         .getElementById("isa_button_riscv_id")
         .addEventListener("click", () => {
             selected_isa = "riscv";
+            refresh_button();
         });
 
     document
         .getElementById("isa_button_toy_id")
         .addEventListener("click", () => {
             selected_isa = "toy";
+            refresh_button();
         });
 
     // register representation button listeners
