@@ -22,7 +22,7 @@ def update_EX_Stage(
     parameters,
     control_unit_signals,
 ) -> None: ...
-def update_MA_Stage(
+def update_MEM_Stage(
     parameters,
     control_unit_signals,
 ) -> None: ...

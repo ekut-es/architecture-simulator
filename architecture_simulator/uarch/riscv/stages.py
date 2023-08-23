@@ -232,7 +232,7 @@ class MemoryAccessStage(Stage):
         index_of_own_input_register: int,
         state: RiscvArchitecturalState,
     ) -> PipelineRegister:
-        """behavior of MA stage
+        """behavior of MEM stage
         Should the pipeline_register not be ExecutePipelineRegister it returns an MemoryAccessPipelineRegister
         with default values
 
@@ -242,7 +242,7 @@ class MemoryAccessStage(Stage):
 
         Returns:
             PipelineRegister: returns MemoryAccessPipelineRegister with all necessary information produced or
-            used in the MA stage, as well as all controll signals
+            used in the MEM stage, as well as all controll signals
         """
         pipeline_register = pipeline_registers[index_of_own_input_register]
 

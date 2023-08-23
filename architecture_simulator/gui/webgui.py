@@ -65,13 +65,12 @@ def step_sim(program: str, is_run_simulation: bool) -> tuple[str, bool]:
     if not simulation.has_instructions():
         try:
             simulation.load_program(program)
-            # archsim_js.set_output(" ")
         except ParserException as Parser_Exception:
             archsim_js.set_output(Parser_Exception.__repr__())
 
     # step the simulation
     try:
-        simulation_ended_flag = simulation.step_simulation()
+        simulation_not_ended_flag = simulation.step()
         if not is_run_simulation:
             update_ui()
     except InstructionExecutionException as e:
@@ -79,7 +78,7 @@ def step_sim(program: str, is_run_simulation: bool) -> tuple[str, bool]:
         archsim_js.set_output(e.__repr__())
         simulation_not_ended_flag = False
 
-    return (str(simulation.get_performance_metrics()), simulation_ended_flag)
+    return (str(simulation.get_performance_metrics()), simulation_not_ended_flag)
 
 
 def resume_timer():
@@ -133,7 +132,6 @@ def reset_sim() -> Simulation:
     Returns:
         Simulation: The new simulation.
     """
-    # FIXME: Why do we check if the simulation is None? Isn't this pretty much the same as sim_init()?
     global simulation
     if simulation is None:
         raise StateNotInitializedError()
@@ -181,22 +179,19 @@ def parse_input(instr: str):
     update_ui()
 
 
-# FIXME: update_tables() does not only update tables. Put this stuff into their own functions and then make update_ui() call them all individually.
 def update_ui():
     """Updates all UI elements based on the current simulation and architectural state."""
     update_tables()
     update_IF_Stage()
     update_ID_Stage()
     update_EX_Stage()
-    update_MA_Stage()
+    update_MEM_Stage()
     update_WB_Stage()
     update_visualization()
-    # update_performance_metrics()
 
 
-# FIXME: this function is way too long. See the suggested fixes above and below.
 def update_tables():
-    """Updates the tables (instructions, registers and memory). Also updates the visualization.
+    """Updates the tables (instructions, registers and memory).
 
     Raises:
         StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
@@ -209,6 +204,7 @@ def update_tables():
     archsim_js.clear_register_table()
     archsim_js.clear_memory_table()
     archsim_js.clear_instruction_table()
+
     if isinstance(simulation, ToySimulation):
         # register table
         accu_representation = simulation.state.get_accu_representation()
@@ -243,7 +239,6 @@ def update_tables():
             archsim_js.update_register_table(reg_i, reg_val, reg_abi)  # int(reg_val)
 
         # memory table
-
         representations = simulation.state.memory.memory_wordwise_repr()
         for address, address_value in sorted(
             representations.items(),
@@ -259,7 +254,7 @@ def update_tables():
                 pipeline_stages_addresses[
                     pipeline_register.address_of_instruction
                 ] = pipeline_register
-        
+
         # display names for the stages
         stage_mapping = {
             PipelineRegister: "Single",
@@ -287,16 +282,22 @@ def update_tables():
 
 
 def update_IF_Stage():
+    """
+    Updates the IF Stage of the visualization and all elements withing this stage.
+    To do this, the archsim.js function update_IF_Stage is called with all relevant arguments.
+
+    Raises:
+        StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
+    """
     global simulation
     if simulation is None:
         raise StateNotInitializedError()
 
-    """Update IF Stage:
-    Updates the IF Stage of the visualization and all elements withing this Stage.
-    To do this the archsim.js function update_IF_Stage is called with all relevant arguments.
-    """
+    if not isinstance(simulation, RiscvSimulation):
+        return
+
     try:
-        IF_pipeline_register = simulation.pipeline.pipeline_registers[0]
+        IF_pipeline_register = simulation.state.pipeline.pipeline_registers[0]
         # parameters = vars(IF_pipeline_register)
         if isinstance(IF_pipeline_register, InstructionFetchPipelineRegister):
             parameters = {
@@ -322,15 +323,22 @@ def update_IF_Stage():
 
 
 def update_ID_Stage():
+    """
+    Updates the ID Stage of the visualization and all elements withing this stage.
+    To do this, the archsim.js function update_ID_Stage is called with all relevant arguments.
+
+    Raises:
+        StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
+    """
     global simulation
     if simulation is None:
         raise StateNotInitializedError()
-    """Update ID Stage:
-    Updates the ID Stage of the visualization and all elements withing this Stage.
-    To do this the archsim.js function update_ID_Stage is called with all relevant arguments.
-    """
+
+    if not isinstance(simulation, RiscvSimulation):
+        return
+
     try:
-        ID_pipeline_register = simulation.pipeline.pipeline_registers[1]
+        ID_pipeline_register = simulation.state.pipeline.pipeline_registers[1]
         if isinstance(ID_pipeline_register, InstructionDecodePipelineRegister):
             control_unit_signals = vars(ID_pipeline_register.control_unit_signals)
             parameters = vars(ID_pipeline_register)
@@ -357,15 +365,22 @@ def update_ID_Stage():
 
 
 def update_EX_Stage():
+    """
+    Updates the EX Stage of the visualization and all elements withing this stage.
+    To do this, the archsim.js function update_EX_Stage is called with all relevant arguments.
+
+    Raises:
+    StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
+    """
     global simulation
     if simulation is None:
         raise StateNotInitializedError()
-    """Update EX Stage:
-        Updates the EX Stage of the visualization and all elements withing this Stage.
-        To do this the archsim.js function update_EX_Stage is called with all relevant arguments.
-        """
+
+    if not isinstance(simulation, RiscvSimulation):
+        return
+
     try:
-        EX_pipeline_register = simulation.pipeline.pipeline_registers[2]
+        EX_pipeline_register = simulation.state.pipeline.pipeline_registers[2]
         if isinstance(EX_pipeline_register, ExecutePipelineRegister):
             control_unit_signals = vars(EX_pipeline_register.control_unit_signals)
             parameters = vars(EX_pipeline_register)
@@ -385,34 +400,41 @@ def update_EX_Stage():
         ...
 
 
-def update_MA_Stage():
+def update_MEM_Stage():
+    """
+    Updates the MEM Stage of the visualization and all elements withing this stage.
+    To do this, the archsim.js function update_MEM_Stage is called with all relevant arguments.
+
+    Raises:
+    StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
+    """
     global simulation
     if simulation is None:
         raise StateNotInitializedError()
-    """Update MEM Stage:
-        Updates the MEM Stage of the visualization and all elements withing this Stage.
-        To do this the archsim.js function update_MA_Stage is called with all relevant arguments.
-        """
+
+    if not isinstance(simulation, RiscvSimulation):
+        return
+
     try:
-        MA_pipeline_register = simulation.pipeline.pipeline_registers[3]
-        if isinstance(MA_pipeline_register, MemoryAccessPipelineRegister):
-            control_unit_signals = vars(MA_pipeline_register.control_unit_signals)
-            parameters = vars(MA_pipeline_register)
-            parameters["mnemonic"] = MA_pipeline_register.instruction.mnemonic
+        MEM_pipeline_register = simulation.state.pipeline.pipeline_registers[3]
+        if isinstance(MEM_pipeline_register, MemoryAccessPipelineRegister):
+            control_unit_signals = vars(MEM_pipeline_register.control_unit_signals)
+            parameters = vars(MEM_pipeline_register)
+            parameters["mnemonic"] = MEM_pipeline_register.instruction.mnemonic
             parameters_js = pyodide.ffi.to_js(parameters)
             control_unit_signals_js = pyodide.ffi.to_js(control_unit_signals)
-            archsim_js.update_MA_Stage(
+            archsim_js.update_MEM_Stage(
                 parameters_js,
                 control_unit_signals_js,
             )
         # this case only applies if the Pipeline Register is flushed or reset
-        elif isinstance(MA_pipeline_register, PipelineRegister):
-            parameters = vars(MA_pipeline_register)
+        elif isinstance(MEM_pipeline_register, PipelineRegister):
+            parameters = vars(MEM_pipeline_register)
             control_unit_signals = dict()
-            parameters["mnemonic"] = MA_pipeline_register.instruction.mnemonic
+            parameters["mnemonic"] = MEM_pipeline_register.instruction.mnemonic
             parameters_js = pyodide.ffi.to_js(parameters)
             control_unit_signals_js = pyodide.ffi.to_js(control_unit_signals)
-            archsim_js.update_MA_Stage(
+            archsim_js.update_MEM_Stage(
                 parameters_js,
                 control_unit_signals_js,
             )
@@ -421,13 +443,20 @@ def update_MA_Stage():
 
 
 def update_WB_Stage():
+    """Update WB Stage:
+    Updates the WB Stage of the visualization and all elements withing this stage.
+    To do this, the archsim.js function update_WB_Stage is called with all relevant arguments.
+
+    Raises:
+    StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
+    """
     global simulation
     if simulation is None:
         raise StateNotInitializedError()
-    """Update WB Stage:
-        Updates the WB Stage of the visualization and all elements withing this Stage.
-        To do this the archsim.js function update_WB_Stage is called with all relevant arguments.
-        """
+
+    if not isinstance(simulation, RiscvSimulation):
+        return
+
     try:
         WB_pipeline_register = simulation.pipeline.pipeline_registers[4]
         if isinstance(WB_pipeline_register, RegisterWritebackPipelineRegister):
@@ -459,8 +488,11 @@ def update_visualization():
     global simulation
     if simulation is None:
         raise StateNotInitializedError()
-    """Update visualization:
-        Updates the Elements of the visualization which need information from more than one stage.
+    """
+        Updates visualization elements that need information from more than one stage.
+
+        Raises:
+        StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
         """
     if len(simulation.pipeline.pipeline_registers) > 1:
         IF_pipeline_register = simulation.pipeline.pipeline_registers[0]
@@ -505,12 +537,3 @@ def update_visualization():
             pc_plus_imm_or_pc_plus_instruction_length,
             pc_plus_imm_or_pc_plus_instruction_length_or_ALU_result,
         )
-
-
-# #actual comment: output = performance metric repr but if parser produces error, overwrite output with error
-# def update_output():
-#     global simulation
-#     if simulation is None:
-#         raise RuntimeError("state has not been initialized.")
-
-#     archsim_js.update_output(simulation.state.performance_metrics.__repr__())

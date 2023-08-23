@@ -666,9 +666,9 @@ const archsim_js = {
             set_svg_colour("AluControl", "black");
         }
     },
-    /**Update MA Stage:
+    /**Update MEM Stage:
      *
-     * Updates all Elements located in the MA Stage of the Visualization
+     * Updates all Elements located in the MEM Stage of the Visualization
      *
      * Parameters:
      * @param mnemonic - The mnemonic value of the instr currently in the EX Stage
@@ -685,7 +685,7 @@ const archsim_js = {
      * @param imm - The imm of the instr
      * @param control_unit_signals - The control unit signals
      */
-    update_MA_Stage: function (parameters, control_unit_signals) {
+    update_MEM_Stage: function (parameters, control_unit_signals) {
         mnemonic = parameters.get("mnemonic");
         memory_address = parameters.get("memory_address");
         result = parameters.get("result");
