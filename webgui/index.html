@@ -73,6 +73,9 @@
                                         id="webapp_header_help_image_id"
                                         src="svg/WEB_APP_BASIC_Help.svg"
                                         class="mr-3"
+                                        title="help"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#helpModal"
                                         width="35px"
                                         height="35px"
                                     />
@@ -564,7 +567,44 @@
                     </div>
                 </main>
             </div>
-
+            <!--Help Modal-->
+            <div
+                class="modal fade"
+                id="helpModal"
+                tabindex="-1"
+                role="dialog"
+                aria-labelledby="helpModalLabel"
+                aria-hidden="true"
+            >
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5
+                                class="modal-title h2 text-light"
+                                id="HelpModalLabel"
+                            >
+                                <img
+                                    id="webapp_header_help_image_id"
+                                    src="svg/WEB_APP_BASIC_Help.svg"
+                                    width="35px"
+                                    height="35px"
+                                />
+                            </h5>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal"
+                            >
+                                close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!--Settings Modal-->
             <div
                 class="modal fade"
