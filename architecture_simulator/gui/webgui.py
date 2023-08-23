@@ -485,48 +485,52 @@ def update_WB_Stage():
 
 
 def update_visualization():
+    """
+    Updates visualization elements that need information from more than one stage.
+
+    Raises:
+    StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
+    """
     global simulation
     if simulation is None:
         raise StateNotInitializedError()
-    """
-        Updates visualization elements that need information from more than one stage.
 
-        Raises:
-        StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
-        """
-    if len(simulation.pipeline.pipeline_registers) > 1:
-        IF_pipeline_register = simulation.pipeline.pipeline_registers[0]
-        MA_pipeline_register = simulation.pipeline.pipeline_registers[3]
+    if not isinstance(simulation, RiscvSimulation):
+        return
+
+    if len(simulation.state.pipeline.pipeline_registers) > 1:
+        IF_pipeline_register = simulation.state.pipeline.pipeline_registers[0]
+        MEM_pipeline_register = simulation.state.pipeline.pipeline_registers[3]
         if isinstance(
             IF_pipeline_register, InstructionFetchPipelineRegister
-        ) and isinstance(MA_pipeline_register, MemoryAccessPipelineRegister):
+        ) and isinstance(MEM_pipeline_register, MemoryAccessPipelineRegister):
             pc_plus_imm_or_pc_plus_instruction_length = (
-                MA_pipeline_register.pc_plus_imm
-                if MA_pipeline_register.comparison_or_jump
+                MEM_pipeline_register.pc_plus_imm
+                if MEM_pipeline_register.comparison_or_jump
                 else IF_pipeline_register.pc_plus_instruction_length
             )
         elif isinstance(IF_pipeline_register, PipelineRegister) and isinstance(
-            MA_pipeline_register, MemoryAccessPipelineRegister
+            MEM_pipeline_register, MemoryAccessPipelineRegister
         ):
             pc_plus_imm_or_pc_plus_instruction_length = (
-                MA_pipeline_register.pc_plus_imm
-                if MA_pipeline_register.comparison_or_jump
+                MEM_pipeline_register.pc_plus_imm
+                if MEM_pipeline_register.comparison_or_jump
                 else None
             )
         else:
             pc_plus_imm_or_pc_plus_instruction_length = None
         if pc_plus_imm_or_pc_plus_instruction_length is not None and isinstance(
-            MA_pipeline_register, MemoryAccessPipelineRegister
+            MEM_pipeline_register, MemoryAccessPipelineRegister
         ):
             pc_plus_imm_or_pc_plus_instruction_length_or_ALU_result = (
-                MA_pipeline_register.result
-                if MA_pipeline_register.control_unit_signals.alu_to_pc
+                MEM_pipeline_register.result
+                if MEM_pipeline_register.control_unit_signals.alu_to_pc
                 else pc_plus_imm_or_pc_plus_instruction_length
             )
-        elif isinstance(MA_pipeline_register, MemoryAccessPipelineRegister):
+        elif isinstance(MEM_pipeline_register, MemoryAccessPipelineRegister):
             pc_plus_imm_or_pc_plus_instruction_length_or_ALU_result = (
-                MA_pipeline_register.result
-                if MA_pipeline_register.control_unit_signals.alu_to_pc
+                MEM_pipeline_register.result
+                if MEM_pipeline_register.control_unit_signals.alu_to_pc
                 else None
             )
 
