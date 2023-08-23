@@ -609,12 +609,12 @@
                                         be used as jump targets.
                                     </p>
                                     <pre class="bg-light">
-                                        # This is a comment
-                                        my_label:
-                                        addi x1, x1, 1
-                                        jal x2, my_label
-                                        addi x3, x3, 1 # This line is never reached
-                                    </pre>
+# This is a comment
+my_label:
+addi x1, x1, 1
+jal x2, my_label
+addi x3, x3, 1 # This line is never reached</pre
+                                    >
 
                                     <h2 id="variables">
                                         Segments and variables
@@ -638,19 +638,19 @@
                                         types:
                                     </p>
                                     <pre class="bg-light">
-                                        .data
-                                            my_var1: .byte -128
-                                            my_var2: .half 0x1234, 0b1010, 999
-                                            my_var3: .word 0x12345678, 0b111
-                                            text1:   .string "Hello, World!"  # ASCII byte array
-                                        .text
-                                            la x1, my_var1     # load address of my_var1 into x1
-                                            lh x2, my_var2     # load halfword from my_var2 into x2
-                                            lh x3, my_var2[0]  # same effect as above
-                                            lh x4, my_var2[2]  # x4 = 999
-                                            lw x5, my_var3[1]  # x5 = 0b111
-                                            lb x6, text1[11]   # x6 = '!'
-                                    </pre>
+.data
+    my_var1: .byte -128
+    my_var2: .half 0x1234, 0b1010, 999
+    my_var3: .word 0x12345678, 0b111
+    text1:   .string "Hello, World!"  # ASCII byte array
+.text
+    la x1, my_var1     # load address of my_var1 into x1
+    lh x2, my_var2     # load halfword from my_var2 into x2
+    lh x3, my_var2[0]  # same effect as above
+    lh x4, my_var2[2]  # x4 = 999
+    lw x5, my_var3[1]  # x5 = 0b111
+    lb x6, text1[11]   # x6 = '!'</pre
+                                    >
                                     <p>
                                         If no directives are given, the entire
                                         input is interpreted as code.<br />
@@ -672,7 +672,7 @@
                                     <h3 id="r-type">R-Type</h3>
                                     <div class="table-responsive">
                                         <table
-                                            class="table table-bordered table-hover"
+                                            class="table table-bordered table-hover table-instr-op"
                                         >
                                             <thead>
                                                 <tr>
@@ -867,7 +867,7 @@
                                     </p>
                                     <div class="table-responsive">
                                         <table
-                                            class="table table-bordered table-hover"
+                                            class="table table-bordered table-hover table-instr-op"
                                         >
                                             <thead>
                                                 <tr>
@@ -1198,7 +1198,7 @@
                                     </p>
                                     <div class="table-responsive">
                                         <table
-                                            class="table table-bordered table-hover"
+                                            class="table table-bordered table-hover table-instr-op"
                                         >
                                             <thead>
                                                 <tr>
@@ -1299,7 +1299,7 @@
                                     </p>
                                     <div class="table-responsive">
                                         <table
-                                            class="table table-bordered table-hover"
+                                            class="table table-bordered table-hover table-instr-op"
                                         >
                                             <thead>
                                                 <tr>
@@ -1432,7 +1432,7 @@
                                     </p>
                                     <div class="table-responsive">
                                         <table
-                                            class="table table-bordered table-hover"
+                                            class="table table-bordered table-hover table-instr-op"
                                         >
                                             <thead>
                                                 <tr>
@@ -1482,7 +1482,7 @@
                                     </p>
                                     <div class="table-responsive">
                                         <table
-                                            class="table table-bordered table-hover"
+                                            class="table table-bordered table-hover table-instr-op"
                                         >
                                             <thead>
                                                 <tr>
@@ -1525,7 +1525,7 @@
                                         </p>
                                         <div class="table-responsive">
                                             <table
-                                                class="table table-bordered table-hover"
+                                                class="table table-bordered table-hover table-instr-op"
                                             >
                                                 <thead>
                                                     <tr>
@@ -1661,7 +1661,7 @@
                                         </p>
                                         <div class="table-responsive">
                                             <table
-                                                class="table table-bordered table-hover"
+                                                class="table table-bordered table-hover table-instr-op"
                                             >
                                                 <thead>
                                                     <tr>
@@ -1729,7 +1729,7 @@
                                         <h3 id="misc">Miscellaneous</h3>
                                         <div class="table-responsive">
                                             <table
-                                                class="table table-bordered table-hover"
+                                                class="table table-bordered table-hover table-instr-op"
                                             >
                                                 <thead>
                                                     <tr>
@@ -1939,8 +1939,8 @@
                                     <h2>Comments</h2>
                                     <p>Comments start with a <code>#</code>.</p>
                                     <pre class="bg-light">
-                                        # This is a comment
-                                    </pre>
+# This is a comment</pre
+                                    >
 
                                     <h2>Labels and variables</h2>
                                     <p>
@@ -1964,17 +1964,17 @@
                                         reassign a variable name.
                                     </p>
                                     <pre class="bg-light">
-                                        loop:
-                                            LDA counter
-                                            DEC
-                                            STO counter
-                                            BRZ end
-                                            ZRO
-                                            BRZ loop
-                                        end:
+loop:
+    LDA counter
+    DEC
+    STO counter
+    BRZ end
+    ZRO
+    BRZ loop
+end:
 
-                                        counter=$400
-                                    </pre>
+counter=$400</pre
+                                    >
 
                                     <h2>Data write directives</h2>
                                     <p>
@@ -1992,11 +1992,11 @@
                                         containing a data write directive.
                                     </p>
                                     <pre class="bg-light">
-                                        :$400:25
-                                        :1025:$FF
-                                        LDA $400
-                                        ...
-                                    </pre>
+:$400:25
+:1025:$FF
+LDA $400
+...</pre
+                                    >
 
                                     <h2>Instruction and data memory</h2>
                                     <p>
@@ -2015,26 +2015,25 @@
 
                                     <h2>Examples</h2>
                                     <pre class="bg-light">
-                                        # computes the sum of the numbers from 1 to n
-                                        # result gets saved in MEM[1025]
-                                        Loopcount = $400
-                                        Result = $401
-                                        :$400:20 # enter n here
+# computes the sum of the numbers from 1 to n
+# result gets saved in MEM[1025]
+Loopcount = $400
+Result = $401
+:$400:20 # enter n here
 
-                                        LDA Loopcount # skip to the end if n=0
-                                        BRZ end
-                                        loop:
-                                            LDA Result
-                                            ADD Loopcount
-                                            STO Result
-                                            LDA Loopcount
-                                            DEC
-                                            STO Loopcount
-                                            BRZ end
-                                            ZRO
-                                            BRZ loop
-                                        end:
-
+LDA Loopcount # skip to the end if n=0
+BRZ end
+loop:
+    LDA Result
+    ADD Loopcount
+    STO Result
+    LDA Loopcount
+    DEC
+    STO Loopcount
+    BRZ end
+    ZRO
+    BRZ loop
+end:
                                     </pre>
                                 </div>
                             </div>
