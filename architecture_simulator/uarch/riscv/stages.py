@@ -211,6 +211,7 @@ class ExecuteStage(Stage):
             instruction=pipeline_register.instruction,
             alu_in_1=alu_in_1,
             alu_in_2=alu_in_2,
+            register_read_data_1=pipeline_register.register_read_data_1,
             register_read_data_2=pipeline_register.register_read_data_2,
             imm=pipeline_register.imm,
             result=result,
@@ -231,7 +232,7 @@ class MemoryAccessStage(Stage):
         index_of_own_input_register: int,
         state: RiscvArchitecturalState,
     ) -> PipelineRegister:
-        """behavior of MA stage
+        """behavior of MEM stage
         Should the pipeline_register not be ExecutePipelineRegister it returns an MemoryAccessPipelineRegister
         with default values
 
@@ -241,7 +242,7 @@ class MemoryAccessStage(Stage):
 
         Returns:
             PipelineRegister: returns MemoryAccessPipelineRegister with all necessary information produced or
-            used in the MA stage, as well as all controll signals
+            used in the MEM stage, as well as all controll signals
         """
         pipeline_register = pipeline_registers[index_of_own_input_register]
 

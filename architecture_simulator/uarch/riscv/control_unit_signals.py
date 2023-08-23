@@ -20,4 +20,4 @@ class ControlUnitSignals:
     branch: Optional[bool] = None
     jump: Optional[bool] = None
     alu_op: Optional[int] = None
-    alu_to_pc: Optional[int] = None
+    alu_to_pc: Optional[bool] = None

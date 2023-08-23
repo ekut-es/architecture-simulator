@@ -46,6 +46,7 @@ class ExecutePipelineRegister(PipelineRegister):
     alu_in_1: Optional[int] = None
     alu_in_2: Optional[int] = None
     # alu_in_2 is one of read_data_2 and imm
+    register_read_data_1: Optional[int] = None
     register_read_data_2: Optional[int] = None
     imm: Optional[int] = None
     result: Optional[int] = None

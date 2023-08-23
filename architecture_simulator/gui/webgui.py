@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Optional
-
 import archsim_js
+import pyodide.ffi  # type: ignore
 from architecture_simulator.isa.parser_exceptions import ParserException
 from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 from architecture_simulator.simulation.toy_simulation import ToySimulation
@@ -19,6 +19,7 @@ from architecture_simulator.uarch.riscv.pipeline_registers import (
 from architecture_simulator.uarch.riscv.pipeline import InstructionExecutionException
 
 simulation: Optional[Simulation] = None
+first_refresh: bool = True
 
 
 @dataclass
@@ -36,16 +37,19 @@ def sim_init() -> RiscvSimulation:
         RiscvSimulation: The new simulation.
     """
     global simulation
+    global first_refresh
+    first_refresh = True
     simulation = RiscvSimulation()
     update_ui()
     return simulation
 
 
-def step_sim(program: str) -> tuple[str, bool]:
+def step_sim(program: str, is_run_simulation: bool) -> tuple[str, bool]:
     """Executes one step in the simulation. First loads the given program in case there are no instructions in the instruction memory yet. Also updates the UI elements.
 
     Args:
         program (str): text format assembly program.
+        is_run_simulation (bool): whether the simulation is currently in play mode
 
     Raises:
         StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
@@ -67,7 +71,8 @@ def step_sim(program: str) -> tuple[str, bool]:
     # step the simulation
     try:
         simulation_not_ended_flag = simulation.step()
-        update_ui()
+        if not is_run_simulation:
+            update_ui()
     except InstructionExecutionException as e:
         archsim_js.highlight_cmd_table(e.address)
         archsim_js.set_output(e.__repr__())
@@ -127,7 +132,6 @@ def reset_sim() -> Simulation:
     Returns:
         Simulation: The new simulation.
     """
-    # FIXME: Why do we check if the simulation is None? Isn't this pretty much the same as sim_init()?
     global simulation
     if simulation is None:
         raise StateNotInitializedError()
@@ -154,6 +158,7 @@ def parse_input(instr: str):
         StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
     """
     global simulation
+    global first_refresh
     if simulation is None:
         raise StateNotInitializedError()
     # reset the whole simulation because there might be things like a data section that also modify the data memory
@@ -162,6 +167,10 @@ def parse_input(instr: str):
     archsim_js.remove_all_highlights()
     try:
         simulation.load_program(instr)
+        archsim_js.remove_all_highlights()
+        if not first_refresh:
+            archsim_js.set_output("TODO no error message")
+        first_refresh = False
     except ParserException as Parser_Exception:
         archsim_js.set_output(Parser_Exception.__repr__())
         archsim_js.highlight(
@@ -170,15 +179,19 @@ def parse_input(instr: str):
     update_ui()
 
 
-# FIXME: update_tables() does not only update tables. Put this stuff into their own functions and then make update_ui() call them all individually.
 def update_ui():
     """Updates all UI elements based on the current simulation and architectural state."""
     update_tables()
+    update_IF_Stage()
+    update_ID_Stage()
+    update_EX_Stage()
+    update_MEM_Stage()
+    update_WB_Stage()
+    update_visualization()
 
 
-# FIXME: this function is way too long. See the suggested fixes above and below.
 def update_tables():
-    """Updates the tables (instructions, registers and memory). Also updates the visualization.
+    """Updates the tables (instructions, registers and memory).
 
     Raises:
         StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
@@ -191,6 +204,7 @@ def update_tables():
     archsim_js.clear_register_table()
     archsim_js.clear_memory_table()
     archsim_js.clear_instruction_table()
+
     if isinstance(simulation, ToySimulation):
         # register table
         accu_representation = simulation.state.get_accu_representation()
@@ -225,7 +239,6 @@ def update_tables():
             archsim_js.update_register_table(reg_i, reg_val, reg_abi)  # int(reg_val)
 
         # memory table
-
         representations = simulation.state.memory.memory_wordwise_repr()
         for address, address_value in sorted(
             representations.items(),
@@ -267,127 +280,264 @@ def update_tables():
                 # if the instruction is not in one of the stages
                 archsim_js.update_instruction_table(hex(address), cmd.__repr__(), "")
 
-        # visualization
-        # Invoke all the js functions which update the visuals
 
-        # FIXME: This is a lot of code for handing the variables of a python object over to js (I think ?).
-        # If that is all this does, you could simply replace everything by `vars(obj)` which returns a dict of all variables ._.
+def update_IF_Stage():
+    """
+    Updates the IF Stage of the visualization and all elements withing this stage.
+    To do this, the archsim.js function update_IF_Stage is called with all relevant arguments.
 
-        # Update IF Stage
+    Raises:
+        StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
+    """
+    global simulation
+    if simulation is None:
+        raise StateNotInitializedError()
+
+    if not isinstance(simulation, RiscvSimulation):
+        return
+
+    try:
         IF_pipeline_register = simulation.state.pipeline.pipeline_registers[0]
+        # parameters = vars(IF_pipeline_register)
         if isinstance(IF_pipeline_register, InstructionFetchPipelineRegister):
-            archsim_js.update_IF_Stage(
-                instruction=IF_pipeline_register.instruction,
-                address_of_instruction=IF_pipeline_register.instruction,
+            parameters = {
+                "mnemonic": IF_pipeline_register.instruction.mnemonic,
+                "instruction": IF_pipeline_register.instruction.__repr__(),
+                "address_of_instruction": IF_pipeline_register.address_of_instruction,
+                "PC": simulation.state.program_counter,
+                "pc_plus_instruction_length": IF_pipeline_register.pc_plus_instruction_length,
+                "i-length": IF_pipeline_register.instruction.length,
+            }
+            parameters_js = pyodide.ffi.to_js(parameters)
+            archsim_js.update_IF_Stage(parameters_js)
+        # this case only applies if the Pipeline Register is flushed
+        elif isinstance(IF_pipeline_register, PipelineRegister):
+            parameters_2 = vars(IF_pipeline_register)
+            parameters = dict()
+            parameters["PC"] = simulation.state.program_counter
+            parameters["mnemonic"] = parameters_2["instruction"].mnemonic
+            parameters_js = pyodide.ffi.to_js(parameters)
+            archsim_js.update_IF_Stage(parameters_js)
+    except:
+        ...
+
+
+def update_ID_Stage():
+    """
+    Updates the ID Stage of the visualization and all elements withing this stage.
+    To do this, the archsim.js function update_ID_Stage is called with all relevant arguments.
+
+    Raises:
+        StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
+    """
+    global simulation
+    if simulation is None:
+        raise StateNotInitializedError()
+
+    if not isinstance(simulation, RiscvSimulation):
+        return
+
+    try:
+        ID_pipeline_register = simulation.state.pipeline.pipeline_registers[1]
+        if isinstance(ID_pipeline_register, InstructionDecodePipelineRegister):
+            control_unit_signals = vars(ID_pipeline_register.control_unit_signals)
+            parameters = vars(ID_pipeline_register)
+            parameters["mnemonic"] = ID_pipeline_register.instruction.mnemonic
+            parameters_js = pyodide.ffi.to_js(parameters)
+            control_unit_signals_js = pyodide.ffi.to_js(control_unit_signals)
+            archsim_js.update_ID_Stage(
+                parameters_js,
+                control_unit_signals_js,
+            )
+        # this case only applies if the Pipeline Register is flushed or reset
+        elif isinstance(ID_pipeline_register, PipelineRegister):
+            parameters = vars(ID_pipeline_register)
+            control_unit_signals = dict()
+            parameters["mnemonic"] = ID_pipeline_register.instruction.mnemonic
+            parameters_js = pyodide.ffi.to_js(parameters)
+            control_unit_signals_js = pyodide.ffi.to_js(control_unit_signals)
+            archsim_js.update_ID_Stage(
+                parameters_js,
+                control_unit_signals_js,
+            )
+    except:
+        ...
+
+
+def update_EX_Stage():
+    """
+    Updates the EX Stage of the visualization and all elements withing this stage.
+    To do this, the archsim.js function update_EX_Stage is called with all relevant arguments.
+
+    Raises:
+    StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
+    """
+    global simulation
+    if simulation is None:
+        raise StateNotInitializedError()
+
+    if not isinstance(simulation, RiscvSimulation):
+        return
+
+    try:
+        EX_pipeline_register = simulation.state.pipeline.pipeline_registers[2]
+        if isinstance(EX_pipeline_register, ExecutePipelineRegister):
+            control_unit_signals = vars(EX_pipeline_register.control_unit_signals)
+            parameters = vars(EX_pipeline_register)
+            parameters["mnemonic"] = EX_pipeline_register.instruction.mnemonic
+            parameters_js = pyodide.ffi.to_js(parameters)
+            control_unit_signals_js = pyodide.ffi.to_js(control_unit_signals)
+            archsim_js.update_EX_Stage(parameters_js, control_unit_signals_js)
+        # this case only applies if the Pipeline Register is flushed or reset
+        elif isinstance(EX_pipeline_register, PipelineRegister):
+            parameters = vars(EX_pipeline_register)
+            control_unit_signals = dict()
+            parameters["mnemonic"] = EX_pipeline_register.instruction.mnemonic
+            parameters_js = pyodide.ffi.to_js(parameters)
+            control_unit_signals_js = pyodide.ffi.to_js(control_unit_signals)
+            archsim_js.update_EX_Stage(parameters_js, control_unit_signals_js)
+    except:
+        ...
+
+
+def update_MEM_Stage():
+    """
+    Updates the MEM Stage of the visualization and all elements withing this stage.
+    To do this, the archsim.js function update_MEM_Stage is called with all relevant arguments.
+
+    Raises:
+    StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
+    """
+    global simulation
+    if simulation is None:
+        raise StateNotInitializedError()
+
+    if not isinstance(simulation, RiscvSimulation):
+        return
+
+    try:
+        MEM_pipeline_register = simulation.state.pipeline.pipeline_registers[3]
+        if isinstance(MEM_pipeline_register, MemoryAccessPipelineRegister):
+            control_unit_signals = vars(MEM_pipeline_register.control_unit_signals)
+            parameters = vars(MEM_pipeline_register)
+            parameters["mnemonic"] = MEM_pipeline_register.instruction.mnemonic
+            parameters_js = pyodide.ffi.to_js(parameters)
+            control_unit_signals_js = pyodide.ffi.to_js(control_unit_signals)
+            archsim_js.update_MEM_Stage(
+                parameters_js,
+                control_unit_signals_js,
+            )
+        # this case only applies if the Pipeline Register is flushed or reset
+        elif isinstance(MEM_pipeline_register, PipelineRegister):
+            parameters = vars(MEM_pipeline_register)
+            control_unit_signals = dict()
+            parameters["mnemonic"] = MEM_pipeline_register.instruction.mnemonic
+            parameters_js = pyodide.ffi.to_js(parameters)
+            control_unit_signals_js = pyodide.ffi.to_js(control_unit_signals)
+            archsim_js.update_MEM_Stage(
+                parameters_js,
+                control_unit_signals_js,
+            )
+    except:
+        ...
+
+
+def update_WB_Stage():
+    """Update WB Stage:
+    Updates the WB Stage of the visualization and all elements withing this stage.
+    To do this, the archsim.js function update_WB_Stage is called with all relevant arguments.
+
+    Raises:
+    StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
+    """
+    global simulation
+    if simulation is None:
+        raise StateNotInitializedError()
+
+    if not isinstance(simulation, RiscvSimulation):
+        return
+
+    try:
+        WB_pipeline_register = simulation.pipeline.pipeline_registers[4]
+        if isinstance(WB_pipeline_register, RegisterWritebackPipelineRegister):
+            control_unit_signals = vars(WB_pipeline_register.control_unit_signals)
+            parameters = vars(WB_pipeline_register)
+            parameters["mnemonic"] = WB_pipeline_register.instruction.mnemonic
+            parameters_js = pyodide.ffi.to_js(parameters)
+            control_unit_signals_js = pyodide.ffi.to_js(control_unit_signals)
+            archsim_js.update_WB_Stage(
+                parameters_js,
+                control_unit_signals_js,
+            )
+        # this case only applies if the Pipeline Register is flushed or reset
+        elif isinstance(WB_pipeline_register, PipelineRegister):
+            parameters = vars(WB_pipeline_register)
+            control_unit_signals = dict()
+            parameters["mnemonic"] = WB_pipeline_register.instruction.mnemonic
+            parameters_js = pyodide.ffi.to_js(parameters)
+            control_unit_signals_js = pyodide.ffi.to_js(control_unit_signals)
+            archsim_js.update_WB_Stage(
+                parameters_js,
+                control_unit_signals_js,
+            )
+    except:
+        ...
+
+
+def update_visualization():
+    """
+    Updates visualization elements that need information from more than one stage.
+
+    Raises:
+    StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
+    """
+    global simulation
+    if simulation is None:
+        raise StateNotInitializedError()
+
+    if not isinstance(simulation, RiscvSimulation):
+        return
+
+    if len(simulation.state.pipeline.pipeline_registers) > 1:
+        IF_pipeline_register = simulation.state.pipeline.pipeline_registers[0]
+        MEM_pipeline_register = simulation.state.pipeline.pipeline_registers[3]
+        if isinstance(
+            IF_pipeline_register, InstructionFetchPipelineRegister
+        ) and isinstance(MEM_pipeline_register, MemoryAccessPipelineRegister):
+            pc_plus_imm_or_pc_plus_instruction_length = (
+                MEM_pipeline_register.pc_plus_imm
+                if MEM_pipeline_register.comparison_or_jump
+                else IF_pipeline_register.pc_plus_instruction_length
+            )
+        elif isinstance(IF_pipeline_register, PipelineRegister) and isinstance(
+            MEM_pipeline_register, MemoryAccessPipelineRegister
+        ):
+            pc_plus_imm_or_pc_plus_instruction_length = (
+                MEM_pipeline_register.pc_plus_imm
+                if MEM_pipeline_register.comparison_or_jump
+                else None
+            )
+        else:
+            pc_plus_imm_or_pc_plus_instruction_length = None
+        if pc_plus_imm_or_pc_plus_instruction_length is not None and isinstance(
+            MEM_pipeline_register, MemoryAccessPipelineRegister
+        ):
+            pc_plus_imm_or_pc_plus_instruction_length_or_ALU_result = (
+                MEM_pipeline_register.result
+                if MEM_pipeline_register.control_unit_signals.alu_to_pc
+                else pc_plus_imm_or_pc_plus_instruction_length
+            )
+        elif isinstance(MEM_pipeline_register, MemoryAccessPipelineRegister):
+            pc_plus_imm_or_pc_plus_instruction_length_or_ALU_result = (
+                MEM_pipeline_register.result
+                if MEM_pipeline_register.control_unit_signals.alu_to_pc
+                else None
             )
 
-        # Update ID Stage
-        try:  # FIXME: Why is this a try statement without an except block?
-            ID_pipeline_register = simulation.state.pipeline.pipeline_registers[1]
-            if isinstance(ID_pipeline_register, InstructionDecodePipelineRegister):
-                control_unit_signals = [
-                    ID_pipeline_register.control_unit_signals.alu_src_1,
-                    ID_pipeline_register.control_unit_signals.alu_src_2,
-                    ID_pipeline_register.control_unit_signals.wb_src,
-                    ID_pipeline_register.control_unit_signals.reg_write,
-                    ID_pipeline_register.control_unit_signals.mem_read,
-                    ID_pipeline_register.control_unit_signals.mem_write,
-                    ID_pipeline_register.control_unit_signals.branch,
-                    ID_pipeline_register.control_unit_signals.jump,
-                    ID_pipeline_register.control_unit_signals.alu_op,
-                    ID_pipeline_register.control_unit_signals.alu_to_pc,
-                ]
-                archsim_js.update_ID_Stage(
-                    register_read_addr_1=ID_pipeline_register.register_read_addr_1,
-                    register_read_addr_2=ID_pipeline_register.register_read_addr_2,
-                    register_read_data_1=ID_pipeline_register.register_read_data_1,
-                    register_read_data_2=ID_pipeline_register.register_read_data_2,
-                    imm=ID_pipeline_register.imm,
-                    control_unit_signals=control_unit_signals,
-                )
-        except:
-            ...
+        else:
+            pc_plus_imm_or_pc_plus_instruction_length_or_ALU_result = None
 
-        # Update EX Stage
-        try:
-            EX_pipeline_register = simulation.state.pipeline.pipeline_registers[2]
-            if isinstance(EX_pipeline_register, ExecutePipelineRegister):
-                control_unit_signals = [
-                    EX_pipeline_register.control_unit_signals.alu_src_1,
-                    EX_pipeline_register.control_unit_signals.alu_src_2,
-                    EX_pipeline_register.control_unit_signals.wb_src,
-                    EX_pipeline_register.control_unit_signals.reg_write,
-                    EX_pipeline_register.control_unit_signals.mem_read,
-                    EX_pipeline_register.control_unit_signals.mem_write,
-                    EX_pipeline_register.control_unit_signals.branch,
-                    EX_pipeline_register.control_unit_signals.jump,
-                    EX_pipeline_register.control_unit_signals.alu_op,
-                    EX_pipeline_register.control_unit_signals.alu_to_pc,
-                ]
-                archsim_js.update_EX_Stage(
-                    alu_in_1=EX_pipeline_register.alu_in_1,
-                    alu_in_2=EX_pipeline_register.alu_in_2,
-                    register_read_data_2=EX_pipeline_register.register_read_data_2,
-                    imm=EX_pipeline_register.imm,
-                    result=EX_pipeline_register.result,
-                    comparison=EX_pipeline_register.comparison,
-                    pc_plus_imm=EX_pipeline_register.pc_plus_imm,
-                    control_unit_signals=control_unit_signals,
-                )
-        except:
-            ...
-
-        # Update MA Stage
-        try:
-            MEM_pipeline_register = simulation.state.pipeline.pipeline_registers[3]
-            if isinstance(MEM_pipeline_register, MemoryAccessPipelineRegister):
-                control_unit_signals = [
-                    MEM_pipeline_register.control_unit_signals.alu_src_1,
-                    MEM_pipeline_register.control_unit_signals.alu_src_2,
-                    MEM_pipeline_register.control_unit_signals.wb_src,
-                    MEM_pipeline_register.control_unit_signals.reg_write,
-                    MEM_pipeline_register.control_unit_signals.mem_read,
-                    MEM_pipeline_register.control_unit_signals.mem_write,
-                    MEM_pipeline_register.control_unit_signals.branch,
-                    MEM_pipeline_register.control_unit_signals.jump,
-                    MEM_pipeline_register.control_unit_signals.alu_op,
-                    MEM_pipeline_register.control_unit_signals.alu_to_pc,
-                ]
-                archsim_js.update_MEM_Stage(
-                    memory_address=MEM_pipeline_register.memory_address,
-                    result=MEM_pipeline_register.result,
-                    memory_write_data=MEM_pipeline_register.memory_write_data,
-                    memory_read_data=MEM_pipeline_register.memory_read_data,
-                    comparison=MEM_pipeline_register.comparison,
-                    comparison_or_jump=MEM_pipeline_register.comparison_or_jump,
-                    pc_plus_imm=MEM_pipeline_register.pc_plus_imm,
-                    control_unit_signals=control_unit_signals,
-                )
-        except:
-            ...
-
-        # Update WB Stage
-        try:
-            WB_pipeline_register = simulation.state.pipeline.pipeline_registers[4]
-            if isinstance(WB_pipeline_register, RegisterWritebackPipelineRegister):
-                control_unit_signals = [
-                    WB_pipeline_register.control_unit_signals.alu_src_1,
-                    WB_pipeline_register.control_unit_signals.alu_src_2,
-                    WB_pipeline_register.control_unit_signals.wb_src,
-                    WB_pipeline_register.control_unit_signals.reg_write,
-                    WB_pipeline_register.control_unit_signals.mem_read,
-                    WB_pipeline_register.control_unit_signals.mem_write,
-                    WB_pipeline_register.control_unit_signals.branch,
-                    WB_pipeline_register.control_unit_signals.jump,
-                    WB_pipeline_register.control_unit_signals.alu_op,
-                    WB_pipeline_register.control_unit_signals.alu_to_pc,
-                ]
-                archsim_js.update_WB_Stage(
-                    register_write_data=WB_pipeline_register.register_write_data,
-                    write_register=WB_pipeline_register.write_register,
-                    memory_read_data=WB_pipeline_register.memory_read_data,
-                    alu_result=WB_pipeline_register.alu_result,
-                    control_unit_signals=control_unit_signals,
-                )
-        except:
-            ...
+        archsim_js.update_visualization(
+            pc_plus_imm_or_pc_plus_instruction_length,
+            pc_plus_imm_or_pc_plus_instruction_length_or_ALU_result,
+        )
