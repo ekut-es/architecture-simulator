@@ -147,6 +147,11 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             selected_isa = "riscv";
             refresh_button();
+
+            document.getElementById("button_SingleStage").disabled = false;
+            document.getElementById("button_5-Stage").disabled = false;
+            document.getElementById("modal_header_switch_stage").style.color =
+                "black";
         });
 
     document
@@ -154,6 +159,18 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             selected_isa = "toy";
             refresh_button();
+
+            if (!document.getElementById("button_HazardDetection").checked) {
+                document.getElementById("button_HazardDetection").click();
+            }
+            if (document.getElementById("button_5-Stage").checked) {
+                document.getElementById("button_SingleStage").click();
+            }
+            document.getElementById("button_HazardDetection").disabled = true;
+            document.getElementById("button_SingleStage").disabled = true;
+            document.getElementById("button_5-Stage").disabled = true;
+            document.getElementById("modal_header_switch_stage").style.color =
+                "grey";
         });
 
     // register representation button listeners
