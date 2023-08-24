@@ -1,4 +1,4 @@
-const riscvDocumentation = /*html*/ ` <div class="container-fluid">
+const riscvDocumentation = html` <div class="container-fluid">
     <h2 id="instructions">Instructions</h2>
     <p>
         This simulator supports a subset of the RISC-V32 ISA. The supported

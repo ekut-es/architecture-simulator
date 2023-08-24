@@ -1,4 +1,4 @@
-const toyDocumentation = /*html*/ `<div class="container-fluid">
+const toyDocumentation = html` <div class="container-fluid">
     <h2>Instructions</h2>
     <div class="table-responsive">
         <table class="table table-bordered table-hover">

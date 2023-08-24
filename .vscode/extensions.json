@@ -6,6 +6,6 @@
         "ms-python.black-formatter",
         "matangover.mypy",
         "esbenp.prettier-vscode",
-        "pushqrdx.inline-html"
+        "bierner.lit-html"
     ]
 }
