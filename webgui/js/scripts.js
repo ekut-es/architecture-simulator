@@ -23,12 +23,18 @@ var run;
 var is_run_simulation = false;
 var manual_run = false;
 var pipeline_mode = "single_stage_pipeline";
+
 window.addEventListener("DOMContentLoaded", function () {
     clearTimeout(input_timer);
     input_timer = setTimeout(
         finished_typing,
         parse_sim_after_not_typing_for_n_ms
     );
+
+    // paste the help pages into the html
+    document.getElementById("RiscvHelp").innerHTML = riscvDocumentation;
+    document.getElementById("ToyHelp").innerHTML = toyDocumentation;
+
     document
         .getElementById("button_simulation_start_id")
         .addEventListener("click", () => {

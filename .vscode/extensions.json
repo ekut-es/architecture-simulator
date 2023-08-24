@@ -5,6 +5,7 @@
         "firefox-devtools.vscode-firefox-debug",
         "ms-python.black-formatter",
         "matangover.mypy",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+        "pushqrdx.inline-html"
     ]
 }
