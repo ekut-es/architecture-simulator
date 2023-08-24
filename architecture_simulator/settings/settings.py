@@ -28,8 +28,8 @@ class Settings:
             "t0": 5,
             "t1": 6,
             "t2": 7,
-            "s0": 8,  # this is intentional
-            "fp": 8,
+            "s0": 8,
+            "fp": 8,  # this is intentional, s0 and fp are the same register
             "s1": 9,
             "a0": 10,
             "a1": 11,
@@ -54,6 +54,8 @@ class Settings:
             "t5": 30,
             "t6": 31,
         },
+        "toy_instruction_memory_min_bytes": 0,
+        "toy_instruction_memory_max_bytes": 1024,
         "toy_memory_min_bytes": 1024,
         "toy_memory_max_bytes": 4096,
     }
