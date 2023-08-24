@@ -45,6 +45,10 @@
         <link rel="stylesheet" href="bootstrap.min.css" />
         <link rel="stylesheet" type="text/css" href="WEB_APP_BASIC.css" />
         <!--	****************************************************************************************************************************** -->
+        <!---->
+        <script type="text/javascript" src="js/html_tag.js"></script>
+        <script type="text/javascript" src="js/riscv_documentation.js"></script>
+        <script type="text/javascript" src="js/toy_documentation.js"></script>
         <script type="text/javascript" src="js/scripts.js"></script>
     </head>
     <body id="webapp_body_id">
@@ -73,6 +77,9 @@
                                         id="webapp_header_help_image_id"
                                         src="svg/WEB_APP_BASIC_Help.svg"
                                         class="mr-3"
+                                        title="help"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#helpModal"
                                         width="35px"
                                         height="35px"
                                     />
@@ -564,7 +571,60 @@
                     </div>
                 </main>
             </div>
-
+            <!--Help Modal-->
+            <div
+                class="modal fade"
+                id="helpModal"
+                tabindex="-1"
+                role="dialog"
+                aria-labelledby="helpModalLabel"
+                aria-hidden="true"
+            >
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5
+                                class="modal-title h2 text-light"
+                                id="HelpModalLabel"
+                            >
+                                <img
+                                    id="webapp_header_help_image_id"
+                                    src="svg/WEB_APP_BASIC_Help.svg"
+                                    width="35px"
+                                    height="35px"
+                                />
+                                <span class="h2" id="HelpHeader">RISC-V</span>
+                            </h5>
+                        </div>
+                        <div class="modal-body">
+                            <!--RISC-V User Documentation/Help-->
+                            <div
+                                id="RiscvHelp"
+                                class="tabcontent"
+                                style="display: block"
+                            >
+                                <!--Filled in by js-->
+                            </div>
+                            <!--Toy User Documentation/Help-->
+                            <div
+                                id="ToyHelp"
+                                class="tabcontent"
+                                style="display: none"
+                            >
+                                <!--Filled in by js-->
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal"
+                            >
+                                close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!--Settings Modal-->
             <div
                 class="modal fade"

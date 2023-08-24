@@ -93,6 +93,10 @@ window.addEventListener("DOMContentLoaded", function () {
         refresh_button();
     });
 
+    // paste the help pages into the html
+    document.getElementById("RiscvHelp").innerHTML = riscvDocumentation;
+    document.getElementById("ToyHelp").innerHTML = toyDocumentation;
+
     document
         .getElementById("button_simulation_start_id")
         .addEventListener("click", () => {
@@ -207,6 +211,10 @@ window.addEventListener("DOMContentLoaded", function () {
             selected_isa = "riscv";
             refresh_button();
 
+            document.getElementById("HelpHeader").textContent = "RISC-V";
+            RiscvHelp.style.display = "block";
+            ToyHelp.style.display = "none";
+
             document.getElementById("button_SingleStage").disabled = false;
             document.getElementById("button_5-Stage").disabled = false;
             document.getElementById("modal_header_switch_stage").style.color =
@@ -218,6 +226,10 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             selected_isa = "toy";
             refresh_button();
+            
+            document.getElementById("HelpHeader").textContent = "Toy";
+            RiscvHelp.style.display = "none";
+            ToyHelp.style.display = "block";
 
             hazard_detection = true;
             if (document.getElementById("button_5-Stage").checked) {
@@ -337,7 +349,6 @@ window.addEventListener("DOMContentLoaded", function () {
         });
 
     editor.on("change", function () {
-        synchronizeEditors(editor, editor_vis);
         editor.save();
         for (let i = 0; i < editor.lineCount(); i++) {
             editor.removeLineClass(i, "background", "highlight");
@@ -358,7 +369,6 @@ window.addEventListener("DOMContentLoaded", function () {
     });
 
     editor_vis.on("change", function () {
-        synchronizeEditors(editor_vis, editor);
         editor_vis.save();
         // autoparse
         clearTimeout(input_timer);
@@ -623,9 +633,7 @@ function toggleMemoryTab() {
 
 function synchronizeEditors(sEditor, tEditor) {
     const content = sEditor.getValue();
-    if (content !== tEditor.getValue()) {
-        tEditor.setValue(content);
-    }
+    tEditor.setValue(content);
 }
 
 window.addEventListener("load", function () {

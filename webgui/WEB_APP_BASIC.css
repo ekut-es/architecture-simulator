@@ -394,3 +394,10 @@ body main #vis_performance_metrics {
     width: 100vh;
     padding-right: 0;
 }
+
+.table-instr-op th:nth-child(1),
+.table-instr-op td:nth-child(1),
+.table-instr-op th:nth-child(2),
+.table-instr-op td:nth-child(2) {
+    width: 36%;
+}

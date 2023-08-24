@@ -1066,9 +1066,17 @@ async function evaluatePython_update_tables() {
 async function evaluatePython_parse_input() {
     let pyodide = await pyodideReadyPromise;
     input_str = input.value;
+    vis_input_str = vis_input.value;
     try {
         parse_input = pyodide.globals.get("parse_input");
-        parse_input(input_str);
+        if (
+            document.getElementById("VisualizationTabContent").style.display ==
+            "block"
+        ) {
+            parse_input(vis_input_str);
+        } else {
+            parse_input(input_str);
+        }
     } catch (err) {
         addToOutput(err);
     }
