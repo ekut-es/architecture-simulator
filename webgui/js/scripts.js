@@ -404,6 +404,7 @@ window.addEventListener("DOMContentLoaded", function () {
      */
     editor_vis.on("change", function () {
         editor_vis.save();
+
         // autoparse
         clearTimeout(input_timer);
         if (!manual_run) {
@@ -604,6 +605,7 @@ function toggleVisualizationTabContent() {
     } else {
         synchronizeEditors(editor_vis, editor);
         editor_vis.closeHint();
+        close_hint = false;
         document.getElementById("VisualizationTabContent").style.display =
             "none";
         document.getElementById("MainContent").style.display = "block";
@@ -614,6 +616,9 @@ function toggleVisualizationTabContent() {
 
 function toggleInputTab() {
     if (document.getElementById("InputTab").style.display === "none") {
+        synchronizeEditors(editor_vis, editor);
+        editor_vis.closeHint();
+        close_hint = false;
         document.getElementById("InputTab").style.display = "block";
         document.getElementById("CmdTab").style.display = "none";
         document.getElementById("RegisterTab").style.display = "none";
@@ -628,6 +633,9 @@ function toggleInputTab() {
 
 function toggleCmdTab() {
     if (document.getElementById("CmdTab").style.display === "none") {
+        synchronizeEditors(editor_vis, editor);
+        editor_vis.closeHint();
+        close_hint = true;
         document.getElementById("CmdTab").style.display = "block";
         document.getElementById("InputTab").style.display = "none";
         document.getElementById("RegisterTab").style.display = "none";
@@ -642,6 +650,9 @@ function toggleCmdTab() {
 
 function toggleRegisterTab() {
     if (document.getElementById("RegisterTab").style.display === "none") {
+        synchronizeEditors(editor_vis, editor);
+        editor_vis.closeHint();
+        close_hint = true;
         document.getElementById("RegisterTab").style.display = "block";
         document.getElementById("InputTab").style.display = "none";
         document.getElementById("CmdTab").style.display = "none";
@@ -656,6 +667,9 @@ function toggleRegisterTab() {
 
 function toggleMemoryTab() {
     if (document.getElementById("MemoryTab").style.display === "none") {
+        synchronizeEditors(editor_vis, editor);
+        editor_vis.closeHint();
+        close_hint = true;
         document.getElementById("MemoryTab").style.display = "block";
         document.getElementById("CmdTab").style.display = "none";
         document.getElementById("RegisterTab").style.display = "none";
