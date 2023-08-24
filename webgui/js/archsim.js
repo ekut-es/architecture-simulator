@@ -1031,6 +1031,10 @@ async function update_performance_metrics() {
  * Resets the simulation and sets it to the currently selected pipeline mode.
  */
 async function evaluatePython_reset_sim(pipeline_mode) {
+    // resets the saved memory for highlighting changed values, so that new values can be highlighted
+    previous_memory = {};
+    previous_registers = {};
+
     start_loading_animation();
     let pyodide = await pyodideReadyPromise;
     stop_loading_animation();
