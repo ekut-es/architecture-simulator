@@ -103,6 +103,11 @@ window.addEventListener("DOMContentLoaded", function () {
             play_button();
         });
 
+    /** play button
+     *
+     * this function is usually called when the play button is pressed, and steps the simulation until there
+     * are no more instructions left, while performing the necessary UI updates.
+     */
     function play_button() {
         is_run_simulation = true;
         manual_run = true;
@@ -133,6 +138,11 @@ window.addEventListener("DOMContentLoaded", function () {
             pause_button();
         });
 
+    /**pause button
+     *
+     * This function is usually called when the pause button is pressed. It stops the execution
+     * of a program and updates the UI.
+     */
     function pause_button() {
         update_ui_async();
         is_run_simulation = false;
@@ -154,6 +164,11 @@ window.addEventListener("DOMContentLoaded", function () {
             next_button();
         });
 
+    /**next button
+     *
+     * This function is usually called when the next button is pressed.
+     * It performs one step of the simulation and updates the UI.
+     */
     function next_button() {
         is_run_simulation = false;
         manual_run = true;
@@ -174,6 +189,11 @@ window.addEventListener("DOMContentLoaded", function () {
             refresh_button();
         });
 
+    /**refresh button
+     *
+     * This function is usually called when the reset button is pressed, or when a full reset is needed.
+     * It resets the entire simulation and clears the UI.
+     */
     function refresh_button() {
         is_run_simulation = false;
         manual_run = false;
@@ -190,6 +210,10 @@ window.addEventListener("DOMContentLoaded", function () {
         finished_typing();
     }
 
+    /**
+     * This function steps the simulation the amount of steps given in steps_per_interval.
+     * It stops when it has stepped for 10ms
+     */
     function step_n_times() {
         let startTime = performance.now(); // get the start time
         for (i = 0; i < steps_per_interval; i++) {
@@ -349,6 +373,11 @@ window.addEventListener("DOMContentLoaded", function () {
             refresh_button();
         });
 
+    /**
+     * This is the event listener for the codemirror editor, it gets called when a change
+     * in the text area occurs.
+     * It removes all highlights and autoparses the input while once again highlighting errors.
+     */
     editor.on("change", function () {
         editor.save();
         for (let i = 0; i < editor.lineCount(); i++) {
@@ -369,6 +398,11 @@ window.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    /**
+     * This is the event listener for the codemirror editor in visualization mode, it gets called when a change
+     * in the text area occurs.
+     * It removes all highlights and autoparses the input while once again highlighting errors.
+     */
     editor_vis.on("change", function () {
         editor_vis.save();
         // autoparse
@@ -381,6 +415,9 @@ window.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    /**
+     * Parses the input and updates the ui
+     */
     function finished_typing() {
         evaluatePython_parse_input();
         update_ui_async();
@@ -650,13 +687,11 @@ window.addEventListener("load", function () {
         .setAttribute("visibility", "hidden");
 });
 
-function set_svg_text_simple(id, str) {
-    const pipeline_svg = document.getElementById(
-        "visualization_pipeline"
-    ).contentDocument;
-    pipeline_svg.getElementById(id).textContent = str;
-}
-
+/**set_svg_text_complex_right_align
+ *
+ * @param {string} id -- The id of the element where the text should be set
+ * @param {string} str -- The text the element given by id should have, the text is right aligned
+ */
 function set_svg_text_complex_right_align(id, str) {
     const pipeline_svg = document.getElementById(
         "visualization_pipeline"
@@ -669,6 +704,11 @@ function set_svg_text_complex_right_align(id, str) {
         .firstChild.nextSibling.setAttribute("text-anchor", "end");
 }
 
+/**set_svg_text_complex_right_align
+ *
+ * @param {string} id -- The id of the element where the text should be set
+ * @param {string} str -- The text the element given by id should have, the text is left aligned
+ */
 function set_svg_text_complex_left_align(id, str) {
     const pipeline_svg = document.getElementById(
         "visualization_pipeline"
@@ -681,6 +721,11 @@ function set_svg_text_complex_left_align(id, str) {
         .firstChild.nextSibling.setAttribute("text-anchor", "start");
 }
 
+/**set_svg_text_complex_right_align
+ *
+ * @param {string} id -- The id of the element where the text should be set
+ * @param {string} str -- The text the element given by id should have, the text is middle aligned
+ */
 function set_svg_text_complex_middle_align(id, str) {
     const pipeline_svg = document.getElementById(
         "visualization_pipeline"
@@ -693,6 +738,11 @@ function set_svg_text_complex_middle_align(id, str) {
         .firstChild.nextSibling.setAttribute("text-anchor", "middle");
 }
 
+/**
+ *
+ * @param {string} id -- The id of the element where the colour should be set
+ * @param {string} str -- The colour the element and all its childnodes should have
+ */
 function set_svg_colour(id, str) {
     const pipeline_svg = document.getElementById(
         "visualization_pipeline"
