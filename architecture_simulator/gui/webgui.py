@@ -458,7 +458,7 @@ def update_WB_Stage():
         return
 
     try:
-        WB_pipeline_register = simulation.pipeline.pipeline_registers[4]
+        WB_pipeline_register = simulation.state.pipeline.pipeline_registers[4]
         if isinstance(WB_pipeline_register, RegisterWritebackPipelineRegister):
             control_unit_signals = vars(WB_pipeline_register.control_unit_signals)
             parameters = vars(WB_pipeline_register)
