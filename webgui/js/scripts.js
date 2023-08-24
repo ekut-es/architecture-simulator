@@ -226,7 +226,7 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             selected_isa = "toy";
             refresh_button();
-            
+
             document.getElementById("HelpHeader").textContent = "Toy";
             RiscvHelp.style.display = "none";
             ToyHelp.style.display = "block";
@@ -346,6 +346,7 @@ window.addEventListener("DOMContentLoaded", function () {
                 hazard_detection = false;
                 button.title = "enable hazard detection";
             }
+            refresh_button();
         });
 
     editor.on("change", function () {
