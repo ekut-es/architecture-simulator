@@ -797,17 +797,17 @@ addi x3, x3, 1 # This line is never reached</pre
     </p>
     <pre class="bg-light">
 .data
-my_var1: .byte -128
-my_var2: .half 0x1234, 0b1010, 999
-my_var3: .word 0x12345678, 0b111
-text1:   .string "Hello, World!"  # ASCII byte array
+    my_var1: .byte -128
+    my_var2: .half 0x1234, 0b1010, 999
+    my_var3: .word 0x12345678, 0b111
+    text1:   .string "Hello, World!"  # ASCII byte array
 .text
-la x1, my_var1     # load address of my_var1 into x1
-lh x2, my_var2     # load halfword from my_var2 into x2
-lh x3, my_var2[0]  # same effect as above
-lh x4, my_var2[2]  # x4 = 999
-lw x5, my_var3[1]  # x5 = 0b111
-lb x6, text1[11]   # x6 = '!'</pre
+    la x1, my_var1     # load address of my_var1 into x1
+    lh x2, my_var2     # load halfword from my_var2 into x2
+    lh x3, my_var2[0]  # same effect as above
+    lh x4, my_var2[2]  # x4 = 999
+    lw x5, my_var3[1]  # x5 = 0b111
+    lb x6, text1[11]   # x6 = '!'</pre
     >
     <p>
         If no directives are given, the entire input is interpreted as code.<br />
