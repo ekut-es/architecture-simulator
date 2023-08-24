@@ -105,8 +105,8 @@ window.addEventListener("DOMContentLoaded", function () {
 
     /** play button
      *
-     * this function is probably called when the play button is pressed, and steps the simulation until there
-     * are no more instructions left.
+     * this function is usually called when the play button is pressed, and steps the simulation until there
+     * are no more instructions left, while performing the necessary UI updates.
      */
     function play_button() {
         is_run_simulation = true;
@@ -140,8 +140,8 @@ window.addEventListener("DOMContentLoaded", function () {
 
     /**pause button
      *
-     * This function is likely called when the pause button is pressed. This function stops the execution
-     * of a program and makes the reset, play and step buttons available again.
+     * This function is usually called when the pause button is pressed. It stops the execution
+     * of a program and updates the UI.
      */
     function pause_button() {
         update_ui_async();
@@ -166,8 +166,8 @@ window.addEventListener("DOMContentLoaded", function () {
 
     /**next button
      *
-     * This function is likely called when the next button is pressed.
-     * It steps the sumulation by one step.
+     * This function is usually called when the next button is pressed.
+     * It performs one step of the simulation and updates the UI.
      */
     function next_button() {
         is_run_simulation = false;
@@ -191,8 +191,8 @@ window.addEventListener("DOMContentLoaded", function () {
 
     /**refresh button
      *
-     * This function is likely called when the reset button is pressed.
-     * It resets the entire simulation and clears all the registers and the memory.
+     * This function is usually called when the reset button is pressed, or when a full reset is needed.
+     * It resets the entire simulation and clears the UI.
      */
     function refresh_button() {
         is_run_simulation = false;
@@ -374,8 +374,8 @@ window.addEventListener("DOMContentLoaded", function () {
 
     /**
      * This is the event listener for the codemirror editor, it gets called when a change
-     * in the textarea occurs.
-     * It first removes all highlights and then autoparses the input and maybe highlights an error again.
+     * in the text area occurs.
+     * It removes all highlights and autoparses the input while once again highlighting errors.
      */
     editor.on("change", function () {
         editor.save();
@@ -398,9 +398,9 @@ window.addEventListener("DOMContentLoaded", function () {
     });
 
     /**
-     * This is the event listener for the codemirror editor (the visualization edition), it gets called when a change
-     * in the textarea occurs.
-     * It first removes all highlights and then autoparses the input and maybe highlights an error again.
+     * This is the event listener for the codemirror editor in visualization mode, it gets called when a change
+     * in the text area occurs.
+     * It removes all highlights and autoparses the input while once again highlighting errors.
      */
     editor_vis.on("change", function () {
         editor_vis.save();
