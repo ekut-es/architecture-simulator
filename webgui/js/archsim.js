@@ -785,9 +785,9 @@ const archsim_js = {
         }
 
         if (jump == true) {
-            set_svg_colour("ControlUnitLeftRight1", "green");
+            set_svg_colour("ControlUnitLeftRight", "green");
         } else {
-            set_svg_colour("ControlUnitLeftRight1", "black");
+            set_svg_colour("ControlUnitLeftRight", "black");
         }
 
         if (alu_to_pc == true) {
