@@ -590,6 +590,7 @@ const riscvDocumentation = html` <div class="container-fluid">
 
         <h3 id="csr-type">CSR-Type</h3>
         <p>
+            <i>Currently not implemented in 5-stage pipeline mode.</i> <br />
             The unsigned immediate (<code>uimm</code>) has a length of 5 bits.
         </p>
         <div class="table-responsive">
