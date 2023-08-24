@@ -41,8 +41,7 @@ window.addEventListener("DOMContentLoaded", function () {
         editor.save();
         //finished_typing(); FIXME: The input should get parsed after clicking the button in case the auto parsing wasn't triggered yet.
         // But this should only happen if the input has changed and not after the user has already started the simulation.
-        document.getElementById("input").disabled = true; // I dont think this does anything. But codemirror provides a function "readOnly" that we could use.
-        document.getElementById("vis_input").disabled = true;
+        disable_editor();
         if (run) {
             stop_loading_animation();
             clearInterval(run);
@@ -70,8 +69,7 @@ window.addEventListener("DOMContentLoaded", function () {
     function pause_button() {
         update_ui_async();
         is_run_simulation = false;
-        document.getElementById("input").disabled = true;
-        document.getElementById("vis_input").disabled = true;
+        disable_editor;
         stop_timer();
         clearInterval(run);
         update_performance_metrics();
@@ -94,8 +92,7 @@ window.addEventListener("DOMContentLoaded", function () {
         editor.save();
         //finished_typing(); FIXME: The input should get parsed after clicking the button in case the auto parsing wasn't triggered yet.
         // But this should only happen if the input has changed and not after the user has already started the simulation.
-        document.getElementById("input").disabled = true;
-        document.getElementById("vis_input").disabled = true;
+        disable_editor();
         evaluatePython_step_sim();
         update_performance_metrics();
         enable_run();
@@ -113,12 +110,10 @@ window.addEventListener("DOMContentLoaded", function () {
     function refresh_button() {
         is_run_simulation = false;
         manual_run = false;
-        document.getElementById("input").disabled = true;
-        document.getElementById("vis_input").disabled = true;
+        disable_editor();
         clearInterval(run);
         evaluatePython_reset_sim();
-        document.getElementById("input").disabled = false;
-        document.getElementById("input").disabled = false;
+        enable_editor();
         enable_run();
         disable_pause();
         enable_step();
@@ -160,13 +155,9 @@ window.addEventListener("DOMContentLoaded", function () {
             selected_isa = "toy";
             refresh_button();
 
-            if (!document.getElementById("button_HazardDetection").checked) {
-                document.getElementById("button_HazardDetection").click();
-            }
             if (document.getElementById("button_5-Stage").checked) {
                 document.getElementById("button_SingleStage").click();
             }
-            document.getElementById("button_HazardDetection").disabled = true;
             document.getElementById("button_SingleStage").disabled = true;
             document.getElementById("button_5-Stage").disabled = true;
             document.getElementById("modal_header_switch_stage").style.color =
@@ -249,10 +240,7 @@ window.addEventListener("DOMContentLoaded", function () {
             document.getElementById("button_tab_visualization").textContent =
                 "Visualization";
 
-            if (!document.getElementById("button_HazardDetection").checked) {
-                document.getElementById("button_HazardDetection").click();
-            }
-            document.getElementById("button_HazardDetection").disabled = true;
+            disable_hazard_detection();
         });
 
     document.getElementById("button_5-Stage").addEventListener("click", () => {
@@ -266,7 +254,7 @@ window.addEventListener("DOMContentLoaded", function () {
         document.getElementById("button_tab_visualization").style.display =
             "block";
 
-        document.getElementById("button_HazardDetection").disabled = false;
+        enable_hazard_detection();
     });
 
     // hazard detection button listener
@@ -338,6 +326,7 @@ function disable_pipeline_switch() {
         getComputedStyle(document.documentElement).getPropertyValue(
             "--button_disabled_color"
         );
+    document.getElementById("button_HazardDetection").disabled = true;
 }
 
 function enable_pipeline_switch() {
@@ -351,6 +340,11 @@ function enable_pipeline_switch() {
         getComputedStyle(document.documentElement).getPropertyValue(
             "button_switch_stage"
         );
+    if (document.getElementById("button_5-Stage").checked) {
+        enable_hazard_detection();
+    } else {
+        disable_hazard_detection();
+    }
 }
 
 function disable_run() {
@@ -447,6 +441,27 @@ function stop_loading_visuals() {
     enable_control_buttons();
     stop_loading_animation();
     disable_pause();
+}
+
+function disable_editor() {
+    editor.setOption("readOnly", true);
+    editor_vis.setOption("readOnly", true);
+}
+
+function enable_editor() {
+    editor.setOption("readOnly", false);
+    editor_vis.setOption("readOnly", false);
+}
+
+function disable_hazard_detection() {
+    if (!document.getElementById("button_HazardDetection").checked) {
+        document.getElementById("button_HazardDetection").click();
+    }
+    document.getElementById("button_HazardDetection").disabled = true;
+}
+
+function enable_hazard_detection() {
+    document.getElementById("button_HazardDetection").disabled = false;
 }
 
 function toggleVisualizationTabContent() {
