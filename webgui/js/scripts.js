@@ -602,6 +602,7 @@ function toggleVisualizationTabContent() {
         document.getElementById("MainContent").style.display = "none";
         document.getElementById("button_tab_visualization").textContent =
             "Visualization Off";
+        toggleInputTab();
     } else {
         synchronizeEditors(editor_vis, editor);
         editor_vis.closeHint();
