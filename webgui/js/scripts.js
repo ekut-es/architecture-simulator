@@ -272,7 +272,6 @@ window.addEventListener("DOMContentLoaded", function () {
         });
 
     editor.on("change", function () {
-        synchronizeEditors(editor, editor_vis);
         editor.save();
         for (let i = 0; i < editor.lineCount(); i++) {
             editor.removeLineClass(i, "background", "highlight");
@@ -293,7 +292,6 @@ window.addEventListener("DOMContentLoaded", function () {
     });
 
     editor_vis.on("change", function () {
-        synchronizeEditors(editor_vis, editor);
         editor_vis.save();
         // autoparse
         clearTimeout(input_timer);
@@ -545,9 +543,7 @@ function toggleMemoryTab() {
 
 function synchronizeEditors(sEditor, tEditor) {
     const content = sEditor.getValue();
-    if (content !== tEditor.getValue()) {
-        tEditor.setValue(content);
-    }
+    tEditor.setValue(content);
 }
 
 window.addEventListener("load", function () {
