@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from fixedint import MutableUInt16
 
+from architecture_simulator.settings.settings import Settings
 from ..memory import MemoryAddressError
 
 
@@ -11,7 +12,12 @@ class ToyMemory:
     """
 
     memory_file: dict[int, MutableUInt16] = field(default_factory=dict)
-    address_range: range = field(default_factory=lambda: range(1024, 4096))
+    address_range: range = field(
+        default_factory=lambda: range(
+            Settings().get()["toy_memory_min_bytes"],
+            Settings().get()["toy_memory_max_bytes"],
+        )
+    )
 
     def write_halfword(self, address: int, value: MutableUInt16):
         """Store given value at given address.

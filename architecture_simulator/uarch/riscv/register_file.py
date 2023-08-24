@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 import fixedint
 
+from architecture_simulator.settings.settings import Settings
+
 
 class Registers(list):
     """Custom list that overwrites [] so that register x0 gets hardwired to zero."""
@@ -78,38 +80,11 @@ class RegisterFile:
         Returns:
             str: ABI name of the register.
         """
-        abi_names = {
-            0: "zero",
-            1: "ra",
-            2: "sp",
-            3: "gp",
-            4: "tp",
-            5: "t0",
-            6: "t1",
-            7: "t2",
-            8: "s0/fp",  # this is intentional
-            9: "s1",
-            10: "a0",
-            11: "a1",
-            12: "a2",
-            13: "a3",
-            14: "a4",
-            15: "a5",
-            16: "a6",
-            17: "a7",
-            18: "s2",
-            19: "s3",
-            20: "s4",
-            21: "s5",
-            22: "s6",
-            23: "s7",
-            24: "s8",
-            25: "s9",
-            26: "s10",
-            27: "s11",
-            28: "t3",
-            29: "t4",
-            30: "t5",
-            31: "t6",
-        }
-        return abi_names[register]
+        abi_names = Settings().get()["abi_names"]
+        register_name = ""
+        for key, value in abi_names.items():
+            if value == register:
+                if register_name != "":
+                    register_name += "/"
+                register_name += key
+        return register_name

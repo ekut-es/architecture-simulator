@@ -1,5 +1,6 @@
 from typing import Optional
 
+from architecture_simulator.settings.settings import Settings
 from .riscv_performance_metrics import RiscvPerformanceMetrics
 from .register_file import RegisterFile
 from ..memory import Memory
@@ -22,8 +23,8 @@ class RiscvArchitecturalState:
 
     def __init__(
         self,
-        pipeline_mode: str = "single_stage_pipeline",
-        detect_data_hazards: bool = True,
+        pipeline_mode: str = Settings().get()["default_pipeline_mode"],
+        detect_data_hazards: bool = Settings().get()["hazard_detection"],
         memory: Optional[Memory] = None,
         register_file: Optional[RegisterFile] = None,
     ):
@@ -46,7 +47,7 @@ class RiscvArchitecturalState:
         self.memory = Memory() if memory is None else memory
         self.register_file = RegisterFile() if register_file is None else register_file
         self.csr_registers = CsrRegisterFile()
-        self.program_counter = 0
+        self.program_counter = self.instruction_memory.address_range.start  # 0
         self.performance_metrics = RiscvPerformanceMetrics()
 
     def change_privilege_level(self, level: int):

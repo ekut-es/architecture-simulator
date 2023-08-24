@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 import fixedint
+from architecture_simulator.settings.settings import Settings
 
 
 @dataclass
@@ -21,9 +22,9 @@ class Memory:
     """
 
     # Address length in bits. Can be used to limit memory size.
-    address_length: int = 32
+    address_length: int = Settings().get()["memory_address_length"]  # 32
     # min address (inclusive)
-    min_bytes: int = 2**14  # 2**14
+    min_bytes: int = Settings().get()["memory_address_min_bytes"]  # 2**14
     memory_file: dict[int, fixedint.MutableUInt8] = field(default_factory=dict)
 
     def memory_wordwise_repr(self) -> dict[int, tuple[str, str, str, str]]:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
 
+from architecture_simulator.settings.settings import Settings
 from architecture_simulator.uarch.riscv.riscv_architectural_state import (
     RiscvArchitecturalState,
 )
@@ -24,8 +25,8 @@ class RiscvSimulation(Simulation):
     def __init__(
         self,
         state: Optional[RiscvArchitecturalState] = None,
-        mode: str = "single_stage_pipeline",
-        detect_data_hazards: bool = True,
+        mode: str = Settings().get()["default_pipeline_mode"],
+        detect_data_hazards: bool = Settings().get()["hazard_detection"],
     ) -> None:
         """Constructor for RISC-V simulations.
 

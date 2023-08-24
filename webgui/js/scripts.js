@@ -1,35 +1,97 @@
+var settings;
+
 const binary_representation = 0;
 const decimal_representation = 1;
 const hexa_representation = 2;
 const signed_decimal_representation = 3;
-//change steps_per_interval if you want to change the amount of times evaluatePython_step_sim() is called per interval (10ms)
-//the higher this number the less responsive the ui gets, at 200 it starts to get a bit too unresponsive. 100 feels acceptable
-const steps_per_interval = 100;
 
-//set use_more_than_one_step_per_10ms to false if you only want to call up evaluatePython_step_sim() more than once per interval (10ms)
-const use_more_than_one_step_per_10ms = true;
-const parse_sim_after_not_typing_for_n_ms = 500;
+var use_more_than_one_step_per_10ms = true;
+
+// Placeholder values! In order to change default settings, go to settings/settings.py
+var steps_per_interval = 100;
+var parse_sim_after_not_typing_for_n_ms = 500;
+var selected_isa = "riscv";
+var reg_representation_mode = 0;
+var mem_representation_mode = 0;
+var pipeline_mode = "single_stage_pipeline";
+var hazard_detection = true;
 
 var input_timer;
-
-let hazard_detection = true;
-
-let selected_isa = "riscv";
-
-let reg_representation_mode = decimal_representation; //change this to set another default repr.
-let mem_representation_mode = decimal_representation;
-
 var run;
 var is_run_simulation = false;
 var manual_run = false;
-var pipeline_mode = "single_stage_pipeline";
 
 window.addEventListener("DOMContentLoaded", function () {
-    clearTimeout(input_timer);
-    input_timer = setTimeout(
-        finished_typing,
-        parse_sim_after_not_typing_for_n_ms
-    );
+    evaluatePython_load_settings().then((value) => {
+        settings = JSON.parse(value);
+
+        steps_per_interval = settings.steps_per_interval;
+        parse_sim_after_not_typing_for_n_ms = settings.autoparse_delay;
+
+        selected_isa = settings.default_isa;
+        reg_representation_mode = settings.default_register_representation;
+        mem_representation_mode = settings.default_memory_representation;
+        pipeline_mode = settings.default_pipeline_mode;
+        hazard_detection = settings.hazard_detection;
+
+        if (reg_representation_mode === binary_representation) {
+            document
+                .getElementById("reg_button_binary_representation_id")
+                .click();
+        } else if (reg_representation_mode === decimal_representation) {
+            document
+                .getElementById("reg_button_decimal_representation_id")
+                .click();
+        } else if (reg_representation_mode === signed_decimal_representation) {
+            document
+                .getElementById("reg_button_signed_decimal_representation_id")
+                .click();
+        } else if (reg_representation_mode === hexa_representation) {
+            document
+                .getElementById("reg_button_hexa_representation_id")
+                .click();
+        }
+
+        if (mem_representation_mode === binary_representation) {
+            document
+                .getElementById("mem_button_binary_representation_id")
+                .click();
+        } else if (mem_representation_mode === decimal_representation) {
+            document
+                .getElementById("mem_button_decimal_representation_id")
+                .click();
+        } else if (mem_representation_mode === signed_decimal_representation) {
+            document
+                .getElementById("mem_button_signed_decimal_representation_id")
+                .click();
+        } else if (mem_representation_mode === hexa_representation) {
+            document
+                .getElementById("mem_button_hexa_representation_id")
+                .click();
+        }
+
+        if (selected_isa === "riscv") {
+            document.getElementById("isa_button_riscv_id").click();
+            if (pipeline_mode === "single_stage_pipeline") {
+                document.getElementById("button_SingleStage").click();
+            } else if (pipeline_mode === "five_stage_pipeline") {
+                document.getElementById("button_5-Stage").click();
+                if (!hazard_detection) {
+                    document.getElementById("button_HazardDetection").click();
+                }
+            }
+        } else if (selected_isa === "toy") {
+            document.getElementById("isa_button_toy_id").click();
+        }
+
+        clearTimeout(input_timer);
+        input_timer = setTimeout(
+            finished_typing,
+            parse_sim_after_not_typing_for_n_ms
+        );
+
+        refresh_button();
+    });
 
     // paste the help pages into the html
     document.getElementById("RiscvHelp").innerHTML = riscvDocumentation;
@@ -45,8 +107,6 @@ window.addEventListener("DOMContentLoaded", function () {
         is_run_simulation = true;
         manual_run = true;
         editor.save();
-        //finished_typing(); FIXME: The input should get parsed after clicking the button in case the auto parsing wasn't triggered yet.
-        // But this should only happen if the input has changed and not after the user has already started the simulation.
         disable_editor();
         if (run) {
             stop_loading_animation();
@@ -63,6 +123,7 @@ window.addEventListener("DOMContentLoaded", function () {
         enable_pause();
         disable_step();
         disable_pipeline_switch();
+        disable_isa_switch();
         update_ui_async();
     }
 
@@ -84,6 +145,7 @@ window.addEventListener("DOMContentLoaded", function () {
         enable_step();
         stop_loading_animation();
         disable_pipeline_switch();
+        disable_isa_switch();
     }
 
     document
@@ -96,14 +158,13 @@ window.addEventListener("DOMContentLoaded", function () {
         is_run_simulation = false;
         manual_run = true;
         editor.save();
-        //finished_typing(); FIXME: The input should get parsed after clicking the button in case the auto parsing wasn't triggered yet.
-        // But this should only happen if the input has changed and not after the user has already started the simulation.
         disable_editor();
         evaluatePython_step_sim();
         update_performance_metrics();
         enable_run();
         disable_pause();
         enable_step();
+        disable_isa_switch();
         disable_pipeline_switch();
     }
 
@@ -124,6 +185,7 @@ window.addEventListener("DOMContentLoaded", function () {
         disable_pause();
         enable_step();
         enable_pipeline_switch();
+        enable_isa_switch();
         clearTimeout(input_timer);
         finished_typing();
     }
@@ -169,6 +231,7 @@ window.addEventListener("DOMContentLoaded", function () {
             RiscvHelp.style.display = "none";
             ToyHelp.style.display = "block";
 
+            hazard_detection = true;
             if (document.getElementById("button_5-Stage").checked) {
                 document.getElementById("button_SingleStage").click();
             }
@@ -327,6 +390,16 @@ window.onbeforeunload = function () {
     return true;
 };
 
+function disable_isa_switch() {
+    document.getElementById("isa_button_riscv_id").disabled = true;
+    document.getElementById("isa_button_toy_id").disabled = true;
+}
+
+function enable_isa_switch() {
+    document.getElementById("isa_button_riscv_id").disabled = false;
+    document.getElementById("isa_button_toy_id").disabled = false;
+}
+
 function disable_pipeline_switch() {
     document.getElementById("button_SingleStage").disabled = true;
     document.getElementById("button_SingleStage").style.backgroundColor =
@@ -342,6 +415,9 @@ function disable_pipeline_switch() {
 }
 
 function enable_pipeline_switch() {
+    if (document.getElementById("isa_button_toy_id").checked) {
+        return;
+    }
     document.getElementById("button_SingleStage").disabled = false;
     document.getElementById("button_SingleStage").style.backgroundColor =
         getComputedStyle(document.documentElement).getPropertyValue(
@@ -579,22 +655,6 @@ function set_svg_text_simple(id, str) {
     ).contentDocument;
     pipeline_svg.getElementById(id).textContent = str;
 }
-
-// function set_svg_text_simple_right_align(id, str) {
-//     const pipeline_svg = document.getElementById(
-//         "visualization_pipeline"
-//     ).contentDocument;
-//     pipeline_svg.getElementById(id).textContent = str;
-//     pipeline_svg.getElementById(id).setAttribute("text-anchor", "end");
-// }
-
-// function set_svg_text_simple_left_align(id, str) {
-//     const pipeline_svg = document.getElementById(
-//         "visualization_pipeline"
-//     ).contentDocument;
-//     pipeline_svg.getElementById(id).textContent = str;
-//     pipeline_svg.getElementById(id).setAttribute("text-anchor", "start");
-// }
 
 function set_svg_text_complex_right_align(id, str) {
     const pipeline_svg = document.getElementById(

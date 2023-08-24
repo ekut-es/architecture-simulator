@@ -1,6 +1,7 @@
 from typing import TypeVar, Generic
 from dataclasses import dataclass, field
 
+from architecture_simulator.settings.settings import Settings
 from architecture_simulator.isa.instruction import Instruction
 from .memory import MemoryAddressError
 
@@ -18,7 +19,12 @@ class InstructionMemory(Generic[T]):
     """
 
     instructions: dict[int, T] = field(default_factory=dict)
-    address_range: range = field(default_factory=lambda: range(0, 2**14))
+    address_range: range = field(
+        default_factory=lambda: range(
+            Settings().get()["instruction_memory_min_bytes"],
+            Settings().get()["instruction_memory_max_bytes"],
+        )
+    )
 
     def read_instruction(self, address: int) -> T:
         """Load instruction from given address.

@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Optional
 import archsim_js
 import pyodide.ffi  # type: ignore
+from architecture_simulator.settings.settings import Settings
 from architecture_simulator.isa.parser_exceptions import ParserException
 from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 from architecture_simulator.simulation.toy_simulation import ToySimulation
@@ -28,6 +29,16 @@ class StateNotInitializedError(RuntimeError):
 
     def __repr__(self):
         return "state has not been initialized."
+
+
+def load_settings() -> str:
+    """Loads the settings JSON using Python, to avoid local JS import errors.
+
+    Returns:
+        str: The settings JSON.
+    """
+    settings_string = Settings().get_JSON()
+    return settings_string
 
 
 def sim_init() -> RiscvSimulation:
@@ -169,7 +180,7 @@ def parse_input(instr: str):
         simulation.load_program(instr)
         archsim_js.remove_all_highlights()
         if not first_refresh:
-            archsim_js.set_output("TODO no error message")
+            archsim_js.set_output(Settings().get()["default_no_error_output"])
         first_refresh = False
     except ParserException as Parser_Exception:
         archsim_js.set_output(Parser_Exception.__repr__())

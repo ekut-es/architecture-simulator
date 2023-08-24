@@ -1,6 +1,7 @@
 from fixedint import MutableUInt16
 from typing import Optional
 
+from architecture_simulator.settings.settings import Settings
 from .toy_memory import ToyMemory
 from ..instruction_memory import InstructionMemory
 from architecture_simulator.isa.toy.toy_instructions import ToyInstruction
@@ -16,18 +17,30 @@ class ToyArchitecturalState:
         data_memory_range: Optional[range] = None,
     ):
         self.program_counter = MutableUInt16(
-            instruction_memory_range.start if instruction_memory_range else 0
+            instruction_memory_range.start
+            if instruction_memory_range
+            else Settings().get()["toy_instruction_memory_min_bytes"]
         )
         self.previous_program_counter: Optional[MutableUInt16] = None
         self.accu = MutableUInt16(0)
         self.instruction_memory = InstructionMemory[ToyInstruction](
             address_range=(
-                instruction_memory_range if instruction_memory_range else range(0, 1024)
+                instruction_memory_range
+                if instruction_memory_range
+                else range(
+                    Settings().get()["toy_instruction_memory_min_bytes"],
+                    Settings().get()["toy_instruction_memory_max_bytes"],
+                )
             )
         )
         self.data_memory = ToyMemory(
             address_range=(
-                data_memory_range if data_memory_range else range(1024, 4096)
+                data_memory_range
+                if data_memory_range
+                else range(
+                    Settings().get()["toy_memory_min_bytes"],
+                    Settings().get()["toy_memory_max_bytes"],
+                )
             )
         )
         self.performance_metrics = ToyPerformanceMetrics()
