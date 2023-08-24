@@ -23,12 +23,18 @@ var run;
 var is_run_simulation = false;
 var manual_run = false;
 var pipeline_mode = "single_stage_pipeline";
+
 window.addEventListener("DOMContentLoaded", function () {
     clearTimeout(input_timer);
     input_timer = setTimeout(
         finished_typing,
         parse_sim_after_not_typing_for_n_ms
     );
+
+    // paste the help pages into the html
+    document.getElementById("RiscvHelp").innerHTML = riscvDocumentation;
+    document.getElementById("ToyHelp").innerHTML = toyDocumentation;
+
     document
         .getElementById("button_simulation_start_id")
         .addEventListener("click", () => {
@@ -143,6 +149,10 @@ window.addEventListener("DOMContentLoaded", function () {
             selected_isa = "riscv";
             refresh_button();
 
+            document.getElementById("HelpHeader").textContent = "RISC-V";
+            RiscvHelp.style.display = "block";
+            ToyHelp.style.display = "none";
+
             document.getElementById("button_SingleStage").disabled = false;
             document.getElementById("button_5-Stage").disabled = false;
             document.getElementById("modal_header_switch_stage").style.color =
@@ -154,6 +164,10 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             selected_isa = "toy";
             refresh_button();
+            
+            document.getElementById("HelpHeader").textContent = "Toy";
+            RiscvHelp.style.display = "none";
+            ToyHelp.style.display = "block";
 
             if (document.getElementById("button_5-Stage").checked) {
                 document.getElementById("button_SingleStage").click();
