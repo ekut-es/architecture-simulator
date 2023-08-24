@@ -121,7 +121,7 @@ const riscvDocumentation = html` <div class="container-fluid">
 
     <h3 id="i-type">I-Type</h3>
     <p>
-        Unless specified otherwise, the immediate (<code>imm</code>) has a
+        Unless otherwise specified, the immediate (<code>imm</code>) has a
         length of 12 bits and is sign extended to 32 bits.
         <br />
         <code>var</code> is a variable name, <code>index</code> is an optional
