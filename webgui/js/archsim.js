@@ -105,7 +105,6 @@ const archsim_js = {
         td1 = document.createElement("td");
         td1.innerText = address;
         td2 = document.createElement("td");
-        //alert(Array.from(representations))
         td2.innerText = Array.from(representations)[mem_representation_mode];
         td2.id = "memory" + address;
         if (previous_memory[address] != Array.from(representations)[1]) {
@@ -121,7 +120,6 @@ const archsim_js = {
         td1_vis = document.createElement("td");
         td1_vis.innerText = address;
         td2_vis = document.createElement("td");
-        //alert(Array.from(representations))
         td2_vis.innerText =
             Array.from(representations)[mem_representation_mode];
         td2_vis.id = "memory" + address;
@@ -132,8 +130,6 @@ const archsim_js = {
         tr_vis.appendChild(td2_vis);
         memory_vis.appendChild(tr_vis);
     },
-    // FIXME: I dont know what the following comment means, it might be outdated
-    //ids und inner texts have to be changed then delete this comment
     /**
      * Appends one row to the instruction memory table.
      *
@@ -1073,6 +1069,19 @@ async function evaluatePython_parse_input() {
     try {
         parse_input = pyodide.globals.get("parse_input");
         parse_input(input_str);
+    } catch (err) {
+        addToOutput(err);
+    }
+}
+
+/**
+ * Loads the settings JSON using Python, to avoid local JS import errors.
+ */
+async function evaluatePython_load_settings() {
+    let pyodide = await pyodideReadyPromise;
+    try {
+        load_settings = pyodide.globals.get("load_settings");
+        return load_settings();
     } catch (err) {
         addToOutput(err);
     }

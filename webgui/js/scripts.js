@@ -1,34 +1,49 @@
+var settings;
+
 const binary_representation = 0;
 const decimal_representation = 1;
 const hexa_representation = 2;
 const signed_decimal_representation = 3;
-//change steps_per_interval if you want to change the amount of times evaluatePython_step_sim() is called per interval (10ms)
-//the higher this number the less responsive the ui gets, at 200 it starts to get a bit too unresponsive. 100 feels acceptable
-const steps_per_interval = 100;
 
-//set use_more_than_one_step_per_10ms to false if you only want to call up evaluatePython_step_sim() more than once per interval (10ms)
-const use_more_than_one_step_per_10ms = true;
-const parse_sim_after_not_typing_for_n_ms = 500;
+// Placeholder values! In order to change default settings, go to settings/settings.py
+var steps_per_interval = 100;
+var use_more_than_one_step_per_10ms = true;
+var parse_sim_after_not_typing_for_n_ms = 500;
+var selected_isa = "riscv";
+var reg_representation_mode = 0;
+var mem_representation_mode = 0;
+var pipeline_mode = "single_stage_pipeline";
+var hazard_detection = true;
 
 var input_timer;
-
-let hazard_detection = true;
-
-let selected_isa = "riscv";
-
-let reg_representation_mode = decimal_representation; //change this to set another default repr.
-let mem_representation_mode = decimal_representation;
-
 var run;
 var is_run_simulation = false;
 var manual_run = false;
-var pipeline_mode = "single_stage_pipeline";
+
 window.addEventListener("DOMContentLoaded", function () {
-    clearTimeout(input_timer);
-    input_timer = setTimeout(
-        finished_typing,
-        parse_sim_after_not_typing_for_n_ms
-    );
+    evaluatePython_load_settings().then((value) => {
+        settings = JSON.parse(value);
+
+        steps_per_interval = settings.steps_per_interval;
+        //set use_more_than_one_step_per_10ms to false if you only want to call up evaluatePython_step_sim() more than once per interval (10ms)
+        use_more_than_one_step_per_10ms = true;
+        parse_sim_after_not_typing_for_n_ms = settings.autoparse_delay;
+
+        selected_isa = settings.default_isa;
+        reg_representation_mode = settings.default_register_representation;
+        mem_representation_mode = settings.default_memory_representation;
+        pipeline_mode = settings.default_pipeline_mode;
+        hazard_detection = settings.hazard_detection;
+
+        clearTimeout(input_timer);
+        input_timer = setTimeout(
+            finished_typing,
+            parse_sim_after_not_typing_for_n_ms
+        );
+
+        refresh_button();
+    });
+
     document
         .getElementById("button_simulation_start_id")
         .addEventListener("click", () => {
@@ -39,8 +54,6 @@ window.addEventListener("DOMContentLoaded", function () {
         is_run_simulation = true;
         manual_run = true;
         editor.save();
-        //finished_typing(); FIXME: The input should get parsed after clicking the button in case the auto parsing wasn't triggered yet.
-        // But this should only happen if the input has changed and not after the user has already started the simulation.
         disable_editor();
         if (run) {
             stop_loading_animation();
@@ -90,8 +103,6 @@ window.addEventListener("DOMContentLoaded", function () {
         is_run_simulation = false;
         manual_run = true;
         editor.save();
-        //finished_typing(); FIXME: The input should get parsed after clicking the button in case the auto parsing wasn't triggered yet.
-        // But this should only happen if the input has changed and not after the user has already started the simulation.
         disable_editor();
         evaluatePython_step_sim();
         update_performance_metrics();
@@ -569,22 +580,6 @@ function set_svg_text_simple(id, str) {
     ).contentDocument;
     pipeline_svg.getElementById(id).textContent = str;
 }
-
-// function set_svg_text_simple_right_align(id, str) {
-//     const pipeline_svg = document.getElementById(
-//         "visualization_pipeline"
-//     ).contentDocument;
-//     pipeline_svg.getElementById(id).textContent = str;
-//     pipeline_svg.getElementById(id).setAttribute("text-anchor", "end");
-// }
-
-// function set_svg_text_simple_left_align(id, str) {
-//     const pipeline_svg = document.getElementById(
-//         "visualization_pipeline"
-//     ).contentDocument;
-//     pipeline_svg.getElementById(id).textContent = str;
-//     pipeline_svg.getElementById(id).setAttribute("text-anchor", "start");
-// }
 
 function set_svg_text_complex_right_align(id, str) {
     const pipeline_svg = document.getElementById(
