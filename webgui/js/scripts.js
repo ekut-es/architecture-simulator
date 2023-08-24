@@ -35,6 +35,56 @@ window.addEventListener("DOMContentLoaded", function () {
         pipeline_mode = settings.default_pipeline_mode;
         hazard_detection = settings.hazard_detection;
 
+        if (reg_representation_mode === binary_representation) {
+            document
+                .getElementById("reg_button_binary_representation_id")
+                .click();
+        } else if (reg_representation_mode === decimal_representation) {
+            document
+                .getElementById("reg_button_decimal_representation_id")
+                .click();
+        } else if (reg_representation_mode === signed_decimal_representation) {
+            document
+                .getElementById("reg_button_signed_decimal_representation_id")
+                .click();
+        } else if (reg_representation_mode === hexa_representation) {
+            document
+                .getElementById("reg_button_hexa_representation_id")
+                .click();
+        }
+
+        if (mem_representation_mode === binary_representation) {
+            document
+                .getElementById("mem_button_binary_representation_id")
+                .click();
+        } else if (mem_representation_mode === decimal_representation) {
+            document
+                .getElementById("mem_button_decimal_representation_id")
+                .click();
+        } else if (mem_representation_mode === signed_decimal_representation) {
+            document
+                .getElementById("mem_button_signed_decimal_representation_id")
+                .click();
+        } else if (mem_representation_mode === hexa_representation) {
+            document
+                .getElementById("mem_button_hexa_representation_id")
+                .click();
+        }
+
+        if (selected_isa === "riscv") {
+            document.getElementById("isa_button_riscv_id").click();
+            if (pipeline_mode === "single_stage_pipeline") {
+                document.getElementById("button_SingleStage").click();
+            } else if (pipeline_mode === "five_stage_pipeline") {
+                document.getElementById("button_5-Stage").click();
+                if (!hazard_detection) {
+                    document.getElementById("button_HazardDetection").click();
+                }
+            }
+        } else if (selected_isa === "toy") {
+            document.getElementById("isa_button_toy_id").click();
+        }
+
         clearTimeout(input_timer);
         input_timer = setTimeout(
             finished_typing,
@@ -70,6 +120,7 @@ window.addEventListener("DOMContentLoaded", function () {
         enable_pause();
         disable_step();
         disable_pipeline_switch();
+        disable_isa_switch();
         update_ui_async();
     }
 
@@ -91,6 +142,7 @@ window.addEventListener("DOMContentLoaded", function () {
         enable_step();
         stop_loading_animation();
         disable_pipeline_switch();
+        disable_isa_switch();
     }
 
     document
@@ -109,6 +161,7 @@ window.addEventListener("DOMContentLoaded", function () {
         enable_run();
         disable_pause();
         enable_step();
+        disable_isa_switch();
         disable_pipeline_switch();
     }
 
@@ -129,6 +182,7 @@ window.addEventListener("DOMContentLoaded", function () {
         disable_pause();
         enable_step();
         enable_pipeline_switch();
+        enable_isa_switch();
         clearTimeout(input_timer);
         finished_typing();
     }
@@ -166,6 +220,7 @@ window.addEventListener("DOMContentLoaded", function () {
             selected_isa = "toy";
             refresh_button();
 
+            hazard_detection = true;
             if (document.getElementById("button_5-Stage").checked) {
                 document.getElementById("button_SingleStage").click();
             }
@@ -326,6 +381,16 @@ window.onbeforeunload = function () {
     return true;
 };
 
+function disable_isa_switch() {
+    document.getElementById("isa_button_riscv_id").disabled = true;
+    document.getElementById("isa_button_toy_id").disabled = true;
+}
+
+function enable_isa_switch() {
+    document.getElementById("isa_button_riscv_id").disabled = false;
+    document.getElementById("isa_button_toy_id").disabled = false;
+}
+
 function disable_pipeline_switch() {
     document.getElementById("button_SingleStage").disabled = true;
     document.getElementById("button_SingleStage").style.backgroundColor =
@@ -341,6 +406,9 @@ function disable_pipeline_switch() {
 }
 
 function enable_pipeline_switch() {
+    if (document.getElementById("isa_button_toy_id").checked) {
+        return;
+    }
     document.getElementById("button_SingleStage").disabled = false;
     document.getElementById("button_SingleStage").style.backgroundColor =
         getComputedStyle(document.documentElement).getPropertyValue(
