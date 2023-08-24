@@ -134,12 +134,12 @@ const toyDocumentation = html` <div class="container-fluid">
     </p>
     <pre class="bg-light">
 loop:
-LDA counter
-DEC
-STO counter
-BRZ end
-ZRO
-BRZ loop
+    LDA counter
+    DEC
+    STO counter
+    BRZ end
+    ZRO
+    BRZ loop
 end:
 
 counter=$400</pre
@@ -183,15 +183,15 @@ Result = $401
 LDA Loopcount # skip to the end if n=0
 BRZ end
 loop:
-LDA Result
-ADD Loopcount
-STO Result
-LDA Loopcount
-DEC
-STO Loopcount
-BRZ end
-ZRO
-BRZ loop
+    LDA Result
+    ADD Loopcount
+    STO Result
+    LDA Loopcount
+    DEC
+    STO Loopcount
+    BRZ end
+    ZRO
+    BRZ loop
 end:
 </pre
     >
