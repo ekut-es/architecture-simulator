@@ -17,6 +17,8 @@ const performance_metrics_vis = document.getElementById(
 
 var previous_pc = 0;
 
+var close_hint = false;
+
 const pipeline_svg = document.getElementById(
     "visualization_pipeline"
 ).contentDocument;
@@ -289,10 +291,10 @@ const archsim_js = {
         if (
             document.getElementById("VisualizationTabContent").style.display ==
             "block"
-        )
-            editor_vis.showHint(error_description);
-        else {
-            editor.showHint(error_description);
+        ) {
+            if (!close_hint) editor_vis.showHint(error_description);
+        } else {
+            if (!close_hint) editor.showHint(error_description);
         }
     },
     /**
