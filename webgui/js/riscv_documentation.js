@@ -1,56 +1,4 @@
 const riscvDocumentation = /*html*/ ` <div class="container-fluid">
-    <h2 id="labels">Comments and labels</h2>
-    <p>
-        Comments can be added to the code using
-        <code>#</code>.<br />
-        Labels are added by appending a colon
-        <code>:</code> to a label name. They can be used as jump targets.
-    </p>
-    <pre class="bg-light">
-# This is a comment
-my_label:
-addi x1, x1, 1
-jal x2, my_label
-addi x3, x3, 1 # This line is never reached</pre
-    >
-
-    <h2 id="variables">Segments and variables</h2>
-    <p>
-        In addition to the program code, the simulator supports a data segment.
-        It can be used to store variables and arrays in the simulator's memory.
-    </p>
-    <p>
-        In order to define a data segment, the
-        <code>.data</code> directive is used, while the
-        <code>.text</code> directive designates the code segment.
-    </p>
-    <p>
-        The following example demonstrates how to declare and use variables and
-        arrays, employing all currently supported data types:
-    </p>
-    <pre class="bg-light">
-.data
-my_var1: .byte -128
-my_var2: .half 0x1234, 0b1010, 999
-my_var3: .word 0x12345678, 0b111
-text1:   .string "Hello, World!"  # ASCII byte array
-.text
-la x1, my_var1     # load address of my_var1 into x1
-lh x2, my_var2     # load halfword from my_var2 into x2
-lh x3, my_var2[0]  # same effect as above
-lh x4, my_var2[2]  # x4 = 999
-lw x5, my_var3[1]  # x5 = 0b111
-lb x6, text1[11]   # x6 = '!'</pre
-    >
-    <p>
-        If no directives are given, the entire input is interpreted as code.<br />
-        Similarly, if a <code>.data</code> but no <code>.text</code> directive
-        is given, every line before the data segment is interpreted as code.
-        <br />
-        There is no fixed segmentation order. However, declaring multiple
-        segments of the same type will throw an error.
-    </p>
-
     <h2 id="instructions">Instructions</h2>
     <p>
         This simulator supports a subset of the RISC-V32 ISA. The supported
@@ -817,4 +765,56 @@ lb x6, text1[11]   # x6 = '!'</pre
             </table>
         </div>
     </div>
+
+    <h2 id="labels">Comments and labels</h2>
+    <p>
+        Comments can be added to the code using
+        <code>#</code>.<br />
+        Labels are added by appending a colon
+        <code>:</code> to a label name. They can be used as jump targets.
+    </p>
+    <pre class="bg-light">
+# This is a comment
+my_label:
+addi x1, x1, 1
+jal x2, my_label
+addi x3, x3, 1 # This line is never reached</pre
+    >
+
+    <h2 id="variables">Segments and variables</h2>
+    <p>
+        In addition to the program code, the simulator supports a data segment.
+        It can be used to store variables and arrays in the simulator's memory.
+    </p>
+    <p>
+        In order to define a data segment, the
+        <code>.data</code> directive is used, while the
+        <code>.text</code> directive designates the code segment.
+    </p>
+    <p>
+        The following example demonstrates how to declare and use variables and
+        arrays, employing all currently supported data types:
+    </p>
+    <pre class="bg-light">
+.data
+my_var1: .byte -128
+my_var2: .half 0x1234, 0b1010, 999
+my_var3: .word 0x12345678, 0b111
+text1:   .string "Hello, World!"  # ASCII byte array
+.text
+la x1, my_var1     # load address of my_var1 into x1
+lh x2, my_var2     # load halfword from my_var2 into x2
+lh x3, my_var2[0]  # same effect as above
+lh x4, my_var2[2]  # x4 = 999
+lw x5, my_var3[1]  # x5 = 0b111
+lb x6, text1[11]   # x6 = '!'</pre
+    >
+    <p>
+        If no directives are given, the entire input is interpreted as code.<br />
+        Similarly, if a <code>.data</code> but no <code>.text</code> directive
+        is given, every line before the data segment is interpreted as code.
+        <br />
+        There is no fixed segmentation order. However, declaring multiple
+        segments of the same type will throw an error.
+    </p>
 </div>`;
