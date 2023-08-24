@@ -54,6 +54,8 @@ class Settings:
             "t5": 30,
             "t6": 31,
         },
+        "toy_memory_min_bytes": 1024,
+        "toy_memory_max_bytes": 4096,
     }
 
     def get_JSON(self) -> str:

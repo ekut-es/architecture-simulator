@@ -5,9 +5,10 @@ const decimal_representation = 1;
 const hexa_representation = 2;
 const signed_decimal_representation = 3;
 
+var use_more_than_one_step_per_10ms = true;
+
 // Placeholder values! In order to change default settings, go to settings/settings.py
 var steps_per_interval = 100;
-var use_more_than_one_step_per_10ms = true;
 var parse_sim_after_not_typing_for_n_ms = 500;
 var selected_isa = "riscv";
 var reg_representation_mode = 0;
@@ -25,8 +26,6 @@ window.addEventListener("DOMContentLoaded", function () {
         settings = JSON.parse(value);
 
         steps_per_interval = settings.steps_per_interval;
-        //set use_more_than_one_step_per_10ms to false if you only want to call up evaluatePython_step_sim() more than once per interval (10ms)
-        use_more_than_one_step_per_10ms = true;
         parse_sim_after_not_typing_for_n_ms = settings.autoparse_delay;
 
         selected_isa = settings.default_isa;
