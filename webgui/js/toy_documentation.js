@@ -123,14 +123,14 @@ const toyDocumentation = html` <div class="container-fluid">
         Labels and variables are both names that can be used instead of
         addresses.<br />
         Labels reference a position in the program and are used as destination
-        address for branch instructions. They are declared by typing the name of
-        the label, followed by a colon.<br />
+        addresses for branch instructions. They are declared by typing the name
+        of the label, followed by a colon.<br />
         Variables can be manually set to reference an arbitrary address and they
-        are used to point to some location in memory. They are declared by
-        typing the name of the variable, followed by an equals sign and the
-        desired address. Note that variables will be processed once before the
-        execution of the program. They can be referenced everywhere in the
-        program and you cannot reassign a variable name.
+        are used to point to a memory location. They are declared by typing the
+        name of the variable, followed by an equals sign and the desired
+        address. Note that variables will be processed once before the execution
+        of the program. They can be referenced everywhere in the program and you
+        cannot reassign a variable name.
     </p>
     <pre class="bg-light">
 loop:
@@ -166,8 +166,8 @@ LDA $400
     <p>
         This simulator uses separate data and instruction memories. By default,
         the instruction memory uses addresses from 0 to 1023, while the data
-        memory uses addresses from 1024 to 4095. That means you can only use up
-        to 1024 instructions and load and store instructions can only use
+        memory uses addresses from 1024 to 4095. That means that you can only
+        use up to 1024 instructions and load and store instructions can only use
         addresses that lie within the data memory. That also means that it is
         not possible to alter the instruction memory "at runtime".
     </p>
