@@ -22,7 +22,7 @@ class Memory:
     """
 
     # Address length in bits. Can be used to limit memory size.
-    address_length: int = 32
+    address_length: int = Settings().get()["memory_address_length"]  # 32
     # min address (inclusive)
     min_bytes: int = Settings().get()["memory_address_min_bytes"]  # 2**14
     memory_file: dict[int, fixedint.MutableUInt8] = field(default_factory=dict)

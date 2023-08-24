@@ -17,6 +17,7 @@ class Settings:
         "hazard_detection": True,
         "instruction_memory_min_bytes": 0,
         "instruction_memory_max_bytes": 2**14,
+        "memory_address_length": 32,
         "memory_address_min_bytes": 2**14,
         "abi_names": {
             "zero": 0,
