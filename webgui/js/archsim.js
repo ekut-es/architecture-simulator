@@ -19,10 +19,6 @@ var previous_pc = 0;
 
 var close_hint = false;
 
-const pipeline_svg = document.getElementById(
-    "visualization_pipeline"
-).contentDocument;
-
 var previous_registers = {};
 var previous_memory = {};
 
@@ -329,6 +325,12 @@ const archsim_js = {
         table2 = document.getElementById("vis_gui_cmd_table_id");
         table2.rows[position].cells[0].style.backgroundColor = "yellow";
         table2.rows[position].cells[1].style.backgroundColor = "yellow";
+    },
+    /**
+     * @returns {bool} whether the visualization svg has finished loading
+     */
+    get_visualization_loaded: function () {
+        return visualization_loaded;
     },
     /**Update IF Stage:
      *
