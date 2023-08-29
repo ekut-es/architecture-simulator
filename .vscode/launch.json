@@ -5,7 +5,7 @@
             "type": "firefox",
             "request": "launch",
             "reAttach": true,
-            "name": "Launch localhost",
+            "name": "Launch Firefox Debugger",
             "url": "http://127.0.0.1:3000/webgui/index.html",
             "webRoot": "${workspaceFolder}",
             "pathMappings": [
@@ -22,6 +22,12 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true
+        },
+        {
+            "type": "chrome",
+            "name": "Launch Chrome Debugger",
+            "request": "launch",
+            "url": "http://127.0.0.1:3000/webgui/index.html"
         }
     ]
 }

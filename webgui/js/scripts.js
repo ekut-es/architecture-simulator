@@ -20,8 +20,22 @@ var input_timer;
 var run;
 var is_run_simulation = false;
 var manual_run = false;
+var visualization_loaded = false;
 
 window.addEventListener("DOMContentLoaded", function () {
+    const svgElement = document.createElement("object");
+    svgElement.data = "svg/pipeline.svg";
+    svgElement.type = "image/svg+xml";
+    svgElement.setAttribute("class", "img-fluid p-0 m-0");
+    svgElement.id = "visualization_pipeline";
+
+    svgElement.addEventListener("load", function () {
+        visualization_loaded = true;
+        update_ui_async();
+    });
+
+    document.getElementById("visualization-svg-container").append(svgElement);
+
     evaluatePython_load_settings().then((value) => {
         settings = JSON.parse(value);
 
@@ -340,7 +354,6 @@ window.addEventListener("DOMContentLoaded", function () {
             document.getElementById("MainContent").style.display = "block";
             document.getElementById("button_tab_visualization").textContent =
                 "Visualization";
-
             disable_hazard_detection();
         });
 
@@ -594,17 +607,8 @@ function enable_hazard_detection() {
 function toggleVisualizationTabContent() {
     if (
         document.getElementById("VisualizationTabContent").style.display ===
-        "none"
+        "block"
     ) {
-        synchronizeEditors(editor, editor_vis);
-        editor.closeHint();
-        document.getElementById("VisualizationTabContent").style.display =
-            "block";
-        document.getElementById("MainContent").style.display = "none";
-        document.getElementById("button_tab_visualization").textContent =
-            "Visualization Off";
-        toggleInputTab();
-    } else {
         synchronizeEditors(editor_vis, editor);
         editor_vis.closeHint();
         close_hint = false;
@@ -613,6 +617,15 @@ function toggleVisualizationTabContent() {
         document.getElementById("MainContent").style.display = "block";
         document.getElementById("button_tab_visualization").textContent =
             "Visualization";
+    } else {
+        synchronizeEditors(editor, editor_vis);
+        editor.closeHint();
+        document.getElementById("VisualizationTabContent").style.display =
+            "block";
+        document.getElementById("MainContent").style.display = "none";
+        document.getElementById("button_tab_visualization").textContent =
+            "Visualization Off";
+        toggleInputTab();
     }
 }
 
@@ -689,19 +702,6 @@ function synchronizeEditors(sEditor, tEditor) {
     tEditor.setValue(content);
 }
 
-window.addEventListener("load", function () {
-    const pipeline_svg = document.getElementById(
-        "visualization_pipeline"
-    ).contentDocument;
-
-    pipeline_svg
-        .getElementById("MemoryExecuteAluResultText1")
-        .setAttribute("visibility", "hidden");
-    pipeline_svg
-        .getElementById("MemoryRegisterFileReadData2Text")
-        .setAttribute("visibility", "hidden");
-});
-
 /**set_svg_text_complex_right_align
  *
  * @param {string} id -- The id of the element where the text should be set
@@ -769,5 +769,51 @@ function set_svg_colour(id, str) {
         }
     } else {
         pipeline_svg.getElementById(id).style.stroke = str;
+        set_svg_marker_color(id, str);
     }
+}
+
+/**
+ * Sets the color of the marker on the given path if it has one (multiple markers will probably not work).
+ * @param {string} id id of the path that might have marker-start or marker-end
+ * @param {string} str color name (either black, blue or green)
+ */
+function set_svg_marker_color(id, str) {
+    const pipeline_svg = document.getElementById(
+        "visualization_pipeline"
+    ).contentDocument;
+    // the marker is part of the style attribute
+    var styleAttribute = pipeline_svg.getElementById(id).getAttribute("style");
+    // marker must contain 'Triangle_XXXXXX' where X is a hexnum. Can be followed or prepended by other characters.
+    var marker_regex = /Triangle_[0-9a-fA-F]{6}/;
+    var result = marker_regex.exec(styleAttribute);
+    if (result != null) {
+        // get the hex value for that color
+        var hexColor = strToHexColor(str);
+        var newMarker = "Triangle_" + hexColor;
+        // create the new style string where the new color is used
+        var newStyleAttribute = styleAttribute.replace(marker_regex, newMarker);
+        pipeline_svg
+            .getElementById(id)
+            .setAttribute("style", newStyleAttribute);
+    }
+}
+
+/**
+ * Turns color names into hex values.
+ * @param {str} str name of the color - must be either black, blue or green.
+ * @returns {Number} the corresponding hex value for that color.
+ */
+function strToHexColor(str) {
+    if (str === "black") {
+        return "000000";
+    }
+    if (str === "blue") {
+        return "0000FF";
+    }
+    if (str === "green") {
+        return "008000";
+    }
+    console.log("color not supported");
+    return "000000";
 }
