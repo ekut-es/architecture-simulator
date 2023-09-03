@@ -13,12 +13,12 @@ class TestRiscvPipeline(unittest.TestCase):
         """
         for step in range(steps - 1):
             simulation.step()
-            self.assert_(
+            self.assertTrue(
                 not simulation.is_done(),
                 f"Pipeline already finished after {step} steps.",
             )
         simulation.step()
-        self.assert_(simulation.is_done(), "Pipeline has not yet finished.")
+        self.assertTrue(simulation.is_done(), "Pipeline has not yet finished.")
 
     def test_rtypes(self):
         program = """add x1, x1, x2
