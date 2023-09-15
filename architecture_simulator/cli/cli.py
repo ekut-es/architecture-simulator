@@ -109,6 +109,8 @@ def main():
             read_command = session.prompt(">>>").strip().lower().split()
         except KeyboardInterrupt:
             break
+        except EOFError:
+            break
         if len(read_command) == 0:
             continue
         if read_command[0] not in list_of_command_names:
