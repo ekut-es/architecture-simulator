@@ -1,0 +1,5 @@
+# Pipeline SVG arrow heads (markers)
+Our js code can change the color of arrows. Thanks to `context-stroke` and `context-fill`, the arrow heads (the path markers) will automatically use the same color as the path. Unfortunately, these two features are not supported in chrome (https://bugs.chromium.org/p/chromium/issues/detail?id=367737) and has only recently been fixed in firefox (https://bugzilla.mozilla.org/show_bug.cgi?id=752638). To still get colored arrow heads, we define one marker per color (actually two, because it also needs a reversed version) and then in the js code, we look into the style attribute of the path and look for a `marker-start:` string and replace it with the correct one for the desired color (which sucks, but works reliably). Now if you want to add or change the markers, the colors or whatever, you need to change that in the js code and in the svg.
+
+## Dont lose the markers
+Since the svg only uses black markers, Inkscape will think that all the other markers are useless and it deletes them ._. So every time you change the svg, make sure to add the markers back (each marker gets defined by a `<marker>` tag inside the same `<defs>` tag).
