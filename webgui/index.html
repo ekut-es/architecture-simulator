@@ -7,49 +7,8 @@
         <!--	****************************************************************************************************************************** -->
         <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
         <!--	****************************************************************************************************************************** -->
-        <!--codemirror-->
-        <script
-            src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"
-        ></script>
-        <script
-            src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/hint/show-hint.min.js"
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"
-        ></script>
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css"
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"
-        />
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/darcula.min.css"
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"
-        />
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/hint/show-hint.min.css"
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"
-        />
-        <script
-            src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/gas/gas.min.js"
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"
-        ></script>
-        <!--	****************************************************************************************************************************** -->
         <link rel="stylesheet" href="bootstrap.min.css" />
         <link rel="stylesheet" type="text/css" href="WEB_APP_BASIC.css" />
-        <!--	****************************************************************************************************************************** -->
-        <!---->
-        <script type="text/javascript" src="js/html_tag.js"></script>
-        <script type="text/javascript" src="js/riscv_documentation.js"></script>
-        <script type="text/javascript" src="js/toy_documentation.js"></script>
-        <script type="text/javascript" src="js/scripts.js"></script>
     </head>
     <body id="webapp_body_id">
         <div class="container-fluid p-0 m-0 d-flex flex-column h-100 w-100">
@@ -201,28 +160,6 @@
                                                         id="input"
                                                         rows="20"
                                                     ></textarea>
-                                                    <script>
-                                                        // initialize codemirror textarea
-                                                        const editor =
-                                                            CodeMirror.fromTextArea(
-                                                                document.getElementById(
-                                                                    "input"
-                                                                ),
-                                                                {
-                                                                    lineNumbers: true,
-                                                                    styleActiveLine: true,
-                                                                    mode: {
-                                                                        name: "gas",
-                                                                        architecture:
-                                                                            "ARM",
-                                                                    },
-                                                                }
-                                                            );
-                                                        editor.setSize(
-                                                            null,
-                                                            "88vh"
-                                                        );
-                                                    </script>
                                                 </div>
                                             </div>
                                         </div>
@@ -408,28 +345,6 @@
                                                         id="vis_input"
                                                         rows="30"
                                                     ></textarea>
-                                                    <script>
-                                                        // initialize codemirror textarea
-                                                        const editor_vis =
-                                                            CodeMirror.fromTextArea(
-                                                                document.getElementById(
-                                                                    "vis_input"
-                                                                ),
-                                                                {
-                                                                    lineNumbers: true,
-                                                                    styleActiveLine: true,
-                                                                    mode: {
-                                                                        name: "gas",
-                                                                        architecture:
-                                                                            "ARM",
-                                                                    },
-                                                                }
-                                                            );
-                                                        editor_vis.setSize(
-                                                            null,
-                                                            "57vh"
-                                                        );
-                                                    </script>
                                                 </div>
                                             </div>
                                             <div
@@ -898,11 +813,50 @@
                 </div>
             </div>
         </div>
+        <!--codemirror-->
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        ></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/hint/show-hint.min.js"
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        ></script>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css"
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/darcula.min.css"
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/hint/show-hint.min.css"
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        />
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/gas/gas.min.js"
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        ></script>
         <script
             type="text/javascript"
             src="https://cdn.jsdelivr.net/pyodide/v0.22.1/full/pyodide.js"
         ></script>
+        <script type="text/javascript" src="js/html_tag.js"></script>
+        <script type="text/javascript" src="js/riscv_documentation.js"></script>
+        <script type="text/javascript" src="js/toy_documentation.js"></script>
+        <script type="text/javascript" src="js/scripts.js"></script>
         <script type="text/javascript" src="js/archsim.js"></script>
-        <script src="js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="js/editor.js"></script>
+        <script type="text/javascript" src="js/bootstrap.min.js"></script>
     </body>
 </html>
