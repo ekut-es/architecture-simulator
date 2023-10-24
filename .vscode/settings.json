@@ -21,4 +21,5 @@
     "[css]":{
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
+    "mypy.runUsingActiveInterpreter": true,
 }
