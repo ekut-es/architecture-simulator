@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>RISC-V Simulator</title>
+        <link rel="stylesheet" href="new-styles.css" />
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+            crossorigin="anonymous"
+        />
+    </head>
+    <body>
+        <!--Header-->
+        <header class="header container-fluid">
+            <div class="row align-items-center">
+                <div class="h1 col-auto">RISC-V Simulator</div>
+                <div class="col-auto ms-auto">
+                    <img src="svg/WEB_APP_BASIC_Help.svg" id="help-icon" />
+                </div>
+            </div>
+        </header>
+
+        <!--Control Bar-->
+        <nav class="container-fluid">
+            <!--Buttons on the left side-->
+            <div class="row pt-1 pb-1">
+                <div class="col-auto">
+                    <button
+                        id="button_run_simulation_id"
+                        class="btn btn-success btn-sm control-button"
+                        title="run simulation"
+                    >
+                        <img src="svg/start.svg" />
+                    </button>
+                    <button
+                        id="button_pause_simulation_id"
+                        class="btn btn-secondary btn-sm control-button"
+                        title="pause simulation"
+                        disabled
+                    >
+                        <img src="svg/pause.svg" />
+                    </button>
+                    <button
+                        id="button_step_simulation_id"
+                        class="btn btn-primary btn-sm control-button"
+                        title="step"
+                    >
+                        <img src="svg/next.svg" />
+                    </button>
+                    <button
+                        id="button_reset_simulation_id"
+                        class="btn btn-danger btn-sm control-button"
+                        title="reset simulation"
+                    >
+                        <img src="svg/refresh.svg" />
+                    </button>
+                </div>
+                <!--Buttons on the right side-->
+                <div class="col-auto ms-auto">
+                    <button
+                        id="button_visualization_id"
+                        class="btn btn-sm btn-secondary"
+                        onclick="toggleVisualizationTabContent()"
+                    >
+                        Visualization
+                    </button>
+                    <button
+                        id="button_settings_id"
+                        class="btn btn-sm control-button"
+                        title="settings"
+                        data-bs-toggle="modal"
+                        data-bs-target="#settingsModal"
+                    >
+                        <img src="svg/settings.svg" />
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous"
+        ></script>
+    </body>
+</html>
