@@ -1,4 +1,5 @@
 /* Header */
+
 .header {
     background-color: #252d73;
     color: white;
@@ -20,18 +21,28 @@ nav {
     background-color: var(--bs-secondary-bg);
 }
 
-#button_run_simulation_id {
+#button-run-simulation-id {
     background-color: rgb(169, 245, 169);
 }
 
-#button_pause_simulation_id {
+#button-pause-simulation-id {
     background-color: rgb(255, 221, 120);
 }
 
-#button_step_simulation_id {
+#button-step-simulation-id {
     background-color: rgb(169, 208, 245);
 }
 
-#button_reset_simulation_id {
+#button-reset-simulation-id {
     background-color: rgb(247, 129, 129);
+}
+
+/* Main Content */
+
+.mono-table {
+    font-family: monospace;
+}
+
+.mono-table th {
+    text-align: center;
 }

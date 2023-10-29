@@ -29,14 +29,14 @@
                 <!--Buttons on the left side-->
                 <div class="col-auto">
                     <button
-                        id="button_run_simulation_id"
+                        id="button-run-simulation-id"
                         class="btn btn-success btn-sm control-button"
                         title="run simulation"
                     >
                         <img src="svg/start.svg" />
                     </button>
                     <button
-                        id="button_pause_simulation_id"
+                        id="button-pause-simulation-id"
                         class="btn btn-warning btn-sm control-button"
                         title="pause simulation"
                         disabled
@@ -44,14 +44,14 @@
                         <img src="svg/pause.svg" />
                     </button>
                     <button
-                        id="button_step_simulation_id"
+                        id="button-step-simulation-id"
                         class="btn btn-primary btn-sm control-button"
                         title="step"
                     >
                         <img src="svg/next.svg" />
                     </button>
                     <button
-                        id="button_reset_simulation_id"
+                        id="button-reset-simulation-id"
                         class="btn btn-danger btn-sm control-button"
                         title="reset simulation"
                     >
@@ -61,14 +61,14 @@
                 <!--Buttons on the right side-->
                 <div class="col-auto ms-auto">
                     <button
-                        id="button_visualization_id"
+                        id="button-visualization-id"
                         class="btn btn-sm btn-secondary"
                         onclick="toggleVisualizationTabContent()"
                     >
-                        Visualization
+                        Visualization Off
                     </button>
                     <button
-                        id="button_settings_id"
+                        id="button-settings-id"
                         class="btn btn-sm control-button"
                         title="settings"
                         data-bs-toggle="modal"
@@ -82,14 +82,16 @@
 
         <!--Main Content-->
         <main class="container-fluid">
-            <div class="row">
+            <div class="row py-2">
                 <!--Text Editor-->
                 <div class="col">
                     <textarea id="input"></textarea>
                 </div>
                 <!--Instruction Table-->
                 <div class="col">
-                    <table class="table table-sm table-hover table-bordered">
+                    <table
+                        class="table table-sm table-hover table-bordered mono-table"
+                    >
                         <tr>
                             <th>Address</th>
                             <th>Command</th>
@@ -99,7 +101,9 @@
                 </div>
                 <!--Register Table-->
                 <div class="col">
-                    <table class="table table-sm table-hover table-bordered">
+                    <table
+                        class="table table-sm table-hover table-bordered mono-table"
+                    >
                         <tr>
                             <th>Register</th>
                             <th>Value</th>
@@ -108,12 +112,18 @@
                 </div>
                 <!--Memory Table-->
                 <div class="col">
-                    <table class="table table-sm table-hover table-bordered">
+                    <table
+                        class="table table-sm table-hover table-bordered mono-table"
+                    >
                         <tr>
                             <th>Address</th>
                             <th>Value</th>
                         </tr>
                     </table>
+                </div>
+                <!--Output Field-->
+                <div class="col">
+                    <textarea id="output-field-id" disabled></textarea>
                 </div>
             </div>
         </main>
