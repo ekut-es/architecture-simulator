@@ -112,7 +112,7 @@ window.addEventListener("DOMContentLoaded", function () {
     document.getElementById("ToyHelp").innerHTML = toyDocumentation;
 
     document
-        .getElementById("button_simulation_start_id")
+        .getElementById("button-run-simulation-id")
         .addEventListener("click", () => {
             play_button();
         });
@@ -147,7 +147,7 @@ window.addEventListener("DOMContentLoaded", function () {
     }
 
     document
-        .getElementById("button_simulation_pause_id")
+        .getElementById("button-pause-simulation-id")
         .addEventListener("click", () => {
             pause_button();
         });
@@ -173,7 +173,7 @@ window.addEventListener("DOMContentLoaded", function () {
     }
 
     document
-        .getElementById("button_simulation_next_id")
+        .getElementById("button-step-simulation-id")
         .addEventListener("click", () => {
             next_button();
         });
@@ -198,7 +198,7 @@ window.addEventListener("DOMContentLoaded", function () {
     }
 
     document
-        .getElementById("button_simulation_refresh_id")
+        .getElementById("button-reset-simulation-id")
         .addEventListener("click", () => {
             refresh_button();
         });
@@ -488,63 +488,61 @@ function enable_pipeline_switch() {
 }
 
 function disable_run() {
-    document.getElementById("button_simulation_start_id").disabled = true;
-    document.getElementById(
-        "button_simulation_start_id"
-    ).style.backgroundColor = getComputedStyle(
-        document.documentElement
-    ).getPropertyValue("--button_disabled_color");
+    document.getElementById("button-run-simulation-id").disabled = true;
+    document.getElementById("button-run-simulation-id").style.backgroundColor =
+        getComputedStyle(document.documentElement).getPropertyValue(
+            "--button_disabled_color"
+        );
 }
 function enable_run() {
-    document.getElementById("button_simulation_start_id").disabled = false;
-    document.getElementById(
-        "button_simulation_start_id"
-    ).style.backgroundColor = getComputedStyle(
-        document.documentElement
-    ).getPropertyValue("--button_green_color");
+    document.getElementById("button-run-simulation-id").disabled = false;
+    document.getElementById("button-run-simulation-id").style.backgroundColor =
+        getComputedStyle(document.documentElement).getPropertyValue(
+            "--button_green_color"
+        );
 }
 function disable_pause() {
-    document.getElementById("button_simulation_pause_id").disabled = true;
+    document.getElementById("button-pause-simulation-id").disabled = true;
     document.getElementById(
-        "button_simulation_pause_id"
+        "button-pause-simulation-id"
     ).style.backgroundColor = getComputedStyle(
         document.documentElement
     ).getPropertyValue("--button_disabled_color");
 }
 function enable_pause() {
-    document.getElementById("button_simulation_pause_id").disabled = false;
+    document.getElementById("button-pause-simulation-id").disabled = false;
     document.getElementById(
-        "button_simulation_pause_id"
+        "button-pause-simulation-id"
     ).style.backgroundColor = getComputedStyle(
         document.documentElement
     ).getPropertyValue("--button_green_color");
 }
 function disable_step() {
-    document.getElementById("button_simulation_next_id").disabled = true;
-    document.getElementById("button_simulation_next_id").style.backgroundColor =
+    document.getElementById("button-step-simulation-id").disabled = true;
+    document.getElementById("button-step-simulation-id").style.backgroundColor =
         getComputedStyle(document.documentElement).getPropertyValue(
             "--button_disabled_color"
         );
 }
 function enable_step() {
-    document.getElementById("button_simulation_next_id").disabled = false;
-    document.getElementById("button_simulation_next_id").style.backgroundColor =
+    document.getElementById("button-step-simulation-id").disabled = false;
+    document.getElementById("button-step-simulation-id").style.backgroundColor =
         getComputedStyle(document.documentElement).getPropertyValue(
             "--button_blue_color"
         );
 }
 function disable_reset() {
-    document.getElementById("button_simulation_refresh_id").disabled = true;
+    document.getElementById("button-reset-simulation-id").disabled = true;
     document.getElementById(
-        "button_simulation_refresh_id"
+        "button-reset-simulation-id"
     ).style.backgroundColor = getComputedStyle(
         document.documentElement
     ).getPropertyValue("--button_disabled_color");
 }
 function enable_reset() {
-    document.getElementById("button_simulation_refresh_id").disabled = false;
+    document.getElementById("button-reset-simulation-id").disabled = false;
     document.getElementById(
-        "button_simulation_refresh_id"
+        "button-reset-simulation-id"
     ).style.backgroundColor = getComputedStyle(
         document.documentElement
     ).getPropertyValue("--button_red_color");
@@ -565,11 +563,11 @@ function enable_control_buttons() {
 }
 
 function start_loading_animation() {
-    document.getElementById("loading_id").style.visibility = "visible";
+    document.getElementById("loading-spinner-id").style.visibility = "visible";
 }
 
 function stop_loading_animation() {
-    document.getElementById("loading_id").style.visibility = "hidden";
+    document.getElementById("loading-spinner-id").style.visibility = "hidden";
 }
 
 function start_loading_visuals() {

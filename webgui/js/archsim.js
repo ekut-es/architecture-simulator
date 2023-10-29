@@ -1,15 +1,8 @@
-const output = document.getElementById("output");
-const output_vis = document.getElementById("vis_output");
+const output = document.getElementById("output-field-id");
 const registers = document.getElementById("register-table-body-id");
-const registers_vis = document.getElementById(
-    "vis_gui_registers_table_body_id"
-);
 const memory = document.getElementById("memory-table-body-id");
-const memory_vis = document.getElementById("vis_gui_memory_table_body_id");
 const instructions = document.getElementById("instruction-table-body-id");
-const instructions_vis = document.getElementById("vis_gui_cmd_table_body_id");
 const input = document.getElementById("input");
-const input_vis = document.getElementById("vis_input");
 
 var previous_pc = 0;
 
@@ -26,8 +19,6 @@ var previous_memory = {};
 function addToOutput(s) {
     output.value += ">>>" + input.value + "\n" + s + "\n";
     output.scrollTop = output.scrollHeight;
-    output_vis.value += ">>>" + input.value + "\n" + s + "\n";
-    output_vis.scrollTop = output_vis.scrollHeight;
 }
 
 // Object containing functions to be exported to python
@@ -49,7 +40,6 @@ const archsim_js = {
      * @param {string} abi_name - an alternative name for the register.
      */
     update_register_table: function (reg, representations, abi_name) {
-        vis_highlight = false;
         tr = document.createElement("tr");
         td1 = document.createElement("td");
         td1.innerText = "x" + reg;
@@ -59,7 +49,6 @@ const archsim_js = {
         if (previous_registers[reg] != Array.from(representations)[1]) {
             td2.style.backgroundColor = "yellow";
             previous_registers[reg] = Array.from(representations)[1];
-            vis_highlight = true;
         }
         td3 = document.createElement("td");
         td3.innerText = abi_name;
@@ -68,24 +57,6 @@ const archsim_js = {
         tr.appendChild(td1);
         tr.appendChild(td2);
         registers.appendChild(tr);
-
-        tr_vis = document.createElement("tr");
-        td1_vis = document.createElement("td");
-        td1_vis.innerText = "x" + reg;
-        td2_vis = document.createElement("td");
-        td2_vis.innerText =
-            Array.from(representations)[reg_representation_mode];
-        td2_vis.id = "val_x" + reg;
-        if (vis_highlight) {
-            td2_vis.style.backgroundColor = "yellow";
-        }
-        td3_vis = document.createElement("td");
-        td3_vis.innerText = abi_name;
-        td3_vis.id = abi_name;
-        tr_vis.appendChild(td3_vis);
-        tr_vis.appendChild(td1_vis);
-        tr_vis.appendChild(td2_vis);
-        registers_vis.appendChild(tr_vis);
     },
     /**
      * Appends one row to the memory table.
@@ -94,7 +65,6 @@ const archsim_js = {
      * @param {Iterable} representations - iterable containing representations of the value stored at the given address.
      */
     update_memory_table: function (address, representations) {
-        vis_highlight = false;
         tr = document.createElement("tr");
         td1 = document.createElement("td");
         td1.innerText = address;
@@ -104,25 +74,10 @@ const archsim_js = {
         if (previous_memory[address] != Array.from(representations)[1]) {
             td2.style.backgroundColor = "yellow";
             previous_memory[address] = Array.from(representations)[1];
-            vis_highlight = true;
         }
         tr.appendChild(td1);
         tr.appendChild(td2);
         memory.appendChild(tr);
-
-        tr_vis = document.createElement("tr");
-        td1_vis = document.createElement("td");
-        td1_vis.innerText = address;
-        td2_vis = document.createElement("td");
-        td2_vis.innerText =
-            Array.from(representations)[mem_representation_mode];
-        td2_vis.id = "memory" + address;
-        if (vis_highlight) {
-            td2_vis.style.backgroundColor = "yellow";
-        }
-        tr_vis.appendChild(td1_vis);
-        tr_vis.appendChild(td2_vis);
-        memory_vis.appendChild(tr_vis);
     },
     /**
      * Appends one row to the instruction memory table.
@@ -170,62 +125,24 @@ const archsim_js = {
         tr.appendChild(td2);
         tr.appendChild(td3);
         instructions.appendChild(tr);
-
-        tr_vis = document.createElement("tr");
-        tr_vis.id = address;
-        td1_vis = document.createElement("td");
-        td1_vis.innerText = address;
-        td2_vis = document.createElement("td");
-        td2_vis.innerText = val;
-        td2_vis.id = "instr" + address;
-        td3_vis = document.createElement("td");
-        td3_vis.innerText = stage;
-        if (stage == "IF") {
-            td1_vis.style.backgroundColor = "#FFFD00";
-            td2_vis.style.backgroundColor = "#FFFD00";
-            td3_vis.style.backgroundColor = "#FFFD00";
-        } else if (stage == "ID") {
-            td1_vis.style.backgroundColor = "#FFD700";
-            td2_vis.style.backgroundColor = "#FFD700";
-            td3_vis.style.backgroundColor = "#FFD700";
-        } else if (stage == "EX") {
-            td1_vis.style.backgroundColor = "#CD78FF";
-            td2_vis.style.backgroundColor = "#CD78FF";
-            td3_vis.style.backgroundColor = "#CD78FF";
-        } else if (stage == "MEM") {
-            td1_vis.style.backgroundColor = "#A37FFF";
-            td2_vis.style.backgroundColor = "#A37FFF";
-            td3_vis.style.backgroundColor = "#A37FFF";
-        } else if (stage == "WB") {
-            td1_vis.style.backgroundColor = "#5A1BFF";
-            td2_vis.style.backgroundColor = "#5A1BFF";
-            td3_vis.style.backgroundColor = "#5A1BFF";
-        }
-        tr_vis.appendChild(td1_vis);
-        tr_vis.appendChild(td2_vis);
-        tr_vis.appendChild(td3_vis);
-        instructions_vis.appendChild(tr_vis);
     },
     /**
      * Clears the memory table.
      */
     clear_memory_table: function () {
         this.clear_a_table(memory);
-        this.clear_a_table(memory_vis);
     },
     /**
      * Clears the register table.
      */
     clear_register_table: function () {
         this.clear_a_table(registers);
-        this.clear_a_table(registers_vis);
     },
     /**
      * Clears the instruction memory table.
      */
     clear_instruction_table: function () {
         this.clear_a_table(instructions);
-        this.clear_a_table(instructions_vis);
     },
     /**
      * Clears the given table.
@@ -242,7 +159,6 @@ const archsim_js = {
      */
     set_output: function (str) {
         output.value = str;
-        output_vis.value = str;
     },
     /**
      * Highlights a line in the text editor and displays the given message as hint.
@@ -254,8 +170,6 @@ const archsim_js = {
     highlight: function (position, str) {
         editor.addLineClass(position - 1, "background", "highlight");
         editor.refresh();
-        editor_vis.addLineClass(position - 1, "background", "highlight");
-        editor_vis.refresh();
         str.toString = function () {
             return this.str;
         };
@@ -280,14 +194,7 @@ const archsim_js = {
             },
         };
 
-        if (
-            document.getElementById("VisualizationTabContent").style.display ==
-            "block"
-        ) {
-            if (!close_hint) editor_vis.showHint(error_description);
-        } else {
-            if (!close_hint) editor.showHint(error_description);
-        }
+        if (!close_hint) editor.showHint(error_description);
     },
     /**
      * Removes all highlights from the editor.
@@ -295,12 +202,9 @@ const archsim_js = {
     remove_all_highlights: function () {
         for (let i = 0; i < editor.lineCount(); i++) {
             editor.removeLineClass(i, "background", "highlight");
-            editor_vis.removeLineClass(i, "background", "highlight");
         }
         editor.refresh();
-        editor_vis.refresh();
         editor.closeHint();
-        editor_vis.closeHint();
     },
     /**
      * Highlights one row in the instruction table.
@@ -317,10 +221,6 @@ const archsim_js = {
         }
         table.rows[position].cells[0].style.backgroundColor = "yellow";
         table.rows[position].cells[1].style.backgroundColor = "yellow";
-
-        table2 = document.getElementById("vis_gui_cmd_table_id");
-        table2.rows[position].cells[0].style.backgroundColor = "yellow";
-        table2.rows[position].cells[1].style.backgroundColor = "yellow";
     },
     /**
      * @returns {bool} whether the visualization svg has finished loading
@@ -922,9 +822,6 @@ const archsim_js = {
     },
 };
 
-output.value = "Output \n\nInitializing... ";
-output_vis.value = "Output \n\nInitializing... ";
-
 input.value = "";
 /**
  * Initialize pyodide.
@@ -953,7 +850,6 @@ from architecture_simulator.gui.webgui import *
 sim_init()
     `);
     output.value += "Ready!\n";
-    output_vis.value += "Ready!\n";
     stop_loading_visuals();
     return pyodide;
 }
@@ -979,7 +875,6 @@ async function evaluatePython_step_sim() {
         update_performance_metrics();
     } catch (err) {
         output.value = err;
-        output_vis.value = err;
         stop_loading_animation();
         disable_pause();
         disable_step();
@@ -1038,7 +933,6 @@ async function evaluatePython_reset_sim(pipeline_mode) {
         reset_sim = pyodide.globals.get("reset_sim");
         reset_sim();
         output.value = "";
-        output_vis.value = "";
     } catch (err) {
         addToOutput(err);
     }
@@ -1063,17 +957,9 @@ async function evaluatePython_update_tables() {
 async function evaluatePython_parse_input() {
     let pyodide = await pyodideReadyPromise;
     input_str = input.value;
-    vis_input_str = vis_input.value;
     try {
         parse_input = pyodide.globals.get("parse_input");
-        if (
-            document.getElementById("VisualizationTabContent").style.display ==
-            "block"
-        ) {
-            parse_input(vis_input_str);
-        } else {
-            parse_input(input_str);
-        }
+        parse_input(input_str);
     } catch (err) {
         addToOutput(err);
     }
