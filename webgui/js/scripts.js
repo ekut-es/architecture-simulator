@@ -371,7 +371,7 @@ window.addEventListener("DOMContentLoaded", function () {
         );
 
         document.getElementById("button-visualization-id").style.display =
-            "block";
+            "inline-block";
         enable_hazard_detection();
     });
 

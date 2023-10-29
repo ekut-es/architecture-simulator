@@ -61,6 +61,10 @@ main {
     overflow-y: scroll;
 }
 
+div .CodeMirror {
+    height: 100%;
+}
+
 /* Modals */
 .modal-content {
     background-color: var(--main-accent-color);
