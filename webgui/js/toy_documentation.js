@@ -110,8 +110,8 @@ const toyDocumentation = html` <div class="container-fluid">
         Note that the address
         <code>addr</code> of an instruction is a 12 bit value that can either be
         given as decimal or hexadecimal number, or it can be the name of a label
-        or a variable. Hexadecimal numbers have to be prepended by a dollar sign
-        like this: <code>$400</code>.
+        or a variable. Hexadecimal numbers have to be prepended by '0x' like
+        this: <code>0x400</code>.
     </p>
 
     <h2>Comments</h2>
@@ -142,7 +142,7 @@ loop:
     BRZ loop
 end:
 
-counter=$400</pre
+counter=0x400</pre
     >
 
     <h2>Data write directives</h2>
@@ -156,9 +156,9 @@ counter=$400</pre
         containing a data write directive.
     </p>
     <pre class="bg-light">
-:$400:25
-:1025:$FF
-LDA $400
+:0x400:25
+:1025:0xFF
+LDA 0x400
 ...</pre
     >
 
@@ -176,9 +176,9 @@ LDA $400
     <pre class="bg-light">
 # computes the sum of the numbers from 1 to n
 # result gets saved in MEM[1025]
-Loopcount = $400
-Result = $401
-:$400:20 # enter n here
+Loopcount = 0x400
+Result = 0x401
+:0x400:20 # enter n here
 
 LDA Loopcount # skip to the end if n=0
 BRZ end
