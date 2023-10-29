@@ -1,19 +1,15 @@
 const output = document.getElementById("output");
 const output_vis = document.getElementById("vis_output");
-const registers = document.getElementById("gui_registers_table_body_id");
+const registers = document.getElementById("register-table-body-id");
 const registers_vis = document.getElementById(
     "vis_gui_registers_table_body_id"
 );
-const memory = document.getElementById("gui_memory_table_body_id");
+const memory = document.getElementById("memory-table-body-id");
 const memory_vis = document.getElementById("vis_gui_memory_table_body_id");
-const instructions = document.getElementById("gui_cmd_table_body_id");
+const instructions = document.getElementById("instruction-table-body-id");
 const instructions_vis = document.getElementById("vis_gui_cmd_table_body_id");
 const input = document.getElementById("input");
 const input_vis = document.getElementById("vis_input");
-const performance_metrics = document.getElementById("performance_metrics");
-const performance_metrics_vis = document.getElementById(
-    "vis_performance_metrics"
-);
 
 var previous_pc = 0;
 
@@ -312,7 +308,7 @@ const archsim_js = {
      * @param {number} address - address of the instruction to highlight (which is not necessarily the same as the position in the table)
      */
     highlight_cmd_table: function (address) {
-        table = document.getElementById("gui_cmd_table_id");
+        table = document.getElementById("instruction-table-id");
         position = 1;
         for (; position < table.rows.length; position++) {
             if (Number(table.rows[position].cells[0].innerHTML) == address) {
@@ -930,8 +926,6 @@ output.value = "Output \n\nInitializing... ";
 output_vis.value = "Output \n\nInitializing... ";
 
 input.value = "";
-performance_metrics.value = "Performance Metrics";
-performance_metrics_vis.value = "Performance Metrics";
 /**
  * Initialize pyodide.
  * @returns pyodide.
@@ -959,9 +953,7 @@ from architecture_simulator.gui.webgui import *
 sim_init()
     `);
     output.value += "Ready!\n";
-    performance_metrics.value += "...";
     output_vis.value += "Ready!\n";
-    performance_metrics_vis.value += "...";
     stop_loading_visuals();
     return pyodide;
 }
@@ -1027,8 +1019,7 @@ async function update_performance_metrics() {
     get_performance_metrics_str = pyodide.globals.get(
         "get_performance_metrics_str"
     );
-    performance_metrics.value = get_performance_metrics_str();
-    performance_metrics_vis.value = get_performance_metrics_str();
+    output.value = get_performance_metrics_str();
 }
 
 /**
@@ -1048,8 +1039,6 @@ async function evaluatePython_reset_sim(pipeline_mode) {
         reset_sim();
         output.value = "";
         output_vis.value = "";
-        performance_metrics.value = "";
-        performance_metrics_vis.value = "";
     } catch (err) {
         addToOutput(err);
     }

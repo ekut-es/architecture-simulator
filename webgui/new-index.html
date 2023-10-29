@@ -90,13 +90,17 @@
                 <!--Instruction Table-->
                 <div class="col">
                     <table
+                        id="instruction-table-id"
                         class="table table-sm table-hover table-bordered mono-table"
                     >
-                        <tr>
-                            <th>Address</th>
-                            <th>Command</th>
-                            <th>Stage</th>
-                        </tr>
+                        <thead>
+                            <tr>
+                                <th>Address</th>
+                                <th>Command</th>
+                                <th>Stage</th>
+                            </tr>
+                        </thead>
+                        <tbody id="instruction-table-body-id"></tbody>
                     </table>
                 </div>
                 <!--Register Table-->
@@ -104,10 +108,13 @@
                     <table
                         class="table table-sm table-hover table-bordered mono-table"
                     >
-                        <tr>
-                            <th>Register</th>
-                            <th>Value</th>
-                        </tr>
+                        <thead>
+                            <tr>
+                                <th>Register</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody id="register-table-body-id"></tbody>
                     </table>
                 </div>
                 <!--Memory Table-->
@@ -115,10 +122,13 @@
                     <table
                         class="table table-sm table-hover table-bordered mono-table"
                     >
-                        <tr>
-                            <th>Address</th>
-                            <th>Value</th>
-                        </tr>
+                        <thead>
+                            <tr>
+                                <th>Address</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody id="memory-table-body-id"></tbody>
                     </table>
                 </div>
                 <!--Output Field-->
