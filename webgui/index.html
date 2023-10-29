@@ -15,7 +15,7 @@
     </head>
     <body>
         <!--Header-->
-        <header class="header container-fluid">
+        <header id="header" class="header container-fluid">
             <div class="row align-items-center">
                 <div class="h1 col-auto">RISC-V Simulator</div>
                 <div class="col-auto ms-auto">
@@ -31,7 +31,7 @@
         </header>
 
         <!--Control Bar-->
-        <nav class="container-fluid">
+        <nav id="nav-bar" class="container-fluid">
             <div class="row pt-1 pb-1">
                 <!--Buttons on the left side-->
                 <div class="col-auto">
@@ -95,6 +95,68 @@
                 </div>
             </div>
         </nav>
+
+        <!--Main Content-->
+        <main class="container-fluid">
+            <div id="main-container" class="row py-2">
+                <!--Text Editor-->
+                <div class="col">
+                    <textarea id="input"></textarea>
+                </div>
+                <!--Instruction Table-->
+                <div class="col">
+                    <table
+                        id="instruction-table-id"
+                        class="table table-sm table-hover table-bordered mono-table mb-0"
+                    >
+                        <thead>
+                            <tr>
+                                <th>Address</th>
+                                <th>Command</th>
+                                <th>Stage</th>
+                            </tr>
+                        </thead>
+                        <tbody id="instruction-table-body-id"></tbody>
+                    </table>
+                </div>
+                <!--Register Table-->
+                <div class="col">
+                    <table
+                        class="table table-sm table-hover table-bordered mono-table mb-0"
+                    >
+                        <thead>
+                            <tr>
+                                <th colspan="2">Register</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody id="register-table-body-id"></tbody>
+                    </table>
+                </div>
+                <!--Memory Table-->
+                <div class="col">
+                    <table
+                        class="table table-sm table-hover table-bordered mono-table mb-0"
+                    >
+                        <thead>
+                            <tr>
+                                <th>Address</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody id="memory-table-body-id"></tbody>
+                    </table>
+                </div>
+                <!--Output Field-->
+                <div class="col">
+                    <textarea
+                        id="output-field-id"
+                        class="form-control"
+                        disabled
+                    ></textarea>
+                </div>
+            </div>
+        </main>
 
         <!--Help Modal-->
         <div
@@ -360,68 +422,6 @@
                 </div>
             </div>
         </div>
-
-        <!--Main Content-->
-        <main class="container-fluid">
-            <div class="row py-2">
-                <!--Text Editor-->
-                <div class="col">
-                    <textarea id="input"></textarea>
-                </div>
-                <!--Instruction Table-->
-                <div class="col">
-                    <table
-                        id="instruction-table-id"
-                        class="table table-sm table-hover table-bordered mono-table"
-                    >
-                        <thead>
-                            <tr>
-                                <th>Address</th>
-                                <th>Command</th>
-                                <th>Stage</th>
-                            </tr>
-                        </thead>
-                        <tbody id="instruction-table-body-id"></tbody>
-                    </table>
-                </div>
-                <!--Register Table-->
-                <div class="col">
-                    <table
-                        class="table table-sm table-hover table-bordered mono-table"
-                    >
-                        <thead>
-                            <tr>
-                                <th colspan="2">Register</th>
-                                <th>Value</th>
-                            </tr>
-                        </thead>
-                        <tbody id="register-table-body-id"></tbody>
-                    </table>
-                </div>
-                <!--Memory Table-->
-                <div class="col">
-                    <table
-                        class="table table-sm table-hover table-bordered mono-table"
-                    >
-                        <thead>
-                            <tr>
-                                <th>Address</th>
-                                <th>Value</th>
-                            </tr>
-                        </thead>
-                        <tbody id="memory-table-body-id"></tbody>
-                    </table>
-                </div>
-                <!--Output Field-->
-                <div class="col">
-                    <textarea
-                        id="output-field-id"
-                        class="form-control"
-                        disabled
-                    ></textarea>
-                </div>
-            </div>
-        </main>
 
         <script
             src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"

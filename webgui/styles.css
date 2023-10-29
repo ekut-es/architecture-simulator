@@ -51,6 +51,16 @@ nav {
     text-align: center;
 }
 
+main {
+    background-color: var(--main-bg-color);
+    overflow: hidden;
+}
+
+#main-container > .col {
+    max-height: 100%;
+    overflow-y: scroll;
+}
+
 /* Modals */
 .modal-content {
     background-color: var(--main-accent-color);

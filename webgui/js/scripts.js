@@ -36,6 +36,8 @@ window.addEventListener("DOMContentLoaded", function () {
 
     // documeOnt.getElementById("visualization-svg-container").append(svgElement); TODO FIXME
 
+    setMainContainerHeight();
+
     evaluatePython_load_settings().then((value) => {
         settings = JSON.parse(value);
 
@@ -116,6 +118,14 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             play_button();
         });
+
+    function setMainContainerHeight() {
+        const headerHeight = document.getElementById("header").offsetHeight;
+        const navBarHeight = document.getElementById("nav-bar").offsetHeight;
+        document.getElementById(
+            "main-container"
+        ).style.height = `calc(100vh - ${headerHeight}px - ${navBarHeight}px)`;
+    }
 
     /** play button
      *
