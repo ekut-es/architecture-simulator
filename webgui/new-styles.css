@@ -1,7 +1,11 @@
+:root {
+    --main-accent-color: #252d73;
+    --main-bg-color: #f5f5f5;
+}
 /* Header */
 
 .header {
-    background-color: #252d73;
+    background-color: var(--main-accent-color);
     color: white;
 }
 
@@ -45,4 +49,13 @@ nav {
 
 .mono-table th {
     text-align: center;
+}
+
+/* Modals */
+.modal-content {
+    background-color: var(--main-accent-color);
+}
+
+.modal-body {
+    background-color: var(--main-bg-color);
 }

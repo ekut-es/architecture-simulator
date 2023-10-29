@@ -4,13 +4,13 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>RISC-V Simulator</title>
-        <link rel="stylesheet" href="new-styles.css" />
         <link
             href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
             rel="stylesheet"
             integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
             crossorigin="anonymous"
         />
+        <link rel="stylesheet" href="new-styles.css" />
     </head>
     <body>
         <!--Header-->
@@ -18,7 +18,13 @@
             <div class="row align-items-center">
                 <div class="h1 col-auto">RISC-V Simulator</div>
                 <div class="col-auto ms-auto">
-                    <img src="svg/WEB_APP_BASIC_Help.svg" id="help-icon" />
+                    <img
+                        id="help-icon"
+                        src="svg/WEB_APP_BASIC_Help.svg"
+                        titel="help"
+                        data-bs-toggle="modal"
+                        data-bs-target="#help-modal"
+                    />
                 </div>
             </div>
         </header>
@@ -72,13 +78,276 @@
                         class="btn btn-sm control-button"
                         title="settings"
                         data-bs-toggle="modal"
-                        data-bs-target="#settingsModal"
+                        data-bs-target="#settings-modal"
                     >
                         <img src="svg/settings.svg" />
                     </button>
                 </div>
             </div>
         </nav>
+
+        <!--Help Modal-->
+        <div
+            class="modal fade"
+            id="help-modal"
+            tabindex="-1"
+            aria-labelledby="help-modal-label"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1
+                            class="modal-title fs-2 text-light"
+                            id="help-modal-label"
+                        >
+                            <img
+                                src="svg/WEB_APP_BASIC_Help.svg"
+                                width="35px"
+                                height="35px"
+                            />
+                            RISC-V
+                        </h1>
+                    </div>
+                    <div class="modal-body">
+                        <!--RISC-V User Documentation/Help-->
+                        <div id="riscv-help" style="display: block">
+                            <!--Filled in by js-->
+                        </div>
+                        <!--Toy User Documentation/Help-->
+                        <div id="toy-help" style="display: none">
+                            <!--Filled in by js-->
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Settings Modal-->
+        <div
+            class="modal fade"
+            id="settings-modal"
+            tabindex="-1"
+            aria-labelledby="settings-modal-label"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1
+                            class="modal-title fs-2 text-light"
+                            id="settingsModalLabel"
+                        >
+                            Settings
+                        </h1>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row border-bottom mb-2">
+                            <div class="col-4">
+                                <h2 class="fs-5">ISA:</h2>
+                            </div>
+                            <div class="col-8">
+                                <div
+                                    class="btn-group-toggle align-items-center justify-content-around"
+                                    data-toggle="buttons"
+                                >
+                                    <label class="button_switch_isa">
+                                        <input
+                                            type="radio"
+                                            name="isa"
+                                            id="isa_button_riscv_id"
+                                            title="switch to riscv isa"
+                                            checked
+                                        />
+                                        RISC-V
+                                    </label>
+                                    <label class="button_switch_isa">
+                                        <input
+                                            type="radio"
+                                            name="isa"
+                                            id="isa_button_toy_id"
+                                            title="switch to toy isa"
+                                        />
+                                        Toy
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <h2 class="fs-5">Representation Mode</h2>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <h3 class="fs-6">Register Table:</h3>
+                            </div>
+                            <div class="col-8">
+                                <div
+                                    class="btn-group-toggle align-items-center justify-content-around"
+                                    data-toggle="buttons"
+                                >
+                                    <label class="button_switch_representation">
+                                        <input
+                                            type="radio"
+                                            name="reg_representation"
+                                            id="reg_button_binary_representation_id"
+                                            title="switch to binary representation"
+                                        />
+                                        binary
+                                    </label>
+                                    <label class="button_switch_representation">
+                                        <input
+                                            type="radio"
+                                            name="reg_representation"
+                                            id="reg_button_decimal_representation_id"
+                                            title="switch to decimal representation"
+                                            checked
+                                        />
+                                        decimal
+                                    </label>
+                                    <label class="button_switch_representation">
+                                        <input
+                                            type="radio"
+                                            name="reg_representation"
+                                            id="reg_button_signed_decimal_representation_id"
+                                            title="switch to signed decimal representation"
+                                            autocomplete="off"
+                                        />
+                                        signed decimal
+                                    </label>
+                                    <label class="button_switch_representation">
+                                        <input
+                                            type="radio"
+                                            name="reg_representation"
+                                            id="reg_button_hexa_representation_id"
+                                            title="switch to hexadecimal representation"
+                                        />
+                                        hexadecimal
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row border-bottom mb-2">
+                            <div class="col-4">
+                                <h3 class="fs-6">Memory Table:</h3>
+                            </div>
+                            <div class="col-8">
+                                <div
+                                    class="btn-group-toggle align-items-center justify-content-around"
+                                    data-toggle="buttons"
+                                >
+                                    <label class="button_switch_representation">
+                                        <input
+                                            type="radio"
+                                            name="mem_representation"
+                                            id="mem_button_binary_representation_id"
+                                            title="switch to binary representation"
+                                            autocomplete="off"
+                                        />
+                                        binary
+                                    </label>
+                                    <label class="button_switch_representation">
+                                        <input
+                                            type="radio"
+                                            name="mem_representation"
+                                            id="mem_button_decimal_representation_id"
+                                            title="switch to decimal representation"
+                                            autocomplete="off"
+                                            checked
+                                        />
+                                        decimal
+                                    </label>
+                                    <label class="button_switch_representation">
+                                        <input
+                                            type="radio"
+                                            name="mem_representation"
+                                            id="mem_button_signed_decimal_representation_id"
+                                            title="switch to signed decimal representation"
+                                            autocomplete="off"
+                                        />
+                                        signed decimal
+                                    </label>
+                                    <label class="button_switch_representation">
+                                        <input
+                                            type="radio"
+                                            name="mem_representation"
+                                            id="mem_button_hexa_representation_id"
+                                            title="switch to hexadecimal representation"
+                                            autocomplete="off"
+                                        />
+                                        hexadecimal
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <h2 class="fs-5">Pipeline Mode:</h2>
+                            </div>
+                            <div class="col-8">
+                                <div
+                                    class="btn-group-toggle align-items-center justify-content-around"
+                                    data-toggle="buttons"
+                                >
+                                    <label class="button_switch_representation">
+                                        <input
+                                            type="radio"
+                                            name="pipeline_mode"
+                                            id="button_SingleStage"
+                                            title="single stage"
+                                            autocomplete="off"
+                                            checked
+                                        />
+                                        SingleStage
+                                    </label>
+                                    <label class="button_switch_representation">
+                                        <input
+                                            type="radio"
+                                            name="pipeline_mode"
+                                            id="button_5-Stage"
+                                            title="five stage"
+                                            autocomplete="off"
+                                        />
+                                        5-Stage
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input
+                                        type="checkbox"
+                                        id="button_HazardDetection"
+                                        title="disable hazard detection"
+                                        checked
+                                        disabled
+                                    />
+                                    <label
+                                        class="form-check-label"
+                                        type="checkbox"
+                                        for="button_HazardDetection"
+                                    >
+                                        Data Hazard Detection
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!--Main Content-->
         <main class="container-fluid">
