@@ -34,7 +34,7 @@ window.addEventListener("DOMContentLoaded", function () {
         update_ui_async();
     });
 
-    document.getElementById("visualization-svg-container").append(svgElement);
+    // documeOnt.getElementById("visualization-svg-container").append(svgElement); TODO FIXME
 
     evaluatePython_load_settings().then((value) => {
         settings = JSON.parse(value);
@@ -108,8 +108,8 @@ window.addEventListener("DOMContentLoaded", function () {
     });
 
     // paste the help pages into the html
-    document.getElementById("RiscvHelp").innerHTML = riscvDocumentation;
-    document.getElementById("ToyHelp").innerHTML = toyDocumentation;
+    document.getElementById("riscv-help").innerHTML = riscvDocumentation;
+    document.getElementById("toy-help").innerHTML = toyDocumentation;
 
     document
         .getElementById("button-run-simulation-id")
@@ -249,13 +249,13 @@ window.addEventListener("DOMContentLoaded", function () {
             selected_isa = "riscv";
             refresh_button();
 
-            document.getElementById("HelpHeader").textContent = "RISC-V";
-            RiscvHelp.style.display = "block";
-            ToyHelp.style.display = "none";
+            document.getElementById("help-heading-id").textContent = "RISC-V";
+            document.getElementById("riscv-help").style.display = "block";
+            document.getElementById("toy-help").style.display = "none";
 
             document.getElementById("button_SingleStage").disabled = false;
             document.getElementById("button_5-Stage").disabled = false;
-            document.getElementById("modal_header_switch_stage").style.color =
+            document.getElementById("pipeline-mode-heading-id").style.color =
                 "black";
         });
 
@@ -265,9 +265,9 @@ window.addEventListener("DOMContentLoaded", function () {
             selected_isa = "toy";
             refresh_button();
 
-            document.getElementById("HelpHeader").textContent = "Toy";
-            RiscvHelp.style.display = "none";
-            ToyHelp.style.display = "block";
+            document.getElementById("help-heading-id").textContent = "Toy";
+            document.getElementById("riscv-help").style.display = "none";
+            document.getElementById("toy-help").style.display = "block";
 
             hazard_detection = true;
             if (document.getElementById("button_5-Stage").checked) {
@@ -275,7 +275,7 @@ window.addEventListener("DOMContentLoaded", function () {
             }
             document.getElementById("button_SingleStage").disabled = true;
             document.getElementById("button_5-Stage").disabled = true;
-            document.getElementById("modal_header_switch_stage").style.color =
+            document.getElementById("pipeline-mode-heading-id").style.color =
                 "grey";
         });
 
@@ -347,13 +347,8 @@ window.addEventListener("DOMContentLoaded", function () {
                 finished_typing,
                 parse_sim_after_not_typing_for_n_ms
             );
-            document.getElementById("button_tab_visualization").style.display =
+            document.getElementById("button-visualization-id").style.display =
                 "none";
-            document.getElementById("VisualizationTabContent").style.display =
-                "none";
-            document.getElementById("MainContent").style.display = "block";
-            document.getElementById("button_tab_visualization").textContent =
-                "Visualization";
             disable_hazard_detection();
         });
 
@@ -365,9 +360,8 @@ window.addEventListener("DOMContentLoaded", function () {
             parse_sim_after_not_typing_for_n_ms
         );
 
-        document.getElementById("button_tab_visualization").style.display =
+        document.getElementById("button-visualization-id").style.display =
             "block";
-
         enable_hazard_detection();
     });
 
@@ -395,30 +389,9 @@ window.addEventListener("DOMContentLoaded", function () {
         editor.save();
         for (let i = 0; i < editor.lineCount(); i++) {
             editor.removeLineClass(i, "background", "highlight");
-            editor_vis.removeLineClass(i, "background", "highlight");
         }
         editor.refresh();
-        editor_vis.refresh();
         editor.closeHint();
-        editor_vis.closeHint();
-        // autoparse
-        clearTimeout(input_timer);
-        if (!manual_run) {
-            input_timer = setTimeout(
-                finished_typing,
-                parse_sim_after_not_typing_for_n_ms
-            );
-        }
-    });
-
-    /**
-     * This is the event listener for the codemirror editor in visualization mode, it gets called when a change
-     * in the text area occurs.
-     * It removes all highlights and autoparses the input while once again highlighting errors.
-     */
-    editor_vis.on("change", function () {
-        editor_vis.save();
-
         // autoparse
         clearTimeout(input_timer);
         if (!manual_run) {
@@ -583,12 +556,10 @@ function stop_loading_visuals() {
 
 function disable_editor() {
     editor.setOption("readOnly", true);
-    editor_vis.setOption("readOnly", true);
 }
 
 function enable_editor() {
     editor.setOption("readOnly", false);
-    editor_vis.setOption("readOnly", false);
 }
 
 function disable_hazard_detection() {
@@ -602,35 +573,8 @@ function enable_hazard_detection() {
     document.getElementById("button_HazardDetection").disabled = false;
 }
 
-function toggleVisualizationTabContent() {
-    if (
-        document.getElementById("VisualizationTabContent").style.display ===
-        "block"
-    ) {
-        synchronizeEditors(editor_vis, editor);
-        editor_vis.closeHint();
-        close_hint = false;
-        document.getElementById("VisualizationTabContent").style.display =
-            "none";
-        document.getElementById("MainContent").style.display = "block";
-        document.getElementById("button_tab_visualization").textContent =
-            "Visualization";
-    } else {
-        synchronizeEditors(editor, editor_vis);
-        editor.closeHint();
-        document.getElementById("VisualizationTabContent").style.display =
-            "block";
-        document.getElementById("MainContent").style.display = "none";
-        document.getElementById("button_tab_visualization").textContent =
-            "Visualization Off";
-        toggleInputTab();
-    }
-}
-
 function toggleInputTab() {
     if (document.getElementById("InputTab").style.display === "none") {
-        synchronizeEditors(editor_vis, editor);
-        editor_vis.closeHint();
         close_hint = false;
         document.getElementById("InputTab").style.display = "block";
         document.getElementById("CmdTab").style.display = "none";
@@ -646,8 +590,6 @@ function toggleInputTab() {
 
 function toggleCmdTab() {
     if (document.getElementById("CmdTab").style.display === "none") {
-        synchronizeEditors(editor_vis, editor);
-        editor_vis.closeHint();
         close_hint = true;
         document.getElementById("CmdTab").style.display = "block";
         document.getElementById("InputTab").style.display = "none";
@@ -663,8 +605,6 @@ function toggleCmdTab() {
 
 function toggleRegisterTab() {
     if (document.getElementById("RegisterTab").style.display === "none") {
-        synchronizeEditors(editor_vis, editor);
-        editor_vis.closeHint();
         close_hint = true;
         document.getElementById("RegisterTab").style.display = "block";
         document.getElementById("InputTab").style.display = "none";
@@ -680,8 +620,6 @@ function toggleRegisterTab() {
 
 function toggleMemoryTab() {
     if (document.getElementById("MemoryTab").style.display === "none") {
-        synchronizeEditors(editor_vis, editor);
-        editor_vis.closeHint();
         close_hint = true;
         document.getElementById("MemoryTab").style.display = "block";
         document.getElementById("CmdTab").style.display = "none";
@@ -693,11 +631,6 @@ function toggleMemoryTab() {
         document.getElementById("button_tab_reg").classList.remove("active");
         document.getElementById("button_tab_cmd").classList.remove("active");
     }
-}
-
-function synchronizeEditors(sEditor, tEditor) {
-    const content = sEditor.getValue();
-    tEditor.setValue(content);
 }
 
 /**set_svg_text_complex_right_align
