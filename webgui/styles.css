@@ -61,18 +61,22 @@ main {
 }
 
 #codemirror-container {
-    min-width: 30em;
+    min-width: 25em;
     max-width: 60em;
     flex-grow: 3;
 }
 
 .main-content-column {
-    min-width: 20em;
+    min-width: 15em;
     max-width: 40em;
     flex-grow: 1;
     margin-left: 1em;
     margin-right: 1em;
     overflow-y: scroll;
+}
+
+#main-container {
+    overflow-x: scroll;
 }
 
 /* Modals */
