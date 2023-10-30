@@ -44,6 +44,9 @@ class ToyArchitecturalState:
             )
         )
         self.performance_metrics = ToyPerformanceMetrics()
+        self.alu_out: Optional[MutableUInt16] = None
+        self.ram_out: Optional[MutableUInt16] = None
+        self.jump: Optional[bool] = None
 
     def increment_pc(self):
         """Increment program counter by 1."""
@@ -87,3 +90,9 @@ class ToyArchitecturalState:
             hexadecimal[:2] + " " + hexadecimal[2:],
             str(signed_decimal),
         )
+
+    def get_repr(self):
+        ...
+        # TODO: Add get repr for alu out, ram out, jump
+        # TODO: Unify Memory, etc
+        # TODO: Can be done in just simulation and stat files, probabliy utilize data from parser

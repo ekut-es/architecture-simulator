@@ -308,3 +308,7 @@ class TestToyInstructions(unittest.TestCase):
             [bool(i) for i in [1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1]],
         )
         self.assertFalse(MicroProgram.get_mp_var_value(type(STO(12)), "set[accu]"))
+
+    def test_toy_visualisation_data(self):
+        # TODO: Write proper tests or integrate into existing tests
+        self.assertTrue(True)

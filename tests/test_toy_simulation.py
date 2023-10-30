@@ -137,3 +137,7 @@ INC"""
             simulation.run()
         self.assertEqual(cm.exception.address, 3)
         self.assertEqual(cm.exception.instruction_repr, "LDA 0x000")
+
+    def test_vis_data(self):
+        ...
+        # TODO: Add test to test if vis data is correct

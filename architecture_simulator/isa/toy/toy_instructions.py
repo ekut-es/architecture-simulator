@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Type
+from typing import TYPE_CHECKING, Type, Optional
 from fixedint import MutableUInt16
 from ..instruction import Instruction
 
@@ -105,6 +105,12 @@ class ToyInstruction(Instruction):
         else:
             return NOP()
 
+    def visualisation_data(
+        self, state: ToyArchitecturalState
+    ) -> tuple[Optional[MutableUInt16], Optional[MutableUInt16], Optional[bool]]:
+        """Returns (alu_out, ram_out, jump) for visualisation."""
+        return (None, None, None)
+
 
 class AddressTypeInstruction(ToyInstruction):
     """Base class for all instructions which do use an address."""
@@ -134,6 +140,12 @@ class STO(AddressTypeInstruction):
         state.data_memory.write_halfword(address=self.address, value=state.accu)
         state.increment_pc()
 
+    def visualisation_data(
+        self, state: ToyArchitecturalState
+    ) -> tuple[Optional[MutableUInt16], Optional[MutableUInt16], Optional[bool]]:
+        """Returns (alu_out, ram_out, jump) for visualisation."""
+        return (state.accu, None, None)
+
 
 class LDA(AddressTypeInstruction):
     def __init__(self, address: int):
@@ -143,6 +155,12 @@ class LDA(AddressTypeInstruction):
         """ACCU = MEM[address]"""
         state.accu = state.data_memory.read_halfword(address=self.address)
         state.increment_pc()
+
+    def visualisation_data(
+        self, state: ToyArchitecturalState
+    ) -> tuple[Optional[MutableUInt16], Optional[MutableUInt16], Optional[bool]]:
+        """Returns (alu_out, ram_out, jump) to visualisation."""
+        return (None, state.data_memory.read_halfword(address=self.address), None)
 
 
 class BRZ(AddressTypeInstruction):
@@ -159,6 +177,12 @@ class BRZ(AddressTypeInstruction):
             state.set_pc(MutableUInt16(self.address))
             state.performance_metrics.branch_count += 1
 
+    def visualisation_data(
+        self, state: ToyArchitecturalState
+    ) -> tuple[Optional[MutableUInt16], Optional[MutableUInt16], Optional[bool]]:
+        """Returns (alu_out, ram_out, jump) to visualisation."""
+        return (None, None, not bool(state.accu))
+
 
 class ADD(AddressTypeInstruction):
     def __init__(self, address: int):
@@ -169,6 +193,13 @@ class ADD(AddressTypeInstruction):
         memory = state.data_memory.read_halfword(address=self.address)
         state.accu = state.accu + memory
         state.increment_pc()
+
+    def visualisation_data(
+        self, state: ToyArchitecturalState
+    ) -> tuple[Optional[MutableUInt16], Optional[MutableUInt16], Optional[bool]]:
+        """Returns (alu_out, ram_out, jump) to visualisation."""
+        memory = state.data_memory.read_halfword(address=self.address)
+        return (state.accu + memory, memory, None)
 
 
 class SUB(AddressTypeInstruction):
@@ -181,6 +212,13 @@ class SUB(AddressTypeInstruction):
         state.accu = state.accu - memory
         state.increment_pc()
 
+    def visualisation_data(
+        self, state: ToyArchitecturalState
+    ) -> tuple[Optional[MutableUInt16], Optional[MutableUInt16], Optional[bool]]:
+        """Returns (alu_out, ram_out, jump) to visualisation."""
+        memory = state.data_memory.read_halfword(address=self.address)
+        return (state.accu - memory, memory, None)
+
 
 class OR(AddressTypeInstruction):
     def __init__(self, address: int):
@@ -191,6 +229,13 @@ class OR(AddressTypeInstruction):
         memory = state.data_memory.read_halfword(address=self.address)
         state.accu = state.accu | memory
         state.increment_pc()
+
+    def visualisation_data(
+        self, state: ToyArchitecturalState
+    ) -> tuple[Optional[MutableUInt16], Optional[MutableUInt16], Optional[bool]]:
+        """Returns (alu_out, ram_out, jump) to visualisation."""
+        memory = state.data_memory.read_halfword(address=self.address)
+        return (state.accu | memory, memory, None)
 
 
 class AND(AddressTypeInstruction):
@@ -203,6 +248,13 @@ class AND(AddressTypeInstruction):
         state.accu = state.accu & memory
         state.increment_pc()
 
+    def visualisation_data(
+        self, state: ToyArchitecturalState
+    ) -> tuple[Optional[MutableUInt16], Optional[MutableUInt16], Optional[bool]]:
+        """Returns (alu_out, ram_out, jump) to visualisation."""
+        memory = state.data_memory.read_halfword(address=self.address)
+        return (state.accu & memory, memory, None)
+
 
 class XOR(AddressTypeInstruction):
     def __init__(self, address: int):
@@ -214,6 +266,13 @@ class XOR(AddressTypeInstruction):
         state.accu = state.accu ^ memory
         state.increment_pc()
 
+    def visualisation_data(
+        self, state: ToyArchitecturalState
+    ) -> tuple[Optional[MutableUInt16], Optional[MutableUInt16], Optional[bool]]:
+        """Returns (alu_out, ram_out, jump) to visualisation."""
+        memory = state.data_memory.read_halfword(address=self.address)
+        return (state.accu ^ memory, memory, None)
+
 
 class NOT(ToyInstruction):
     def __init__(self):
@@ -223,6 +282,12 @@ class NOT(ToyInstruction):
         """ACCU = ~ACCU"""
         state.accu = ~state.accu
         state.increment_pc()
+
+    def visualisation_data(
+        self, state: ToyArchitecturalState
+    ) -> tuple[Optional[MutableUInt16], Optional[MutableUInt16], Optional[bool]]:
+        """Returns (alu_out, ram_out, jump) to visualisation."""
+        return (~state.accu, None, None)
 
 
 class INC(ToyInstruction):
