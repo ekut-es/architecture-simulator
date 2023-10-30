@@ -56,13 +56,23 @@ main {
     overflow: hidden;
 }
 
-#main-container > .col {
-    max-height: 100%;
-    overflow-y: scroll;
+#main-container > .height-100 > * {
+    height: 100%;
 }
 
-div .CodeMirror {
-    height: 100%;
+#codemirror-container {
+    min-width: 30em;
+    max-width: 60em;
+    flex-grow: 3;
+}
+
+.main-content-column {
+    min-width: 20em;
+    max-width: 40em;
+    flex-grow: 1;
+    margin-left: 1em;
+    margin-right: 1em;
+    overflow-y: scroll;
 }
 
 /* Modals */

@@ -97,14 +97,20 @@
         </nav>
 
         <!--Main Content-->
-        <main class="container-fluid">
-            <div id="main-container" class="row py-2">
+        <main>
+            <div
+                id="main-container"
+                class="d-flex justify-content-between py-2"
+            >
                 <!--Text Editor-->
-                <div class="col">
+                <div
+                    id="codemirror-container"
+                    class="main-content-column height-100"
+                >
                     <textarea id="input"></textarea>
                 </div>
                 <!--Instruction Table-->
-                <div class="col">
+                <div class="main-content-column">
                     <table
                         id="instruction-table-id"
                         class="table table-sm table-hover table-bordered mono-table mb-0"
@@ -120,7 +126,7 @@
                     </table>
                 </div>
                 <!--Register Table-->
-                <div class="col">
+                <div class="main-content-column">
                     <table
                         class="table table-sm table-hover table-bordered mono-table mb-0"
                     >
@@ -134,7 +140,7 @@
                     </table>
                 </div>
                 <!--Memory Table-->
-                <div class="col">
+                <div class="main-content-column">
                     <table
                         class="table table-sm table-hover table-bordered mono-table mb-0"
                     >
@@ -148,7 +154,7 @@
                     </table>
                 </div>
                 <!--Output Field-->
-                <div class="col">
+                <div class="main-content-column height-100">
                     <textarea
                         id="output-field-id"
                         class="form-control"
