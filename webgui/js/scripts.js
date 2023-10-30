@@ -26,7 +26,7 @@ window.addEventListener("DOMContentLoaded", function () {
     const svgElement = document.createElement("object");
     svgElement.data = "svg/pipeline.svg";
     svgElement.type = "image/svg+xml";
-    svgElement.setAttribute("class", "img-fluid p-0 m-0");
+    //svgElement.setAttribute("class", "img-fluid p-0 m-0");
     svgElement.id = "visualization_pipeline";
 
     svgElement.addEventListener("load", function () {
@@ -34,7 +34,7 @@ window.addEventListener("DOMContentLoaded", function () {
         update_ui_async();
     });
 
-    // documeOnt.getElementById("visualization-svg-container").append(svgElement); TODO FIXME
+    document.getElementById("riscv-svg-container").append(svgElement);
 
     setMainContainerHeight();
 
@@ -757,4 +757,25 @@ function strToHexColor(str) {
     }
     console.log("color not supported");
     return "000000";
+}
+
+/**
+ * Toggles the visibility of the visualization.
+ */
+function toggleVisualizationTabContent() {
+    if (selected_isa === "riscv") {
+        toggleDisplayBlockNone(document.getElementById("riscv-svg-container"));
+    }
+}
+
+/**
+ * Toggles the display attribute of the given element between "none" and "block"
+ * @param {HTMLElement} element The element whose display should be toggled.
+ */
+function toggleDisplayBlockNone(element) {
+    if (element.style.display === "block") {
+        element.style.display = "none";
+    } else {
+        element.style.display = "block";
+    }
 }
