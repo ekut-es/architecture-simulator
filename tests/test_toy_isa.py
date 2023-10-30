@@ -20,6 +20,10 @@ from architecture_simulator.isa.toy.toy_instructions import (
     NOP,
     ToyInstruction,
 )
+from architecture_simulator.isa.toy.toy_micro_program import (
+    MicroProgram,
+    int_to_bool_list,
+)
 
 
 class TestToyInstructions(unittest.TestCase):
@@ -290,3 +294,17 @@ class TestToyInstructions(unittest.TestCase):
         self.assertEqual(ToyInstruction.from_integer(53248), NOP())
         self.assertEqual(ToyInstruction.from_integer(57344), NOP())
         self.assertEqual(ToyInstruction.from_integer(61440), NOP())
+
+    def test_micro_program(self):
+        self.assertTrue(int_to_bool_list(0x800)[0])
+        self.assertTrue(int_to_bool_list(0x001)[11])
+        self.assertEqual(
+            int_to_bool_list(0b110001011100),
+            [bool(i) for i in [1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0]],
+        )
+
+        self.assertEqual(
+            MicroProgram.get_mp_values(type(STO(12))),
+            [bool(i) for i in [1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1]],
+        )
+        self.assertFalse(MicroProgram.get_mp_var_value(type(STO(12)), "set[accu]"))
