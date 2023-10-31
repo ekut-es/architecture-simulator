@@ -139,5 +139,47 @@ INC"""
         self.assertEqual(cm.exception.instruction_repr, "LDA 0x000")
 
     def test_vis_data(self):
-        ...
-        # TODO: Add test to test if vis data is correct
+        sim = ToySimulation()
+        sim.load_program(
+            """
+            num = 0x400
+            :0x400:11
+            LDA num
+            INC
+            DEC
+            ADD num
+            SUB num
+            SUB num
+            BRZ label
+            label:
+            """
+        )
+        self.assertEqual(sim.state.alu_out, None)
+        self.assertEqual(sim.state.ram_out, None)
+        self.assertEqual(sim.state.jump, None)
+        # LDA
+        sim.step()
+        self.assertEqual(sim.state.alu_out, None)
+        self.assertEqual(sim.state.ram_out, 11)
+        self.assertEqual(sim.state.jump, None)
+        # INC
+        sim.step()
+        self.assertEqual(sim.state.alu_out, 12)
+        self.assertEqual(sim.state.ram_out, None)
+        self.assertEqual(sim.state.jump, None)
+        # DEC
+        sim.step()
+        # ADD
+        sim.step()
+        self.assertEqual(sim.state.alu_out, 22)
+        self.assertEqual(sim.state.ram_out, 11)
+        self.assertEqual(sim.state.jump, None)
+        # SUB
+        sim.step()
+        # SUB
+        sim.step()
+        # BRZ
+        sim.step()
+        self.assertEqual(sim.state.alu_out, None)
+        self.assertEqual(sim.state.ram_out, None)
+        self.assertEqual(sim.state.jump, True)

@@ -32,11 +32,6 @@ class ToySimulation(Simulation):
                 int(program_counter)
             )
             try:
-                (
-                    self.state.alu_out,
-                    self.state.ram_out,
-                    self.state.jump,
-                ) = instruction.visualisation_data(self.state)
                 instruction.behavior(self.state)
                 self.state.performance_metrics.instruction_count += 1
             except Exception as e:

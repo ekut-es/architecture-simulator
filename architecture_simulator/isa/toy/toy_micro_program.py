@@ -63,7 +63,7 @@ class MicroProgram:
     @classmethod
     def get_mp_values(self, instr: Type[ToyInstruction]):
         """
-        Returns all micro program values of the instruction.
+        Returns all micro program values for the instruction.
         """
         return self._instr_bool_list_mapping[instr]
 
