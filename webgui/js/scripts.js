@@ -39,6 +39,10 @@ window.addEventListener("DOMContentLoaded", function () {
 
     setMainContainerHeight();
 
+    window.addEventListener("resize", function () {
+        setMainContainerHeight();
+    });
+
     evaluatePython_load_settings().then((value) => {
         settings = JSON.parse(value);
 
