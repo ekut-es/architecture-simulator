@@ -42,6 +42,10 @@ nav {
     background-color: rgb(247, 129, 129);
 }
 
+#button-visualization-id {
+    display: none;
+}
+
 /* Main Content */
 
 #main-content-container {

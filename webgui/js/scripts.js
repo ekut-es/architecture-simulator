@@ -780,9 +780,12 @@ function toggleVisualizationTabContent() {
  * @param {HTMLElement} element The element whose display should be toggled.
  */
 function toggleDisplayBlockNone(element) {
+    const button = document.getElementById("button-visualization-id");
     if (element.style.display === "block") {
         element.style.display = "none";
+        button.textContent = "Visualization Off";
     } else {
         element.style.display = "block";
+        button.textContent = "Visualization On";
     }
 }
