@@ -26,7 +26,8 @@ window.addEventListener("DOMContentLoaded", function () {
     const svgElement = document.createElement("object");
     svgElement.data = "svg/pipeline.svg";
     svgElement.type = "image/svg+xml";
-    //svgElement.setAttribute("class", "img-fluid p-0 m-0");
+    // svgElement.setAttribute("class", "img-fluid p-0 m-0");
+
     svgElement.id = "visualization_pipeline";
 
     svgElement.addEventListener("load", function () {
@@ -34,7 +35,7 @@ window.addEventListener("DOMContentLoaded", function () {
         update_ui_async();
     });
 
-    document.getElementById("riscv-svg-container").append(svgElement);
+    document.getElementById("main-content-container").append(svgElement);
 
     setMainContainerHeight();
 
@@ -123,7 +124,7 @@ window.addEventListener("DOMContentLoaded", function () {
         const headerHeight = document.getElementById("header").offsetHeight;
         const navBarHeight = document.getElementById("nav-bar").offsetHeight;
         document.getElementById(
-            "main-container"
+            "main-content-container"
         ).style.height = `calc(100vh - ${headerHeight}px - ${navBarHeight}px)`;
     }
 
@@ -764,7 +765,9 @@ function strToHexColor(str) {
  */
 function toggleVisualizationTabContent() {
     if (selected_isa === "riscv") {
-        toggleDisplayBlockNone(document.getElementById("riscv-svg-container"));
+        toggleDisplayBlockNone(
+            document.getElementById("visualization_pipeline")
+        );
     }
 }
 

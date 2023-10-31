@@ -97,10 +97,14 @@
         </nav>
 
         <!--Main Content-->
-        <main>
+        <div
+            id="main-content-container"
+            class="d-flex justify-content-between py-3 px-3"
+            role="main"
+        >
             <div
-                id="main-container"
-                class="d-flex justify-content-between py-2"
+                id="text-content-container"
+                class="d-flex justify-content-between flex-grow-1"
             >
                 <!--Text Editor-->
                 <div
@@ -161,14 +165,13 @@
                         disabled
                     ></textarea>
                 </div>
-                <!--RISC-V Visualization-->
-                <div
-                    id="riscv-svg-container"
-                    class="height-100"
-                    style="display: none"
-                ></div>
             </div>
-        </main>
+            <!--RISC-V Visualization-->
+            <!-- <div
+                id="riscv-svg-container"
+                style="display: none;"
+            ></div> -->
+        </div>
 
         <!--Help Modal-->
         <div
