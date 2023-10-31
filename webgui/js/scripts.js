@@ -25,7 +25,7 @@ var toy_visualization_loaded = false;
 
 window.addEventListener("DOMContentLoaded", function () {
     const riscvSvgElement = document.createElement("object");
-    riscvSvgElement.data = "svg/pipeline.svg";
+    riscvSvgElement.data = "svg/riscv_pipeline.svg";
     riscvSvgElement.type = "image/svg+xml";
     riscvSvgElement.id = "riscv-visualization";
     riscvSvgElement.addEventListener("load", function () {
@@ -36,7 +36,7 @@ window.addEventListener("DOMContentLoaded", function () {
     document.getElementById("main-content-container").append(riscvSvgElement);
 
     const toySvgElement = document.createElement("object");
-    toySvgElement.data = "svg/pipeline.svg";
+    toySvgElement.data = "svg/toy_structure.svg";
     toySvgElement.type = "image/svg+xml";
     toySvgElement.id = "toy-visualization";
     toySvgElement.addEventListener("load", function () {
