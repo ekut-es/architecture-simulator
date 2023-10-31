@@ -193,7 +193,7 @@ def parse_input(instr: str):
 def update_ui():
     """Updates all UI elements based on the current simulation and architectural state."""
     update_tables()
-    if archsim_js.get_visualization_loaded():
+    if archsim_js.get_riscv_visualization_loaded():
         update_IF_Stage()
         update_ID_Stage()
         update_EX_Stage()

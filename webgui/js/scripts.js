@@ -20,22 +20,31 @@ var input_timer;
 var run;
 var is_run_simulation = false;
 var manual_run = false;
-var visualization_loaded = false;
+var riscv_visualization_loaded = false;
+var toy_visualization_loaded = false;
 
 window.addEventListener("DOMContentLoaded", function () {
-    const svgElement = document.createElement("object");
-    svgElement.data = "svg/pipeline.svg";
-    svgElement.type = "image/svg+xml";
-    // svgElement.setAttribute("class", "img-fluid p-0 m-0");
-
-    svgElement.id = "visualization_pipeline";
-
-    svgElement.addEventListener("load", function () {
-        visualization_loaded = true;
+    const riscvSvgElement = document.createElement("object");
+    riscvSvgElement.data = "svg/pipeline.svg";
+    riscvSvgElement.type = "image/svg+xml";
+    riscvSvgElement.id = "riscv-visualization";
+    riscvSvgElement.addEventListener("load", function () {
+        riscv_visualization_loaded = true;
         update_ui_async();
     });
 
-    document.getElementById("main-content-container").append(svgElement);
+    document.getElementById("main-content-container").append(riscvSvgElement);
+
+    const toySvgElement = document.createElement("object");
+    toySvgElement.data = "svg/pipeline.svg";
+    toySvgElement.type = "image/svg+xml";
+    toySvgElement.id = "toy-visualization";
+    toySvgElement.addEventListener("load", function () {
+        toy_visualization_loaded = true;
+        update_ui_async();
+    });
+
+    document.getElementById("main-content-container").append(toySvgElement);
 
     setMainContainerHeight();
 
@@ -261,6 +270,12 @@ window.addEventListener("DOMContentLoaded", function () {
     document
         .getElementById("isa_button_riscv_id")
         .addEventListener("click", () => {
+            if (selected_isa === "toy") {
+                hideCurrentVisualization();
+            }
+            document.getElementById("button-visualization-id").style.display =
+                "none";
+
             selected_isa = "riscv";
             refresh_button();
 
@@ -277,6 +292,10 @@ window.addEventListener("DOMContentLoaded", function () {
     document
         .getElementById("isa_button_toy_id")
         .addEventListener("click", () => {
+            if (selected_isa === "riscv") {
+                hideCurrentVisualization();
+            }
+
             selected_isa = "toy";
             refresh_button();
 
@@ -292,6 +311,9 @@ window.addEventListener("DOMContentLoaded", function () {
             document.getElementById("button_5-Stage").disabled = true;
             document.getElementById("pipeline-mode-heading-id").style.color =
                 "grey";
+
+            document.getElementById("button-visualization-id").style.display =
+                "inline-block";
         });
 
     // register representation button listeners
@@ -655,7 +677,7 @@ function toggleMemoryTab() {
  */
 function set_svg_text_complex_right_align(id, str) {
     const pipeline_svg = document.getElementById(
-        "visualization_pipeline"
+        "riscv-visualization"
     ).contentDocument;
     pipeline_svg.getElementById(id).firstChild.nextSibling.style.fontSize =
         "15px";
@@ -672,7 +694,7 @@ function set_svg_text_complex_right_align(id, str) {
  */
 function set_svg_text_complex_left_align(id, str) {
     const pipeline_svg = document.getElementById(
-        "visualization_pipeline"
+        "riscv-visualization"
     ).contentDocument;
     pipeline_svg.getElementById(id).firstChild.nextSibling.style.fontSize =
         "15px";
@@ -689,7 +711,7 @@ function set_svg_text_complex_left_align(id, str) {
  */
 function set_svg_text_complex_middle_align(id, str) {
     const pipeline_svg = document.getElementById(
-        "visualization_pipeline"
+        "riscv-visualization"
     ).contentDocument;
     pipeline_svg.getElementById(id).firstChild.nextSibling.style.fontSize =
         "15px";
@@ -706,7 +728,7 @@ function set_svg_text_complex_middle_align(id, str) {
  */
 function set_svg_colour(id, str) {
     const pipeline_svg = document.getElementById(
-        "visualization_pipeline"
+        "riscv-visualization"
     ).contentDocument;
     const Child_Nodes = pipeline_svg.getElementById(id).childNodes;
     if (Child_Nodes.length > 0) {
@@ -726,7 +748,7 @@ function set_svg_colour(id, str) {
  */
 function set_svg_marker_color(id, str) {
     const pipeline_svg = document.getElementById(
-        "visualization_pipeline"
+        "riscv-visualization"
     ).contentDocument;
     // the marker is part of the style attribute
     var styleAttribute = pipeline_svg.getElementById(id).getAttribute("style");
@@ -768,24 +790,30 @@ function strToHexColor(str) {
  * Toggles the visibility of the visualization.
  */
 function toggleVisualizationTabContent() {
-    if (selected_isa === "riscv") {
-        toggleDisplayBlockNone(
-            document.getElementById("visualization_pipeline")
-        );
+    const visualization = getCurrentVisualization();
+    const button = document.getElementById("button-visualization-id");
+    if (visualization.style.display === "block") {
+        visualization.style.display = "none";
+        button.textContent = "Visualization Off";
+    } else {
+        visualization.style.display = "block";
+        button.textContent = "Visualization On";
     }
 }
 
 /**
- * Toggles the display attribute of the given element between "none" and "block"
- * @param {HTMLElement} element The element whose display should be toggled.
+ * @returns {HTMLElement} The Visualization for the current ISA.
  */
-function toggleDisplayBlockNone(element) {
-    const button = document.getElementById("button-visualization-id");
-    if (element.style.display === "block") {
-        element.style.display = "none";
-        button.textContent = "Visualization Off";
-    } else {
-        element.style.display = "block";
-        button.textContent = "Visualization On";
+function getCurrentVisualization() {
+    if (selected_isa == "riscv") {
+        return document.getElementById("riscv-visualization");
+    } /*if (selected_isa == "toy")*/ else {
+        return document.getElementById("toy-visualization");
     }
+}
+
+function hideCurrentVisualization() {
+    getCurrentVisualization().style.display = "none";
+    document.getElementById("button-visualization-id").textContent =
+        "Visualization Off";
 }

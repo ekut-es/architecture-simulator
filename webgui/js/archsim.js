@@ -223,10 +223,10 @@ const archsim_js = {
         table.rows[position].cells[1].style.backgroundColor = "yellow";
     },
     /**
-     * @returns {bool} whether the visualization svg has finished loading
+     * @returns {bool} whether the riscv visualization svg has finished loading
      */
-    get_visualization_loaded: function () {
-        return visualization_loaded;
+    get_riscv_visualization_loaded: function () {
+        return riscv_visualization_loaded;
     },
     /**Update IF Stage:
      *

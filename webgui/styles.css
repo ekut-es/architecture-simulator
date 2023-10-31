@@ -97,7 +97,8 @@ nav {
 
 /* Visualization */
 
-#visualization_pipeline {
+#riscv-visualization,
+#toy-visualization {
     max-width: 60%;
     display: none;
     margin-left: var(--content-margin);
