@@ -114,7 +114,7 @@ class AddressTypeInstruction(ToyInstruction):
         self.address = address % 4096
 
     def __repr__(self):
-        return f"{self.mnemonic.upper()} ${self.address:03X}"
+        return f"{self.mnemonic.upper()} 0x{self.address:03X}"
 
     def __eq__(self, other):
         if isinstance(other, AddressTypeInstruction):

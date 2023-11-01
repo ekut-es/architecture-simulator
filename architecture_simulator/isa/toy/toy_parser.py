@@ -20,7 +20,7 @@ class ToyParser:
     _address_mnemonics = ["STO", "LDA", "BRZ", "ADD", "SUB", "OR", "AND", "XOR"]
     _no_address_mnemonics = ["NOT", "INC", "DEC", "ZRO", "NOP"]
 
-    _pattern_hex_value = pp.Combine("$" + pp.Word(pp.hexnums))
+    _pattern_hex_value = pp.Combine("0x" + pp.Word(pp.hexnums))
     _pattern_dec_value = pp.Word(pp.nums)
 
     _pattern_label = pp.Word(pp.alphas + "_", pp.alphanums + "_")
@@ -157,16 +157,16 @@ class ToyParser:
                 self.state.data_memory.write_halfword(address=address, value=value)
 
     def _value_to_int(self, address: str) -> int:
-        """Convert addresses to ints. Hex addresses (starting with '$') and decimal addresses are supported.
+        """Convert addresses to ints. Hex addresses (starting with '0x') and decimal addresses are supported.
 
         Args:
-            address (str): An address like '$d9c' or '1044'.
+            address (str): An address like '0xd9c' or '1044'.
 
         Returns:
             int: the corresponding integer.
         """
-        if address[0] == "$":
-            return int(address[1:], base=16)
+        if address.startswith("0x"):
+            return int(address[2:], base=16)
         else:
             return int(address)
 

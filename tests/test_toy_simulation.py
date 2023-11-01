@@ -48,10 +48,10 @@ class TestToySimulation(unittest.TestCase):
         program = """INC
         DEC
         INC
-        STO $400
-        ADD $400
-        STO $400
-        ADD $400"""
+        STO 0x400
+        ADD 0x400
+        STO 0x400
+        ADD 0x400"""
         simulation.load_program(program)
         simulation.run()
         self.assertEqual(simulation.state.data_memory.read_halfword(0x400), 2)
@@ -64,11 +64,11 @@ class TestToySimulation(unittest.TestCase):
         INC
         INC
         DEC
-        BRZ $008
+        BRZ 0x008
         ZRO
-        BRZ $003
-        BRZ $009
-        ADD $400"""
+        BRZ 0x003
+        BRZ 0x009
+        ADD 0x400"""
         simulation.load_program(program)
         simulation.run()
         self.assertEqual(simulation.state.accu, 0)
@@ -80,9 +80,9 @@ class TestToySimulation(unittest.TestCase):
         simulation = ToySimulation()
         program = """    # computes the sum of the numbers from 1 to n
     # result gets saved in MEM[1025]
-    Loopcount = $400
-    Result = $401
-    :$400:20 # enter n here
+    Loopcount = 0x400
+    Result = 0x401
+    :0x400:20 # enter n here
 
     LDA Loopcount # skip to the end if n=0
     BRZ end
@@ -103,7 +103,7 @@ class TestToySimulation(unittest.TestCase):
 
     def test_memory_issue(self):
         program = """INC
-STO $400
+STO 0x400
 INC"""
         simulation = ToySimulation()
         simulation.load_program(program)
@@ -113,8 +113,8 @@ INC"""
         self.assertEqual(simulation.state.data_memory.read_halfword(1024), 1)
 
         program = """INC
-STO $400
-LDA $400
+STO 0x400
+LDA 0x400
 INC"""
         simulation = ToySimulation()
         simulation.load_program(program)
@@ -136,4 +136,4 @@ INC"""
         with self.assertRaises(InstructionExecutionException) as cm:
             simulation.run()
         self.assertEqual(cm.exception.address, 3)
-        self.assertEqual(cm.exception.instruction_repr, "LDA $000")
+        self.assertEqual(cm.exception.instruction_repr, "LDA 0x000")

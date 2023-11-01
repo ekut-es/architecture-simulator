@@ -18,19 +18,19 @@ from architecture_simulator.uarch.toy.toy_architectural_state import (
 class TestToyParser(unittest.TestCase):
     def test_sanitize(self):
         parser = ToyParser()
-        program = """ADD $030
+        program = """ADD 0x030
         INC
 
-        SUB    $200
+        SUB    0x200
         NOP#lol
         #Zwetschgenkuchen
         DEC # Ameisenkuchen
         """
         parser.parse(program, state=ToyArchitecturalState())
         expected = [
-            (1, "ADD $030"),
+            (1, "ADD 0x030"),
             (2, "INC"),
-            (4, "SUB    $200"),
+            (4, "SUB    0x200"),
             (5, "NOP"),
             (7, "DEC"),
         ]
@@ -39,10 +39,10 @@ class TestToyParser(unittest.TestCase):
     def test_parse(self):
         parser = ToyParser()
         state = ToyArchitecturalState()
-        program = """ADD $030
+        program = """ADD 0x030
         INC
 
-        SUB    $200
+        SUB    0x200
         NOP#lol
         #Zwetschgenkuchen
         DEC # Ameisenkuchen
@@ -83,10 +83,10 @@ class TestToyParser(unittest.TestCase):
     def test_write_data(self):
         parser = ToyParser()
         state = ToyArchitecturalState()
-        program = """ADD $400
+        program = """ADD 0x400
         SUB 1025
         :1025:30
-        :$1400:$1000F # test for overflow
+        :0x1400:0x1000F # test for overflow
         ADD 1025
         #:13141:11111"""
         parser.parse(program=program, state=state)
@@ -112,7 +112,7 @@ class TestToyParser(unittest.TestCase):
     def test_variables(self):
         parser = ToyParser()
         state = ToyArchitecturalState()
-        program = """_test = $400
+        program = """_test = 0x400
         test2 = 22
         INC
         sto _test
