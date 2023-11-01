@@ -132,7 +132,7 @@ class STO(AddressTypeInstruction):
     def behavior(self, state: ToyArchitecturalState):
         """MEM[address] = ACCU"""
         state.alu_out, state.ram_out, state.jump = state.accu, None, None
-        state.data_memory.write_halfword(address=self.address, value=state.accu)
+        state.memory.write_halfword(address=self.address, value=state.accu)
         state.increment_pc()
 
 
@@ -144,10 +144,10 @@ class LDA(AddressTypeInstruction):
         """ACCU = MEM[address]"""
         state.alu_out, state.ram_out, state.jump = (
             None,
-            state.data_memory.read_halfword(address=self.address),
+            state.memory.read_halfword(address=self.address),
             None,
         )
-        state.accu = state.data_memory.read_halfword(address=self.address)
+        state.accu = state.memory.read_halfword(address=self.address)
         state.increment_pc()
 
 
@@ -173,7 +173,7 @@ class ADD(AddressTypeInstruction):
 
     def behavior(self, state: ToyArchitecturalState):
         """ACCU += MEM[address]"""
-        memory = state.data_memory.read_halfword(address=self.address)
+        memory = state.memory.read_halfword(address=self.address)
         state.alu_out, state.ram_out, state.jump = state.accu + memory, memory, None
         state.accu = state.accu + memory
         state.increment_pc()
@@ -185,7 +185,7 @@ class SUB(AddressTypeInstruction):
 
     def behavior(self, state: ToyArchitecturalState):
         """ACCU -= MEM[address]"""
-        memory = state.data_memory.read_halfword(address=self.address)
+        memory = state.memory.read_halfword(address=self.address)
         state.alu_out, state.ram_out, state.jump = state.accu - memory, memory, None
         state.accu = state.accu - memory
         state.increment_pc()
@@ -197,7 +197,7 @@ class OR(AddressTypeInstruction):
 
     def behavior(self, state: ToyArchitecturalState):
         """ACCU |= MEM[address]"""
-        memory = state.data_memory.read_halfword(address=self.address)
+        memory = state.memory.read_halfword(address=self.address)
         state.alu_out, state.ram_out, state.jump = state.accu | memory, memory, None
         state.accu = state.accu | memory
         state.increment_pc()
@@ -209,7 +209,7 @@ class AND(AddressTypeInstruction):
 
     def behavior(self, state: ToyArchitecturalState):
         """ACCU &= MEM[address]"""
-        memory = state.data_memory.read_halfword(address=self.address)
+        memory = state.memory.read_halfword(address=self.address)
         state.alu_out, state.ram_out, state.jump = state.accu & memory, memory, None
         state.accu = state.accu & memory
         state.increment_pc()
@@ -221,7 +221,7 @@ class XOR(AddressTypeInstruction):
 
     def behavior(self, state: ToyArchitecturalState):
         """ACCU ^= MEM[address]"""
-        memory = state.data_memory.read_halfword(address=self.address)
+        memory = state.memory.read_halfword(address=self.address)
         state.alu_out, state.ram_out, state.jump = state.accu ^ memory, memory, None
         state.accu = state.accu ^ memory
         state.increment_pc()

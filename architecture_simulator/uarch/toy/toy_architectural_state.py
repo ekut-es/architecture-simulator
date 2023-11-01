@@ -11,38 +11,18 @@ from .toy_performance_metrics import ToyPerformanceMetrics
 class ToyArchitecturalState:
     """Architectural State for the Toy architecture."""
 
-    def __init__(
-        self,
-        instruction_memory_range: Optional[range] = None,
-        data_memory_range: Optional[range] = None,
-    ):
-        self.program_counter = MutableUInt16(
-            instruction_memory_range.start
-            if instruction_memory_range
-            else Settings().get()["toy_instruction_memory_min_bytes"]
-        )
+    def __init__(self, unified_memory_size: Optional[int] = None):
+        self.program_counter = MutableUInt16(0)
         self.previous_program_counter: Optional[MutableUInt16] = None
         self.accu = MutableUInt16(0)
-        self.instruction_memory = InstructionMemory[ToyInstruction](
+        self.memory = ToyMemory(
             address_range=(
-                instruction_memory_range
-                if instruction_memory_range
-                else range(
-                    Settings().get()["toy_instruction_memory_min_bytes"],
-                    Settings().get()["toy_instruction_memory_max_bytes"],
-                )
+                range(unified_memory_size)
+                if unified_memory_size
+                else range(Settings().get()["toy_memory_max_bytes"])
             )
         )
-        self.data_memory = ToyMemory(
-            address_range=(
-                data_memory_range
-                if data_memory_range
-                else range(
-                    Settings().get()["toy_memory_min_bytes"],
-                    Settings().get()["toy_memory_max_bytes"],
-                )
-            )
-        )
+        self.max_pc: Optional[int] = None  # init by parser
         self.performance_metrics = ToyPerformanceMetrics()
         self.alu_out: Optional[MutableUInt16] = None
         self.ram_out: Optional[MutableUInt16] = None
@@ -68,7 +48,8 @@ class ToyArchitecturalState:
         Returns:
             bool: Whether there is an instruction in the instruction memory at the current program counter.
         """
-        return self.instruction_memory.instruction_at_address(int(self.program_counter))
+        # return self.instruction_memory.instruction_at_address(int(self.program_counter))
+        return False if not self.max_pc else (int(self.program_counter) <= self.max_pc)
 
     def get_accu_representation(self) -> tuple[str, str, str, str]:
         """Returns the values of the accu as binary, unsigned decimal, hexadecimal, signed decimal strings.

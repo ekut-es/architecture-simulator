@@ -9,6 +9,7 @@ from architecture_simulator.isa.toy.toy_instructions import (
     DEC,
     STO,
     BRZ,
+    ToyInstruction,
 )
 from architecture_simulator.uarch.toy.toy_architectural_state import (
     ToyArchitecturalState,
@@ -49,7 +50,10 @@ class TestToyParser(unittest.TestCase):
         """
         expected = [ADD(0x030), INC(), SUB(0x200), NOP(), DEC()]
         parser.parse(program=program, state=state)
-        parsed = state.instruction_memory.instructions
+        parsed = [
+            ToyInstruction.from_integer(int(state.memory.read_halfword(i)))
+            for i in range(len(expected))
+        ]
         self.assertEqual(len(parsed), 5)
         self.assertEqual(parsed[0], expected[0])
         self.assertEqual(parsed[1], expected[1])
@@ -78,7 +82,11 @@ class TestToyParser(unittest.TestCase):
             5: STO(4095),
             6: SUB(1024),
         }
-        self.assertEqual(state.instruction_memory.instructions, expected)
+        parsed = {
+            i: ToyInstruction.from_integer(int(state.memory.read_halfword(i)))
+            for i in range(len(expected))
+        }
+        self.assertEqual(parsed, expected)
 
     def test_write_data(self):
         parser = ToyParser()
@@ -90,11 +98,17 @@ class TestToyParser(unittest.TestCase):
         ADD 1025
         #:13141:11111"""
         parser.parse(program=program, state=state)
-        self.assertEqual(state.data_memory.read_halfword(1025), 30)
-        self.assertEqual(state.data_memory.read_halfword(1024), 15)
-        self.assertEqual(state.instruction_memory.read_instruction(0), ADD(1024))
-        self.assertEqual(state.instruction_memory.read_instruction(1), SUB(1025))
-        self.assertEqual(state.instruction_memory.read_instruction(2), ADD(1025))
+        self.assertEqual(state.memory.read_halfword(1025), 30)
+        self.assertEqual(state.memory.read_halfword(1024), 15)
+        self.assertEqual(
+            ToyInstruction.from_integer(int(state.memory.read_halfword(0))), ADD(1024)
+        )
+        self.assertEqual(
+            ToyInstruction.from_integer(int(state.memory.read_halfword(1))), SUB(1025)
+        )
+        self.assertEqual(
+            ToyInstruction.from_integer(int(state.memory.read_halfword(2))), ADD(1025)
+        )
 
     def test_labels(self):
         parser = ToyParser()

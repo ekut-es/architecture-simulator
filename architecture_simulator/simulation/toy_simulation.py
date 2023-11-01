@@ -5,6 +5,7 @@ from architecture_simulator.uarch.toy.toy_architectural_state import (
     ToyArchitecturalState,
 )
 from architecture_simulator.isa.toy.toy_parser import ToyParser
+from architecture_simulator.isa.toy.toy_instructions import ToyInstruction
 from .simulation import Simulation
 from .runtime_errors import InstructionExecutionException
 
@@ -20,18 +21,15 @@ class ToySimulation(Simulation):
         instruction_memory_range: Optional[range] = None,
         data_memory_range: Optional[range] = None,
     ):
-        self.state = ToyArchitecturalState(
-            instruction_memory_range=instruction_memory_range,
-            data_memory_range=data_memory_range,
-        )
+        self.state = ToyArchitecturalState()  # NOTE ???
 
     # step first clock
     # step second clock
     def step(self):
         if not self.is_done():
             program_counter = self.state.program_counter
-            instruction = self.state.instruction_memory.read_instruction(
-                int(program_counter)
+            instruction = ToyInstruction.from_integer(
+                int(self.state.memory.read_halfword(int(program_counter)))
             )
             # inc pc
             try:
@@ -55,15 +53,12 @@ class ToySimulation(Simulation):
         self.state.performance_metrics.stop_timer()
 
     def load_program(self, program: str):
-        self.state = ToyArchitecturalState(
-            instruction_memory_range=self.state.instruction_memory.address_range,
-            data_memory_range=self.state.data_memory.address_range,
-        )
+        self.state = ToyArchitecturalState()
         parser = ToyParser()
         parser.parse(program=program, state=self.state)
 
     def has_instructions(self) -> bool:
-        return bool(self.state.instruction_memory)
+        return False if self.state.max_pc is None else self.state.max_pc >= 0
 
     def get_performance_metrics(self) -> ToyPerformanceMetrics:
         return self.state.performance_metrics
