@@ -304,3 +304,15 @@ instruction_map: dict[str, Type[ToyInstruction]] = {
     "ZRO": ZRO,
     "NOP": NOP,
 }
+
+# 2 PC
+# currPc, lade von 0, setze curr auf 1
+# nextPc
+# norm Instr ignorieren curr Pc
+# branch 0 passt currPc im branch fall an
+# 2. Takt -> next Pc = currPC + 1 immer
+# step lade von currPC, currPc = next PC
+
+# first step
+# second step -> kann man in die super class machen
+# für vis

@@ -96,3 +96,5 @@ class ToyArchitecturalState:
         # TODO: Add get repr for alu out, ram out, jump
         # TODO: Unify Memory, etc
         # TODO: Can be done in just simulation and stat files, probabliy utilize data from parser
+        # TODO: Make a general display category where you can display code as instructions?!
+        # TODO: Was tun wenn wer was auf seinen instruktions bereich schreiben will, sonst idee: bei verlassen von selbst def instr ber stopp

@@ -25,12 +25,15 @@ class ToySimulation(Simulation):
             data_memory_range=data_memory_range,
         )
 
+    # step first clock
+    # step second clock
     def step(self):
         if not self.is_done():
             program_counter = self.state.program_counter
             instruction = self.state.instruction_memory.read_instruction(
                 int(program_counter)
             )
+            # inc pc
             try:
                 instruction.behavior(self.state)
                 self.state.performance_metrics.instruction_count += 1
