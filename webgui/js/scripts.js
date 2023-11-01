@@ -213,7 +213,7 @@ window.addEventListener("DOMContentLoaded", function () {
         editor.save();
         disable_editor();
         evaluatePython_step_sim();
-        update_performance_metrics();
+        //update_performance_metrics();
         enable_run();
         disable_pause();
         enable_step();

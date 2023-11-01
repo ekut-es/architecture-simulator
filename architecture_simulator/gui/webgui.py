@@ -55,7 +55,7 @@ def sim_init() -> RiscvSimulation:
     return simulation
 
 
-def step_sim(program: str, is_run_simulation: bool) -> tuple[str, bool]:
+def step_sim(program: str, is_run_simulation: bool) -> tuple[str, bool, bool]:
     """Executes one step in the simulation. First loads the given program in case there are no instructions in the instruction memory yet. Also updates the UI elements.
 
     Args:
@@ -66,11 +66,14 @@ def step_sim(program: str, is_run_simulation: bool) -> tuple[str, bool]:
         StateNotInitializedError: Throws an error if the simulation has not yet been initialized.
 
     Returns:
-        tuple[str, bool]: tuple of (performance metrics string, whether the simulation has not ended yet)
+        tuple[str, bool, bool]: tuple of (performance metrics string, whether the simulation has not ended yet, whether there was an exception)
     """
     global simulation
     if simulation is None:
         raise StateNotInitializedError()
+
+    # Variable to tell js whether there was an exception
+    exception_flag = False
 
     # parse the instr json string into a python dict
     if not simulation.has_instructions():
@@ -78,6 +81,7 @@ def step_sim(program: str, is_run_simulation: bool) -> tuple[str, bool]:
             simulation.load_program(program)
         except ParserException as Parser_Exception:
             archsim_js.set_output(Parser_Exception.__repr__())
+            exception_flag = True
 
     # step the simulation
     try:
@@ -88,8 +92,13 @@ def step_sim(program: str, is_run_simulation: bool) -> tuple[str, bool]:
         archsim_js.highlight_cmd_table(e.address)
         archsim_js.set_output(e.__repr__())
         simulation_not_ended_flag = False
+        exception_flag = True
 
-    return (str(simulation.get_performance_metrics()), simulation_not_ended_flag)
+    return (
+        str(simulation.get_performance_metrics()),
+        simulation_not_ended_flag,
+        exception_flag,
+    )
 
 
 def resume_timer():
