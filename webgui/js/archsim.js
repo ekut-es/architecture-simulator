@@ -1,19 +1,8 @@
-const output = document.getElementById("output");
-const output_vis = document.getElementById("vis_output");
-const registers = document.getElementById("gui_registers_table_body_id");
-const registers_vis = document.getElementById(
-    "vis_gui_registers_table_body_id"
-);
-const memory = document.getElementById("gui_memory_table_body_id");
-const memory_vis = document.getElementById("vis_gui_memory_table_body_id");
-const instructions = document.getElementById("gui_cmd_table_body_id");
-const instructions_vis = document.getElementById("vis_gui_cmd_table_body_id");
+const output = document.getElementById("output-field-id");
+const registers = document.getElementById("register-table-body-id");
+const memory = document.getElementById("memory-table-body-id");
+const instructions = document.getElementById("instruction-table-body-id");
 const input = document.getElementById("input");
-const input_vis = document.getElementById("vis_input");
-const performance_metrics = document.getElementById("performance_metrics");
-const performance_metrics_vis = document.getElementById(
-    "vis_performance_metrics"
-);
 
 var previous_pc = 0;
 
@@ -30,8 +19,6 @@ var previous_memory = {};
 function addToOutput(s) {
     output.value += ">>>" + input.value + "\n" + s + "\n";
     output.scrollTop = output.scrollHeight;
-    output_vis.value += ">>>" + input.value + "\n" + s + "\n";
-    output_vis.scrollTop = output_vis.scrollHeight;
 }
 
 // Object containing functions to be exported to python
@@ -53,7 +40,6 @@ const archsim_js = {
      * @param {string} abi_name - an alternative name for the register.
      */
     update_register_table: function (reg, representations, abi_name) {
-        vis_highlight = false;
         tr = document.createElement("tr");
         td1 = document.createElement("td");
         td1.innerText = "x" + reg;
@@ -63,7 +49,6 @@ const archsim_js = {
         if (previous_registers[reg] != Array.from(representations)[1]) {
             td2.style.backgroundColor = "yellow";
             previous_registers[reg] = Array.from(representations)[1];
-            vis_highlight = true;
         }
         td3 = document.createElement("td");
         td3.innerText = abi_name;
@@ -72,24 +57,6 @@ const archsim_js = {
         tr.appendChild(td1);
         tr.appendChild(td2);
         registers.appendChild(tr);
-
-        tr_vis = document.createElement("tr");
-        td1_vis = document.createElement("td");
-        td1_vis.innerText = "x" + reg;
-        td2_vis = document.createElement("td");
-        td2_vis.innerText =
-            Array.from(representations)[reg_representation_mode];
-        td2_vis.id = "val_x" + reg;
-        if (vis_highlight) {
-            td2_vis.style.backgroundColor = "yellow";
-        }
-        td3_vis = document.createElement("td");
-        td3_vis.innerText = abi_name;
-        td3_vis.id = abi_name;
-        tr_vis.appendChild(td3_vis);
-        tr_vis.appendChild(td1_vis);
-        tr_vis.appendChild(td2_vis);
-        registers_vis.appendChild(tr_vis);
     },
     /**
      * Appends one row to the memory table.
@@ -98,7 +65,6 @@ const archsim_js = {
      * @param {Iterable} representations - iterable containing representations of the value stored at the given address.
      */
     update_memory_table: function (address, representations) {
-        vis_highlight = false;
         tr = document.createElement("tr");
         td1 = document.createElement("td");
         td1.innerText = address;
@@ -108,25 +74,10 @@ const archsim_js = {
         if (previous_memory[address] != Array.from(representations)[1]) {
             td2.style.backgroundColor = "yellow";
             previous_memory[address] = Array.from(representations)[1];
-            vis_highlight = true;
         }
         tr.appendChild(td1);
         tr.appendChild(td2);
         memory.appendChild(tr);
-
-        tr_vis = document.createElement("tr");
-        td1_vis = document.createElement("td");
-        td1_vis.innerText = address;
-        td2_vis = document.createElement("td");
-        td2_vis.innerText =
-            Array.from(representations)[mem_representation_mode];
-        td2_vis.id = "memory" + address;
-        if (vis_highlight) {
-            td2_vis.style.backgroundColor = "yellow";
-        }
-        tr_vis.appendChild(td1_vis);
-        tr_vis.appendChild(td2_vis);
-        memory_vis.appendChild(tr_vis);
     },
     /**
      * Appends one row to the instruction memory table.
@@ -174,62 +125,24 @@ const archsim_js = {
         tr.appendChild(td2);
         tr.appendChild(td3);
         instructions.appendChild(tr);
-
-        tr_vis = document.createElement("tr");
-        tr_vis.id = address;
-        td1_vis = document.createElement("td");
-        td1_vis.innerText = address;
-        td2_vis = document.createElement("td");
-        td2_vis.innerText = val;
-        td2_vis.id = "instr" + address;
-        td3_vis = document.createElement("td");
-        td3_vis.innerText = stage;
-        if (stage == "IF") {
-            td1_vis.style.backgroundColor = "#FFFD00";
-            td2_vis.style.backgroundColor = "#FFFD00";
-            td3_vis.style.backgroundColor = "#FFFD00";
-        } else if (stage == "ID") {
-            td1_vis.style.backgroundColor = "#FFD700";
-            td2_vis.style.backgroundColor = "#FFD700";
-            td3_vis.style.backgroundColor = "#FFD700";
-        } else if (stage == "EX") {
-            td1_vis.style.backgroundColor = "#CD78FF";
-            td2_vis.style.backgroundColor = "#CD78FF";
-            td3_vis.style.backgroundColor = "#CD78FF";
-        } else if (stage == "MEM") {
-            td1_vis.style.backgroundColor = "#A37FFF";
-            td2_vis.style.backgroundColor = "#A37FFF";
-            td3_vis.style.backgroundColor = "#A37FFF";
-        } else if (stage == "WB") {
-            td1_vis.style.backgroundColor = "#5A1BFF";
-            td2_vis.style.backgroundColor = "#5A1BFF";
-            td3_vis.style.backgroundColor = "#5A1BFF";
-        }
-        tr_vis.appendChild(td1_vis);
-        tr_vis.appendChild(td2_vis);
-        tr_vis.appendChild(td3_vis);
-        instructions_vis.appendChild(tr_vis);
     },
     /**
      * Clears the memory table.
      */
     clear_memory_table: function () {
         this.clear_a_table(memory);
-        this.clear_a_table(memory_vis);
     },
     /**
      * Clears the register table.
      */
     clear_register_table: function () {
         this.clear_a_table(registers);
-        this.clear_a_table(registers_vis);
     },
     /**
      * Clears the instruction memory table.
      */
     clear_instruction_table: function () {
         this.clear_a_table(instructions);
-        this.clear_a_table(instructions_vis);
     },
     /**
      * Clears the given table.
@@ -246,7 +159,6 @@ const archsim_js = {
      */
     set_output: function (str) {
         output.value = str;
-        output_vis.value = str;
     },
     /**
      * Highlights a line in the text editor and displays the given message as hint.
@@ -258,8 +170,6 @@ const archsim_js = {
     highlight: function (position, str) {
         editor.addLineClass(position - 1, "background", "highlight");
         editor.refresh();
-        editor_vis.addLineClass(position - 1, "background", "highlight");
-        editor_vis.refresh();
         str.toString = function () {
             return this.str;
         };
@@ -284,14 +194,7 @@ const archsim_js = {
             },
         };
 
-        if (
-            document.getElementById("VisualizationTabContent").style.display ==
-            "block"
-        ) {
-            if (!close_hint) editor_vis.showHint(error_description);
-        } else {
-            if (!close_hint) editor.showHint(error_description);
-        }
+        if (!close_hint) editor.showHint(error_description);
     },
     /**
      * Removes all highlights from the editor.
@@ -299,12 +202,9 @@ const archsim_js = {
     remove_all_highlights: function () {
         for (let i = 0; i < editor.lineCount(); i++) {
             editor.removeLineClass(i, "background", "highlight");
-            editor_vis.removeLineClass(i, "background", "highlight");
         }
         editor.refresh();
-        editor_vis.refresh();
         editor.closeHint();
-        editor_vis.closeHint();
     },
     /**
      * Highlights one row in the instruction table.
@@ -312,7 +212,7 @@ const archsim_js = {
      * @param {number} address - address of the instruction to highlight (which is not necessarily the same as the position in the table)
      */
     highlight_cmd_table: function (address) {
-        table = document.getElementById("gui_cmd_table_id");
+        table = document.getElementById("instruction-table-id");
         position = 1;
         for (; position < table.rows.length; position++) {
             if (Number(table.rows[position].cells[0].innerHTML) == address) {
@@ -321,16 +221,12 @@ const archsim_js = {
         }
         table.rows[position].cells[0].style.backgroundColor = "yellow";
         table.rows[position].cells[1].style.backgroundColor = "yellow";
-
-        table2 = document.getElementById("vis_gui_cmd_table_id");
-        table2.rows[position].cells[0].style.backgroundColor = "yellow";
-        table2.rows[position].cells[1].style.backgroundColor = "yellow";
     },
     /**
-     * @returns {bool} whether the visualization svg has finished loading
+     * @returns {bool} whether the riscv visualization svg has finished loading
      */
-    get_visualization_loaded: function () {
-        return visualization_loaded;
+    get_riscv_visualization_loaded: function () {
+        return riscv_visualization_loaded;
     },
     /**Update IF Stage:
      *
@@ -926,12 +822,7 @@ const archsim_js = {
     },
 };
 
-output.value = "Output \n\nInitializing... ";
-output_vis.value = "Output \n\nInitializing... ";
-
 input.value = "";
-performance_metrics.value = "Performance Metrics";
-performance_metrics_vis.value = "Performance Metrics";
 /**
  * Initialize pyodide.
  * @returns pyodide.
@@ -959,9 +850,6 @@ from architecture_simulator.gui.webgui import *
 sim_init()
     `);
     output.value += "Ready!\n";
-    performance_metrics.value += "...";
-    output_vis.value += "Ready!\n";
-    performance_metrics_vis.value += "...";
     stop_loading_visuals();
     return pyodide;
 }
@@ -973,26 +861,20 @@ let pyodideReadyPromise = main();
 async function evaluatePython_step_sim() {
     let pyodide = await pyodideReadyPromise;
     input_str = input.value;
-    try {
-        step_sim = pyodide.globals.get("step_sim");
-        let output_repr = Array.from(step_sim(input_str, is_run_simulation));
-        if (output_repr[1] == false) {
-            stop_timer();
-            stop_loading_animation();
-            disable_pause();
-            disable_step();
-            disable_run();
-            clearInterval(run);
-        }
-        update_performance_metrics();
-    } catch (err) {
-        output.value = err;
-        output_vis.value = err;
+    step_sim = pyodide.globals.get("step_sim");
+    let output_repr = Array.from(step_sim(input_str, is_run_simulation));
+    if (output_repr[1] == false) {
+        stop_timer();
         stop_loading_animation();
         disable_pause();
         disable_step();
         disable_run();
         clearInterval(run);
+    }
+    if (!output_repr[2]) {
+        // Only update the performance metrics if there was no exception
+        // otherwise it would overwrite the printed exception
+        set_output_message(output_repr[0]);
     }
 }
 async function update_ui_async() {
@@ -1020,15 +902,18 @@ async function stop_timer() {
 }
 
 /**
- * Updates the performance metrics output field.
+ * Updates the performance metrics output field with the performance metrics it pulls from python.
  */
 async function update_performance_metrics() {
     let pyodide = await pyodideReadyPromise;
     get_performance_metrics_str = pyodide.globals.get(
         "get_performance_metrics_str"
     );
-    performance_metrics.value = get_performance_metrics_str();
-    performance_metrics_vis.value = get_performance_metrics_str();
+    set_output_message(get_performance_metrics_str());
+}
+
+function set_output_message(str) {
+    output.value = str;
 }
 
 /**
@@ -1047,9 +932,6 @@ async function evaluatePython_reset_sim(pipeline_mode) {
         reset_sim = pyodide.globals.get("reset_sim");
         reset_sim();
         output.value = "";
-        output_vis.value = "";
-        performance_metrics.value = "";
-        performance_metrics_vis.value = "";
     } catch (err) {
         addToOutput(err);
     }
@@ -1074,17 +956,9 @@ async function evaluatePython_update_tables() {
 async function evaluatePython_parse_input() {
     let pyodide = await pyodideReadyPromise;
     input_str = input.value;
-    vis_input_str = vis_input.value;
     try {
         parse_input = pyodide.globals.get("parse_input");
-        if (
-            document.getElementById("VisualizationTabContent").style.display ==
-            "block"
-        ) {
-            parse_input(vis_input_str);
-        } else {
-            parse_input(input_str);
-        }
+        parse_input(input_str);
     } catch (err) {
         addToOutput(err);
     }

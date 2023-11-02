@@ -1,0 +1,119 @@
+:root {
+    --main-accent-color: #252d73;
+    --main-bg-color: #f5f5f5;
+    --content-margin: 1em;
+}
+/* Header */
+
+.header {
+    background-color: var(--main-accent-color);
+    color: white;
+}
+
+#help-icon {
+    height: 35px;
+    vertical-align: middle;
+}
+
+/* Control bar */
+
+.control-button > img {
+    width: 25px;
+    height: 25px;
+}
+
+nav {
+    background-color: var(--bs-secondary-bg);
+}
+
+#button-run-simulation-id {
+    background-color: rgb(169, 245, 169);
+}
+
+#button-pause-simulation-id {
+    background-color: rgb(255, 221, 120);
+}
+
+#button-step-simulation-id {
+    background-color: rgb(169, 208, 245);
+}
+
+#button-reset-simulation-id {
+    background-color: rgb(247, 129, 129);
+}
+
+#button-visualization-id {
+    display: none;
+}
+
+/* Main Content */
+
+#main-content-container {
+    background-color: var(--main-bg-color);
+}
+
+/* Text Content Area */
+
+.mono-table {
+    font-family: monospace;
+}
+
+.mono-table th {
+    text-align: center;
+}
+
+#text-content-container {
+    border: 0.1em solid darkgrey;
+    border-radius: 0.5em;
+    padding: 1em;
+    overflow-x: scroll;
+}
+
+#text-content-container > .height-100 > * {
+    height: 100%;
+}
+
+#text-content-container > .main-content-column:first-child {
+    margin-left: 0;
+}
+
+#text-content-container > .main-content-column:last-child {
+    margin-right: 0;
+}
+
+#codemirror-container {
+    min-width: 25em;
+    max-width: 60em;
+    flex-grow: 3;
+}
+
+.main-content-column {
+    min-width: 15em;
+    max-width: 40em;
+    flex-grow: 1;
+    margin: 0 var(--content-margin);
+    overflow-y: scroll;
+}
+
+#register-table-body-id > tr > td:nth-child(3),
+#memory-table-body-id > tr > td:nth-child(2) {
+    text-align: right;
+}
+
+/* Visualization */
+
+#riscv-visualization,
+#toy-visualization {
+    max-width: 60%;
+    display: none;
+    margin-left: var(--content-margin);
+}
+
+/* Modals */
+.modal-content {
+    background-color: var(--main-accent-color);
+}
+
+.modal-body {
+    background-color: var(--main-bg-color);
+}

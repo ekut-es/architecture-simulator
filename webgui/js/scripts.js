@@ -20,21 +20,37 @@ var input_timer;
 var run;
 var is_run_simulation = false;
 var manual_run = false;
-var visualization_loaded = false;
+var riscv_visualization_loaded = false;
+var toy_visualization_loaded = false;
 
 window.addEventListener("DOMContentLoaded", function () {
-    const svgElement = document.createElement("object");
-    svgElement.data = "svg/pipeline.svg";
-    svgElement.type = "image/svg+xml";
-    svgElement.setAttribute("class", "img-fluid p-0 m-0");
-    svgElement.id = "visualization_pipeline";
-
-    svgElement.addEventListener("load", function () {
-        visualization_loaded = true;
+    const riscvSvgElement = document.createElement("object");
+    riscvSvgElement.data = "svg/riscv_pipeline.svg";
+    riscvSvgElement.type = "image/svg+xml";
+    riscvSvgElement.id = "riscv-visualization";
+    riscvSvgElement.addEventListener("load", function () {
+        riscv_visualization_loaded = true;
         update_ui_async();
     });
 
-    document.getElementById("visualization-svg-container").append(svgElement);
+    document.getElementById("main-content-container").append(riscvSvgElement);
+
+    const toySvgElement = document.createElement("object");
+    toySvgElement.data = "svg/toy_structure.svg";
+    toySvgElement.type = "image/svg+xml";
+    toySvgElement.id = "toy-visualization";
+    toySvgElement.addEventListener("load", function () {
+        toy_visualization_loaded = true;
+        update_ui_async();
+    });
+
+    document.getElementById("main-content-container").append(toySvgElement);
+
+    setMainContainerHeight();
+
+    window.addEventListener("resize", function () {
+        setMainContainerHeight();
+    });
 
     evaluatePython_load_settings().then((value) => {
         settings = JSON.parse(value);
@@ -108,14 +124,22 @@ window.addEventListener("DOMContentLoaded", function () {
     });
 
     // paste the help pages into the html
-    document.getElementById("RiscvHelp").innerHTML = riscvDocumentation;
-    document.getElementById("ToyHelp").innerHTML = toyDocumentation;
+    document.getElementById("riscv-help").innerHTML = riscvDocumentation;
+    document.getElementById("toy-help").innerHTML = toyDocumentation;
 
     document
-        .getElementById("button_simulation_start_id")
+        .getElementById("button-run-simulation-id")
         .addEventListener("click", () => {
             play_button();
         });
+
+    function setMainContainerHeight() {
+        const headerHeight = document.getElementById("header").offsetHeight;
+        const navBarHeight = document.getElementById("nav-bar").offsetHeight;
+        document.getElementById(
+            "main-content-container"
+        ).style.height = `calc(100vh - ${headerHeight}px - ${navBarHeight}px)`;
+    }
 
     /** play button
      *
@@ -147,7 +171,7 @@ window.addEventListener("DOMContentLoaded", function () {
     }
 
     document
-        .getElementById("button_simulation_pause_id")
+        .getElementById("button-pause-simulation-id")
         .addEventListener("click", () => {
             pause_button();
         });
@@ -173,7 +197,7 @@ window.addEventListener("DOMContentLoaded", function () {
     }
 
     document
-        .getElementById("button_simulation_next_id")
+        .getElementById("button-step-simulation-id")
         .addEventListener("click", () => {
             next_button();
         });
@@ -189,7 +213,7 @@ window.addEventListener("DOMContentLoaded", function () {
         editor.save();
         disable_editor();
         evaluatePython_step_sim();
-        update_performance_metrics();
+        //update_performance_metrics();
         enable_run();
         disable_pause();
         enable_step();
@@ -198,7 +222,7 @@ window.addEventListener("DOMContentLoaded", function () {
     }
 
     document
-        .getElementById("button_simulation_refresh_id")
+        .getElementById("button-reset-simulation-id")
         .addEventListener("click", () => {
             refresh_button();
         });
@@ -246,28 +270,38 @@ window.addEventListener("DOMContentLoaded", function () {
     document
         .getElementById("isa_button_riscv_id")
         .addEventListener("click", () => {
+            if (selected_isa === "toy") {
+                hideCurrentVisualization();
+            }
+            document.getElementById("button-visualization-id").style.display =
+                "none";
+
             selected_isa = "riscv";
             refresh_button();
 
-            document.getElementById("HelpHeader").textContent = "RISC-V";
-            RiscvHelp.style.display = "block";
-            ToyHelp.style.display = "none";
+            document.getElementById("help-heading-id").textContent = "RISC-V";
+            document.getElementById("riscv-help").style.display = "block";
+            document.getElementById("toy-help").style.display = "none";
 
             document.getElementById("button_SingleStage").disabled = false;
             document.getElementById("button_5-Stage").disabled = false;
-            document.getElementById("modal_header_switch_stage").style.color =
+            document.getElementById("pipeline-mode-heading-id").style.color =
                 "black";
         });
 
     document
         .getElementById("isa_button_toy_id")
         .addEventListener("click", () => {
+            if (selected_isa === "riscv") {
+                hideCurrentVisualization();
+            }
+
             selected_isa = "toy";
             refresh_button();
 
-            document.getElementById("HelpHeader").textContent = "Toy";
-            RiscvHelp.style.display = "none";
-            ToyHelp.style.display = "block";
+            document.getElementById("help-heading-id").textContent = "Toy";
+            document.getElementById("riscv-help").style.display = "none";
+            document.getElementById("toy-help").style.display = "block";
 
             hazard_detection = true;
             if (document.getElementById("button_5-Stage").checked) {
@@ -275,8 +309,11 @@ window.addEventListener("DOMContentLoaded", function () {
             }
             document.getElementById("button_SingleStage").disabled = true;
             document.getElementById("button_5-Stage").disabled = true;
-            document.getElementById("modal_header_switch_stage").style.color =
+            document.getElementById("pipeline-mode-heading-id").style.color =
                 "grey";
+
+            document.getElementById("button-visualization-id").style.display =
+                "inline-block";
         });
 
     // register representation button listeners
@@ -347,13 +384,8 @@ window.addEventListener("DOMContentLoaded", function () {
                 finished_typing,
                 parse_sim_after_not_typing_for_n_ms
             );
-            document.getElementById("button_tab_visualization").style.display =
+            document.getElementById("button-visualization-id").style.display =
                 "none";
-            document.getElementById("VisualizationTabContent").style.display =
-                "none";
-            document.getElementById("MainContent").style.display = "block";
-            document.getElementById("button_tab_visualization").textContent =
-                "Visualization";
             disable_hazard_detection();
         });
 
@@ -365,9 +397,8 @@ window.addEventListener("DOMContentLoaded", function () {
             parse_sim_after_not_typing_for_n_ms
         );
 
-        document.getElementById("button_tab_visualization").style.display =
-            "block";
-
+        document.getElementById("button-visualization-id").style.display =
+            "inline-block";
         enable_hazard_detection();
     });
 
@@ -395,30 +426,9 @@ window.addEventListener("DOMContentLoaded", function () {
         editor.save();
         for (let i = 0; i < editor.lineCount(); i++) {
             editor.removeLineClass(i, "background", "highlight");
-            editor_vis.removeLineClass(i, "background", "highlight");
         }
         editor.refresh();
-        editor_vis.refresh();
         editor.closeHint();
-        editor_vis.closeHint();
-        // autoparse
-        clearTimeout(input_timer);
-        if (!manual_run) {
-            input_timer = setTimeout(
-                finished_typing,
-                parse_sim_after_not_typing_for_n_ms
-            );
-        }
-    });
-
-    /**
-     * This is the event listener for the codemirror editor in visualization mode, it gets called when a change
-     * in the text area occurs.
-     * It removes all highlights and autoparses the input while once again highlighting errors.
-     */
-    editor_vis.on("change", function () {
-        editor_vis.save();
-
         // autoparse
         clearTimeout(input_timer);
         if (!manual_run) {
@@ -488,63 +498,61 @@ function enable_pipeline_switch() {
 }
 
 function disable_run() {
-    document.getElementById("button_simulation_start_id").disabled = true;
-    document.getElementById(
-        "button_simulation_start_id"
-    ).style.backgroundColor = getComputedStyle(
-        document.documentElement
-    ).getPropertyValue("--button_disabled_color");
+    document.getElementById("button-run-simulation-id").disabled = true;
+    document.getElementById("button-run-simulation-id").style.backgroundColor =
+        getComputedStyle(document.documentElement).getPropertyValue(
+            "--button_disabled_color"
+        );
 }
 function enable_run() {
-    document.getElementById("button_simulation_start_id").disabled = false;
-    document.getElementById(
-        "button_simulation_start_id"
-    ).style.backgroundColor = getComputedStyle(
-        document.documentElement
-    ).getPropertyValue("--button_green_color");
+    document.getElementById("button-run-simulation-id").disabled = false;
+    document.getElementById("button-run-simulation-id").style.backgroundColor =
+        getComputedStyle(document.documentElement).getPropertyValue(
+            "--button_green_color"
+        );
 }
 function disable_pause() {
-    document.getElementById("button_simulation_pause_id").disabled = true;
+    document.getElementById("button-pause-simulation-id").disabled = true;
     document.getElementById(
-        "button_simulation_pause_id"
+        "button-pause-simulation-id"
     ).style.backgroundColor = getComputedStyle(
         document.documentElement
     ).getPropertyValue("--button_disabled_color");
 }
 function enable_pause() {
-    document.getElementById("button_simulation_pause_id").disabled = false;
+    document.getElementById("button-pause-simulation-id").disabled = false;
     document.getElementById(
-        "button_simulation_pause_id"
+        "button-pause-simulation-id"
     ).style.backgroundColor = getComputedStyle(
         document.documentElement
     ).getPropertyValue("--button_green_color");
 }
 function disable_step() {
-    document.getElementById("button_simulation_next_id").disabled = true;
-    document.getElementById("button_simulation_next_id").style.backgroundColor =
+    document.getElementById("button-step-simulation-id").disabled = true;
+    document.getElementById("button-step-simulation-id").style.backgroundColor =
         getComputedStyle(document.documentElement).getPropertyValue(
             "--button_disabled_color"
         );
 }
 function enable_step() {
-    document.getElementById("button_simulation_next_id").disabled = false;
-    document.getElementById("button_simulation_next_id").style.backgroundColor =
+    document.getElementById("button-step-simulation-id").disabled = false;
+    document.getElementById("button-step-simulation-id").style.backgroundColor =
         getComputedStyle(document.documentElement).getPropertyValue(
             "--button_blue_color"
         );
 }
 function disable_reset() {
-    document.getElementById("button_simulation_refresh_id").disabled = true;
+    document.getElementById("button-reset-simulation-id").disabled = true;
     document.getElementById(
-        "button_simulation_refresh_id"
+        "button-reset-simulation-id"
     ).style.backgroundColor = getComputedStyle(
         document.documentElement
     ).getPropertyValue("--button_disabled_color");
 }
 function enable_reset() {
-    document.getElementById("button_simulation_refresh_id").disabled = false;
+    document.getElementById("button-reset-simulation-id").disabled = false;
     document.getElementById(
-        "button_simulation_refresh_id"
+        "button-reset-simulation-id"
     ).style.backgroundColor = getComputedStyle(
         document.documentElement
     ).getPropertyValue("--button_red_color");
@@ -565,11 +573,11 @@ function enable_control_buttons() {
 }
 
 function start_loading_animation() {
-    document.getElementById("loading_id").style.visibility = "visible";
+    document.getElementById("loading-spinner-id").style.visibility = "visible";
 }
 
 function stop_loading_animation() {
-    document.getElementById("loading_id").style.visibility = "hidden";
+    document.getElementById("loading-spinner-id").style.visibility = "hidden";
 }
 
 function start_loading_visuals() {
@@ -585,12 +593,10 @@ function stop_loading_visuals() {
 
 function disable_editor() {
     editor.setOption("readOnly", true);
-    editor_vis.setOption("readOnly", true);
 }
 
 function enable_editor() {
     editor.setOption("readOnly", false);
-    editor_vis.setOption("readOnly", false);
 }
 
 function disable_hazard_detection() {
@@ -604,35 +610,8 @@ function enable_hazard_detection() {
     document.getElementById("button_HazardDetection").disabled = false;
 }
 
-function toggleVisualizationTabContent() {
-    if (
-        document.getElementById("VisualizationTabContent").style.display ===
-        "block"
-    ) {
-        synchronizeEditors(editor_vis, editor);
-        editor_vis.closeHint();
-        close_hint = false;
-        document.getElementById("VisualizationTabContent").style.display =
-            "none";
-        document.getElementById("MainContent").style.display = "block";
-        document.getElementById("button_tab_visualization").textContent =
-            "Visualization";
-    } else {
-        synchronizeEditors(editor, editor_vis);
-        editor.closeHint();
-        document.getElementById("VisualizationTabContent").style.display =
-            "block";
-        document.getElementById("MainContent").style.display = "none";
-        document.getElementById("button_tab_visualization").textContent =
-            "Visualization Off";
-        toggleInputTab();
-    }
-}
-
 function toggleInputTab() {
     if (document.getElementById("InputTab").style.display === "none") {
-        synchronizeEditors(editor_vis, editor);
-        editor_vis.closeHint();
         close_hint = false;
         document.getElementById("InputTab").style.display = "block";
         document.getElementById("CmdTab").style.display = "none";
@@ -648,8 +627,6 @@ function toggleInputTab() {
 
 function toggleCmdTab() {
     if (document.getElementById("CmdTab").style.display === "none") {
-        synchronizeEditors(editor_vis, editor);
-        editor_vis.closeHint();
         close_hint = true;
         document.getElementById("CmdTab").style.display = "block";
         document.getElementById("InputTab").style.display = "none";
@@ -665,8 +642,6 @@ function toggleCmdTab() {
 
 function toggleRegisterTab() {
     if (document.getElementById("RegisterTab").style.display === "none") {
-        synchronizeEditors(editor_vis, editor);
-        editor_vis.closeHint();
         close_hint = true;
         document.getElementById("RegisterTab").style.display = "block";
         document.getElementById("InputTab").style.display = "none";
@@ -682,8 +657,6 @@ function toggleRegisterTab() {
 
 function toggleMemoryTab() {
     if (document.getElementById("MemoryTab").style.display === "none") {
-        synchronizeEditors(editor_vis, editor);
-        editor_vis.closeHint();
         close_hint = true;
         document.getElementById("MemoryTab").style.display = "block";
         document.getElementById("CmdTab").style.display = "none";
@@ -697,11 +670,6 @@ function toggleMemoryTab() {
     }
 }
 
-function synchronizeEditors(sEditor, tEditor) {
-    const content = sEditor.getValue();
-    tEditor.setValue(content);
-}
-
 /**set_svg_text_complex_right_align
  *
  * @param {string} id -- The id of the element where the text should be set
@@ -709,7 +677,7 @@ function synchronizeEditors(sEditor, tEditor) {
  */
 function set_svg_text_complex_right_align(id, str) {
     const pipeline_svg = document.getElementById(
-        "visualization_pipeline"
+        "riscv-visualization"
     ).contentDocument;
     pipeline_svg.getElementById(id).firstChild.nextSibling.style.fontSize =
         "15px";
@@ -726,7 +694,7 @@ function set_svg_text_complex_right_align(id, str) {
  */
 function set_svg_text_complex_left_align(id, str) {
     const pipeline_svg = document.getElementById(
-        "visualization_pipeline"
+        "riscv-visualization"
     ).contentDocument;
     pipeline_svg.getElementById(id).firstChild.nextSibling.style.fontSize =
         "15px";
@@ -743,7 +711,7 @@ function set_svg_text_complex_left_align(id, str) {
  */
 function set_svg_text_complex_middle_align(id, str) {
     const pipeline_svg = document.getElementById(
-        "visualization_pipeline"
+        "riscv-visualization"
     ).contentDocument;
     pipeline_svg.getElementById(id).firstChild.nextSibling.style.fontSize =
         "15px";
@@ -760,7 +728,7 @@ function set_svg_text_complex_middle_align(id, str) {
  */
 function set_svg_colour(id, str) {
     const pipeline_svg = document.getElementById(
-        "visualization_pipeline"
+        "riscv-visualization"
     ).contentDocument;
     const Child_Nodes = pipeline_svg.getElementById(id).childNodes;
     if (Child_Nodes.length > 0) {
@@ -780,7 +748,7 @@ function set_svg_colour(id, str) {
  */
 function set_svg_marker_color(id, str) {
     const pipeline_svg = document.getElementById(
-        "visualization_pipeline"
+        "riscv-visualization"
     ).contentDocument;
     // the marker is part of the style attribute
     var styleAttribute = pipeline_svg.getElementById(id).getAttribute("style");
@@ -816,4 +784,36 @@ function strToHexColor(str) {
     }
     console.log("color not supported");
     return "000000";
+}
+
+/**
+ * Toggles the visibility of the visualization.
+ */
+function toggleVisualizationTabContent() {
+    const visualization = getCurrentVisualization();
+    const button = document.getElementById("button-visualization-id");
+    if (visualization.style.display === "block") {
+        visualization.style.display = "none";
+        button.textContent = "Visualization Off";
+    } else {
+        visualization.style.display = "block";
+        button.textContent = "Visualization On";
+    }
+}
+
+/**
+ * @returns {HTMLElement} The Visualization for the current ISA.
+ */
+function getCurrentVisualization() {
+    if (selected_isa == "riscv") {
+        return document.getElementById("riscv-visualization");
+    } /*if (selected_isa == "toy")*/ else {
+        return document.getElementById("toy-visualization");
+    }
+}
+
+function hideCurrentVisualization() {
+    getCurrentVisualization().style.display = "none";
+    document.getElementById("button-visualization-id").textContent =
+        "Visualization Off";
 }

@@ -7,21 +7,6 @@ const editor = CodeMirror.fromTextArea(document.getElementById("input"), {
         architecture: "ARM",
     },
 });
-editor.setSize(null, "88vh");
-
-// initialize codemirror textarea
-const editor_vis = CodeMirror.fromTextArea(
-    document.getElementById("vis_input"),
-    {
-        lineNumbers: true,
-        styleActiveLine: true,
-        mode: {
-            name: "gas",
-            architecture: "ARM",
-        },
-    }
-);
-editor_vis.setSize(null, "57vh");
 
 function saveTextAsFile() {
     // thanks to https://stackoverflow.com/questions/51315044/how-do-i-save-the-content-of-the-editor-not-the-whole-html-page
