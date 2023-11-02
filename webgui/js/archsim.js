@@ -861,25 +861,20 @@ let pyodideReadyPromise = main();
 async function evaluatePython_step_sim() {
     let pyodide = await pyodideReadyPromise;
     input_str = input.value;
-    try {
-        step_sim = pyodide.globals.get("step_sim");
-        let output_repr = Array.from(step_sim(input_str, is_run_simulation));
-        if (output_repr[1] == false) {
-            stop_timer();
-            stop_loading_animation();
-            disable_pause();
-            disable_step();
-            disable_run();
-            clearInterval(run);
-        }
-        update_performance_metrics();
-    } catch (err) {
-        output.value = err;
+    step_sim = pyodide.globals.get("step_sim");
+    let output_repr = Array.from(step_sim(input_str, is_run_simulation));
+    if (output_repr[1] == false) {
+        stop_timer();
         stop_loading_animation();
         disable_pause();
         disable_step();
         disable_run();
         clearInterval(run);
+    }
+    if (!output_repr[2]) {
+        // Only update the performance metrics if there was no exception
+        // otherwise it would overwrite the printed exception
+        set_output_message(output_repr[0]);
     }
 }
 async function update_ui_async() {
@@ -907,14 +902,18 @@ async function stop_timer() {
 }
 
 /**
- * Updates the performance metrics output field.
+ * Updates the performance metrics output field with the performance metrics it pulls from python.
  */
 async function update_performance_metrics() {
     let pyodide = await pyodideReadyPromise;
     get_performance_metrics_str = pyodide.globals.get(
         "get_performance_metrics_str"
     );
-    output.value = get_performance_metrics_str();
+    set_output_message(get_performance_metrics_str());
+}
+
+function set_output_message(str) {
+    output.value = str;
 }
 
 /**

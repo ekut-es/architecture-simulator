@@ -95,6 +95,11 @@ nav {
     overflow-y: scroll;
 }
 
+#register-table-body-id > tr > td:nth-child(3),
+#memory-table-body-id > tr > td:nth-child(2) {
+    text-align: right;
+}
+
 /* Visualization */
 
 #riscv-visualization,
