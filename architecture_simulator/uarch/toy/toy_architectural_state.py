@@ -12,8 +12,6 @@ class ToyArchitecturalState:
     """Architectural State for the Toy architecture."""
 
     def __init__(self, unified_memory_size: Optional[int] = None):
-        self.program_counter = MutableUInt16(0)
-        self.previous_program_counter: Optional[MutableUInt16] = None
         self.accu = MutableUInt16(0)
         self.memory = ToyMemory(
             address_range=(
@@ -27,29 +25,32 @@ class ToyArchitecturalState:
         self.alu_out: Optional[MutableUInt16] = None
         self.ram_out: Optional[MutableUInt16] = None
         self.jump: Optional[bool] = None
+        self.program_counter: MutableUInt16 = MutableUInt16(1)
+        self.loaded_instruction: Optional[ToyInstruction] = None  # init by parser
 
-    def increment_pc(self):
-        """Increment program counter by 1."""
-        self.previous_program_counter = MutableUInt16(int(self.program_counter))
-        self.program_counter += MutableUInt16(1)
+    # def increment_pc(self):
+    #    """Increment program counter by 1."""
+    #    # self.previous_program_counter = MutableUInt16(int(self.program_counter)) # was macht der überhaupt
+    #    self.program_counter += MutableUInt16(1)
 
-    def set_pc(self, address: MutableUInt16):
+    # NOTE: only used by brz
+    def set_current_pc(self, address: MutableUInt16):
         """Sets the program counter to the specified address.
 
         Args:
             address (MutableUInt16): Address for the program counter.
         """
-        self.previous_program_counter = MutableUInt16(int(self.program_counter))
-        self.program_counter = MutableUInt16(int(address))
+        # self.previous_program_counter = MutableUInt16(int(self.program_counter))
+        self.program_counter = address
 
-    def instruction_at_pc(self) -> bool:
+    def instruction_loaded(self) -> bool:
         """Return whether there is an instruction in the instruction memory at the current program counter.
 
         Returns:
             bool: Whether there is an instruction in the instruction memory at the current program counter.
         """
         # return self.instruction_memory.instruction_at_address(int(self.program_counter))
-        return False if not self.max_pc else (int(self.program_counter) <= self.max_pc)
+        return self.loaded_instruction is not None
 
     def get_accu_representation(self) -> tuple[str, str, str, str]:
         """Returns the values of the accu as binary, unsigned decimal, hexadecimal, signed decimal strings.

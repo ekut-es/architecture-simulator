@@ -14,12 +14,14 @@ class TestToySimulation(unittest.TestCase):
         ):
             simulation.state.memory.write_halfword(addr, instr)
         simulation.state.max_pc = 6
+        simulation.state.loaded_instruction = INC()
         self.assertTrue(not simulation.is_done())
         simulation.step()
         self.assertEqual(simulation.state.accu, 1)
         simulation.step()
         self.assertEqual(simulation.state.accu, 2)
         simulation.step()
+        simulation.state.memory.read_halfword(1024)
         self.assertEqual(simulation.state.memory.read_halfword(1024), 2)
         simulation.step()
         self.assertEqual(simulation.state.accu, 4)
@@ -38,10 +40,11 @@ class TestToySimulation(unittest.TestCase):
         ):
             simulation.state.memory.write_halfword(addr, instr)
         simulation.state.max_pc = 7
+        simulation.state.loaded_instruction = INC()
         self.assertTrue(not simulation.is_done())
         simulation.run()
         self.assertTrue(simulation.is_done())
-        self.assertEqual(simulation.state.program_counter, 8)
+        self.assertEqual(simulation.state.program_counter, 9)
         self.assertEqual(simulation.state.accu, 0)
         self.assertEqual(simulation.state.memory.read_halfword(1024), 2)
         self.assertEqual(simulation.state.memory.read_halfword(1025), 4)

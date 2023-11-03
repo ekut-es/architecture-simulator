@@ -133,7 +133,6 @@ class STO(AddressTypeInstruction):
         """MEM[address] = ACCU"""
         state.alu_out, state.ram_out, state.jump = state.accu, None, None
         state.memory.write_halfword(address=self.address, value=state.accu)
-        state.increment_pc()
 
 
 class LDA(AddressTypeInstruction):
@@ -148,7 +147,6 @@ class LDA(AddressTypeInstruction):
             None,
         )
         state.accu = state.memory.read_halfword(address=self.address)
-        state.increment_pc()
 
 
 class BRZ(AddressTypeInstruction):
@@ -158,12 +156,8 @@ class BRZ(AddressTypeInstruction):
     def behavior(self, state: ToyArchitecturalState):
         """PC = ADDRESS if (ACCU == 0)"""
         state.alu_out, state.ram_out, state.jump = (None, None, not bool(state.accu))
-        if state.accu:
-            state.increment_pc()
-        else:
-            # NOTE: sets the pc to self.address without additionally increasing the program counter.
-            # But I dont think this should cause any problems.
-            state.set_pc(MutableUInt16(self.address))
+        if not state.accu:
+            state.set_current_pc(MutableUInt16(self.address))
             state.performance_metrics.branch_count += 1
 
 
@@ -176,7 +170,6 @@ class ADD(AddressTypeInstruction):
         memory = state.memory.read_halfword(address=self.address)
         state.alu_out, state.ram_out, state.jump = state.accu + memory, memory, None
         state.accu = state.accu + memory
-        state.increment_pc()
 
 
 class SUB(AddressTypeInstruction):
@@ -188,7 +181,6 @@ class SUB(AddressTypeInstruction):
         memory = state.memory.read_halfword(address=self.address)
         state.alu_out, state.ram_out, state.jump = state.accu - memory, memory, None
         state.accu = state.accu - memory
-        state.increment_pc()
 
 
 class OR(AddressTypeInstruction):
@@ -200,7 +192,6 @@ class OR(AddressTypeInstruction):
         memory = state.memory.read_halfword(address=self.address)
         state.alu_out, state.ram_out, state.jump = state.accu | memory, memory, None
         state.accu = state.accu | memory
-        state.increment_pc()
 
 
 class AND(AddressTypeInstruction):
@@ -212,7 +203,6 @@ class AND(AddressTypeInstruction):
         memory = state.memory.read_halfword(address=self.address)
         state.alu_out, state.ram_out, state.jump = state.accu & memory, memory, None
         state.accu = state.accu & memory
-        state.increment_pc()
 
 
 class XOR(AddressTypeInstruction):
@@ -224,7 +214,6 @@ class XOR(AddressTypeInstruction):
         memory = state.memory.read_halfword(address=self.address)
         state.alu_out, state.ram_out, state.jump = state.accu ^ memory, memory, None
         state.accu = state.accu ^ memory
-        state.increment_pc()
 
 
 class NOT(ToyInstruction):
@@ -235,7 +224,6 @@ class NOT(ToyInstruction):
         """ACCU = ~ACCU"""
         state.alu_out, state.ram_out, state.jump = ~state.accu, None, None
         state.accu = ~state.accu
-        state.increment_pc()
 
 
 class INC(ToyInstruction):
@@ -250,7 +238,6 @@ class INC(ToyInstruction):
             None,
         )
         state.accu += MutableUInt16(1)
-        state.increment_pc()
 
 
 class DEC(ToyInstruction):
@@ -265,7 +252,6 @@ class DEC(ToyInstruction):
             None,
         )
         state.accu -= MutableUInt16(1)
-        state.increment_pc()
 
 
 class ZRO(ToyInstruction):
@@ -276,7 +262,6 @@ class ZRO(ToyInstruction):
         """ACCU = 0"""
         state.alu_out, state.ram_out, state.jump = MutableUInt16(0), None, None
         state.accu = MutableUInt16(0)
-        state.increment_pc()
 
 
 class NOP(ToyInstruction):
@@ -286,7 +271,6 @@ class NOP(ToyInstruction):
     def behavior(self, state: ToyArchitecturalState):
         """no operation"""
         state.alu_out, state.ram_out, state.jump = None, None, None
-        state.increment_pc()
 
 
 instruction_map: dict[str, Type[ToyInstruction]] = {

@@ -8,6 +8,7 @@ from architecture_simulator.isa.toy.toy_parser import ToyParser
 from architecture_simulator.isa.toy.toy_instructions import ToyInstruction
 from .simulation import Simulation
 from .runtime_errors import InstructionExecutionException
+from fixedint import MutableUInt16
 
 if TYPE_CHECKING:
     from architecture_simulator.uarch.toy.toy_performance_metrics import (
@@ -22,29 +23,42 @@ class ToySimulation(Simulation):
         data_memory_range: Optional[range] = None,
     ):
         self.state = ToyArchitecturalState()  # NOTE ???
+        self.next_cycle = 1
+
+    def first_cycle_step(self):
+        if self.is_done():
+            return
+        if not self.next_cycle == 1:
+            return  # NOTE: Proper Error
+        self.next_cycle = 2
+        self.state.loaded_instruction.behavior(self.state)
+
+    def second_cycle_step(self):
+        if self.is_done():
+            return
+        if not self.next_cycle == 2:
+            return  # NOTE: Proper Error
+        if self.state.program_counter <= self.state.max_pc:
+            self.state.loaded_instruction = ToyInstruction.from_integer(
+                int(self.state.memory.read_halfword(int(self.state.program_counter)))
+            )
+        else:
+            self.state.loaded_instruction = None
+        self.state.program_counter += MutableUInt16(1)
+        self.state.performance_metrics.instruction_count += 1
+        self.next_cycle = 1
 
     # step first clock
     # step second clock
     def step(self):
-        if not self.is_done():
-            program_counter = self.state.program_counter
-            instruction = ToyInstruction.from_integer(
-                int(self.state.memory.read_halfword(int(program_counter)))
-            )
-            # inc pc
-            try:
-                instruction.behavior(self.state)
-                self.state.performance_metrics.instruction_count += 1
-            except Exception as e:
-                raise InstructionExecutionException(
-                    address=int(program_counter),
-                    instruction_repr=str(instruction),
-                    error_message=e.__repr__(),
-                )
+        if not self.next_cycle == 1:
+            return True  # NOTE: Proper Error
+        self.first_cycle_step()
+        self.second_cycle_step()
         return not self.is_done()
 
     def is_done(self) -> bool:
-        return not self.state.instruction_at_pc()
+        return not self.state.instruction_loaded()
 
     def run(self):
         self.state.performance_metrics.resume_timer()

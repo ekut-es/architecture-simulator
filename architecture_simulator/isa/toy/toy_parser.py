@@ -149,6 +149,8 @@ class ToyParser:
         self.state.max_pc = len(instructions) - 1
         for addr, instr in enumerate(instructions):
             self.state.memory.write_halfword(addr, MutableUInt16(int(instr)))
+        if len(instructions) >= 1:
+            self.state.loaded_instruction = instructions[0]
 
     def _write_data(self):
         """Looks for data write commands in self.token_list and then write the data to the data memory of self.state if applicable."""
