@@ -136,3 +136,12 @@ class TestToyParser(unittest.TestCase):
         brz lol"""
         parser.parse(program=program, state=state)
         expected = {0: INC(), 1: STO(1024), 2: ADD(1024), 3: STO(22), 4: BRZ(4)}
+
+    def test_load_instructions(self):
+        parser = ToyParser()
+        state = ToyArchitecturalState()
+        program = """INC
+        DEC"""
+        parser.parse(program, state)
+        self.assertEqual(state.max_pc, 1)
+        self.assertEqual(state.loaded_instruction, INC())

@@ -1,9 +1,7 @@
 import unittest
 from architecture_simulator.simulation.toy_simulation import ToySimulation
 from architecture_simulator.isa.toy.toy_instructions import ADD, INC, STO, LDA
-from architecture_simulator.simulation.runtime_errors import (
-    InstructionExecutionException,
-)
+from architecture_simulator.simulation.runtime_errors import StepSequenceError
 
 
 class TestToySimulation(unittest.TestCase):
@@ -175,3 +173,25 @@ INC"""
         self.assertEqual(sim.state.alu_out, None)
         self.assertEqual(sim.state.ram_out, None)
         self.assertEqual(sim.state.jump, True)
+
+    def test_cycle_steps(self):
+        sim = ToySimulation()
+        self.assertEqual(sim.state.loaded_instruction, None)
+        self.assertTrue(sim.is_done())
+        self.assertEqual(sim.state.program_counter, 1)
+        sim.load_program("")
+        self.assertEqual(sim.state.max_pc, -1)
+        self.assertEqual(sim.state.loaded_instruction, None)
+        sim.load_program("INC")
+        self.assertEqual(sim.state.max_pc, 0)
+        self.assertEqual(sim.state.loaded_instruction, INC())
+        sim.first_cycle_step()
+        self.assertEqual(sim.state.accu, 1)
+        self.assertEqual(sim.state.loaded_instruction, INC())
+        self.assertEqual(sim.state.program_counter, 1)
+        with self.assertRaises(StepSequenceError):
+            sim.first_cycle_step()
+        sim.second_cycle_step()
+        self.assertEqual(sim.state.loaded_instruction, None)
+        self.assertEqual(sim.state.program_counter, 2)
+        self.assertTrue(sim.is_done())

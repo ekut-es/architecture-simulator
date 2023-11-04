@@ -68,7 +68,7 @@ class MicroProgram:
         return self._instr_bool_list_mapping[instr]
 
     @classmethod
-    def get_mp_var_value(self, instr: Type[ToyInstruction], signal_name: str):
+    def get_mp_var_value(self, instr: Type[ToyInstruction], signal_name: str) -> bool:
         """
         Returns the value of a signal_variable of the micro program.
         """
