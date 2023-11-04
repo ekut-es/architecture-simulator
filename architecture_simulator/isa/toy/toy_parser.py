@@ -146,6 +146,7 @@ class ToyParser:
                 instructions.append(instruction_class(address=address))
             else:  # else it is an instruction without an address
                 instructions.append(instruction_class())
+        # write instructions to memory and init state:
         self.state.max_pc = len(instructions) - 1
         for addr, instr in enumerate(instructions):
             self.state.memory.write_halfword(addr, MutableUInt16(int(instr)))

@@ -12,6 +12,7 @@ class ToyArchitecturalState:
     """Architectural State for the Toy architecture."""
 
     def __init__(self, unified_memory_size: Optional[int] = None):
+        self.program_counter: MutableUInt16 = MutableUInt16(1)
         self.accu = MutableUInt16(0)
         self.memory = ToyMemory(
             address_range=(
@@ -20,36 +21,27 @@ class ToyArchitecturalState:
                 else range(Settings().get()["toy_memory_max_bytes"])
             )
         )
-        self.max_pc: Optional[int] = None  # init by parser
         self.performance_metrics = ToyPerformanceMetrics()
+        self.max_pc: Optional[int] = None  # init by parser
+        self.loaded_instruction: Optional[ToyInstruction] = None  # init by parser
         self.alu_out: Optional[MutableUInt16] = None
         self.ram_out: Optional[MutableUInt16] = None
         self.jump: Optional[bool] = None
-        self.program_counter: MutableUInt16 = MutableUInt16(1)
-        self.loaded_instruction: Optional[ToyInstruction] = None  # init by parser
 
-    # def increment_pc(self):
-    #    """Increment program counter by 1."""
-    #    # self.previous_program_counter = MutableUInt16(int(self.program_counter)) # was macht der überhaupt
-    #    self.program_counter += MutableUInt16(1)
-
-    # NOTE: only used by brz
     def set_current_pc(self, address: MutableUInt16):
         """Sets the program counter to the specified address.
 
         Args:
             address (MutableUInt16): Address for the program counter.
         """
-        # self.previous_program_counter = MutableUInt16(int(self.program_counter))
         self.program_counter = address
 
     def instruction_loaded(self) -> bool:
-        """Return whether there is an instruction in the instruction memory at the current program counter.
+        """Return whether a instructions is currently loaded.
 
         Returns:
-            bool: Whether there is an instruction in the instruction memory at the current program counter.
+            bool: Whether a instructions is currently loaded.
         """
-        # return self.instruction_memory.instruction_at_address(int(self.program_counter))
         return self.loaded_instruction is not None
 
     def get_accu_representation(self) -> tuple[str, str, str, str]:
@@ -75,8 +67,4 @@ class ToyArchitecturalState:
 
     def get_repr(self):
         ...
-        # TODO: Add get repr for alu out, ram out, jump
-        # TODO: Unify Memory, etc
-        # TODO: Can be done in just simulation and stat files, probabliy utilize data from parser
-        # TODO: Make a general display category where you can display code as instructions?!
-        # TODO: Was tun wenn wer was auf seinen instruktions bereich schreiben will, sonst idee: bei verlassen von selbst def instr ber stopp
+        # TODO: Implement for alu_out, ram_out, accu
