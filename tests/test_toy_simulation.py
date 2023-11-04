@@ -148,31 +148,35 @@ INC"""
         self.assertEqual(sim.state.ram_out, None)
         self.assertEqual(sim.state.jump, None)
         # LDA
-        sim.step()
+        sim.first_cycle_step()
         self.assertEqual(sim.state.alu_out, None)
         self.assertEqual(sim.state.ram_out, 11)
         self.assertEqual(sim.state.jump, None)
+        sim.second_cycle_step()
         # INC
-        sim.step()
+        sim.first_cycle_step()
         self.assertEqual(sim.state.alu_out, 12)
         self.assertEqual(sim.state.ram_out, None)
         self.assertEqual(sim.state.jump, None)
+        sim.second_cycle_step()
         # DEC
         sim.step()
         # ADD
-        sim.step()
+        sim.first_cycle_step()
         self.assertEqual(sim.state.alu_out, 22)
         self.assertEqual(sim.state.ram_out, 11)
         self.assertEqual(sim.state.jump, None)
+        sim.second_cycle_step()
         # SUB
         sim.step()
         # SUB
         sim.step()
         # BRZ
-        sim.step()
+        sim.first_cycle_step()
         self.assertEqual(sim.state.alu_out, None)
         self.assertEqual(sim.state.ram_out, None)
         self.assertEqual(sim.state.jump, True)
+        sim.second_cycle_step()
 
     def test_cycle_steps(self):
         sim = ToySimulation()

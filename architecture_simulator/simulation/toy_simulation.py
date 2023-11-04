@@ -49,9 +49,14 @@ class ToySimulation(Simulation):
             raise StepSequenceError(
                 "Bevore you can call this function again, you have to call first_cycle_step()"
             )
+        self.state.alu_out = None
+        self.state.jump = None
         if self.state.program_counter <= self.state.max_pc:
+            self.state.ram_out = self.state.memory.read_halfword(
+                int(self.state.program_counter)
+            )
             self.state.loaded_instruction = ToyInstruction.from_integer(
-                int(self.state.memory.read_halfword(int(self.state.program_counter)))
+                int(self.state.ram_out)
             )
         else:
             self.state.loaded_instruction = None
