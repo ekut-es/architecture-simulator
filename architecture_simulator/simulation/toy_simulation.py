@@ -19,10 +19,9 @@ if TYPE_CHECKING:
 class ToySimulation(Simulation):
     def __init__(
         self,
-        instruction_memory_range: Optional[range] = None,
-        data_memory_range: Optional[range] = None,
+        unified_memory_size: Optional[int] = None,
     ):
-        self.state = ToyArchitecturalState()  # NOTE ???
+        self.state = ToyArchitecturalState(unified_memory_size)
         self.next_cycle = 1
 
     def first_cycle_step(self):

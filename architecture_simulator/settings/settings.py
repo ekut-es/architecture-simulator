@@ -54,9 +54,6 @@ class Settings:
             "t5": 30,
             "t6": 31,
         },
-        "toy_instruction_memory_min_bytes": 0,
-        "toy_instruction_memory_max_bytes": 1024,
-        "toy_memory_min_bytes": 1024,
         "toy_memory_max_bytes": 4096,
     }
 
