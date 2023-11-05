@@ -330,28 +330,28 @@ window.addEventListener("DOMContentLoaded", function () {
         .getElementById("reg_button_binary_representation_id")
         .addEventListener("click", () => {
             reg_representation_mode = binary_representation;
-            evaluatePython_update_tables();
+            update_ui_async();
         });
 
     document
         .getElementById("reg_button_decimal_representation_id")
         .addEventListener("click", () => {
             reg_representation_mode = decimal_representation;
-            evaluatePython_update_tables();
+            update_ui_async();
         });
 
     document
         .getElementById("reg_button_signed_decimal_representation_id")
         .addEventListener("click", () => {
             reg_representation_mode = signed_decimal_representation;
-            evaluatePython_update_tables();
+            update_ui_async();
         });
 
     document
         .getElementById("reg_button_hexa_representation_id")
         .addEventListener("click", () => {
             reg_representation_mode = hexa_representation;
-            evaluatePython_update_tables();
+            update_ui_async();
         });
 
     // memory representation button listeners
@@ -359,28 +359,28 @@ window.addEventListener("DOMContentLoaded", function () {
         .getElementById("mem_button_binary_representation_id")
         .addEventListener("click", () => {
             mem_representation_mode = binary_representation;
-            evaluatePython_update_tables();
+            update_ui_async();
         });
 
     document
         .getElementById("mem_button_decimal_representation_id")
         .addEventListener("click", () => {
             mem_representation_mode = decimal_representation;
-            evaluatePython_update_tables();
+            update_ui_async();
         });
 
     document
         .getElementById("mem_button_hexa_representation_id")
         .addEventListener("click", () => {
             mem_representation_mode = hexa_representation;
-            evaluatePython_update_tables();
+            update_ui_async();
         });
 
     document
         .getElementById("mem_button_signed_decimal_representation_id")
         .addEventListener("click", () => {
             mem_representation_mode = signed_decimal_representation;
-            evaluatePython_update_tables();
+            update_ui_async();
         });
 
     // pipeline mode button listeners
