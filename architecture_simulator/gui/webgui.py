@@ -18,6 +18,7 @@ from architecture_simulator.uarch.riscv.pipeline_registers import (
     RegisterWritebackPipelineRegister,
 )
 from architecture_simulator.uarch.riscv.pipeline import InstructionExecutionException
+from architecture_simulator.isa.toy.toy_instructions import ToyInstruction
 
 simulation: Optional[Simulation] = None
 first_refresh: bool = True
@@ -184,31 +185,59 @@ def parse_input(instr: str):
     # reset the whole simulation because there might be things like a data section that also modify the data memory
     # so resetting the instruction memory is not enough
     simulation = reset_sim()
-    archsim_js.remove_all_highlights()
+    selected_isa = archsim_js.get_selected_isa()
+    if selected_isa == "riscv":
+        archsim_js.remove_all_highlights()
     try:
         simulation.load_program(instr)
-        archsim_js.remove_all_highlights()
         if not first_refresh:
             archsim_js.set_output(Settings().get()["default_no_error_output"])
         first_refresh = False
     except ParserException as Parser_Exception:
         archsim_js.set_output(Parser_Exception.__repr__())
-        archsim_js.highlight(
-            Parser_Exception.line_number, str=Parser_Exception.__repr__()
-        )
+        if selected_isa == "riscv":
+            archsim_js.highlight(
+                Parser_Exception.line_number, str=Parser_Exception.__repr__()
+            )
     update_ui()
 
 
 def update_ui():
     """Updates all UI elements based on the current simulation and architectural state."""
-    update_tables()
-    if archsim_js.get_riscv_visualization_loaded():
-        update_IF_Stage()
-        update_ID_Stage()
-        update_EX_Stage()
-        update_MEM_Stage()
-        update_WB_Stage()
-        update_visualization()
+    selected_isa = archsim_js.get_selected_isa()
+    if selected_isa == "riscv":
+        update_tables()
+        if archsim_js.get_riscv_visualization_loaded():
+            update_IF_Stage()
+            update_ID_Stage()
+            update_EX_Stage()
+            update_MEM_Stage()
+            update_WB_Stage()
+            update_visualization()
+    elif selected_isa == "toy":
+        update_toy_ui()
+
+
+def update_toy_ui():
+    """Updates the accu and the memory table for toy"""
+    if isinstance(simulation, ToySimulation):
+        # accu
+        accu_representation = simulation.state.get_accu_representation()
+        archsim_js.toyUpdateAccu(accu_representation)
+
+        # memory table
+        archsim_js.toyClearMemoryTable()
+        representations = simulation.state.memory.memory_repr()
+        for address, value_representations in sorted(representations.items()):
+            if address <= simulation.state.max_pc:
+                instruction_representation = str(
+                    ToyInstruction.from_integer(int(value_representations[1]))
+                )
+            else:
+                instruction_representation = "-"
+            archsim_js.toyUpdateMemoryTable(
+                str(address), value_representations, instruction_representation
+            )
 
 
 def update_tables():
@@ -226,30 +255,7 @@ def update_tables():
     archsim_js.clear_memory_table()
     archsim_js.clear_instruction_table()
 
-    if isinstance(simulation, ToySimulation):
-        # register table
-        accu_representation = simulation.state.get_accu_representation()
-        archsim_js.update_register_table(0, accu_representation, "ACCU")
-
-        # instruction table
-        for address, cmd in sorted(
-            simulation.state.instruction_memory.instructions.items(),
-            key=lambda item: item[0],
-        ):
-            stage = (
-                "Single" if address == simulation.state.previous_program_counter else ""
-            )
-            archsim_js.update_instruction_table(hex(address), cmd.__repr__(), stage)
-
-        # memory table
-        representations = simulation.state.data_memory.memory_repr()
-        for address, address_value in sorted(
-            representations.items(),
-            key=lambda item: item[0],
-        ):
-            archsim_js.update_memory_table(hex(address), address_value)
-
-    elif isinstance(simulation, RiscvSimulation):
+    if isinstance(simulation, RiscvSimulation):
         # register table
         representations = simulation.state.register_file.reg_repr()
         for reg_i, reg_val in sorted(

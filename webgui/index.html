@@ -116,9 +116,12 @@
                     <textarea id="input"></textarea>
                 </div>
                 <!--Instruction Table-->
-                <div class="main-content-column">
+                <div
+                    id="riscv-instruction-table-container-id"
+                    class="main-content-column"
+                >
                     <table
-                        id="instruction-table-id"
+                        id="riscv-instruction-table-id"
                         class="table table-sm table-hover table-bordered mono-table mb-0"
                     >
                         <thead>
@@ -128,11 +131,14 @@
                                 <th>Stage</th>
                             </tr>
                         </thead>
-                        <tbody id="instruction-table-body-id"></tbody>
+                        <tbody id="riscv-instruction-table-body-id"></tbody>
                     </table>
                 </div>
                 <!--Register Table-->
-                <div class="main-content-column">
+                <div
+                    id="riscv-register-table-container-id"
+                    class="main-content-column"
+                >
                     <table
                         class="table table-sm table-hover table-bordered mono-table mb-0"
                     >
@@ -142,11 +148,14 @@
                                 <th>Value</th>
                             </tr>
                         </thead>
-                        <tbody id="register-table-body-id"></tbody>
+                        <tbody id="riscv-register-table-body-id"></tbody>
                     </table>
                 </div>
                 <!--Memory Table-->
-                <div class="main-content-column">
+                <div
+                    id="riscv-memory-table-container-id"
+                    class="main-content-column"
+                >
                     <table
                         class="table table-sm table-hover table-bordered mono-table mb-0"
                     >
@@ -156,7 +165,7 @@
                                 <th>Value</th>
                             </tr>
                         </thead>
-                        <tbody id="memory-table-body-id"></tbody>
+                        <tbody id="riscv-memory-table-body-id"></tbody>
                     </table>
                 </div>
                 <!--Output Field-->
@@ -480,6 +489,8 @@
         <script type="text/javascript" src="js/html_tag.js"></script>
         <script type="text/javascript" src="js/riscv_documentation.js"></script>
         <script type="text/javascript" src="js/toy_documentation.js"></script>
+        <script type="text/javascript" src="js/riscv_simulation.js"></script>
+        <script type="text/javascript" src="js/toy_simulation.js"></script>
         <script type="text/javascript" src="js/scripts.js"></script>
         <script type="text/javascript" src="js/archsim.js"></script>
         <script type="text/javascript" src="js/editor.js"></script>

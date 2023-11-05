@@ -1,7 +1,4 @@
 const output = document.getElementById("output-field-id");
-const registers = document.getElementById("register-table-body-id");
-const memory = document.getElementById("memory-table-body-id");
-const instructions = document.getElementById("instruction-table-body-id");
 const input = document.getElementById("input");
 
 var previous_pc = 0;
@@ -23,6 +20,31 @@ function addToOutput(s) {
 
 // Object containing functions to be exported to python
 const archsim_js = {
+    toyUpdateAccu: function (representations) {
+        document.getElementById("toy-accu-id").innerText =
+            Array.from(representations)[reg_representation_mode];
+    },
+    toyClearMemoryTable: function () {
+        document.getElementById("toy-memory-table-body-id").innerHTML = "";
+    },
+    toyUpdateMemoryTable: function (
+        address,
+        value_representations,
+        instruction_representation
+    ) {
+        const value = Array.from(value_representations)[
+            mem_representation_mode
+        ];
+        const row = document
+            .getElementById("toy-memory-table-body-id")
+            .insertRow();
+        const cell1 = row.insertCell();
+        const cell2 = row.insertCell();
+        const cell3 = row.insertCell();
+        cell1.innerText = address;
+        cell2.innerText = value;
+        cell3.innerText = instruction_representation;
+    },
     get_selected_isa: function () {
         return selected_isa;
     },
@@ -56,7 +78,7 @@ const archsim_js = {
         tr.appendChild(td3);
         tr.appendChild(td1);
         tr.appendChild(td2);
-        registers.appendChild(tr);
+        document.getElementById("riscv-register-table-body-id").appendChild(tr);
     },
     /**
      * Appends one row to the memory table.
@@ -77,7 +99,7 @@ const archsim_js = {
         }
         tr.appendChild(td1);
         tr.appendChild(td2);
-        memory.appendChild(tr);
+        document.getElementById("riscv-memory-table-body-id").appendChild(tr);
     },
     /**
      * Appends one row to the instruction memory table.
@@ -124,25 +146,33 @@ const archsim_js = {
         tr.appendChild(td1);
         tr.appendChild(td2);
         tr.appendChild(td3);
-        instructions.appendChild(tr);
+        document
+            .getElementById("riscv-instruction-table-body-id")
+            .appendChild(tr);
     },
     /**
      * Clears the memory table.
      */
     clear_memory_table: function () {
-        this.clear_a_table(memory);
+        this.clear_a_table(
+            document.getElementById("riscv-memory-table-body-id")
+        );
     },
     /**
      * Clears the register table.
      */
     clear_register_table: function () {
-        this.clear_a_table(registers);
+        this.clear_a_table(
+            document.getElementById("riscv-register-table-body-id")
+        );
     },
     /**
      * Clears the instruction memory table.
      */
     clear_instruction_table: function () {
-        this.clear_a_table(instructions);
+        this.clear_a_table(
+            document.getElementById("riscv-instruction-table-body-id")
+        );
     },
     /**
      * Clears the given table.
