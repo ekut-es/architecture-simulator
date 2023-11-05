@@ -96,7 +96,10 @@ nav {
 }
 
 #register-table-body-id > tr > td:nth-child(3),
-#memory-table-body-id > tr > td:nth-child(2) {
+#memory-table-body-id > tr > td:nth-child(2),
+#toy-memory-table-body-id > tr > td:nth-child(1),
+#toy-memory-table-body-id > tr > td:nth-child(2),
+#toy-accu-id {
     text-align: right;
 }
 
