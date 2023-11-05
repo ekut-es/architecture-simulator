@@ -1,5 +1,5 @@
 function getRiscvRegisterTable() {
-    return html`<div
+    return createNode(html`<div
         id="riscv-register-table-container-id"
         class="main-content-column"
     >
@@ -14,11 +14,11 @@ function getRiscvRegisterTable() {
             </thead>
             <tbody id="riscv-register-table-body-id"></tbody>
         </table>
-    </div>`;
+    </div>`);
 }
 
 function getRiscvInstructionTable() {
-    return html`<div
+    return createNode(html`<div
         id="riscv-instruction-table-container-id"
         class="main-content-column"
     >
@@ -35,11 +35,11 @@ function getRiscvInstructionTable() {
             </thead>
             <tbody id="riscv-instruction-table-body-id"></tbody>
         </table>
-    </div>`;
+    </div>`);
 }
 
 function getRiscvMemoryTable() {
-    return html`<div
+    return createNode(html`<div
         id="riscv-memory-table-container-id"
         class="main-content-column"
     >
@@ -54,7 +54,7 @@ function getRiscvMemoryTable() {
             </thead>
             <tbody id="riscv-memory-table-body-id"></tbody>
         </table>
-    </div>`;
+    </div>`);
 }
 
 function insertRiscvElements() {
