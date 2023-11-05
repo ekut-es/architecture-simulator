@@ -395,6 +395,7 @@ window.addEventListener("DOMContentLoaded", function () {
             );
             document.getElementById("button-visualization-id").style.display =
                 "none";
+            hideCurrentVisualization();
             disable_hazard_detection();
         });
 
