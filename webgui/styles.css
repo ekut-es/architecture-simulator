@@ -95,6 +95,12 @@ nav {
     overflow-y: scroll;
 }
 
+#toy-accu-memory-container-id {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
 #register-table-body-id > tr > td:nth-child(3),
 #memory-table-body-id > tr > td:nth-child(2),
 #toy-memory-table-body-id > tr > td:nth-child(1),

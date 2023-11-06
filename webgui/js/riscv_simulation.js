@@ -80,7 +80,7 @@ function insertRiscvElements() {
 }
 
 /**
- * Deletes all of RISC-V's custom elements from the DOM.
+ * Removes all of RISC-V's custom elements from the DOM.
  */
 function destroyRiscvElements() {
     document.getElementById("riscv-register-table-container-id").remove();

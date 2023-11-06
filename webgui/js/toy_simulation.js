@@ -1,44 +1,37 @@
 /**
- * @returns {Node} A Node containing the TOY memory table.
+ * @returns {Node} A Node containing the TOY accu and memory table.
  */
-function getToyMemoryTable() {
+function getMemoryAndAccuColumn() {
     return createNode(html`<div
-        id="toy-memory-table-container-id"
+        id="toy-accu-memory-container-id"
         class="main-content-column"
     >
-        <table
-            class="table table-sm table-hover table-bordered mono-table mb-0"
-        >
-            <thead>
-                <tr>
-                    <th>Address</th>
-                    <th>Value</th>
-                    <th>Instruction</th>
-                </tr>
-            </thead>
-            <tbody id="toy-memory-table-body-id"></tbody>
-        </table>
-    </div>`);
-}
-
-/**
- * @returns {Node} A Node containing the TOY accu.
- */
-function getToyAccuTable() {
-    return createNode(html`<div
-        id="toy-accu-table-container-id"
-        class="main-content-column"
-    >
-        <table
-            class="table table-sm table-hover table-bordered mono-table mb-0"
-        >
-            <thead>
-                <tr>
-                    <th>ACCU</th>
-                    <th id="toy-accu-id">0</th>
-                </tr>
-            </thead>
-        </table>
+        <div>
+            <table
+                class="table table-sm table-hover table-bordered mono-table mb-3"
+            >
+                <thead>
+                    <tr>
+                        <th>ACCU</th>
+                        <th id="toy-accu-id">0</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <div style="overflow: scroll;">
+            <table
+                class="table table-sm table-hover table-bordered mono-table mb-0"
+            >
+                <thead>
+                    <tr>
+                        <th>Address</th>
+                        <th>Value</th>
+                        <th>Instruction</th>
+                    </tr>
+                </thead>
+                <tbody id="toy-memory-table-body-id"></tbody>
+            </table>
+        </div>
     </div>`);
 }
 
@@ -48,13 +41,12 @@ function getToyAccuTable() {
 function insertToyElements() {
     document
         .getElementById("codemirror-container")
-        .after(getToyMemoryTable(), getToyAccuTable());
+        .after(getMemoryAndAccuColumn());
 }
 
 /**
- * Deletes all of TOY's custom elements from the DOM.
+ * Removes all of TOY's custom elements from the DOM.
  */
 function destroyToyElements() {
-    document.getElementById("toy-memory-table-container-id").remove();
-    document.getElementById("toy-accu-table-container-id").remove();
+    document.getElementById("toy-accu-memory-container-id").remove();
 }
