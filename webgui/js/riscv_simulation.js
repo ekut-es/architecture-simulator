@@ -1,3 +1,6 @@
+/**
+ * @returns {Node} A Node containing the RISC-V register table.
+ */
 function getRiscvRegisterTable() {
     return createNode(html`<div
         id="riscv-register-table-container-id"
@@ -17,6 +20,9 @@ function getRiscvRegisterTable() {
     </div>`);
 }
 
+/**
+ * @returns {Node} A Node containing the RISC-V instruction table.
+ */
 function getRiscvInstructionTable() {
     return createNode(html`<div
         id="riscv-instruction-table-container-id"
@@ -38,6 +44,9 @@ function getRiscvInstructionTable() {
     </div>`);
 }
 
+/**
+ * @returns {Node} A Node containing the RISC-V memory table.
+ */
 function getRiscvMemoryTable() {
     return createNode(html`<div
         id="riscv-memory-table-container-id"
@@ -57,6 +66,9 @@ function getRiscvMemoryTable() {
     </div>`);
 }
 
+/**
+ * Inserts all of RISC-V's custom elements into the DOM.
+ */
 function insertRiscvElements() {
     document
         .getElementById("codemirror-container")
@@ -67,6 +79,9 @@ function insertRiscvElements() {
         );
 }
 
+/**
+ * Deletes all of RISC-V's custom elements from the DOM.
+ */
 function destroyRiscvElements() {
     document.getElementById("riscv-register-table-container-id").remove();
     document.getElementById("riscv-memory-table-container-id").remove();
