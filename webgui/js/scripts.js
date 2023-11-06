@@ -303,6 +303,9 @@ window.addEventListener("DOMContentLoaded", function () {
                 insertToyElements();
 
                 selected_isa = "toy";
+                document
+                    .getElementById("mem_button_decimal_representation_id")
+                    .click();
                 refresh_button();
 
                 document.getElementById("help-heading-id").textContent = "Toy";

@@ -236,7 +236,7 @@ def update_toy_ui():
             else:
                 instruction_representation = "-"
             archsim_js.toyUpdateMemoryTable(
-                "0x{:04X}".format(address),
+                "0x{:03X}".format(address),
                 value_representations,
                 instruction_representation,
             )

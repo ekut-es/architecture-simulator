@@ -45,9 +45,8 @@ const archsim_js = {
         value_representations,
         instruction_representation
     ) {
-        const value = Array.from(value_representations)[
-            mem_representation_mode
-        ];
+        value_representations_array = Array.from(value_representations);
+        const value = value_representations_array[mem_representation_mode];
         const row = document
             .getElementById("toy-memory-table-body-id")
             .insertRow();
@@ -57,6 +56,10 @@ const archsim_js = {
         cell1.innerText = address;
         cell2.innerText = value;
         cell3.innerText = instruction_representation;
+        if (previous_memory[address] !== value_representations_array[1]) {
+            previous_memory[address] = value_representations_array[1];
+            cell2.style.backgroundColor = "yellow";
+        }
     },
     get_selected_isa: function () {
         return selected_isa;
