@@ -63,7 +63,7 @@ const archsim_js = {
             cell2.style.backgroundColor = "yellow";
         }
         if (is_current_instruction) {
-            cell1.innerHTML += "X";
+            cell1.innerHTML = instructionArrow + cell1.innerHTML;
         }
     },
     get_selected_isa: function () {
