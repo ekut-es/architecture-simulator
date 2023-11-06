@@ -36,7 +36,7 @@ const archsim_js = {
     },
     /**
      * Updates the TOY memory table.
-     * @param {number} address The memory address
+     * @param {string} address The memory address
      * @param value_representations A Python Tuple containing the representations (binary, unsigned decimal, hexadecimal, signed decimal) for one value in the memory.
      * @param {string} instruction_representation The instruction the value represents.
      */
