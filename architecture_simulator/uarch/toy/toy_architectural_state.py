@@ -13,6 +13,8 @@ class ToyArchitecturalState:
 
     def __init__(self, unified_memory_size: Optional[int] = None):
         self.program_counter: MutableUInt16 = MutableUInt16(1)
+        self.address_of_current_instruction: Optional[int] = None
+        self.address_of_next_instruction = 0
         self.accu = MutableUInt16(0)
         self.memory = ToyMemory(
             address_range=(

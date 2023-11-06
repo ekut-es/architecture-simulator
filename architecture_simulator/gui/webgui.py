@@ -235,10 +235,15 @@ def update_toy_ui():
                 )
             else:
                 instruction_representation = "-"
+            is_current_instruction = (
+                simulation.state.address_of_current_instruction is not None
+                and address == simulation.state.address_of_current_instruction
+            )
             archsim_js.toyUpdateMemoryTable(
                 "0x{:03X}".format(address),
                 value_representations,
                 instruction_representation,
+                is_current_instruction,
             )
 
 

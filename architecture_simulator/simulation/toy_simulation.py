@@ -34,10 +34,14 @@ class ToySimulation(Simulation):
             return
         if not self.next_cycle == 1:
             raise StepSequenceError(
-                "Bevore you can call this function again, you have to call second_cycle_step()"
+                "Before you can call this function again, you have to call second_cycle_step()"
             )
         self.next_cycle = 2
         self.state.loaded_instruction.behavior(self.state)
+        self.state.address_of_current_instruction = (
+            self.state.address_of_next_instruction
+        )
+        self.state.address_of_next_instruction = int(self.state.program_counter)
 
     def second_cycle_step(self):
         """
