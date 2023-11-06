@@ -588,6 +588,86 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str]]:
     """
     result: list[tuple[str, str, str]] = []
     loaded_instruction = sim.state.loaded_instruction
+    visualisation_values = sim.state.visualisation_values
+    control_unit_values: list[bool]
+
+    if sim.next_cycle == 1:
+        if loaded_instruction is not None:
+            control_unit_values = MicroProgram.get_mp_values(type(loaded_instruction))
+        else:
+            control_unit_values = [False for i in range(12)]
+    else:
+        control_unit_values = MicroProgram.second_half_micro_program
+
+    # Arrows:
+    result.append(
+        ("path-accu-pc-accu-is-zero", "highlight", str(visualisation_values.jump))
+    )
+    result.append(("path-accu-alu", "highlight", "???"))
+    result.append(
+        (
+            "path-alu-junction",
+            "highlight",
+            str(visualisation_values.alu_out is not None),
+        )
+    )
+    result.append(
+        ("path-junction-acccu", "highlight", str(control_unit_values[5]))
+    )  # 5 -> SET[ACCU]
+    result.append(
+        ("path-junction-ram", "highlight", str(control_unit_values[0]))
+    )  # 0 -> WRITE[RAM]
+    result.append(
+        ("path-opcode-control-unit", "highlight", str(loaded_instruction is not None))
+    )
+    result.append(
+        (
+            "path-instaddress-junction",
+            "highlight",
+            str(visualisation_values.ram_out is not None or visualisation_values.jump),
+        )
+    )
+    result.append(("path-junction-pc", "highlight", str(visualisation_values.jump)))
+    result.append(
+        (
+            "path-junction-multiplexer",
+            "highlight",
+            str(
+                visualisation_values.ram_out is not None and not control_unit_values[4]
+            ),
+        )
+    )  # 0 -> SET[IR]
+    result.append(
+        ("path-pc-multiplexer", "highlight", str(control_unit_values[4]))
+    )  # 0 -> SET[IR]
+    result.append(
+        (
+            "path-multiplexer-ram",
+            "highlight",
+            str(visualisation_values.ram_out is not None),
+        )
+    )
+    result.append(
+        (
+            "path-ram-junction",
+            "highlight",
+            str(visualisation_values.ram_out is not None),
+        )
+    )
+    result.append(
+        (
+            "path-junction-alu",
+            "highlight",
+            str(
+                visualisation_values.ram_out is not None
+                and visualisation_values.alu_out is not None
+            ),
+        )
+    )
+    result.append(
+        ("path-junction-ir", "highlight", str(control_unit_values[4]))
+    )  # 0 -> SET[IR]
+
     # Text:
     if loaded_instruction is not None:
         result.append(("text-mnemonic", "write", str(loaded_instruction)))
@@ -599,8 +679,8 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str]]:
         for name in ["text-mnemonic", "text-opcode", "text-address"]:
             result.append((name, "write", ""))
     result.append(("text-program-counter", "write", str(sim.state.program_counter)))
-    alu_out = sim.state.visualisation_values.alu_out
-    ram_out = sim.state.visualisation_values.ram_out
+    alu_out = visualisation_values.alu_out
+    ram_out = visualisation_values.ram_out
     result.append(
         ("text-alu-out", "write", str(alu_out) if alu_out is not None else "")
     )
@@ -609,21 +689,21 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str]]:
     )
 
     # Textblocks over Arrows:
-    old_opcode = sim.state.visualisation_values.op_code_old
+    old_opcode = visualisation_values.op_code_old
     if old_opcode is not None:  # do not remove is not None
         result.append(("group-old-opcode-and-mnemonic", "", ""))
         result.append(("text-old-opcode-and-mnemonic", "", str(old_opcode)))
     else:
         result.append(("group-old-opcode-and-mnemonic", "", ""))
         result.append(("text-old-opcode-and-mnemonic", "", ""))
-    old_pc = sim.state.visualisation_values.pc_old
+    old_pc = visualisation_values.pc_old
     if old_pc is not None:  # do not remove is not None
         result.append(("group-old-pc", "", ""))
         result.append(("text-old-pc", "", str(old_pc)))
     else:
         result.append(("group-old-pc", "", ""))
         result.append(("text-old-pc", "", ""))
-    old_accu = sim.state.visualisation_values.accu_old
+    old_accu = visualisation_values.accu_old
     if old_accu is not None:  # do not remove is not None
         result.append(("group-old-accu", "", ""))
         result.append(("text-old-accu", "", str(old_accu)))
@@ -646,17 +726,6 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str]]:
         "alu1",
         "alu0",
     ]
-
-    control_unit_values: list[bool]
-
-    if sim.next_cycle == 1:
-        if loaded_instruction is not None:
-            control_unit_values = MicroProgram.get_mp_values(type(loaded_instruction))
-        else:
-            control_unit_values = [False for i in range(12)]
-    else:
-        control_unit_values = MicroProgram.second_half_micro_program
-
     for name, value in zip(control_unit_names, control_unit_values):
         result.append(("path-control-unit-" + name, "highlight", str(value)))
         result.append(("text-" + name, "highlight", str(value)))
