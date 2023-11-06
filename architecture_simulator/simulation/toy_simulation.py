@@ -9,6 +9,7 @@ from architecture_simulator.isa.toy.toy_instructions import ToyInstruction
 from .simulation import Simulation
 from .runtime_errors import StepSequenceError
 from fixedint import MutableUInt16
+from architecture_simulator.uarch.toy.SvgVisValues import SvgVisValues
 
 if TYPE_CHECKING:
     from architecture_simulator.uarch.toy.toy_performance_metrics import (
@@ -49,14 +50,16 @@ class ToySimulation(Simulation):
             raise StepSequenceError(
                 "Bevore you can call this function again, you have to call first_cycle_step()"
             )
-        self.state.alu_out = None
-        self.state.jump = None
+        old_op_code = (int(self.state.loaded_instruction) >> 12) & 0xF
+        self.state.visualisation_values = SvgVisValues(
+            op_code_old=old_op_code, pc_old=self.state.program_counter
+        )
         if self.state.program_counter <= self.state.max_pc:
-            self.state.ram_out = self.state.memory.read_halfword(
+            self.state.visualisation_values.ram_out = self.state.memory.read_halfword(
                 int(self.state.program_counter)
             )
             self.state.loaded_instruction = ToyInstruction.from_integer(
-                int(self.state.ram_out)
+                int(self.state.visualisation_values.ram_out)
             )
         else:
             self.state.loaded_instruction = None

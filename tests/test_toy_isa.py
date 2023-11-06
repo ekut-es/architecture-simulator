@@ -35,7 +35,7 @@ class TestToyInstructions(unittest.TestCase):
         state.accu = MutableUInt16(1)
         STO(1024).behavior(state)
         self.assertEqual(state.memory.read_halfword(1024), 1)
-        self.assertEqual(state.alu_out, state.accu)
+        self.assertEqual(state.visualisation_values.alu_out, state.accu)
         state.accu = MutableUInt16(2**16 - 1)
         STO(4095).behavior(state)
         self.assertEqual(state.memory.read_halfword(4095), 2**16 - 1)
@@ -51,7 +51,7 @@ class TestToyInstructions(unittest.TestCase):
         self.assertEqual(state.accu, 1)
         LDA(1026).behavior(state)
         self.assertEqual(state.accu, 25)
-        self.assertEqual(state.ram_out, state.accu)
+        self.assertEqual(state.visualisation_values.ram_out, state.accu)
         LDA(4095).behavior(state)
         self.assertEqual(state.accu, 2**16 - 1)
 
@@ -63,7 +63,7 @@ class TestToyInstructions(unittest.TestCase):
         self.assertEqual(state.program_counter, MutableUInt16(1))
         state.accu = MutableUInt16(0)
         BRZ(2).behavior(state)
-        self.assertTrue(state.jump)
+        self.assertTrue(state.visualisation_values.jump)
         self.assertEqual(state.program_counter, MutableUInt16(2))
 
     def test_add(self):
@@ -80,8 +80,10 @@ class TestToyInstructions(unittest.TestCase):
         self.assertEqual(state.accu, 4)
         ADD(1026).behavior(state=state)
         self.assertEqual(state.accu, 14)
-        self.assertEqual(state.accu, state.alu_out)
-        self.assertEqual(state.ram_out, state.memory.read_halfword(1026))
+        self.assertEqual(state.accu, state.visualisation_values.alu_out)
+        self.assertEqual(
+            state.visualisation_values.ram_out, state.memory.read_halfword(1026)
+        )
         ADD(1027).behavior(state=state)
         self.assertEqual(state.accu, 13)
 
@@ -97,8 +99,10 @@ class TestToyInstructions(unittest.TestCase):
         self.assertEqual(state.accu, 0)
         SUB(1026).behavior(state)
         self.assertEqual(state.accu, 2**16 - 10)
-        self.assertEqual(state.accu, state.alu_out)
-        self.assertEqual(state.ram_out, state.memory.read_halfword(1026))
+        self.assertEqual(state.accu, state.visualisation_values.alu_out)
+        self.assertEqual(
+            state.visualisation_values.ram_out, state.memory.read_halfword(1026)
+        )
         SUB(1025).behavior(state)
         self.assertEqual(state.accu, 2**16 - 12)
 
@@ -114,8 +118,10 @@ class TestToyInstructions(unittest.TestCase):
         self.assertEqual(state.accu, 0x0EFF)
         OR(1026).behavior(state)
         self.assertEqual(state.accu, 0x0FFF)
-        self.assertEqual(state.accu, state.alu_out)
-        self.assertEqual(state.ram_out, state.memory.read_halfword(1026))
+        self.assertEqual(state.accu, state.visualisation_values.alu_out)
+        self.assertEqual(
+            state.visualisation_values.ram_out, state.memory.read_halfword(1026)
+        )
         OR(1027).behavior(state)
         self.assertEqual(state.accu, 0xFFFF)
 
@@ -135,8 +141,10 @@ class TestToyInstructions(unittest.TestCase):
         state.accu = MutableUInt16(0x0100)
         AND(1026).behavior(state)
         self.assertEqual(state.accu, 0x0100)
-        self.assertEqual(state.accu, state.alu_out)
-        self.assertEqual(state.ram_out, state.memory.read_halfword(1026))
+        self.assertEqual(state.accu, state.visualisation_values.alu_out)
+        self.assertEqual(
+            state.visualisation_values.ram_out, state.memory.read_halfword(1026)
+        )
         AND(1027).behavior(state)
         self.assertEqual(state.accu, 0x0100)
 
@@ -154,8 +162,10 @@ class TestToyInstructions(unittest.TestCase):
         self.assertEqual(state.accu, 0b1111)
         XOR(1026).behavior(state)
         self.assertEqual(state.accu, 0xFFF0)
-        self.assertEqual(state.accu, state.alu_out)
-        self.assertEqual(state.ram_out, state.memory.read_halfword(1026))
+        self.assertEqual(state.accu, state.visualisation_values.alu_out)
+        self.assertEqual(
+            state.visualisation_values.ram_out, state.memory.read_halfword(1026)
+        )
         XOR(1027).behavior(state)
         self.assertEqual(state.accu, 0xF0FF)
 
@@ -169,7 +179,7 @@ class TestToyInstructions(unittest.TestCase):
         state.accu = MutableUInt16(0xF0F0)
         NOT().behavior(state)
         self.assertEqual(state.accu, 0x0F0F)
-        self.assertEqual(state.alu_out, state.accu)
+        self.assertEqual(state.visualisation_values.alu_out, state.accu)
 
     def test_inc(self):
         state = ToyArchitecturalState()
@@ -182,7 +192,7 @@ class TestToyInstructions(unittest.TestCase):
         self.assertEqual(state.accu, 3)
         INC().behavior(state)
         self.assertEqual(state.accu, 4)
-        self.assertEqual(state.alu_out, state.accu)
+        self.assertEqual(state.visualisation_values.alu_out, state.accu)
         state.accu = MutableUInt16(2**16 - 1)
         INC().behavior(state)
         self.assertEqual(state.accu, 0)
@@ -194,7 +204,7 @@ class TestToyInstructions(unittest.TestCase):
         self.assertEqual(state.accu, 2)
         DEC().behavior(state)
         self.assertEqual(state.accu, 1)
-        self.assertEqual(state.alu_out, state.accu)
+        self.assertEqual(state.visualisation_values.alu_out, state.accu)
         DEC().behavior(state)
         self.assertEqual(state.accu, 0)
         DEC().behavior(state)
@@ -203,9 +213,9 @@ class TestToyInstructions(unittest.TestCase):
     def test_zro(self):
         state = ToyArchitecturalState()
         state.accu = MutableUInt16(12415)
-        self.assertEqual(state.alu_out, None)
+        self.assertEqual(state.visualisation_values.alu_out, None)
         ZRO().behavior(state)
-        self.assertEqual(state.alu_out, MutableUInt16(0))
+        self.assertEqual(state.visualisation_values.alu_out, MutableUInt16(0))
         self.assertEqual(state.accu, 0)
         ZRO().behavior(state)
         ZRO().behavior(state)

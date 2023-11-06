@@ -3,9 +3,9 @@ from typing import Optional
 
 from architecture_simulator.settings.settings import Settings
 from .toy_memory import ToyMemory
-from ..instruction_memory import InstructionMemory
 from architecture_simulator.isa.toy.toy_instructions import ToyInstruction
 from .toy_performance_metrics import ToyPerformanceMetrics
+from .SvgVisValues import SvgVisValues
 
 
 class ToyArchitecturalState:
@@ -24,9 +24,7 @@ class ToyArchitecturalState:
         self.performance_metrics = ToyPerformanceMetrics()
         self.max_pc: Optional[int] = None  # init by parser
         self.loaded_instruction: Optional[ToyInstruction] = None  # init by parser
-        self.alu_out: Optional[MutableUInt16] = None
-        self.ram_out: Optional[MutableUInt16] = None
-        self.jump: Optional[bool] = None
+        self.visualisation_values = SvgVisValues()
 
     def set_current_pc(self, address: MutableUInt16):
         """Sets the program counter to the specified address.

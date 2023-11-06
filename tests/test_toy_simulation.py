@@ -144,28 +144,28 @@ INC"""
             label:
             """
         )
-        self.assertEqual(sim.state.alu_out, None)
-        self.assertEqual(sim.state.ram_out, None)
-        self.assertEqual(sim.state.jump, None)
+        self.assertEqual(sim.state.visualisation_values.alu_out, None)
+        self.assertEqual(sim.state.visualisation_values.ram_out, None)
+        self.assertEqual(sim.state.visualisation_values.jump, False)
         # LDA
         sim.first_cycle_step()
-        self.assertEqual(sim.state.alu_out, None)
-        self.assertEqual(sim.state.ram_out, 11)
-        self.assertEqual(sim.state.jump, None)
+        self.assertEqual(sim.state.visualisation_values.alu_out, 11)
+        self.assertEqual(sim.state.visualisation_values.ram_out, 11)
+        self.assertEqual(sim.state.visualisation_values.jump, False)
         sim.second_cycle_step()
         # INC
         sim.first_cycle_step()
-        self.assertEqual(sim.state.alu_out, 12)
-        self.assertEqual(sim.state.ram_out, None)
-        self.assertEqual(sim.state.jump, None)
+        self.assertEqual(sim.state.visualisation_values.alu_out, 12)
+        self.assertEqual(sim.state.visualisation_values.ram_out, None)
+        self.assertEqual(sim.state.visualisation_values.jump, False)
         sim.second_cycle_step()
         # DEC
         sim.step()
         # ADD
         sim.first_cycle_step()
-        self.assertEqual(sim.state.alu_out, 22)
-        self.assertEqual(sim.state.ram_out, 11)
-        self.assertEqual(sim.state.jump, None)
+        self.assertEqual(sim.state.visualisation_values.alu_out, 22)
+        self.assertEqual(sim.state.visualisation_values.ram_out, 11)
+        self.assertEqual(sim.state.visualisation_values.jump, False)
         sim.second_cycle_step()
         # SUB
         sim.step()
@@ -173,9 +173,9 @@ INC"""
         sim.step()
         # BRZ
         sim.first_cycle_step()
-        self.assertEqual(sim.state.alu_out, None)
-        self.assertEqual(sim.state.ram_out, None)
-        self.assertEqual(sim.state.jump, True)
+        self.assertEqual(sim.state.visualisation_values.alu_out, None)
+        self.assertEqual(sim.state.visualisation_values.ram_out, None)
+        self.assertEqual(sim.state.visualisation_values.jump, True)
         sim.second_cycle_step()
 
     def test_cycle_steps(self):
