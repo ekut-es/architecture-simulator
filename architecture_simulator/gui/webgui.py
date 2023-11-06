@@ -562,3 +562,71 @@ def update_visualization():
             pc_plus_imm_or_pc_plus_instruction_length,
             pc_plus_imm_or_pc_plus_instruction_length_or_ALU_result,
         )
+
+
+from architecture_simulator.isa.toy.toy_micro_program import MicroProgram
+
+
+def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str]]:
+    """
+    Take a Toy simulation and return all information needed to update the svg.
+    Args: ToySimulation
+    Returns: list[tuple[str, str, str]], where each tuple is [svg-id, what-to-do, optional-value-to-change-to]
+    """
+    result: list[tuple[str, str, str]] = []
+    # Textblocks over Arrows:
+    old_opcode = sim.state.visualisation_values.op_code_old
+    if old_opcode is not None:  # do not remove is not None
+        result.append(("group-old-opcode-and-mnemonic", "", ""))
+        result.append(("text-old-opcode-and-mnemonic", "", str(old_opcode)))
+    else:
+        result.append(("group-old-opcode-and-mnemonic", "", ""))
+        result.append(("text-old-opcode-and-mnemonic", "", ""))
+    old_pc = sim.state.visualisation_values.pc_old
+    if old_pc is not None:  # do not remove is not None
+        result.append(("group-old-pc", "", ""))
+        result.append(("text-old-pc", "", str(old_pc)))
+    else:
+        result.append(("group-old-pc", "", ""))
+        result.append(("text-old-pc", "", ""))
+    old_accu = sim.state.visualisation_values.accu_old
+    if old_accu is not None:  # do not remove is not None
+        result.append(("group-old-accu", "", ""))
+        result.append(("text-old-accu", "", str(old_accu)))
+    else:
+        result.append(("group-old-accu", "", ""))
+        result.append(("text-old-accu", "", ""))
+
+    # Control Unit:
+    control_unit_names = [
+        "write-ram",
+        "inc-pc",
+        "set-pc",
+        "addr-ir",
+        "set-ir",
+        "set-accu",
+        "alucin",
+        "alumode",
+        "alu3",
+        "alu2",
+        "alu1",
+        "alu0",
+    ]
+
+    control_unit_values: list[bool]
+
+    if sim.next_cycle == 1:
+        if sim.state.loaded_instruction is not None:
+            control_unit_values = MicroProgram.get_mp_values(
+                type(sim.state.loaded_instruction)
+            )
+        else:
+            control_unit_values = [False for i in range(12)]
+    else:
+        control_unit_values = MicroProgram.second_half_micro_program
+
+    for name, value in zip(control_unit_names, control_unit_values):
+        result.append(("path-control-unit-" + name, "highlight", str(value)))
+        result.append(("text-" + name, "highlight", str(value)))
+
+    return result
