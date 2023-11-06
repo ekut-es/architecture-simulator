@@ -67,6 +67,18 @@ class ToyInstruction(Instruction):
         """
         return "{:04X}".format(int(self))
 
+    def op_code_value(self) -> int:
+        """
+        Return the op code of the instruction as a int.
+        """
+        return (int(self) >> 12) & 0xF
+
+    def address_section_value(self) -> int:
+        """
+        Return the address section of a instruction, even if the instruction is no AddressTypeInstruction.
+        """
+        return int(self) & 0xFF
+
     @classmethod
     def from_integer(cls, integer_instruction: int) -> ToyInstruction:
         """Turn a machine code integer into the corresponding instruction object.

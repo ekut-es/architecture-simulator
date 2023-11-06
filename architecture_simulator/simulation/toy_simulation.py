@@ -50,7 +50,7 @@ class ToySimulation(Simulation):
             raise StepSequenceError(
                 "Bevore you can call this function again, you have to call first_cycle_step()"
             )
-        old_op_code = (int(self.state.loaded_instruction) >> 12) & 0xF
+        old_op_code = self.state.loaded_instruction.op_code_value()
         self.state.visualisation_values = SvgVisValues(
             op_code_old=old_op_code, pc_old=self.state.program_counter
         )

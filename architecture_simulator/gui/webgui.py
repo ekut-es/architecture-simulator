@@ -574,6 +574,27 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str]]:
     Returns: list[tuple[str, str, str]], where each tuple is [svg-id, what-to-do, optional-value-to-change-to]
     """
     result: list[tuple[str, str, str]] = []
+    loaded_instruction = sim.state.loaded_instruction
+    # Text:
+    if loaded_instruction is not None:
+        result.append(("text-mnemonic", "write", str(loaded_instruction)))
+        result.append(("text-opcode", "write", str(loaded_instruction.op_code_value())))
+        result.append(
+            ("text-address", "write", str(loaded_instruction.address_section_value()))
+        )
+    else:
+        for name in ["text-mnemonic", "text-opcode", "text-address"]:
+            result.append((name, "write", ""))
+    result.append(("text-program-counter", "write", str(sim.state.program_counter)))
+    alu_out = sim.state.visualisation_values.alu_out
+    ram_out = sim.state.visualisation_values.ram_out
+    result.append(
+        ("text-alu-out", "write", str(alu_out) if alu_out is not None else "")
+    )
+    result.append(
+        ("text-ram-out", "write", str(ram_out) if ram_out is not None else "")
+    )
+
     # Textblocks over Arrows:
     old_opcode = sim.state.visualisation_values.op_code_old
     if old_opcode is not None:  # do not remove is not None
@@ -616,10 +637,8 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str]]:
     control_unit_values: list[bool]
 
     if sim.next_cycle == 1:
-        if sim.state.loaded_instruction is not None:
-            control_unit_values = MicroProgram.get_mp_values(
-                type(sim.state.loaded_instruction)
-            )
+        if loaded_instruction is not None:
+            control_unit_values = MicroProgram.get_mp_values(type(loaded_instruction))
         else:
             control_unit_values = [False for i in range(12)]
     else:
