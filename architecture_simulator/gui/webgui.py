@@ -578,20 +578,21 @@ def update_visualization():
 
 
 from architecture_simulator.isa.toy.toy_micro_program import MicroProgram
+from architecture_simulator.isa.toy.toy_instructions import ToyInstruction, ZRO, LDA
 
 
 def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str]]:
     """
     Take a Toy simulation and return all information needed to update the svg.
     Args: ToySimulation
-    Returns: list[tuple[str, str, str]], where each tuple is [svg-id, what-to-do, optional-value-to-change-to]
+    Returns: list[tuple[str, str, str]], where each tuple is [svg-id, what-to-do, value-to-change-to | str(bool)]
     """
     result: list[tuple[str, str, str]] = []
     loaded_instruction = sim.state.loaded_instruction
     visualisation_values = sim.state.visualisation_values
     control_unit_values: list[bool]
 
-    if sim.next_cycle == 1:
+    if sim.next_cycle == 2:
         if loaded_instruction is not None:
             control_unit_values = MicroProgram.get_mp_values(type(loaded_instruction))
         else:
@@ -603,7 +604,16 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str]]:
     result.append(
         ("path-accu-pc-accu-is-zero", "highlight", str(visualisation_values.jump))
     )
-    result.append(("path-accu-alu", "highlight", "???"))
+    result.append(
+        (
+            "path-accu-alu",
+            "highlight",
+            str(
+                visualisation_values.alu_out is not None
+                and not type(loaded_instruction) in [LDA, ZRO]
+            ),
+        )
+    )
     result.append(
         (
             "path-alu-junction",
@@ -636,10 +646,10 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str]]:
                 visualisation_values.ram_out is not None and not control_unit_values[4]
             ),
         )
-    )  # 0 -> SET[IR]
+    )  # 4 -> SET[IR]
     result.append(
         ("path-pc-multiplexer", "highlight", str(control_unit_values[4]))
-    )  # 0 -> SET[IR]
+    )  # 4 -> SET[IR]
     result.append(
         (
             "path-multiplexer-ram",
@@ -666,7 +676,7 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str]]:
     )
     result.append(
         ("path-junction-ir", "highlight", str(control_unit_values[4]))
-    )  # 0 -> SET[IR]
+    )  # 4 -> SET[IR]
 
     # Text:
     if loaded_instruction is not None:
@@ -690,26 +700,35 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str]]:
 
     # Textblocks over Arrows:
     old_opcode = visualisation_values.op_code_old
+    result.append(
+        ("group-old-opcode-and-mnemonic", "show", str(old_opcode is not None))
+    )
     if old_opcode is not None:  # do not remove is not None
-        result.append(("group-old-opcode-and-mnemonic", "", ""))
-        result.append(("text-old-opcode-and-mnemonic", "", str(old_opcode)))
+        result.append(
+            (
+                "text-old-opcode-and-mnemonic",
+                "write",
+                str(old_opcode)
+                + " "
+                + str(ToyInstruction.from_integer(old_opcode << 12)),
+            )
+        )
     else:
-        result.append(("group-old-opcode-and-mnemonic", "", ""))
-        result.append(("text-old-opcode-and-mnemonic", "", ""))
+        result.append(("text-old-opcode-and-mnemonic", "write", ""))
+
     old_pc = visualisation_values.pc_old
+    result.append(("group-old-pc", "show", str(old_pc is not None)))
     if old_pc is not None:  # do not remove is not None
-        result.append(("group-old-pc", "", ""))
-        result.append(("text-old-pc", "", str(old_pc)))
+        result.append(("text-old-pc", "write", str(old_pc)))
     else:
-        result.append(("group-old-pc", "", ""))
-        result.append(("text-old-pc", "", ""))
+        result.append(("text-old-pc", "write", ""))
+
     old_accu = visualisation_values.accu_old
+    result.append(("group-old-accu", "", str(old_accu is not None)))
     if old_accu is not None:  # do not remove is not None
-        result.append(("group-old-accu", "", ""))
-        result.append(("text-old-accu", "", str(old_accu)))
+        result.append(("text-old-accu", "write", str(old_accu)))
     else:
-        result.append(("group-old-accu", "", ""))
-        result.append(("text-old-accu", "", ""))
+        result.append(("text-old-accu", "write", ""))
 
     # Control Unit:
     control_unit_names = [
