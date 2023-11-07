@@ -325,6 +325,7 @@ window.addEventListener("DOMContentLoaded", function () {
                 document.getElementById(
                     "button-visualization-id"
                 ).style.display = "inline-block";
+                document.getElementById("button-visualization-id").click();
             }
         });
 
@@ -412,6 +413,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
         document.getElementById("button-visualization-id").style.display =
             "inline-block";
+        document.getElementById("button-visualization-id").click();
         enable_hazard_detection();
     });
 
