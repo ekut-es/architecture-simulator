@@ -36,12 +36,30 @@ function getMemoryAndAccuColumn() {
 }
 
 /**
+ * @returns {Node} A Node containing the double step button.
+ */
+function getDoubleStepButton() {
+    return createNode(html`<button
+        id="button-double-step-simulation-id"
+        class="btn btn-primary btn-sm control-button me-1"
+        title="double step"
+    >
+        <img src="svg/double-step.svg" />
+    </button>`);
+}
+
+/**
  * Inserts all of TOY's coustom elements into the DOM.
  */
 function insertToyElements() {
     document
         .getElementById("codemirror-container")
         .after(getMemoryAndAccuColumn());
+    const doubleStepButton = getDoubleStepButton();
+    document
+        .getElementById("button-step-simulation-id")
+        .after(doubleStepButton);
+    doubleStepButton.addEventListener("click", doubleStep);
     document.getElementById("page-heading-id").innerText = "TOY Simulator";
     document.title = "TOY Simulator";
 }
@@ -51,4 +69,26 @@ function insertToyElements() {
  */
 function destroyToyElements() {
     document.getElementById("toy-accu-memory-container-id").remove();
+    document.getElementById("button-double-step-simulation-id").remove();
+}
+
+function doubleStep() {
+    is_run_simulation = false;
+    manual_run = true;
+    editor.save();
+    disable_editor();
+    evaluatePython_step_sim();
+    enable_run();
+    disable_pause();
+    enable_step();
+}
+
+function disable_double_step() {
+    document.getElementById("button-double-step-simulation-id").disabled = true;
+}
+
+function enable_double_step() {
+    document.getElementById(
+        "button-double-step-simulation-id"
+    ).disabled = false;
 }

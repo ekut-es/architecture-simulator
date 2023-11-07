@@ -263,7 +263,7 @@ const archsim_js = {
      * @param {number} address - address of the instruction to highlight (which is not necessarily the same as the position in the table)
      */
     highlight_cmd_table: function (address) {
-        table = document.getElementById("instruction-table-id");
+        table = document.getElementById("riscv-instruction-table-id");
         position = 1;
         for (; position < table.rows.length; position++) {
             if (Number(table.rows[position].cells[0].innerHTML) == address) {
@@ -919,6 +919,9 @@ async function evaluatePython_step_sim() {
         stop_loading_animation();
         disable_pause();
         disable_step();
+        if (selected_isa == "toy") {
+            disable_double_step();
+        }
         disable_run();
         clearInterval(run);
     }
@@ -928,6 +931,35 @@ async function evaluatePython_step_sim() {
         set_output_message(output_repr[0]);
     }
 }
+
+async function evaluatePython_toy_single_step() {
+    let pyodide = await pyodideReadyPromise;
+    const single_step = pyodide.globals.get("toy_single_step");
+    const get_next_cycle = pyodide.globals.get("toy_get_next_cycle");
+    input_str = input.value;
+    let output_repr = Array.from(single_step(input_str));
+    if (output_repr[1] == false) {
+        stop_timer();
+        stop_loading_animation();
+        disable_pause();
+        disable_step();
+        disable_double_step();
+        disable_run();
+        clearInterval(run);
+    } else {
+        if (get_next_cycle() == 1) {
+            enable_double_step();
+        } else {
+            disable_double_step();
+        }
+    }
+    if (!output_repr[2]) {
+        // Only update the performance metrics if there was no exception
+        // otherwise it would overwrite the printed exception
+        set_output_message(output_repr[0]);
+    }
+}
+
 async function update_ui_async() {
     let pyodide = await pyodideReadyPromise;
     update_ui = pyodide.globals.get("update_ui");

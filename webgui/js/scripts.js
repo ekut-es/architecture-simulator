@@ -211,8 +211,11 @@ window.addEventListener("DOMContentLoaded", function () {
         manual_run = true;
         editor.save();
         disable_editor();
-        evaluatePython_step_sim();
-        //update_performance_metrics();
+        if (selected_isa === "riscv") {
+            evaluatePython_step_sim();
+        } else if (selected_isa === "toy") {
+            evaluatePython_toy_single_step();
+        }
         enable_run();
         disable_pause();
         enable_step();
@@ -241,6 +244,9 @@ window.addEventListener("DOMContentLoaded", function () {
         enable_run();
         disable_pause();
         enable_step();
+        if (selected_isa == "toy") {
+            enable_double_step();
+        }
         enable_pipeline_switch();
         enable_isa_switch();
         clearTimeout(input_timer);

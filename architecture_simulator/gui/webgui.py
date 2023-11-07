@@ -662,3 +662,40 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str]]:
         result.append(("text-" + name, "highlight", str(value)))
 
     return result
+
+
+def toy_get_next_cycle():
+    """
+    Returns:
+        int: 1 or 2, depending on which cycle has to be executed next
+    """
+    if isinstance(simulation, ToySimulation):
+        return simulation.next_cycle
+
+
+def toy_single_step(program: str):
+    if isinstance(simulation, ToySimulation):
+        # Variable to tell js whether there was an exception
+        exception_flag = False
+
+        # parse the instr json string into a python dict
+        if not simulation.has_instructions():
+            try:
+                simulation.load_program(program)
+            except ParserException as Parser_Exception:
+                archsim_js.set_output(Parser_Exception.__repr__())
+                exception_flag = True
+
+        # step the simulation
+        if simulation.next_cycle == 1:
+            simulation.first_cycle_step()
+        else:
+            simulation.second_cycle_step()
+        simulation_not_ended_flag = not simulation.is_done()
+        update_ui()
+
+        return (
+            str(simulation.get_performance_metrics()),
+            simulation_not_ended_flag,
+            exception_flag,
+        )
