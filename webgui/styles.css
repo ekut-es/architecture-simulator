@@ -84,12 +84,11 @@ nav {
 #codemirror-container {
     min-width: 25em;
     max-width: 60em;
-    flex-grow: 3;
+    flex-grow: 1;
 }
 
 .main-content-column {
-    min-width: 15em;
-    max-width: 40em;
+    flex-shrink: 0;
     flex-grow: 1;
     margin: 0 var(--content-margin);
     overflow-y: scroll;
