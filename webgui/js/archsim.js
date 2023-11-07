@@ -292,8 +292,9 @@ const archsim_js = {
                     toy_svg_show(id, value);
                     break;
             }
+            update.destroy();
         }
-        //update_values.destroy();
+        update_values.destroy();
     },
     /**
      * @returns {bool} whether the riscv visualization svg has finished loading
