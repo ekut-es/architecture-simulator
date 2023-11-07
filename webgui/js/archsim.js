@@ -949,8 +949,10 @@ async function evaluatePython_toy_single_step() {
     } else {
         if (get_next_cycle() == 1) {
             enable_double_step();
+            enable_run();
         } else {
             disable_double_step();
+            disable_run();
         }
     }
     if (!output_repr[2]) {
