@@ -280,7 +280,7 @@ const archsim_js = {
             const id = update.get(0);
             const action = update.get(1);
             const value = update.get(2);
-            console.log(action + " " + value + " " + id);
+            console.log(action + ' "' + value + '" ' + id);
             switch (action) {
                 case "highlight":
                     toy_svg_highlight(id, value);
