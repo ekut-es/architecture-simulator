@@ -77,6 +77,8 @@ function insertRiscvElements() {
             getRiscvRegisterTable(),
             getRiscvMemoryTable()
         );
+    document.getElementById("page-heading-id").innerText = "RISC-V Simulator";
+    document.title = "RISC-V Simulator";
 }
 
 /**

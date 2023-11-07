@@ -42,6 +42,8 @@ function insertToyElements() {
     document
         .getElementById("codemirror-container")
         .after(getMemoryAndAccuColumn());
+    document.getElementById("page-heading-id").innerText = "TOY Simulator";
+    document.title = "TOY Simulator";
 }
 
 /**
