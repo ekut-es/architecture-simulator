@@ -273,11 +273,39 @@ const archsim_js = {
         table.rows[position].cells[0].style.backgroundColor = "yellow";
         table.rows[position].cells[1].style.backgroundColor = "yellow";
     },
+    update_toy_visualization: function (update_values) {
+        console.log("===update_toy_visualization===");
+        for (let i = 0; i < update_values.length; i++) {
+            const update = update_values.get(i);
+            const id = update.get(0);
+            const action = update.get(1);
+            const value = update.get(2);
+            console.log(action + " " + value + " " + id);
+            switch (action) {
+                case "highlight":
+                    toy_svg_highlight(id, value);
+                    break;
+                case "write":
+                    toy_svg_set_text(id, value);
+                    break;
+                case "show":
+                    toy_svg_show(id, value);
+                    break;
+            }
+        }
+        //update_values.destroy();
+    },
     /**
      * @returns {bool} whether the riscv visualization svg has finished loading
      */
     get_riscv_visualization_loaded: function () {
         return riscv_visualization_loaded;
+    },
+    /**
+     * @returns {bool} whether the toy visualization svg has finished loading
+     */
+    get_toy_visualization_loaded: function () {
+        return toy_visualization_loaded;
     },
     /**Update IF Stage:
      *

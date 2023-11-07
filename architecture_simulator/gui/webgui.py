@@ -215,10 +215,20 @@ def update_ui():
             update_WB_Stage()
             update_visualization()
     elif selected_isa == "toy":
-        update_toy_ui()
+        update_toy_tables()
+        if archsim_js.get_toy_visualization_loaded():
+            update_toy_visualization()
 
 
-def update_toy_ui():
+def update_toy_visualization():
+    global simulation
+    if simulation is None:
+        raise StateNotInitializedError()
+    if isinstance(simulation, ToySimulation):
+        archsim_js.update_toy_visualization(get_toy_svg_update_values(simulation))
+
+
+def update_toy_tables():
     """Updates the accu and the memory table for toy"""
     if isinstance(simulation, ToySimulation):
         # accu
@@ -582,12 +592,16 @@ from architecture_simulator.isa.toy.toy_instructions import ToyInstruction, ZRO,
 
 
 def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str | bool]]:
+    """Take a Toy simulation and return all information needed to update the svg.
+
+    Args:
+        sim (ToySimulation): ToySimulation object
+
+    Returns:
+        list[tuple[str, str, str | bool]]: each tuple is [svg-id, what update function to use, argument for update function (str | bool)].
+            They can be one of ("<id>","highlight", <bool>), ("<id>", "write", "<content>"), ("<id>", "show", <bool>)
     """
-    Take a Toy simulation and return all information needed to update the svg.
-    Args: ToySimulation
-    Returns: list[tuple[str, str, str]], where each tuple is [svg-id, what update function to use, argument for update function (str | bool)]
-    Possible tuples: ("<id>","highlight", <bool>), ("<id>", "write", "<content>"), ("<id>", "show", <bool>)
-    """
+
     result: list[tuple[str, str, str | bool]] = []
     loaded_instruction = sim.state.loaded_instruction
     visualisation_values = sim.state.visualisation_values
@@ -619,7 +633,7 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str | 
         )
     )
     result.append(
-        ("path-junction-acccu", "highlight", control_unit_values[5])
+        ("path-junction-accu", "highlight", control_unit_values[5])
     )  # 5 -> SET[ACCU]
     result.append(
         ("path-junction-ram", "highlight", control_unit_values[0])
