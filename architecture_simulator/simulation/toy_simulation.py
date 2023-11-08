@@ -56,7 +56,8 @@ class ToySimulation(Simulation):
             )
         old_op_code = self.state.loaded_instruction.op_code_value()
         self.state.visualisation_values = SvgVisValues(
-            op_code_old=old_op_code, pc_old=self.state.program_counter
+            op_code_old=old_op_code,
+            pc_old=MutableUInt16(int(self.state.program_counter)),
         )
         if self.state.program_counter <= self.state.max_pc:
             self.state.visualisation_values.ram_out = self.state.memory.read_halfword(

@@ -645,7 +645,8 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str | 
         (
             "path-instaddress-junction",
             "highlight",
-            visualisation_values.ram_out is not None or visualisation_values.jump,
+            (visualisation_values.ram_out is not None or visualisation_values.jump)
+            and not control_unit_values[4],
         )
     )
     result.append(("path-junction-pc", "highlight", visualisation_values.jump))
@@ -704,6 +705,7 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str | 
     result.append(
         ("text-ram-out", "write", str(ram_out) if ram_out is not None else "")
     )
+    result.append(("text-accu", "write", str(sim.state.accu)))
 
     # Textblocks over Arrows:
     old_opcode = visualisation_values.op_code_old
