@@ -688,7 +688,7 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str | 
 
     # Text:
     if loaded_instruction is not None:
-        result.append(("text-mnemonic", "write", str(loaded_instruction)))
+        result.append(("text-mnemonic", "write", loaded_instruction.mnemonic))
         result.append(("text-opcode", "write", str(loaded_instruction.op_code_value())))
         result.append(
             ("text-address", "write", str(loaded_instruction.address_section_value()))
@@ -717,7 +717,7 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str | 
                 "write",
                 str(old_opcode)
                 + " "
-                + str(ToyInstruction.from_integer(old_opcode << 12)),
+                + ToyInstruction.from_integer(old_opcode << 12).mnemonic,
             )
         )
     else:

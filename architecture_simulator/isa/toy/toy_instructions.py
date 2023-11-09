@@ -77,7 +77,7 @@ class ToyInstruction(Instruction):
         """
         Return the address section of a instruction, even if the instruction is no AddressTypeInstruction.
         """
-        return int(self) & 0xFF
+        return int(self) & 0xFFF
 
     @classmethod
     def from_integer(cls, integer_instruction: int) -> ToyInstruction:

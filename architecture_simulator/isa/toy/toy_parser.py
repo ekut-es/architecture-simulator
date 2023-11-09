@@ -9,6 +9,7 @@ from ..parser_exceptions import (
     ParserLabelException,
     DuplicateLabelException,
 )
+from architecture_simulator.uarch.toy.SvgVisValues import SvgVisValues
 
 if TYPE_CHECKING:
     from architecture_simulator.uarch.toy.toy_architectural_state import (
@@ -152,6 +153,9 @@ class ToyParser:
             self.state.memory.write_halfword(addr, MutableUInt16(int(instr)))
         if len(instructions) >= 1:
             self.state.loaded_instruction = instructions[0]
+            self.state.visualisation_values = SvgVisValues(
+                pc_old=MutableUInt16(0), ram_out=MutableUInt16(int(instructions[0]))
+            )
 
     def _write_data(self):
         """Looks for data write commands in self.token_list and then write the data to the data memory of self.state if applicable."""

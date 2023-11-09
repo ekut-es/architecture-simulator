@@ -59,10 +59,10 @@ class ToySimulation(Simulation):
             op_code_old=old_op_code,
             pc_old=MutableUInt16(int(self.state.program_counter)),
         )
+        self.state.visualisation_values.ram_out = self.state.memory.read_halfword(
+            int(self.state.program_counter)
+        )
         if self.state.program_counter <= self.state.max_pc:
-            self.state.visualisation_values.ram_out = self.state.memory.read_halfword(
-                int(self.state.program_counter)
-            )
             self.state.loaded_instruction = ToyInstruction.from_integer(
                 int(self.state.visualisation_values.ram_out)
             )

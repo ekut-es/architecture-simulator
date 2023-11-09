@@ -145,7 +145,7 @@ INC"""
             """
         )
         self.assertEqual(sim.state.visualisation_values.alu_out, None)
-        self.assertEqual(sim.state.visualisation_values.ram_out, None)
+        self.assertEqual(sim.state.visualisation_values.ram_out, int(LDA(0x400)))
         self.assertEqual(sim.state.visualisation_values.jump, False)
         # LDA
         sim.first_cycle_step()
