@@ -64,7 +64,7 @@ test:
 deploy:
   stage: deploy
   only:
-    - main
+    - dev
   variables:
     TARGET: "archsim@atreus.cs.uni-tuebingen.de:/opt/landing_page/archsim/"
   dependencies:
