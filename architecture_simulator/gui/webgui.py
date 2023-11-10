@@ -588,7 +588,12 @@ def update_visualization():
 
 
 from architecture_simulator.isa.toy.toy_micro_program import MicroProgram
-from architecture_simulator.isa.toy.toy_instructions import ToyInstruction, ZRO, LDA
+from architecture_simulator.isa.toy.toy_instructions import (
+    ToyInstruction,
+    ZRO,
+    LDA,
+    STO,
+)
 
 
 def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str | bool]]:
@@ -638,14 +643,16 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str | 
     result.append(
         ("path-junction-ram", "highlight", control_unit_values[0])
     )  # 0 -> WRITE[RAM]
-    result.append(
-        ("path-opcode-control-unit", "highlight", loaded_instruction is not None)
-    )
+    result.append(("path-opcode-control-unit", "highlight", True))
     result.append(
         (
             "path-instaddress-junction",
             "highlight",
-            (visualisation_values.ram_out is not None or visualisation_values.jump)
+            (
+                visualisation_values.ram_out is not None
+                or visualisation_values.jump
+                or isinstance(loaded_instruction, STO)
+            )
             and not control_unit_values[4],
         )
     )
@@ -654,7 +661,11 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str | 
         (
             "path-junction-multiplexer",
             "highlight",
-            visualisation_values.ram_out is not None and not control_unit_values[4],
+            (
+                visualisation_values.ram_out is not None
+                or isinstance(loaded_instruction, STO)
+            )
+            and not control_unit_values[4],
         )
     )  # 4 -> SET[IR]
     result.append(
@@ -664,7 +675,8 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str | 
         (
             "path-multiplexer-ram",
             "highlight",
-            visualisation_values.ram_out is not None,
+            visualisation_values.ram_out is not None
+            or isinstance(loaded_instruction, STO),
         )
     )
     result.append(
