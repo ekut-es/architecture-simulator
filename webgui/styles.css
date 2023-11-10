@@ -38,6 +38,10 @@ nav {
     background-color: rgb(169, 208, 245);
 }
 
+#button-double-step-simulation-id {
+    background-color: rgb(169, 208, 245);
+}
+
 #button-reset-simulation-id {
     background-color: rgb(247, 129, 129);
 }
@@ -84,19 +88,27 @@ nav {
 #codemirror-container {
     min-width: 25em;
     max-width: 60em;
-    flex-grow: 3;
+    flex-grow: 1;
 }
 
 .main-content-column {
-    min-width: 15em;
-    max-width: 40em;
+    flex-shrink: 0;
     flex-grow: 1;
     margin: 0 var(--content-margin);
     overflow-y: scroll;
 }
 
+#toy-accu-memory-container-id {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
 #register-table-body-id > tr > td:nth-child(3),
-#memory-table-body-id > tr > td:nth-child(2) {
+#memory-table-body-id > tr > td:nth-child(2),
+#toy-memory-table-body-id > tr > td:nth-child(1),
+#toy-memory-table-body-id > tr > td:nth-child(2),
+#toy-accu-id {
     text-align: right;
 }
 

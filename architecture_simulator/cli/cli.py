@@ -183,9 +183,10 @@ def display(sim: Union[ToySimulation, RiscvSimulation], display_mode: str) -> st
         hline = "=" * 35 + "\n"
         res = "Architectural state:\n"
         res += hline
-        res += toy_memory_repr(sim.state.data_memory, display_mode)
+        res += toy_memory_repr(sim.state.memory, display_mode)
         res += hline
-        res += f"PC: {sim.state.program_counter} | Instruction at PC: {'#####' if not sim.state.instruction_at_pc() else str(sim.state.instruction_memory.read_instruction(int(sim.state.program_counter)))}\n"
+        # TODO: Fix me
+        # res += f"PC: {sim.state.program_counter} | Instruction at PC: {'#####' if not sim.state.instruction_at_pc() else str(sim.state.instruction_memory.read_instruction(int(sim.state.program_counter)))}\n"
         res += hline
         res += f"Accu: {sim.state.accu}\n"
         res += hline

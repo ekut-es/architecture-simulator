@@ -9,6 +9,7 @@ from ..parser_exceptions import (
     ParserLabelException,
     DuplicateLabelException,
 )
+from architecture_simulator.uarch.toy.SvgVisValues import SvgVisValues
 
 if TYPE_CHECKING:
     from architecture_simulator.uarch.toy.toy_architectural_state import (
@@ -146,7 +147,15 @@ class ToyParser:
                 instructions.append(instruction_class(address=address))
             else:  # else it is an instruction without an address
                 instructions.append(instruction_class())
-        self.state.instruction_memory.write_instructions(instructions)
+        # write instructions to memory and init state:
+        self.state.max_pc = len(instructions) - 1
+        for addr, instr in enumerate(instructions):
+            self.state.memory.write_halfword(addr, MutableUInt16(int(instr)))
+        if len(instructions) >= 1:
+            self.state.loaded_instruction = instructions[0]
+            self.state.visualisation_values = SvgVisValues(
+                pc_old=MutableUInt16(0), ram_out=MutableUInt16(int(instructions[0]))
+            )
 
     def _write_data(self):
         """Looks for data write commands in self.token_list and then write the data to the data memory of self.state if applicable."""
@@ -154,7 +163,7 @@ class ToyParser:
             if tokens.write_data:
                 address = self._value_to_int(tokens.address) % 4096
                 value = MutableUInt16(self._value_to_int(tokens.value) % (2**16))
-                self.state.data_memory.write_halfword(address=address, value=value)
+                self.state.memory.write_halfword(address=address, value=value)
 
     def _value_to_int(self, address: str) -> int:
         """Convert addresses to ints. Hex addresses (starting with '0x') and decimal addresses are supported.

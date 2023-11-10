@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Type
 from fixedint import MutableUInt16
 from ..instruction import Instruction
+from architecture_simulator.uarch.toy.SvgVisValues import SvgVisValues
 
 if TYPE_CHECKING:
     from architecture_simulator.uarch.toy.toy_architectural_state import (
@@ -65,6 +66,18 @@ class ToyInstruction(Instruction):
             str: A 4 digit long hexadecimal string.
         """
         return "{:04X}".format(int(self))
+
+    def op_code_value(self) -> int:
+        """
+        Return the op code of the instruction as a int.
+        """
+        return (int(self) >> 12) & 0xF
+
+    def address_section_value(self) -> int:
+        """
+        Return the address section of a instruction, even if the instruction is no AddressTypeInstruction.
+        """
+        return int(self) & 0xFFF
 
     @classmethod
     def from_integer(cls, integer_instruction: int) -> ToyInstruction:
@@ -131,8 +144,8 @@ class STO(AddressTypeInstruction):
 
     def behavior(self, state: ToyArchitecturalState):
         """MEM[address] = ACCU"""
-        state.data_memory.write_halfword(address=self.address, value=state.accu)
-        state.increment_pc()
+        state.visualisation_values = SvgVisValues(alu_out=state.accu)
+        state.memory.write_halfword(address=self.address, value=state.accu)
 
 
 class LDA(AddressTypeInstruction):
@@ -141,8 +154,11 @@ class LDA(AddressTypeInstruction):
 
     def behavior(self, state: ToyArchitecturalState):
         """ACCU = MEM[address]"""
-        state.accu = state.data_memory.read_halfword(address=self.address)
-        state.increment_pc()
+        read_value = state.memory.read_halfword(address=self.address)
+        state.visualisation_values = SvgVisValues(
+            ram_out=read_value, alu_out=read_value
+        )
+        state.accu = read_value
 
 
 class BRZ(AddressTypeInstruction):
@@ -151,12 +167,9 @@ class BRZ(AddressTypeInstruction):
 
     def behavior(self, state: ToyArchitecturalState):
         """PC = ADDRESS if (ACCU == 0)"""
-        if state.accu:
-            state.increment_pc()
-        else:
-            # NOTE: sets the pc to self.address without additionally increasing the program counter.
-            # But I dont think this should cause any problems.
-            state.set_pc(MutableUInt16(self.address))
+        state.visualisation_values = SvgVisValues(jump=not state.accu)
+        if not state.accu:
+            state.set_current_pc(MutableUInt16(self.address))
             state.performance_metrics.branch_count += 1
 
 
@@ -166,9 +179,13 @@ class ADD(AddressTypeInstruction):
 
     def behavior(self, state: ToyArchitecturalState):
         """ACCU += MEM[address]"""
-        memory = state.data_memory.read_halfword(address=self.address)
-        state.accu = state.accu + memory
-        state.increment_pc()
+        read_value = state.memory.read_halfword(address=self.address)
+        state.visualisation_values = SvgVisValues(
+            accu_old=MutableUInt16(int(state.accu)),
+            ram_out=read_value,
+            alu_out=state.accu + read_value,
+        )
+        state.accu = state.accu + read_value
 
 
 class SUB(AddressTypeInstruction):
@@ -177,9 +194,13 @@ class SUB(AddressTypeInstruction):
 
     def behavior(self, state: ToyArchitecturalState):
         """ACCU -= MEM[address]"""
-        memory = state.data_memory.read_halfword(address=self.address)
-        state.accu = state.accu - memory
-        state.increment_pc()
+        read_value = state.memory.read_halfword(address=self.address)
+        state.visualisation_values = SvgVisValues(
+            accu_old=MutableUInt16(int(state.accu)),
+            ram_out=read_value,
+            alu_out=state.accu - read_value,
+        )
+        state.accu = state.accu - read_value
 
 
 class OR(AddressTypeInstruction):
@@ -188,9 +209,13 @@ class OR(AddressTypeInstruction):
 
     def behavior(self, state: ToyArchitecturalState):
         """ACCU |= MEM[address]"""
-        memory = state.data_memory.read_halfword(address=self.address)
-        state.accu = state.accu | memory
-        state.increment_pc()
+        read_value = state.memory.read_halfword(address=self.address)
+        state.visualisation_values = SvgVisValues(
+            accu_old=MutableUInt16(int(state.accu)),
+            ram_out=read_value,
+            alu_out=state.accu | read_value,
+        )
+        state.accu = state.accu | read_value
 
 
 class AND(AddressTypeInstruction):
@@ -199,9 +224,13 @@ class AND(AddressTypeInstruction):
 
     def behavior(self, state: ToyArchitecturalState):
         """ACCU &= MEM[address]"""
-        memory = state.data_memory.read_halfword(address=self.address)
-        state.accu = state.accu & memory
-        state.increment_pc()
+        read_value = state.memory.read_halfword(address=self.address)
+        state.visualisation_values = SvgVisValues(
+            accu_old=MutableUInt16(int(state.accu)),
+            ram_out=read_value,
+            alu_out=state.accu & read_value,
+        )
+        state.accu = state.accu & read_value
 
 
 class XOR(AddressTypeInstruction):
@@ -210,9 +239,13 @@ class XOR(AddressTypeInstruction):
 
     def behavior(self, state: ToyArchitecturalState):
         """ACCU ^= MEM[address]"""
-        memory = state.data_memory.read_halfword(address=self.address)
-        state.accu = state.accu ^ memory
-        state.increment_pc()
+        read_value = state.memory.read_halfword(address=self.address)
+        state.visualisation_values = SvgVisValues(
+            accu_old=MutableUInt16(int(state.accu)),
+            ram_out=read_value,
+            alu_out=state.accu ^ read_value,
+        )
+        state.accu = state.accu ^ read_value
 
 
 class NOT(ToyInstruction):
@@ -221,8 +254,10 @@ class NOT(ToyInstruction):
 
     def behavior(self, state: ToyArchitecturalState):
         """ACCU = ~ACCU"""
+        state.visualisation_values = SvgVisValues(
+            accu_old=MutableUInt16(int(state.accu)), alu_out=~state.accu
+        )
         state.accu = ~state.accu
-        state.increment_pc()
 
 
 class INC(ToyInstruction):
@@ -231,8 +266,11 @@ class INC(ToyInstruction):
 
     def behavior(self, state: ToyArchitecturalState):
         """ACCU += 1"""
+        state.visualisation_values = SvgVisValues(
+            accu_old=MutableUInt16(int(state.accu)),
+            alu_out=state.accu + MutableUInt16(1),
+        )
         state.accu += MutableUInt16(1)
-        state.increment_pc()
 
 
 class DEC(ToyInstruction):
@@ -241,8 +279,11 @@ class DEC(ToyInstruction):
 
     def behavior(self, state: ToyArchitecturalState):
         """ACCU -= 1"""
+        state.visualisation_values = SvgVisValues(
+            accu_old=MutableUInt16(int(state.accu)),
+            alu_out=state.accu - MutableUInt16(1),
+        )
         state.accu -= MutableUInt16(1)
-        state.increment_pc()
 
 
 class ZRO(ToyInstruction):
@@ -251,8 +292,8 @@ class ZRO(ToyInstruction):
 
     def behavior(self, state: ToyArchitecturalState):
         """ACCU = 0"""
+        state.visualisation_values = SvgVisValues(alu_out=MutableUInt16(0))
         state.accu = MutableUInt16(0)
-        state.increment_pc()
 
 
 class NOP(ToyInstruction):
@@ -261,7 +302,7 @@ class NOP(ToyInstruction):
 
     def behavior(self, state: ToyArchitecturalState):
         """no operation"""
-        state.increment_pc()
+        state.visualisation_values = SvgVisValues()
 
 
 instruction_map: dict[str, Type[ToyInstruction]] = {

@@ -1,7 +1,4 @@
 const output = document.getElementById("output-field-id");
-const registers = document.getElementById("register-table-body-id");
-const memory = document.getElementById("memory-table-body-id");
-const instructions = document.getElementById("instruction-table-body-id");
 const input = document.getElementById("input");
 
 var previous_pc = 0;
@@ -23,6 +20,52 @@ function addToOutput(s) {
 
 // Object containing functions to be exported to python
 const archsim_js = {
+    /**
+     * Updates the TOY accu.
+     * @param representations A Python Tuple containing the representations (binary, unsigned decimal, hexadecimal, signed decimal) for the accu.
+     */
+    toyUpdateAccu: function (representations) {
+        document.getElementById("toy-accu-id").innerText =
+            Array.from(representations)[reg_representation_mode];
+    },
+    /**
+     * Clears the TOY memory table.
+     */
+    toyClearMemoryTable: function () {
+        document.getElementById("toy-memory-table-body-id").innerHTML = "";
+    },
+    /**
+     * Updates the TOY memory table.
+     * @param {string} address The memory address
+     * @param value_representations A Python Tuple containing the representations (binary, unsigned decimal, hexadecimal, signed decimal) for one value in the memory.
+     * @param {string} instruction_representation The instruction the value represents.
+     * @param {boolean} is_current_instruction Whether this entry is the current instruction. This will be marked in the table.
+     */
+    toyUpdateMemoryTable: function (
+        address,
+        value_representations,
+        instruction_representation,
+        is_current_instruction
+    ) {
+        value_representations_array = Array.from(value_representations);
+        const value = value_representations_array[mem_representation_mode];
+        const row = document
+            .getElementById("toy-memory-table-body-id")
+            .insertRow();
+        const cell1 = row.insertCell();
+        const cell2 = row.insertCell();
+        const cell3 = row.insertCell();
+        cell1.innerText = address;
+        cell2.innerText = value;
+        cell3.innerText = instruction_representation;
+        if (previous_memory[address] !== value_representations_array[1]) {
+            previous_memory[address] = value_representations_array[1];
+            cell2.style.backgroundColor = "yellow";
+        }
+        if (is_current_instruction) {
+            cell1.innerHTML = instructionArrow + cell1.innerHTML;
+        }
+    },
     get_selected_isa: function () {
         return selected_isa;
     },
@@ -56,7 +99,7 @@ const archsim_js = {
         tr.appendChild(td3);
         tr.appendChild(td1);
         tr.appendChild(td2);
-        registers.appendChild(tr);
+        document.getElementById("riscv-register-table-body-id").appendChild(tr);
     },
     /**
      * Appends one row to the memory table.
@@ -77,7 +120,7 @@ const archsim_js = {
         }
         tr.appendChild(td1);
         tr.appendChild(td2);
-        memory.appendChild(tr);
+        document.getElementById("riscv-memory-table-body-id").appendChild(tr);
     },
     /**
      * Appends one row to the instruction memory table.
@@ -124,25 +167,33 @@ const archsim_js = {
         tr.appendChild(td1);
         tr.appendChild(td2);
         tr.appendChild(td3);
-        instructions.appendChild(tr);
+        document
+            .getElementById("riscv-instruction-table-body-id")
+            .appendChild(tr);
     },
     /**
      * Clears the memory table.
      */
     clear_memory_table: function () {
-        this.clear_a_table(memory);
+        this.clear_a_table(
+            document.getElementById("riscv-memory-table-body-id")
+        );
     },
     /**
      * Clears the register table.
      */
     clear_register_table: function () {
-        this.clear_a_table(registers);
+        this.clear_a_table(
+            document.getElementById("riscv-register-table-body-id")
+        );
     },
     /**
      * Clears the instruction memory table.
      */
     clear_instruction_table: function () {
-        this.clear_a_table(instructions);
+        this.clear_a_table(
+            document.getElementById("riscv-instruction-table-body-id")
+        );
     },
     /**
      * Clears the given table.
@@ -212,7 +263,7 @@ const archsim_js = {
      * @param {number} address - address of the instruction to highlight (which is not necessarily the same as the position in the table)
      */
     highlight_cmd_table: function (address) {
-        table = document.getElementById("instruction-table-id");
+        table = document.getElementById("riscv-instruction-table-id");
         position = 1;
         for (; position < table.rows.length; position++) {
             if (Number(table.rows[position].cells[0].innerHTML) == address) {
@@ -222,11 +273,40 @@ const archsim_js = {
         table.rows[position].cells[0].style.backgroundColor = "yellow";
         table.rows[position].cells[1].style.backgroundColor = "yellow";
     },
+    update_toy_visualization: function (update_values) {
+        console.log("===update_toy_visualization===");
+        for (let i = 0; i < update_values.length; i++) {
+            const update = update_values.get(i);
+            const id = update.get(0);
+            const action = update.get(1);
+            const value = update.get(2);
+            console.log(action + ' "' + value + '" ' + id);
+            switch (action) {
+                case "highlight":
+                    toy_svg_highlight(id, value);
+                    break;
+                case "write":
+                    toy_svg_set_text(id, value);
+                    break;
+                case "show":
+                    toy_svg_show(id, value);
+                    break;
+            }
+            update.destroy();
+        }
+        update_values.destroy();
+    },
     /**
      * @returns {bool} whether the riscv visualization svg has finished loading
      */
     get_riscv_visualization_loaded: function () {
         return riscv_visualization_loaded;
+    },
+    /**
+     * @returns {bool} whether the toy visualization svg has finished loading
+     */
+    get_toy_visualization_loaded: function () {
+        return toy_visualization_loaded;
     },
     /**Update IF Stage:
      *
@@ -868,6 +948,9 @@ async function evaluatePython_step_sim() {
         stop_loading_animation();
         disable_pause();
         disable_step();
+        if (selected_isa == "toy") {
+            disable_double_step();
+        }
         disable_run();
         clearInterval(run);
     }
@@ -877,6 +960,37 @@ async function evaluatePython_step_sim() {
         set_output_message(output_repr[0]);
     }
 }
+
+async function evaluatePython_toy_single_step() {
+    let pyodide = await pyodideReadyPromise;
+    const single_step = pyodide.globals.get("toy_single_step");
+    const get_next_cycle = pyodide.globals.get("toy_get_next_cycle");
+    input_str = input.value;
+    let output_repr = Array.from(single_step(input_str));
+    if (output_repr[1] == false) {
+        stop_timer();
+        stop_loading_animation();
+        disable_pause();
+        disable_step();
+        disable_double_step();
+        disable_run();
+        clearInterval(run);
+    } else {
+        if (get_next_cycle() == 1) {
+            enable_double_step();
+            enable_run();
+        } else {
+            disable_double_step();
+            disable_run();
+        }
+    }
+    if (!output_repr[2]) {
+        // Only update the performance metrics if there was no exception
+        // otherwise it would overwrite the printed exception
+        set_output_message(output_repr[0]);
+    }
+}
+
 async function update_ui_async() {
     let pyodide = await pyodideReadyPromise;
     update_ui = pyodide.globals.get("update_ui");

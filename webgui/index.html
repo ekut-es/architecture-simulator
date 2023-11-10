@@ -17,7 +17,9 @@
         <!--Header-->
         <header id="header" class="header container-fluid">
             <div class="row align-items-center">
-                <div class="h1 col-auto">RISC-V Simulator</div>
+                <div id="page-heading-id" class="h1 col-auto">
+                    RISC-V Simulator
+                </div>
                 <div class="col-auto ms-auto">
                     <button class="btn btn-sm px-0 py-0">
                         <img
@@ -42,7 +44,7 @@
                         class="btn btn-success btn-sm control-button me-1"
                         title="run simulation"
                     >
-                        <img src="svg/start.svg" />
+                        <img src="svg/run.svg" />
                     </button>
                     <button
                         id="button-pause-simulation-id"
@@ -57,14 +59,14 @@
                         class="btn btn-primary btn-sm control-button me-1"
                         title="step"
                     >
-                        <img src="svg/next.svg" />
+                        <img src="svg/step.svg" />
                     </button>
                     <button
                         id="button-reset-simulation-id"
                         class="btn btn-danger btn-sm control-button"
                         title="reset simulation"
                     >
-                        <img src="svg/refresh.svg" />
+                        <img src="svg/reset.svg" />
                     </button>
                     <img
                         src="loading.gif"
@@ -116,9 +118,12 @@
                     <textarea id="input"></textarea>
                 </div>
                 <!--Instruction Table-->
-                <div class="main-content-column">
+                <div
+                    id="riscv-instruction-table-container-id"
+                    class="main-content-column"
+                >
                     <table
-                        id="instruction-table-id"
+                        id="riscv-instruction-table-id"
                         class="table table-sm table-hover table-bordered mono-table mb-0"
                     >
                         <thead>
@@ -128,11 +133,14 @@
                                 <th>Stage</th>
                             </tr>
                         </thead>
-                        <tbody id="instruction-table-body-id"></tbody>
+                        <tbody id="riscv-instruction-table-body-id"></tbody>
                     </table>
                 </div>
                 <!--Register Table-->
-                <div class="main-content-column">
+                <div
+                    id="riscv-register-table-container-id"
+                    class="main-content-column"
+                >
                     <table
                         class="table table-sm table-hover table-bordered mono-table mb-0"
                     >
@@ -142,11 +150,14 @@
                                 <th>Value</th>
                             </tr>
                         </thead>
-                        <tbody id="register-table-body-id"></tbody>
+                        <tbody id="riscv-register-table-body-id"></tbody>
                     </table>
                 </div>
                 <!--Memory Table-->
-                <div class="main-content-column">
+                <div
+                    id="riscv-memory-table-container-id"
+                    class="main-content-column"
+                >
                     <table
                         class="table table-sm table-hover table-bordered mono-table mb-0"
                     >
@@ -156,7 +167,7 @@
                                 <th>Value</th>
                             </tr>
                         </thead>
-                        <tbody id="memory-table-body-id"></tbody>
+                        <tbody id="riscv-memory-table-body-id"></tbody>
                     </table>
                 </div>
                 <!--Output Field-->
@@ -477,9 +488,11 @@
             type="text/javascript"
             src="https://cdn.jsdelivr.net/pyodide/v0.22.1/full/pyodide.js"
         ></script>
-        <script type="text/javascript" src="js/html_tag.js"></script>
+        <script type="text/javascript" src="js/util.js"></script>
         <script type="text/javascript" src="js/riscv_documentation.js"></script>
         <script type="text/javascript" src="js/toy_documentation.js"></script>
+        <script type="text/javascript" src="js/riscv_simulation.js"></script>
+        <script type="text/javascript" src="js/toy_simulation.js"></script>
         <script type="text/javascript" src="js/scripts.js"></script>
         <script type="text/javascript" src="js/archsim.js"></script>
         <script type="text/javascript" src="js/editor.js"></script>

@@ -3,69 +3,46 @@ from typing import Optional
 
 from architecture_simulator.settings.settings import Settings
 from .toy_memory import ToyMemory
-from ..instruction_memory import InstructionMemory
 from architecture_simulator.isa.toy.toy_instructions import ToyInstruction
 from .toy_performance_metrics import ToyPerformanceMetrics
+from .SvgVisValues import SvgVisValues
 
 
 class ToyArchitecturalState:
     """Architectural State for the Toy architecture."""
 
-    def __init__(
-        self,
-        instruction_memory_range: Optional[range] = None,
-        data_memory_range: Optional[range] = None,
-    ):
-        self.program_counter = MutableUInt16(
-            instruction_memory_range.start
-            if instruction_memory_range
-            else Settings().get()["toy_instruction_memory_min_bytes"]
-        )
-        self.previous_program_counter: Optional[MutableUInt16] = None
+    def __init__(self, unified_memory_size: Optional[int] = None):
+        self.program_counter: MutableUInt16 = MutableUInt16(1)
+        self.address_of_current_instruction: Optional[int] = None
+        self.address_of_next_instruction = 0
         self.accu = MutableUInt16(0)
-        self.instruction_memory = InstructionMemory[ToyInstruction](
+        self.memory = ToyMemory(
             address_range=(
-                instruction_memory_range
-                if instruction_memory_range
-                else range(
-                    Settings().get()["toy_instruction_memory_min_bytes"],
-                    Settings().get()["toy_instruction_memory_max_bytes"],
-                )
-            )
-        )
-        self.data_memory = ToyMemory(
-            address_range=(
-                data_memory_range
-                if data_memory_range
-                else range(
-                    Settings().get()["toy_memory_min_bytes"],
-                    Settings().get()["toy_memory_max_bytes"],
-                )
+                range(unified_memory_size)
+                if unified_memory_size
+                else range(Settings().get()["toy_memory_max_bytes"])
             )
         )
         self.performance_metrics = ToyPerformanceMetrics()
+        self.max_pc: Optional[int] = None  # init by parser
+        self.loaded_instruction: Optional[ToyInstruction] = None  # init by parser
+        self.visualisation_values = SvgVisValues()
 
-    def increment_pc(self):
-        """Increment program counter by 1."""
-        self.previous_program_counter = MutableUInt16(int(self.program_counter))
-        self.program_counter += MutableUInt16(1)
-
-    def set_pc(self, address: MutableUInt16):
+    def set_current_pc(self, address: MutableUInt16):
         """Sets the program counter to the specified address.
 
         Args:
             address (MutableUInt16): Address for the program counter.
         """
-        self.previous_program_counter = MutableUInt16(int(self.program_counter))
-        self.program_counter = MutableUInt16(int(address))
+        self.program_counter = address
 
-    def instruction_at_pc(self) -> bool:
-        """Return whether there is an instruction in the instruction memory at the current program counter.
+    def instruction_loaded(self) -> bool:
+        """Return whether a instructions is currently loaded.
 
         Returns:
-            bool: Whether there is an instruction in the instruction memory at the current program counter.
+            bool: Whether a instructions is currently loaded.
         """
-        return self.instruction_memory.instruction_at_address(int(self.program_counter))
+        return self.loaded_instruction is not None
 
     def get_accu_representation(self) -> tuple[str, str, str, str]:
         """Returns the values of the accu as binary, unsigned decimal, hexadecimal, signed decimal strings.
@@ -87,3 +64,7 @@ class ToyArchitecturalState:
             hexadecimal[:2] + " " + hexadecimal[2:],
             str(signed_decimal),
         )
+
+    def get_repr(self):
+        ...
+        # TODO: Implement for alu_out, ram_out, accu

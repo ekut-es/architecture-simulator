@@ -9,3 +9,11 @@ class InstructionExecutionException(RuntimeError):
 
     def __repr__(self):
         return f"There was an error executing the instruction at address '{self.address}': '{self.instruction_repr}':\n{self.error_message}"
+
+
+@dataclass
+class StepSequenceError(RuntimeError):
+    message: str
+
+    def __repr__(self) -> str:
+        return self.message

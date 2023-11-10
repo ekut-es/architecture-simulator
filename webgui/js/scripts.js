@@ -24,30 +24,7 @@ var riscv_visualization_loaded = false;
 var toy_visualization_loaded = false;
 
 window.addEventListener("DOMContentLoaded", function () {
-    const riscvSvgElement = document.createElement("object");
-    riscvSvgElement.data = "svg/riscv_pipeline.svg";
-    riscvSvgElement.type = "image/svg+xml";
-    riscvSvgElement.id = "riscv-visualization";
-    riscvSvgElement.addEventListener("load", function () {
-        riscv_visualization_loaded = true;
-        update_ui_async();
-    });
-
-    document.getElementById("main-content-container").append(riscvSvgElement);
-
-    const toySvgElement = document.createElement("object");
-    toySvgElement.data = "svg/toy_structure.svg";
-    toySvgElement.type = "image/svg+xml";
-    toySvgElement.id = "toy-visualization";
-    toySvgElement.addEventListener("load", function () {
-        toy_visualization_loaded = true;
-        update_ui_async();
-    });
-
-    document.getElementById("main-content-container").append(toySvgElement);
-
     setMainContainerHeight();
-
     window.addEventListener("resize", function () {
         setMainContainerHeight();
     });
@@ -63,6 +40,20 @@ window.addEventListener("DOMContentLoaded", function () {
         mem_representation_mode = settings.default_memory_representation;
         pipeline_mode = settings.default_pipeline_mode;
         hazard_detection = settings.hazard_detection;
+
+        if (selected_isa === "riscv") {
+            document.getElementById("isa_button_riscv_id").click();
+            if (pipeline_mode === "single_stage_pipeline") {
+                document.getElementById("button_SingleStage").click();
+            } else if (pipeline_mode === "five_stage_pipeline") {
+                document.getElementById("button_5-Stage").click();
+                if (!hazard_detection) {
+                    document.getElementById("button_HazardDetection").click();
+                }
+            }
+        } else if (selected_isa === "toy") {
+            document.getElementById("isa_button_toy_id").click();
+        }
 
         if (reg_representation_mode === binary_representation) {
             document
@@ -100,20 +91,6 @@ window.addEventListener("DOMContentLoaded", function () {
                 .click();
         }
 
-        if (selected_isa === "riscv") {
-            document.getElementById("isa_button_riscv_id").click();
-            if (pipeline_mode === "single_stage_pipeline") {
-                document.getElementById("button_SingleStage").click();
-            } else if (pipeline_mode === "five_stage_pipeline") {
-                document.getElementById("button_5-Stage").click();
-                if (!hazard_detection) {
-                    document.getElementById("button_HazardDetection").click();
-                }
-            }
-        } else if (selected_isa === "toy") {
-            document.getElementById("isa_button_toy_id").click();
-        }
-
         clearTimeout(input_timer);
         input_timer = setTimeout(
             finished_typing,
@@ -122,6 +99,28 @@ window.addEventListener("DOMContentLoaded", function () {
 
         refresh_button();
     });
+
+    // Insert RISC-V SVG
+    const riscvSvgElement = document.createElement("object");
+    riscvSvgElement.data = "svg/riscv_pipeline.svg";
+    riscvSvgElement.type = "image/svg+xml";
+    riscvSvgElement.id = "riscv-visualization";
+    riscvSvgElement.addEventListener("load", function () {
+        riscv_visualization_loaded = true;
+        update_ui_async();
+    });
+    document.getElementById("main-content-container").append(riscvSvgElement);
+
+    // Insert TOY SVG
+    const toySvgElement = document.createElement("object");
+    toySvgElement.data = "svg/toy_structure.svg";
+    toySvgElement.type = "image/svg+xml";
+    toySvgElement.id = "toy-visualization";
+    toySvgElement.addEventListener("load", function () {
+        toy_visualization_loaded = true;
+        update_ui_async();
+    });
+    document.getElementById("main-content-container").append(toySvgElement);
 
     // paste the help pages into the html
     document.getElementById("riscv-help").innerHTML = riscvDocumentation;
@@ -212,8 +211,11 @@ window.addEventListener("DOMContentLoaded", function () {
         manual_run = true;
         editor.save();
         disable_editor();
-        evaluatePython_step_sim();
-        //update_performance_metrics();
+        if (selected_isa === "riscv") {
+            evaluatePython_step_sim();
+        } else if (selected_isa === "toy") {
+            evaluatePython_toy_single_step();
+        }
         enable_run();
         disable_pause();
         enable_step();
@@ -242,6 +244,9 @@ window.addEventListener("DOMContentLoaded", function () {
         enable_run();
         disable_pause();
         enable_step();
+        if (selected_isa == "toy") {
+            enable_double_step();
+        }
         enable_pipeline_switch();
         enable_isa_switch();
         clearTimeout(input_timer);
@@ -272,21 +277,27 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             if (selected_isa === "toy") {
                 hideCurrentVisualization();
+                destroyCurrentIsaElements();
+                insertRiscvElements();
+
+                document.getElementById(
+                    "button-visualization-id"
+                ).style.display = "none";
+
+                selected_isa = "riscv";
+                refresh_button();
+
+                document.getElementById("help-heading-id").textContent =
+                    "RISC-V";
+                document.getElementById("riscv-help").style.display = "block";
+                document.getElementById("toy-help").style.display = "none";
+
+                document.getElementById("button_SingleStage").disabled = false;
+                document.getElementById("button_5-Stage").disabled = false;
+                document.getElementById(
+                    "pipeline-mode-heading-id"
+                ).style.color = "black";
             }
-            document.getElementById("button-visualization-id").style.display =
-                "none";
-
-            selected_isa = "riscv";
-            refresh_button();
-
-            document.getElementById("help-heading-id").textContent = "RISC-V";
-            document.getElementById("riscv-help").style.display = "block";
-            document.getElementById("toy-help").style.display = "none";
-
-            document.getElementById("button_SingleStage").disabled = false;
-            document.getElementById("button_5-Stage").disabled = false;
-            document.getElementById("pipeline-mode-heading-id").style.color =
-                "black";
         });
 
     document
@@ -294,26 +305,34 @@ window.addEventListener("DOMContentLoaded", function () {
         .addEventListener("click", () => {
             if (selected_isa === "riscv") {
                 hideCurrentVisualization();
+                destroyCurrentIsaElements();
+                insertToyElements();
+
+                selected_isa = "toy";
+                document
+                    .getElementById("mem_button_decimal_representation_id")
+                    .click();
+                refresh_button();
+
+                document.getElementById("help-heading-id").textContent = "Toy";
+                document.getElementById("riscv-help").style.display = "none";
+                document.getElementById("toy-help").style.display = "block";
+
+                hazard_detection = true;
+                if (document.getElementById("button_5-Stage").checked) {
+                    document.getElementById("button_SingleStage").click();
+                }
+                document.getElementById("button_SingleStage").disabled = true;
+                document.getElementById("button_5-Stage").disabled = true;
+                document.getElementById(
+                    "pipeline-mode-heading-id"
+                ).style.color = "grey";
+
+                document.getElementById(
+                    "button-visualization-id"
+                ).style.display = "inline-block";
+                document.getElementById("button-visualization-id").click();
             }
-
-            selected_isa = "toy";
-            refresh_button();
-
-            document.getElementById("help-heading-id").textContent = "Toy";
-            document.getElementById("riscv-help").style.display = "none";
-            document.getElementById("toy-help").style.display = "block";
-
-            hazard_detection = true;
-            if (document.getElementById("button_5-Stage").checked) {
-                document.getElementById("button_SingleStage").click();
-            }
-            document.getElementById("button_SingleStage").disabled = true;
-            document.getElementById("button_5-Stage").disabled = true;
-            document.getElementById("pipeline-mode-heading-id").style.color =
-                "grey";
-
-            document.getElementById("button-visualization-id").style.display =
-                "inline-block";
         });
 
     // register representation button listeners
@@ -321,28 +340,28 @@ window.addEventListener("DOMContentLoaded", function () {
         .getElementById("reg_button_binary_representation_id")
         .addEventListener("click", () => {
             reg_representation_mode = binary_representation;
-            evaluatePython_update_tables();
+            update_ui_async();
         });
 
     document
         .getElementById("reg_button_decimal_representation_id")
         .addEventListener("click", () => {
             reg_representation_mode = decimal_representation;
-            evaluatePython_update_tables();
+            update_ui_async();
         });
 
     document
         .getElementById("reg_button_signed_decimal_representation_id")
         .addEventListener("click", () => {
             reg_representation_mode = signed_decimal_representation;
-            evaluatePython_update_tables();
+            update_ui_async();
         });
 
     document
         .getElementById("reg_button_hexa_representation_id")
         .addEventListener("click", () => {
             reg_representation_mode = hexa_representation;
-            evaluatePython_update_tables();
+            update_ui_async();
         });
 
     // memory representation button listeners
@@ -350,28 +369,28 @@ window.addEventListener("DOMContentLoaded", function () {
         .getElementById("mem_button_binary_representation_id")
         .addEventListener("click", () => {
             mem_representation_mode = binary_representation;
-            evaluatePython_update_tables();
+            update_ui_async();
         });
 
     document
         .getElementById("mem_button_decimal_representation_id")
         .addEventListener("click", () => {
             mem_representation_mode = decimal_representation;
-            evaluatePython_update_tables();
+            update_ui_async();
         });
 
     document
         .getElementById("mem_button_hexa_representation_id")
         .addEventListener("click", () => {
             mem_representation_mode = hexa_representation;
-            evaluatePython_update_tables();
+            update_ui_async();
         });
 
     document
         .getElementById("mem_button_signed_decimal_representation_id")
         .addEventListener("click", () => {
             mem_representation_mode = signed_decimal_representation;
-            evaluatePython_update_tables();
+            update_ui_async();
         });
 
     // pipeline mode button listeners
@@ -386,6 +405,7 @@ window.addEventListener("DOMContentLoaded", function () {
             );
             document.getElementById("button-visualization-id").style.display =
                 "none";
+            hideCurrentVisualization();
             disable_hazard_detection();
         });
 
@@ -399,6 +419,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
         document.getElementById("button-visualization-id").style.display =
             "inline-block";
+        document.getElementById("button-visualization-id").click();
         enable_hazard_detection();
     });
 
@@ -812,8 +833,22 @@ function getCurrentVisualization() {
     }
 }
 
+/**
+ * Hides the visualization for the current isa.
+ */
 function hideCurrentVisualization() {
     getCurrentVisualization().style.display = "none";
     document.getElementById("button-visualization-id").textContent =
         "Visualization Off";
+}
+
+/**
+ * Removes the isa specific elements of the currently selected isa. This does not include the visualization svg.
+ */
+function destroyCurrentIsaElements() {
+    if (selected_isa === "riscv") {
+        destroyRiscvElements();
+    } else if (selected_isa === "toy") {
+        destroyToyElements();
+    }
 }

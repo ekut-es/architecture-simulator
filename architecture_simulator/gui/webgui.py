@@ -18,6 +18,7 @@ from architecture_simulator.uarch.riscv.pipeline_registers import (
     RegisterWritebackPipelineRegister,
 )
 from architecture_simulator.uarch.riscv.pipeline import InstructionExecutionException
+from architecture_simulator.isa.toy.toy_instructions import ToyInstruction
 
 simulation: Optional[Simulation] = None
 first_refresh: bool = True
@@ -184,31 +185,76 @@ def parse_input(instr: str):
     # reset the whole simulation because there might be things like a data section that also modify the data memory
     # so resetting the instruction memory is not enough
     simulation = reset_sim()
-    archsim_js.remove_all_highlights()
+    selected_isa = archsim_js.get_selected_isa()
+    if selected_isa == "riscv":
+        archsim_js.remove_all_highlights()
     try:
         simulation.load_program(instr)
-        archsim_js.remove_all_highlights()
         if not first_refresh:
             archsim_js.set_output(Settings().get()["default_no_error_output"])
         first_refresh = False
     except ParserException as Parser_Exception:
         archsim_js.set_output(Parser_Exception.__repr__())
-        archsim_js.highlight(
-            Parser_Exception.line_number, str=Parser_Exception.__repr__()
-        )
+        if selected_isa == "riscv":
+            archsim_js.highlight(
+                Parser_Exception.line_number, str=Parser_Exception.__repr__()
+            )
     update_ui()
 
 
 def update_ui():
     """Updates all UI elements based on the current simulation and architectural state."""
-    update_tables()
-    if archsim_js.get_riscv_visualization_loaded():
-        update_IF_Stage()
-        update_ID_Stage()
-        update_EX_Stage()
-        update_MEM_Stage()
-        update_WB_Stage()
-        update_visualization()
+    selected_isa = archsim_js.get_selected_isa()
+    if selected_isa == "riscv":
+        update_tables()
+        if archsim_js.get_riscv_visualization_loaded():
+            update_IF_Stage()
+            update_ID_Stage()
+            update_EX_Stage()
+            update_MEM_Stage()
+            update_WB_Stage()
+            update_visualization()
+    elif selected_isa == "toy":
+        update_toy_tables()
+        if archsim_js.get_toy_visualization_loaded():
+            update_toy_visualization()
+
+
+def update_toy_visualization():
+    global simulation
+    if simulation is None:
+        raise StateNotInitializedError()
+    if isinstance(simulation, ToySimulation):
+        archsim_js.update_toy_visualization(get_toy_svg_update_values(simulation))
+
+
+def update_toy_tables():
+    """Updates the accu and the memory table for toy"""
+    if isinstance(simulation, ToySimulation):
+        # accu
+        accu_representation = simulation.state.get_accu_representation()
+        archsim_js.toyUpdateAccu(accu_representation)
+
+        # memory table
+        archsim_js.toyClearMemoryTable()
+        representations = simulation.state.memory.memory_repr()
+        for address, value_representations in sorted(representations.items()):
+            if address <= simulation.state.max_pc:
+                instruction_representation = str(
+                    ToyInstruction.from_integer(int(value_representations[1]))
+                )
+            else:
+                instruction_representation = "-"
+            is_current_instruction = (
+                simulation.state.address_of_current_instruction is not None
+                and address == simulation.state.address_of_current_instruction
+            )
+            archsim_js.toyUpdateMemoryTable(
+                "0x{:03X}".format(address),
+                value_representations,
+                instruction_representation,
+                is_current_instruction,
+            )
 
 
 def update_tables():
@@ -226,30 +272,7 @@ def update_tables():
     archsim_js.clear_memory_table()
     archsim_js.clear_instruction_table()
 
-    if isinstance(simulation, ToySimulation):
-        # register table
-        accu_representation = simulation.state.get_accu_representation()
-        archsim_js.update_register_table(0, accu_representation, "ACCU")
-
-        # instruction table
-        for address, cmd in sorted(
-            simulation.state.instruction_memory.instructions.items(),
-            key=lambda item: item[0],
-        ):
-            stage = (
-                "Single" if address == simulation.state.previous_program_counter else ""
-            )
-            archsim_js.update_instruction_table(hex(address), cmd.__repr__(), stage)
-
-        # memory table
-        representations = simulation.state.data_memory.memory_repr()
-        for address, address_value in sorted(
-            representations.items(),
-            key=lambda item: item[0],
-        ):
-            archsim_js.update_memory_table(hex(address), address_value)
-
-    elif isinstance(simulation, RiscvSimulation):
+    if isinstance(simulation, RiscvSimulation):
         # register table
         representations = simulation.state.register_file.reg_repr()
         for reg_i, reg_val in sorted(
@@ -561,4 +584,213 @@ def update_visualization():
         archsim_js.update_visualization(
             pc_plus_imm_or_pc_plus_instruction_length,
             pc_plus_imm_or_pc_plus_instruction_length_or_ALU_result,
+        )
+
+
+from architecture_simulator.isa.toy.toy_micro_program import MicroProgram
+from architecture_simulator.isa.toy.toy_instructions import ToyInstruction, ZRO, LDA
+
+
+def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str | bool]]:
+    """Take a Toy simulation and return all information needed to update the svg.
+
+    Args:
+        sim (ToySimulation): ToySimulation object
+
+    Returns:
+        list[tuple[str, str, str | bool]]: each tuple is [svg-id, what update function to use, argument for update function (str | bool)].
+            They can be one of ("<id>","highlight", <bool>), ("<id>", "write", "<content>"), ("<id>", "show", <bool>)
+    """
+
+    result: list[tuple[str, str, str | bool]] = []
+    loaded_instruction = sim.state.loaded_instruction
+    visualisation_values = sim.state.visualisation_values
+    control_unit_values: list[bool]
+
+    if sim.next_cycle == 2:
+        if loaded_instruction is not None:
+            control_unit_values = MicroProgram.get_mp_values(type(loaded_instruction))
+        else:
+            control_unit_values = [False for i in range(12)]
+    else:
+        control_unit_values = MicroProgram.second_half_micro_program
+
+    # Arrows:
+    result.append(("path-accu-pc-accu-is-zero", "highlight", visualisation_values.jump))
+    result.append(
+        (
+            "path-accu-alu",
+            "highlight",
+            visualisation_values.alu_out is not None
+            and not type(loaded_instruction) in [LDA, ZRO],
+        )
+    )
+    result.append(
+        (
+            "path-alu-junction",
+            "highlight",
+            visualisation_values.alu_out is not None,
+        )
+    )
+    result.append(
+        ("path-junction-accu", "highlight", control_unit_values[5])
+    )  # 5 -> SET[ACCU]
+    result.append(
+        ("path-junction-ram", "highlight", control_unit_values[0])
+    )  # 0 -> WRITE[RAM]
+    result.append(
+        ("path-opcode-control-unit", "highlight", loaded_instruction is not None)
+    )
+    result.append(
+        (
+            "path-instaddress-junction",
+            "highlight",
+            (visualisation_values.ram_out is not None or visualisation_values.jump)
+            and not control_unit_values[4],
+        )
+    )
+    result.append(("path-junction-pc", "highlight", visualisation_values.jump))
+    result.append(
+        (
+            "path-junction-multiplexer",
+            "highlight",
+            visualisation_values.ram_out is not None and not control_unit_values[4],
+        )
+    )  # 4 -> SET[IR]
+    result.append(
+        ("path-pc-multiplexer", "highlight", control_unit_values[4])
+    )  # 4 -> SET[IR]
+    result.append(
+        (
+            "path-multiplexer-ram",
+            "highlight",
+            visualisation_values.ram_out is not None,
+        )
+    )
+    result.append(
+        (
+            "path-ram-junction",
+            "highlight",
+            visualisation_values.ram_out is not None,
+        )
+    )
+    result.append(
+        (
+            "path-junction-alu",
+            "highlight",
+            visualisation_values.ram_out is not None
+            and visualisation_values.alu_out is not None,
+        )
+    )
+    result.append(
+        ("path-junction-ir", "highlight", control_unit_values[4])
+    )  # 4 -> SET[IR]
+
+    # Text:
+    if loaded_instruction is not None:
+        result.append(("text-mnemonic", "write", loaded_instruction.mnemonic))
+        result.append(("text-opcode", "write", str(loaded_instruction.op_code_value())))
+        result.append(
+            ("text-address", "write", str(loaded_instruction.address_section_value()))
+        )
+    else:
+        for name in ["text-mnemonic", "text-opcode", "text-address"]:
+            result.append((name, "write", ""))
+    result.append(("text-program-counter", "write", str(sim.state.program_counter)))
+    alu_out = visualisation_values.alu_out
+    ram_out = visualisation_values.ram_out
+    result.append(
+        ("text-alu-out", "write", str(alu_out) if alu_out is not None else "")
+    )
+    result.append(
+        ("text-ram-out", "write", str(ram_out) if ram_out is not None else "")
+    )
+    result.append(("text-accu", "write", str(sim.state.accu)))
+
+    # Textblocks over Arrows:
+    old_opcode = visualisation_values.op_code_old
+    result.append(("group-old-opcode-and-mnemonic", "show", old_opcode is not None))
+    if old_opcode is not None:  # do not remove is not None
+        result.append(
+            (
+                "text-old-opcode-and-mnemonic",
+                "write",
+                str(old_opcode)
+                + " "
+                + ToyInstruction.from_integer(old_opcode << 12).mnemonic,
+            )
+        )
+    else:
+        result.append(("text-old-opcode-and-mnemonic", "write", ""))
+
+    old_pc = visualisation_values.pc_old
+    result.append(("group-old-pc", "show", old_pc is not None))
+    if old_pc is not None:  # do not remove is not None
+        result.append(("text-old-pc", "write", str(old_pc)))
+    else:
+        result.append(("text-old-pc", "write", ""))
+
+    old_accu = visualisation_values.accu_old
+    result.append(("group-old-accu", "show", old_accu is not None))
+    if old_accu is not None:  # do not remove is not None
+        result.append(("text-old-accu", "write", str(old_accu)))
+    else:
+        result.append(("text-old-accu", "write", ""))
+
+    # Control Unit:
+    control_unit_names = [
+        "write-ram",
+        "inc-pc",
+        "set-pc",
+        "addr-ir",
+        "set-ir",
+        "set-accu",
+        "alucin",
+        "alumode",
+        "alu3",
+        "alu2",
+        "alu1",
+        "alu0",
+    ]
+    for name, value in zip(control_unit_names, control_unit_values):
+        result.append(("path-control-unit-" + name, "highlight", value))
+        result.append(("text-" + name, "highlight", value))
+
+    return result
+
+
+def toy_get_next_cycle():
+    """
+    Returns:
+        int: 1 or 2, depending on which cycle has to be executed next
+    """
+    if isinstance(simulation, ToySimulation):
+        return simulation.next_cycle
+
+
+def toy_single_step(program: str):
+    if isinstance(simulation, ToySimulation):
+        # Variable to tell js whether there was an exception
+        exception_flag = False
+
+        # parse the instr json string into a python dict
+        if not simulation.has_instructions():
+            try:
+                simulation.load_program(program)
+            except ParserException as Parser_Exception:
+                archsim_js.set_output(Parser_Exception.__repr__())
+                exception_flag = True
+
+        # step the simulation
+        if simulation.next_cycle == 1:
+            simulation.first_cycle_step()
+        else:
+            simulation.second_cycle_step()
+        simulation_not_ended_flag = not simulation.is_done()
+        update_ui()
+
+        return (
+            str(simulation.get_performance_metrics()),
+            simulation_not_ended_flag,
+            exception_flag,
         )
