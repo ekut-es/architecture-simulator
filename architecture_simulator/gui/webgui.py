@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Any
 import archsim_js
 import pyodide.ffi  # type: ignore
 from architecture_simulator.settings.settings import Settings
@@ -19,7 +19,10 @@ from architecture_simulator.uarch.riscv.pipeline_registers import (
 )
 from architecture_simulator.uarch.riscv.pipeline import InstructionExecutionException
 from architecture_simulator.isa.toy.toy_instructions import ToyInstruction
-from architecture_simulator.gui.toy_svg_directives import get_toy_svg_directives
+from architecture_simulator.gui.toy_svg_directives import (
+    ToySvgDirectives,
+    SvgFillDirectiveControlUnit,
+)
 
 simulation: Optional[Simulation] = None
 first_refresh: bool = True
@@ -597,17 +600,17 @@ from architecture_simulator.isa.toy.toy_instructions import (
 )
 
 
-def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str | bool]]:
+def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, Any]]:
     """Take a Toy simulation and return all information needed to update the svg.
 
     Args:
         sim (ToySimulation): ToySimulation object
 
     Returns:
-        list[tuple[str, str, str | bool]]: each tuple is [svg-id, what update function to use, argument for update function (str | bool)].
+        list[tuple[str, str, str | bool]]: each tuple is [svg-id, what update function to use, argument for update function (Any)].
             They can be one of ("<id>","highlight", <bool>), ("<id>", "write", "<content>"), ("<id>", "show", <bool>)
     """
-    result = get_toy_svg_directives()
+    result = ToySvgDirectives()
     if sim.has_instructions():
         loaded_instruction = sim.state.loaded_instruction
         visualisation_values = sim.state.visualisation_values
@@ -624,83 +627,86 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str | 
             control_unit_values = MicroProgram.second_half_micro_program
 
         # Arrows:
-        result["path-accu-pc-accu-is-zero"][1] = visualisation_values.jump
-        result["path-accu-alu"][
-            1
-        ] = visualisation_values.alu_out is not None and not type(
-            loaded_instruction
-        ) in [
-            LDA,
-            ZRO,
-        ]
-        result["path-alu-junction"][1] = visualisation_values.alu_out is not None
-        result["path-junction-accu"][1] = control_unit_values[5]  # 5 -> SET[ACCU]
-        result["path-junction-ram"][1] = control_unit_values[0]  # 0 -> WRITE[RAM]
-        result["path-opcode-control-unit"][1] = True
-        result["path-instaddress-junction"][1] = (
+        result.path_accu_pc_accu_is_zero.do_highlight = visualisation_values.jump
+        result.path_accu_alu.do_highlight = (
+            visualisation_values.alu_out is not None
+            and not type(loaded_instruction)
+            in [
+                LDA,
+                ZRO,
+            ]
+        )
+        result.path_alu_junction.do_highlight = visualisation_values.alu_out is not None
+        result.path_junction_accu.do_highlight = control_unit_values[
+            5
+        ]  # 5 _> SET[ACCU]
+        result.path_junction_ram.do_highlight = control_unit_values[
+            0
+        ]  # 0 _> WRITE[RAM]
+        result.path_opcode_control_unit.do_highlight = True
+        result.path_instaddress_junction.do_highlight = (
             visualisation_values.ram_out is not None
             or visualisation_values.jump
             or isinstance(loaded_instruction, STO)
         ) and not control_unit_values[4]
-        result["path-junction-pc"][1] = visualisation_values.jump
-        result["path-junction-multiplexer"][1] = (
+        result.path_junction_pc.do_highlight = visualisation_values.jump
+        result.path_junction_multiplexer.do_highlight = (
             visualisation_values.ram_out is not None
             or isinstance(loaded_instruction, STO)
         ) and not control_unit_values[
             4
-        ]  # 4 -> SET[IR]
-        result["path-pc-multiplexer"][1] = control_unit_values[4]  # 4 -> SET[IR]
-        result["path-multiplexer-ram"][
-            1
-        ] = visualisation_values.ram_out is not None or isinstance(
-            loaded_instruction, STO
+        ]  # 4 _> SET[IR]
+        result.path_pc_multiplexer.do_highlight = control_unit_values[4]  # 4 _> SET[IR]
+        result.path_multiplexer_ram.do_highlight = (
+            visualisation_values.ram_out is not None
+            or isinstance(loaded_instruction, STO)
         )
-        result["path-ram-junction"][1] = visualisation_values.ram_out is not None
-        result["path-junction-alu"][1] = (
+        result.path_ram_junction.do_highlight = visualisation_values.ram_out is not None
+        result.path_junction_alu.do_highlight = (
             visualisation_values.ram_out is not None
             and visualisation_values.alu_out is not None
         )
-        result["path-junction-ir"][1] = control_unit_values[4]  # 4 -> SET[IR]
+        result.path_junction_ir.do_highlight = control_unit_values[4]  # 4 _> SET[IR]
 
         # Text:
         if loaded_instruction is not None:
-            result["text-mnemonic"][1] = loaded_instruction.mnemonic
-            result["text-opcode"][1] = str(loaded_instruction.op_code_value())
-            result["text-address"][1] = str(loaded_instruction.address_section_value())
-        result["text-program-counter"][1] = str(sim.state.program_counter)
+            result.text_mnemonic.text = loaded_instruction.mnemonic
+            result.text_opcode.text = str(loaded_instruction.op_code_value())
+            result.text_address.text = str(loaded_instruction.address_section_value())
+        result.text_program_counter.text = str(sim.state.program_counter)
         alu_out = visualisation_values.alu_out
         ram_out = visualisation_values.ram_out
-        result["text-alu-out"][1] = str(alu_out) if alu_out is not None else ""
-        result["group-alu-out"][1] = alu_out is not None
-        result["text-ram-out"][1] = str(ram_out) if ram_out is not None else ""
-        result["text-accu"][1] = str(sim.state.accu)
+        result.text_alu_out.text = str(alu_out) if alu_out is not None else ""
+        result.group_alu_out.text = alu_out is not None
+        result.text_ram_out.text = str(ram_out) if ram_out is not None else ""
+        result.text_accu.text = str(sim.state.accu)
 
         # Textblocks over Arrows:
         old_opcode = visualisation_values.op_code_old
-        result["group-old-opcode-and-mnemonic"][1] = old_opcode is not None
+        result.group_old_opcode_and_mnemonic.do_show = old_opcode is not None
         if old_opcode is not None:  # do not remove is not None
-            result["text-old-opcode-and-mnemonic"][1] = (
+            result.text_old_opcode_and_mnemonic.text = (
                 str(old_opcode)
                 + " "
                 + ToyInstruction.from_integer(old_opcode << 12).mnemonic
             )
         old_pc = visualisation_values.pc_old
-        result["group-old-pc"][1] = old_pc is not None
+        result.group_old_pc.do_show = old_pc is not None
         if old_pc is not None:  # do not remove is not None
-            result["text-old-pc"][1] = str(old_pc)
+            result.text_old_pc.text = str(old_pc)
         old_accu = visualisation_values.accu_old
-        result["group-old-accu"][1] = old_accu is not None
+        result.group_old_accu.do_show = old_accu is not None
         if old_accu is not None:  # do not remove is not None
-            result["text-old-accu"][1] = str(old_accu)
+            result.text_old_accu.text = str(old_accu)
 
         # Control Unit:
         control_unit_names = [
-            "write-ram",
-            "inc-pc",
-            "set-pc",
-            "addr-ir",
-            "set-ir",
-            "set-accu",
+            "write_ram",
+            "inc_pc",
+            "set_pc",
+            "addr_ir",
+            "set_ir",
+            "set_accu",
             "alucin",
             "alumode",
             "alu3",
@@ -709,9 +715,13 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str | 
             "alu0",
         ]
         for name, value in zip(control_unit_names, control_unit_values):
-            result["path-control-unit-" + name][1] = value
-            result["text-" + name][1] = value
-    return [(key, value[0], value[1]) for key, value in result.items()]
+            control_unit_path = getattr(result, "path_control_unit_" + name)
+            control_unit_text = getattr(result, "text_" + name)
+            assert isinstance(control_unit_path, SvgFillDirectiveControlUnit)
+            assert isinstance(control_unit_text, SvgFillDirectiveControlUnit)
+            control_unit_path.do_highlight = value
+            control_unit_text.do_highlight = value
+    return result.export()
 
 
 def toy_get_next_cycle():

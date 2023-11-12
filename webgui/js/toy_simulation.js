@@ -93,20 +93,7 @@ function enable_double_step() {
     ).disabled = false;
 }
 
-function toySvgHighlightPath1(id, doHighlight) {
-    const color = doHighlight ? "#ff3300" : "#5f5f5f";
-    const svg = document.getElementById("toy-visualization").contentDocument;
-    svg.getElementById(id).setAttribute("style", "fill: " + color);
-}
-
-function toySvgHighlightPath2(id, doHighlight) {
-    const color = doHighlight ? "#ff3300" : "#000000";
-    const svg = document.getElementById("toy-visualization").contentDocument;
-    svg.getElementById(id).setAttribute("style", "fill: " + color);
-}
-
-function toySvgHighlightControlUnitSignal(id, doHighlight) {
-    const color = doHighlight ? "#ff3300" : "#000000";
+function toySvgHighlight(id, color) {
     const svg = document.getElementById("toy-visualization").contentDocument;
     svg.getElementById(id).setAttribute("style", "fill: " + color);
 }
