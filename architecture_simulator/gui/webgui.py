@@ -714,6 +714,7 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str | 
     result.append(
         ("text-alu-out", "write", str(alu_out) if alu_out is not None else "")
     )
+    result.append(("group-alu-out", "show", alu_out is not None))
     result.append(
         ("text-ram-out", "write", str(ram_out) if ram_out is not None else "")
     )
