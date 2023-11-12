@@ -19,6 +19,7 @@ from architecture_simulator.uarch.riscv.pipeline_registers import (
 )
 from architecture_simulator.uarch.riscv.pipeline import InstructionExecutionException
 from architecture_simulator.isa.toy.toy_instructions import ToyInstruction
+from architecture_simulator.gui.toy_svg_directives import get_toy_svg_directives
 
 simulation: Optional[Simulation] = None
 first_refresh: bool = True
@@ -607,7 +608,7 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str | 
             They can be one of ("<id>","highlight", <bool>), ("<id>", "write", "<content>"), ("<id>", "show", <bool>)
     """
 
-    result: list[tuple[str, str, str | bool]] = []
+    result = get_toy_svg_directives()
     loaded_instruction = sim.state.loaded_instruction
     visualisation_values = sim.state.visualisation_values
     control_unit_values: list[bool]
@@ -621,134 +622,66 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str | 
         control_unit_values = MicroProgram.second_half_micro_program
 
     # Arrows:
-    result.append(("path-accu-pc-accu-is-zero", "highlight", visualisation_values.jump))
-    result.append(
-        (
-            "path-accu-alu",
-            "highlight",
-            visualisation_values.alu_out is not None
-            and not type(loaded_instruction) in [LDA, ZRO],
-        )
+    result["path-accu-pc-accu-is-zero"][1] = visualisation_values.jump
+    result["path-accu-alu"][1] = visualisation_values.alu_out is not None and not type(
+        loaded_instruction
+    ) in [LDA, ZRO]
+    result["path-alu-junction"][1] = visualisation_values.alu_out is not None
+    result["path-junction-accu"][1] = control_unit_values[5]  # 5 -> SET[ACCU]
+    result["path-junction-ram"][1] = control_unit_values[0]  # 0 -> WRITE[RAM]
+    result["path-opcode-control-unit"][1] = True
+    result["path-instaddress-junction"][1] = (
+        visualisation_values.ram_out is not None
+        or visualisation_values.jump
+        or isinstance(loaded_instruction, STO)
+    ) and not control_unit_values[4]
+    result["path-junction-pc"][1] = visualisation_values.jump
+    result["path-junction-multiplexer"][1] = (
+        visualisation_values.ram_out is not None or isinstance(loaded_instruction, STO)
+    ) and not control_unit_values[
+        4
+    ]  # 4 -> SET[IR]
+    result["path-pc-multiplexer"][1] = control_unit_values[4]  # 4 -> SET[IR]
+    result["path-multiplexer-ram"][
+        1
+    ] = visualisation_values.ram_out is not None or isinstance(loaded_instruction, STO)
+    result["path-ram-junction"][1] = visualisation_values.ram_out is not None
+    result["path-junction-alu"][1] = (
+        visualisation_values.ram_out is not None
+        and visualisation_values.alu_out is not None
     )
-    result.append(
-        (
-            "path-alu-junction",
-            "highlight",
-            visualisation_values.alu_out is not None,
-        )
-    )
-    result.append(
-        ("path-junction-accu", "highlight", control_unit_values[5])
-    )  # 5 -> SET[ACCU]
-    result.append(
-        ("path-junction-ram", "highlight", control_unit_values[0])
-    )  # 0 -> WRITE[RAM]
-    result.append(("path-opcode-control-unit", "highlight", True))
-    result.append(
-        (
-            "path-instaddress-junction",
-            "highlight",
-            (
-                visualisation_values.ram_out is not None
-                or visualisation_values.jump
-                or isinstance(loaded_instruction, STO)
-            )
-            and not control_unit_values[4],
-        )
-    )
-    result.append(("path-junction-pc", "highlight", visualisation_values.jump))
-    result.append(
-        (
-            "path-junction-multiplexer",
-            "highlight",
-            (
-                visualisation_values.ram_out is not None
-                or isinstance(loaded_instruction, STO)
-            )
-            and not control_unit_values[4],
-        )
-    )  # 4 -> SET[IR]
-    result.append(
-        ("path-pc-multiplexer", "highlight", control_unit_values[4])
-    )  # 4 -> SET[IR]
-    result.append(
-        (
-            "path-multiplexer-ram",
-            "highlight",
-            visualisation_values.ram_out is not None
-            or isinstance(loaded_instruction, STO),
-        )
-    )
-    result.append(
-        (
-            "path-ram-junction",
-            "highlight",
-            visualisation_values.ram_out is not None,
-        )
-    )
-    result.append(
-        (
-            "path-junction-alu",
-            "highlight",
-            visualisation_values.ram_out is not None
-            and visualisation_values.alu_out is not None,
-        )
-    )
-    result.append(
-        ("path-junction-ir", "highlight", control_unit_values[4])
-    )  # 4 -> SET[IR]
+    result["path-junction-ir"][1] = control_unit_values[4]  # 4 -> SET[IR]
 
     # Text:
     if loaded_instruction is not None:
-        result.append(("text-mnemonic", "write", loaded_instruction.mnemonic))
-        result.append(("text-opcode", "write", str(loaded_instruction.op_code_value())))
-        result.append(
-            ("text-address", "write", str(loaded_instruction.address_section_value()))
-        )
-    else:
-        for name in ["text-mnemonic", "text-opcode", "text-address"]:
-            result.append((name, "write", ""))
-    result.append(("text-program-counter", "write", str(sim.state.program_counter)))
+        result["text-mnemonic"][1] = loaded_instruction.mnemonic
+        result["text-opcode"][1] = str(loaded_instruction.op_code_value())
+        result["text-address"][1] = str(loaded_instruction.address_section_value())
+    result["text-program-counter"][1] = str(sim.state.program_counter)
     alu_out = visualisation_values.alu_out
     ram_out = visualisation_values.ram_out
-    result.append(
-        ("text-alu-out", "write", str(alu_out) if alu_out is not None else "")
-    )
-    result.append(("group-alu-out", "show", alu_out is not None))
-    result.append(
-        ("text-ram-out", "write", str(ram_out) if ram_out is not None else "")
-    )
-    result.append(("text-accu", "write", str(sim.state.accu)))
+    result["text-alu-out"][1] = str(alu_out) if alu_out is not None else ""
+    result["group-alu-out"][1] = alu_out is not None
+    result["text-ram-out"][1] = str(ram_out) if ram_out is not None else ""
+    result["text-accu"][1] = str(sim.state.accu)
 
     # Textblocks over Arrows:
     old_opcode = visualisation_values.op_code_old
-    result.append(("group-old-opcode-and-mnemonic", "show", old_opcode is not None))
+    result["group-old-opcode-and-mnemonic"][1] = old_opcode is not None
     if old_opcode is not None:  # do not remove is not None
-        result.append(
-            (
-                "text-old-opcode-and-mnemonic",
-                "write",
-                str(old_opcode)
-                + " "
-                + ToyInstruction.from_integer(old_opcode << 12).mnemonic,
-            )
+        result["text-old-opcode-and-mnemonic"][1] = (
+            str(old_opcode)
+            + " "
+            + ToyInstruction.from_integer(old_opcode << 12).mnemonic
         )
-    else:
-        result.append(("text-old-opcode-and-mnemonic", "write", ""))
-
     old_pc = visualisation_values.pc_old
-    result.append(("group-old-pc", "show", old_pc is not None))
+    result["group-old-pc"][1] = old_pc is not None
     if old_pc is not None:  # do not remove is not None
-        result.append(("text-old-pc", "write", str(old_pc)))
-    else:
-        result.append(("text-old-pc", "write", ""))
-
+        result["text-old-pc"][1] = str(old_pc)
     old_accu = visualisation_values.accu_old
-    result.append(("group-old-accu", "show", old_accu is not None))
+    result["group-old-accu"][1] = old_accu is not None
     if old_accu is not None:  # do not remove is not None
-        result.append(("text-old-accu", "write", str(old_accu)))
-    else:
-        result.append(("text-old-accu", "write", ""))
+        result["text-old-accu"][1] = str(old_accu)
 
     # Control Unit:
     control_unit_names = [
@@ -766,10 +699,9 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str | 
         "alu0",
     ]
     for name, value in zip(control_unit_names, control_unit_values):
-        result.append(("path-control-unit-" + name, "highlight", value))
-        result.append(("text-" + name, "highlight", value))
-
-    return result
+        result["path-control-unit-" + name][1] = value
+        result["text-" + name][1] = value
+    return [(key, value[0], value[1]) for key, value in result.items()]
 
 
 def toy_get_next_cycle():
