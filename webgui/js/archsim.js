@@ -282,14 +282,20 @@ const archsim_js = {
             const value = update.get(2);
             console.log(action + ' "' + value + '" ' + id);
             switch (action) {
-                case "highlight":
-                    toy_svg_highlight(id, value);
+                case "highlight-path-1":
+                    toySvgHighlightPath1(id, value);
+                    break;
+                case "highlight-path-2":
+                    toySvgHighlightPath2(id, value);
+                    break;
+                case "highlight-control-unit-signal":
+                    toySvgHighlightControlUnitSignal(id, value);
                     break;
                 case "write":
-                    toy_svg_set_text(id, value);
+                    toySvgSetText(id, value);
                     break;
                 case "show":
-                    toy_svg_show(id, value);
+                    toySvgShow(id, value);
                     break;
             }
             update.destroy();
