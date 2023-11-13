@@ -79,6 +79,7 @@ class TestToySimulation(unittest.TestCase):
         self.assertEqual(simulation.state.accu, 0)
         self.assertEqual(simulation.state.performance_metrics.instruction_count, 13)
         self.assertEqual(simulation.state.performance_metrics.branch_count, 3)
+        self.assertEqual(simulation.state.performance_metrics.cycles, 26)
         self.assertGreater(simulation.state.performance_metrics.get_execution_time(), 0)
 
     def test_program(self):

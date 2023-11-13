@@ -42,6 +42,7 @@ class ToySimulation(Simulation):
             self.state.address_of_next_instruction
         )
         self.state.address_of_next_instruction = int(self.state.program_counter)
+        self.state.performance_metrics.cycles += 1
 
     def second_cycle_step(self):
         """
@@ -70,6 +71,7 @@ class ToySimulation(Simulation):
             self.state.loaded_instruction = None
         self.state.program_counter += MutableUInt16(1)
         self.state.performance_metrics.instruction_count += 1
+        self.state.performance_metrics.cycles += 1
         self.next_cycle = 1
 
     def step(self):
