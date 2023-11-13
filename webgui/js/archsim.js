@@ -274,13 +274,11 @@ const archsim_js = {
         table.rows[position].cells[1].style.backgroundColor = "yellow";
     },
     update_toy_visualization: function (update_values) {
-        console.log("===update_toy_visualization===");
         for (let i = 0; i < update_values.length; i++) {
             const update = update_values.get(i);
             const id = update.get(0);
             const action = update.get(1);
             const value = update.get(2);
-            console.log(action + ' "' + value + '" ' + id);
             switch (action) {
                 case "highlight":
                     toySvgHighlight(id, value);
