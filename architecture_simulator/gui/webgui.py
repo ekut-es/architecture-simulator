@@ -677,7 +677,7 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, Any]]:
         alu_out = visualisation_values.alu_out
         ram_out = visualisation_values.ram_out
         result.text_alu_out.text = str(alu_out) if alu_out is not None else ""
-        result.group_alu_out.text = alu_out is not None
+        result.group_alu_out.do_show = alu_out is not None
         result.text_ram_out.text = str(ram_out) if ram_out is not None else ""
         result.text_accu.text = str(sim.state.accu)
 
