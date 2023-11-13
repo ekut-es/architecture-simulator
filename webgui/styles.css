@@ -17,7 +17,8 @@
 
 /* Control bar */
 
-.control-button > img {
+.control-button > img,
+.control-button > svg {
     width: 25px;
     height: 25px;
 }
