@@ -22,6 +22,10 @@
     height: 25px;
 }
 
+.control-button:disabled {
+    background-color: #aaaaaa !important;
+}
+
 nav {
     background-color: var(--bs-secondary-bg);
 }
