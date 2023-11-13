@@ -72,6 +72,9 @@ function destroyToyElements() {
     document.getElementById("button-double-step-simulation-id").remove();
 }
 
+/**
+ * Executes the first cycle step and the second cycle step.
+ */
 function doubleStep() {
     is_run_simulation = false;
     manual_run = true;
@@ -83,26 +86,47 @@ function doubleStep() {
     enable_step();
 }
 
+/**
+ * Disables the double step button.
+ */
 function disable_double_step() {
     document.getElementById("button-double-step-simulation-id").disabled = true;
 }
 
+/**
+ * Enables the double step button.
+ */
 function enable_double_step() {
     document.getElementById(
         "button-double-step-simulation-id"
     ).disabled = false;
 }
 
+/**
+ * Sets the fill color of an element.
+ * @param {string} id target id.
+ * @param {string} color hex color string.
+ */
 function toySvgHighlight(id, color) {
     const svg = document.getElementById("toy-visualization").contentDocument;
     svg.getElementById(id).setAttribute("style", "fill: " + color);
 }
 
+/**
+ * Sets the text content of an element.
+ * @param {string} id target id.
+ * @param {string} text text to set as the content of the element.
+ */
 function toySvgSetText(id, text) {
     const svg = document.getElementById("toy-visualization").contentDocument;
     svg.getElementById(id).textContent = text;
 }
 
+/**
+ * Shows or hides an element.
+ * @param {string} id target id.
+ * @param {boolean} doShow Whether to show the element (display: block). Else it will be hidden (display: none)
+ */
 function toySvgShow(id, doShow) {
     const display = doShow ? "block" : "none";
     const svg = document.getElementById("toy-visualization").contentDocument;

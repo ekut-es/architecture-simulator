@@ -2,9 +2,12 @@ from typing import Any
 
 
 class ToySvgDirectives:
-    def __init__(self):
-        self.path_accu_pc_accu_is_zero = SvgFillDirectiveAlt()
+    """A Class that holds all the SvgDirectives for the Toy SVG."""
 
+    def __init__(self):
+        # Path with different fill color.
+        self.path_accu_pc_accu_is_zero = SvgFillDirectiveAlt()
+        # All the normal paths.
         self.path_accu_alu = SvgFillDirectiveMain()
         self.path_alu_junction = SvgFillDirectiveMain()
         self.path_junction_accu = SvgFillDirectiveMain()
@@ -18,24 +21,24 @@ class ToySvgDirectives:
         self.path_ram_junction = SvgFillDirectiveMain()
         self.path_junction_alu = SvgFillDirectiveMain()
         self.path_junction_ir = SvgFillDirectiveMain()
-
+        # Normal Text fields.
         self.text_mnemonic = SvgWriteDirective()
         self.text_opcode = SvgWriteDirective()
         self.text_address = SvgWriteDirective()
         self.text_program_counter = SvgWriteDirective()
         self.text_ram_out = SvgWriteDirective()
         self.text_accu = SvgWriteDirective()
-
+        # Groups for the text fields above paths to show or hide.
         self.group_old_opcode_and_mnemonic = SvgShowDirective()
         self.group_old_pc = SvgShowDirective()
         self.group_old_accu = SvgShowDirective()
         self.group_alu_out = SvgShowDirective()
-
+        # Text fields for the above groups.
         self.text_old_opcode_and_mnemonic = SvgWriteDirective()
         self.text_old_pc = SvgWriteDirective()
         self.text_old_accu = SvgWriteDirective()
         self.text_alu_out = SvgWriteDirective()
-
+        # Control unit signal paths and texts to highlight.
         self.path_control_unit_write_ram = SvgFillDirectiveControlUnit()
         self.text_write_ram = SvgFillDirectiveControlUnit()
         self.path_control_unit_inc_pc = SvgFillDirectiveControlUnit()
@@ -62,6 +65,15 @@ class ToySvgDirectives:
         self.text_alu0 = SvgFillDirectiveControlUnit()
 
     def export(self) -> list[tuple[str, str, Any]]:
+        """Exports all SvgDirectives into a format that the front end understands.
+
+        Note: It will take all the SvgDirective attributes of the object.
+        The name of the attribute has to be the id, except underscores will be replaced by dashes.
+
+        Returns:
+            list[tuple[str, str, Any]]: each tuple is [svg-id, what update function to use, argument for update function (Any)].
+            They can be one of ("<id>","highlight", <#hexcolor>), ("<id>", "write", <content>), ("<id>", "show", <bool>)
+        """
         result: list[tuple[str, str, Any]] = []
         for key, value in vars(self).items():
             if isinstance(value, SvgDirective):
@@ -70,33 +82,73 @@ class ToySvgDirectives:
 
 
 class SvgDirective:
+    """Base class for SVG Directives which tell the front end how to manipulate the svg."""
+
     def export(self, id: str) -> tuple[str, str, Any]:
+        """Creates a tuple of the directive that the front end can understand.
+
+        Args:
+            id (str): The id to target.
+
+        Returns:
+            tuple[str, str, Any]: Tuple of (<id>, <action>, <value>)
+        """
         raise NotImplementedError()
 
 
 class SvgWriteDirective(SvgDirective):
+    """SVG Directive for changing text."""
+
     def __init__(self):
         self.text = ""
 
     def export(self, id: str) -> tuple[str, str, str]:
+        """Creates a tuple of the directive that the front end can understand.
+
+        Args:
+            id (str): The id to target.
+
+        Returns:
+            tuple[str, str, str]: Tuple of (<id>, write, <value>)
+        """
         return (id, "write", self.text)
 
 
 class SvgShowDirective(SvgDirective):
+    """SVG Directive for showing/hiding an element."""
+
     def __init__(self):
         self.do_show = False
 
     def export(self, id: str) -> tuple[str, str, bool]:
+        """Creates a tuple of the directive that the front end can understand.
+
+        Args:
+            id (str): The id to target.
+
+        Returns:
+            tuple[str, str, bool]: Tuple of (<id>, show, <value>)
+        """
         return (id, "show", self.do_show)
 
 
 class SvgFillDirective(SvgDirective):
+    """SVG Fill Directive base class. The colors for highlighting are set here."""
+
     def __init__(self, color_on: str, color_off: str):
         self._color_on = color_on
         self._color_off = color_off
         self.do_highlight = False
 
     def export(self, id: str) -> tuple[str, str, str]:
+        """Creates a tuple of the directive that the front end can understand.
+
+        Args:
+            id (str): The id to target.
+
+        Returns:
+            tuple[str, str, str]: Tuple of (<id>, highlight, <#hexccolor>)
+        """
         return (
             id,
             "highlight",
@@ -105,15 +157,21 @@ class SvgFillDirective(SvgDirective):
 
 
 class SvgFillDirectiveMain(SvgFillDirective):
+    """SVG Fill Directive for normal paths."""
+
     def __init__(self):
         super().__init__(color_on="#ff3300", color_off="#5f5f5f")
 
 
 class SvgFillDirectiveAlt(SvgFillDirective):
+    """SVG Fill Directive for secondary paths."""
+
     def __init__(self):
         super().__init__(color_on="#ff3300", color_off="#000000")
 
 
 class SvgFillDirectiveControlUnit(SvgFillDirective):
+    """SVG Fill Directive for the control unit signals."""
+
     def __init__(self):
         super().__init__(color_on="#ff3300", color_off="#000000")

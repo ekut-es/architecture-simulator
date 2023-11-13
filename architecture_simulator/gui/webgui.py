@@ -607,8 +607,8 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, Any]]:
         sim (ToySimulation): ToySimulation object
 
     Returns:
-        list[tuple[str, str, str | bool]]: each tuple is [svg-id, what update function to use, argument for update function (Any)].
-            They can be one of ("<id>","highlight", <bool>), ("<id>", "write", "<content>"), ("<id>", "show", <bool>)
+        list[tuple[str, str, Any]]: each tuple is [svg-id, what update function to use, argument for update function (Any)].
+            They can be one of ("<id>","highlight", <#hexcolor>), ("<id>", "write", <content>), ("<id>", "show", <bool>)
     """
     result = ToySvgDirectives()
     if sim.has_instructions():
@@ -733,29 +733,37 @@ def toy_get_next_cycle():
         return simulation.next_cycle
 
 
-def toy_single_step(program: str):
-    if isinstance(simulation, ToySimulation):
-        # Variable to tell js whether there was an exception
-        exception_flag = False
+def toy_single_step(program: str) -> tuple[str, bool, bool]:
+    """Executes a single cycle of the toy simulation.
 
-        # parse the instr json string into a python dict
-        if not simulation.has_instructions():
-            try:
-                simulation.load_program(program)
-            except ParserException as Parser_Exception:
-                archsim_js.set_output(Parser_Exception.__repr__())
-                exception_flag = True
+    Args:
+        program (str): Text program. Will be loaded if no instructions have been loaded yet.
 
-        # step the simulation
-        if simulation.next_cycle == 1:
-            simulation.first_cycle_step()
-        else:
-            simulation.second_cycle_step()
-        simulation_not_ended_flag = not simulation.is_done()
-        update_ui()
+    Returns:
+        tuple[str, bool, bool]: Tuple of (performance metrics string, whether the simulation has not yet finished, whether there was an exception)
+    """
+    assert isinstance(simulation, ToySimulation)
+    # Variable to tell js whether there was an exception
+    exception_flag = False
 
-        return (
-            str(simulation.get_performance_metrics()),
-            simulation_not_ended_flag,
-            exception_flag,
-        )
+    # parse the instr json string into a python dict
+    if not simulation.has_instructions():
+        try:
+            simulation.load_program(program)
+        except ParserException as Parser_Exception:
+            archsim_js.set_output(Parser_Exception.__repr__())
+            exception_flag = True
+
+    # step the simulation
+    if simulation.next_cycle == 1:
+        simulation.first_cycle_step()
+    else:
+        simulation.second_cycle_step()
+    simulation_not_ended_flag = not simulation.is_done()
+    update_ui()
+
+    return (
+        str(simulation.get_performance_metrics()),
+        simulation_not_ended_flag,
+        exception_flag,
+    )
