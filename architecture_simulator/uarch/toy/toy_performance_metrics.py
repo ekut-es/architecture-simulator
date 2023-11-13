@@ -5,6 +5,7 @@ from ..performance_metrics import PerformanceMetrics
 @dataclass
 class ToyPerformanceMetrics(PerformanceMetrics):
     branch_count: int = 0
+    cycles: int = 0
 
     def __repr__(self):
         execution_time = self.get_execution_time()
@@ -17,5 +18,6 @@ class ToyPerformanceMetrics(PerformanceMetrics):
                 f"instructions per second: {instructions_per_second:.2f}\n"
             )
         representation += f"instructions: {self.instruction_count} \n"
+        representation += f"cycles: {self.cycles}\n"
         representation += f"branches: {self.branch_count}\n"
         return representation
