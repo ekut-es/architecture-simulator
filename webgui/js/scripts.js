@@ -45,7 +45,7 @@ window.addEventListener("DOMContentLoaded", function () {
         const urlParams = new URLSearchParams(window.location.search);
         const isaParam = urlParams.get("isa");
         if (isaParam !== null) {
-            preferred_isa = isaParam;
+            preferred_isa = isaParam.toLowerCase();
         }
 
         if (preferred_isa === "riscv") {
