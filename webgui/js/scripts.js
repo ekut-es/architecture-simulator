@@ -35,13 +35,20 @@ window.addEventListener("DOMContentLoaded", function () {
         steps_per_interval = settings.steps_per_interval;
         parse_sim_after_not_typing_for_n_ms = settings.autoparse_delay;
 
-        selected_isa = settings.default_isa;
+        // do NOT directly manipulate selected_isa because things the riscv elements wont get destroyed otherwise
+        let preferred_isa = settings.default_isa;
         reg_representation_mode = settings.default_register_representation;
         mem_representation_mode = settings.default_memory_representation;
         pipeline_mode = settings.default_pipeline_mode;
         hazard_detection = settings.hazard_detection;
 
-        if (selected_isa === "riscv") {
+        const urlParams = new URLSearchParams(window.location.search);
+        const isaParam = urlParams.get("isa");
+        if (isaParam !== null) {
+            preferred_isa = isaParam;
+        }
+
+        if (preferred_isa === "riscv") {
             document.getElementById("isa_button_riscv_id").click();
             if (pipeline_mode === "single_stage_pipeline") {
                 document.getElementById("button_SingleStage").click();
@@ -51,7 +58,7 @@ window.addEventListener("DOMContentLoaded", function () {
                     document.getElementById("button_HazardDetection").click();
                 }
             }
-        } else if (selected_isa === "toy") {
+        } else if (preferred_isa === "toy") {
             document.getElementById("isa_button_toy_id").click();
         }
 
