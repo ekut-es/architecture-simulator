@@ -67,6 +67,18 @@ function getRiscvMemoryTable() {
 }
 
 /**
+ * @returns {Node} A Node containing the output field.
+ */
+function getRiscvOutputField() {
+    return createNode(html`<div
+        id="riscv-output-container-id"
+        class="main-content-column height-100"
+    >
+        <div id="output-field-id"></div>
+    </div>`);
+}
+
+/**
  * Inserts all of RISC-V's custom elements into the DOM.
  */
 function insertRiscvElements() {
@@ -75,7 +87,8 @@ function insertRiscvElements() {
         .after(
             getRiscvInstructionTable(),
             getRiscvRegisterTable(),
-            getRiscvMemoryTable()
+            getRiscvMemoryTable(),
+            getRiscvOutputField()
         );
     document.getElementById("page-heading-id").innerText = "RISC-V Simulator";
     document.title = "RISC-V Simulator";
@@ -88,4 +101,5 @@ function destroyRiscvElements() {
     document.getElementById("riscv-register-table-container-id").remove();
     document.getElementById("riscv-memory-table-container-id").remove();
     document.getElementById("riscv-instruction-table-container-id").remove();
+    document.getElementById("riscv-output-container-id").remove();
 }

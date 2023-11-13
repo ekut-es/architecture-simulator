@@ -1,4 +1,3 @@
-const output = document.getElementById("output-field-id");
 const input = document.getElementById("input");
 
 var previous_pc = 0;
@@ -14,7 +13,8 @@ var previous_memory = {};
  * @param {string} s -  string to paste to the output field.
  */
 function addToOutput(s) {
-    output.value += ">>>" + input.value + "\n" + s + "\n";
+    const output = document.getElementById("output-field-id");
+    output.innerText += ">>>" + input.value + "\n" + s + "\n";
     output.scrollTop = output.scrollHeight;
 }
 
@@ -209,7 +209,8 @@ const archsim_js = {
      * @param {string} str - string to set the output field to.
      */
     set_output: function (str) {
-        output.value = str;
+        const output = document.getElementById("output-field-id");
+        output.innerText = str;
     },
     /**
      * Highlights a line in the text editor and displays the given message as hint.
@@ -929,7 +930,8 @@ async function main() {
 from architecture_simulator.gui.webgui import *
 sim_init()
     `);
-    output.value += "Ready!\n";
+    const output = document.getElementById("output-field-id");
+    output.innerText += "Ready!\n";
     stop_loading_visuals();
     return pyodide;
 }
@@ -1027,7 +1029,8 @@ async function update_performance_metrics() {
 }
 
 function set_output_message(str) {
-    output.value = str;
+    const output = document.getElementById("output-field-id");
+    output.innerText = str;
 }
 
 /**
@@ -1045,7 +1048,7 @@ async function evaluatePython_reset_sim(pipeline_mode) {
         previous_pc = 0; // resets the PC for the visualization
         reset_sim = pyodide.globals.get("reset_sim");
         reset_sim();
-        output.value = "";
+        set_output_message("");
     } catch (err) {
         addToOutput(err);
     }

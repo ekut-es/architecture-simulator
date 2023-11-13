@@ -3,12 +3,12 @@
  */
 function getMemoryAndAccuColumn() {
     return createNode(html`<div
-        id="toy-accu-memory-container-id"
+        id="toy-main-text-container-id"
         class="main-content-column"
     >
-        <div>
+        <div class="mb-3">
             <table
-                class="table table-sm table-hover table-bordered mono-table mb-3"
+                class="table table-sm table-hover table-bordered mono-table mb-0"
             >
                 <thead>
                     <tr>
@@ -18,7 +18,7 @@ function getMemoryAndAccuColumn() {
                 </thead>
             </table>
         </div>
-        <div style="overflow: scroll;">
+        <div class="mb-3" style="overflow: scroll;">
             <table
                 class="table table-sm table-hover table-bordered mono-table mb-0"
             >
@@ -31,6 +31,9 @@ function getMemoryAndAccuColumn() {
                 </thead>
                 <tbody id="toy-memory-table-body-id"></tbody>
             </table>
+        </div>
+        <div id="toy-output-container-id">
+            <div id="output-field-id"></div>
         </div>
     </div>`);
 }
@@ -68,7 +71,7 @@ function insertToyElements() {
  * Removes all of TOY's custom elements from the DOM.
  */
 function destroyToyElements() {
-    document.getElementById("toy-accu-memory-container-id").remove();
+    document.getElementById("toy-main-text-container-id").remove();
     document.getElementById("button-double-step-simulation-id").remove();
 }
 

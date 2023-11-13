@@ -112,6 +112,13 @@ nav {
     text-align: right;
 }
 
+#output-field-id {
+    background-color: #e9ecef;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5em;
+    padding: 1em;
+}
+
 /* Visualization */
 
 #riscv-visualization,
