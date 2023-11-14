@@ -1,19 +1,20 @@
 # computes the sum of the numbers from 1 to n
-# result gets saved in MEM[1025]
-Loopcount = 0x400
-Result = 0x401
-:0x400:20 # enter n here
 
-LDA Loopcount # skip to the end if n=0
-BRZ end
-loop:
-    LDA Result
-    ADD Loopcount
-    STO Result
-    LDA Loopcount
-    DEC
-    STO Loopcount
+.data
+    n: .word 10 # enter n here
+    result: .word 0
+
+.text
+    LDA n # skip to the end if n=0
     BRZ end
-    ZRO
-    BRZ loop
-end:
+    loop:
+        LDA result
+        ADD n
+        STO result
+        LDA n
+        DEC
+        STO n
+        BRZ end
+        ZRO
+        BRZ loop
+    end:

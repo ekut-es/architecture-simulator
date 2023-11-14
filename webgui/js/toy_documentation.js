@@ -118,81 +118,117 @@ const toyDocumentation = html` <div class="container-fluid">
     <p>Comments start with a <code>#</code>.</p>
     <pre class="bg-light"># This is a comment</pre>
 
-    <h2>Labels and variables</h2>
+    <h2>Labels</h2>
     <p>
-        Labels and variables are both names that can be used instead of
-        addresses.<br />
+        Labels are names that can be used instead of addresses.<br />
         Labels reference a position in the program and are used as destination
-        addresses for branch instructions. They are declared by typing the name
-        of the label, followed by a colon.<br />
-        Variables can be manually set to reference an arbitrary address and they
-        are used to point to a memory location. They are declared by typing the
-        name of the variable, followed by an equals sign and the desired
-        address. Note that variables will be processed once before the execution
-        of the program. They can be referenced everywhere in the program and you
-        cannot reassign a variable name.
+        addresses for branch instructions or to reference an instruction. They
+        are declared by typing the name of the label, followed by a colon. Note
+        that indenting the following code section is optional.<br />
     </p>
     <pre class="bg-light">
 loop:
-    LDA counter
+    LDA 0x400
     DEC
-    STO counter
+    STO 0x400
     BRZ end
     ZRO
     BRZ loop
 end:
-
-counter=0x400</pre
+</pre
     >
 
-    <h2>Data write directives</h2>
-    <p>
-        It is possible to write data to the data memory before the execution of
-        the program with data write directives. To create such a directive, type
-        a colon, followed by an address, then another colon and the desired
-        value. Note that data write directives are also processed exactly once
-        before the execution of the program, just like variables. The data will
-        not be written to the memory every time the program "steps over a line"
-        containing a data write directive.
-    </p>
+    <h2>Segments and variables</h2>
+    In addition to the program code, the simulator supports a data segment. It
+    can be used to store variables and arrays in the processor's memory.<br />
+
+    In order to define a data segment, the
+    <code>.data</code> directive is used, while the <code>.text</code> directive
+    designates the code segment. <br />
+    The following example demonstrates how to declare and use variables and
+    arrays: <br />
+    <br />
     <pre class="bg-light">
-:0x400:25
-:1025:0xFF
-LDA 0x400
-...</pre
+.data
+    my_array: .word 7, 0x00F, 3 # my_array points to the address of the first element of the array
+    my_var: .word 7
+    my_result: .word 0
+.text
+    # check if the first element of my_array is equal to my_var and store result in my_result
+    LDA my_array
+    SUB my_var
+    BRZ true
+    ZRO
+    BRZ end
+    true:
+        INC
+        STO my_result
+    end:</pre
     >
-
-    <h2>Instruction and data memory</h2>
     <p>
-        This simulator uses separate data and instruction memories. By default,
-        the instruction memory uses addresses from 0 to 1023, while the data
-        memory uses addresses from 1024 to 4095. That means that you can only
-        use up to 1024 instructions and load and store instructions can only use
-        addresses that lie within the data memory. That also means that it is
-        not possible to alter the instruction memory "at runtime".
+        Note that similarly to labels, indentation is optional. <br />
+        If no directives are given, the entire input is interpreted as code.<br />
+        Similarly, if a <code>.data</code> but no <code>.text</code> directive
+        is given, every line before the data segment is interpreted as code.
+        <br />
+        There is no fixed segmentation order. However, declaring multiple
+        segments of the same type will throw an error.
+    </p>
+    <h2>Memory</h2>
+    <p>
+        The simulator uses one memory of 4096 16 bit words for instructions and
+        data.<br />
+        Instructions get written to the beginning of the memory space. They can
+        be modified "at runtime" (see Examples).<br />
+        Any value in the memory can be interpreted as an instruction. To still
+        know when to stop, we use the last instruction written in the code
+        editor. If the program counter gets higher, the simulation will stop.<br />
+        Variables and arrays get written to the end of the memory (the first
+        variable declared will have the highest memory address). Note that the
+        elements of an array still get written in ascending order.
     </p>
 
     <h2>Examples</h2>
+
+    <h4>Example 1:</h4>
     <pre class="bg-light">
 # computes the sum of the numbers from 1 to n
-# result gets saved in MEM[1025]
-Loopcount = 0x400
-Result = 0x401
-:0x400:20 # enter n here
 
-LDA Loopcount # skip to the end if n=0
-BRZ end
-loop:
-    LDA Result
-    ADD Loopcount
-    STO Result
-    LDA Loopcount
-    DEC
-    STO Loopcount
+.data
+    n: .word 10 # enter n here
+    result: .word 0
+
+.text
+    LDA n # skip to the end if n=0
     BRZ end
-    ZRO
-    BRZ loop
-end:
+    loop:
+        LDA result
+        ADD n
+        STO result
+        LDA n
+        DEC
+        STO n
+        BRZ end
+        ZRO
+        BRZ loop
+    end:
+</pre
+    >
+    <h4>Example 2:</h4>
+    <pre class="bg-light">
+# store second value of my_tuple in my_value
+
+.data
+    my_tuple: .word 3, 4
+    my_value: .word 0
+
+.text
+    LDA my_load_instruction     # load 'LDA my_tuple' (LDA 0xFFE) into accu
+    INC                         # increment address in LDA instruction
+    STO my_load_instruction     # store 'LDA 0xFFF' at my_load_instruction
+    my_load_instruction:        # this label points to the memory location of LDA instruction
+    LDA my_tuple                # actually load data at my_tuple + 1 (=0xFFF)
+    STO my_value                # store value of second tuple entry at my_value (0xFFD)
 </pre
     >
 </div>`;
