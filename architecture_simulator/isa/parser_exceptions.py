@@ -79,3 +79,13 @@ class ParserVariableException(ParserException):
 
     def __repr__(self) -> str:
         return f"Variable {self.name} is not defined in line {self.line_number}: {self.line}"
+
+
+@dataclass
+class MemorySizeException(Exception):
+    """An exception that can be raised when there is not enough memory space to write all instructions and data to memory."""
+
+    size_in_words: int
+
+    def __repr__(self) -> str:
+        return f"There is not enough space to write all instructions and data to memory. The memory size is only {str(self.size_in_words)} words."

@@ -242,6 +242,9 @@ def update_toy_tables():
         # memory table
         archsim_js.toyClearMemoryTable()
         representations = simulation.state.memory.memory_repr()
+        if simulation.state.max_pc is None:
+            return
+
         for address, value_representations in sorted(representations.items()):
             if address <= simulation.state.max_pc:
                 instruction_representation = str(
