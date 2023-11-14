@@ -51,12 +51,6 @@ nav {
     display: none;
 }
 
-/* Main Content */
-
-#main-content-container {
-    background-color: var(--main-bg-color);
-}
-
 /* Text Content Area */
 
 .mono-table {
@@ -67,10 +61,12 @@ nav {
     text-align: center;
 }
 
-#text-content-container {
-    border: 0.1em solid darkgrey;
-    border-radius: 0.5em;
+#text-content-container,
+#visualizations-container-id > object {
     padding: 1em;
+}
+
+#text-content-container {
     overflow-x: scroll;
 }
 
@@ -87,14 +83,18 @@ nav {
 }
 
 #codemirror-container {
-    min-width: 25em;
+    min-width: 10em;
     max-width: 60em;
     flex-grow: 1;
 }
 
+.CodeMirror {
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.5em;
+}
+
 .main-content-column {
     flex-shrink: 0;
-    flex-grow: 1;
     margin: 0 var(--content-margin);
     overflow-y: scroll;
 }
@@ -121,10 +121,7 @@ nav {
 }
 
 .toy-current-cycle {
-    /* font-size: 0.6em; */
     padding: 0em 0.2em;
-    color: white;
-    background-color: #0d6efd;
     border-radius: 0.3em;
 }
 
@@ -132,16 +129,13 @@ nav {
 
 #riscv-visualization,
 #toy-visualization {
-    max-width: 60%;
+    height: 100%;
+    width: 100%;
     display: none;
-    margin-left: var(--content-margin);
 }
 
 /* Modals */
-.modal-content {
+.modal-header,
+.modal-footer {
     background-color: var(--main-accent-color);
-}
-
-.modal-body {
-    background-color: var(--main-bg-color);
 }
