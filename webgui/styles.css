@@ -87,14 +87,13 @@ nav {
 }
 
 #codemirror-container {
-    min-width: 25em;
+    min-width: 10em;
     max-width: 60em;
     flex-grow: 1;
 }
 
 .main-content-column {
     flex-shrink: 0;
-    flex-grow: 1;
     margin: 0 var(--content-margin);
     overflow-y: scroll;
 }
@@ -132,9 +131,9 @@ nav {
 
 #riscv-visualization,
 #toy-visualization {
-    max-width: 60%;
+    height: 100%;
+    width: 100%;
     display: none;
-    margin-left: var(--content-margin);
 }
 
 /* Modals */

@@ -12,6 +12,7 @@
             crossorigin="anonymous"
         />
         <link rel="stylesheet" href="styles.css" />
+        <link rel="stylesheet" href="splitjs.css" />
     </head>
     <body>
         <!--Header-->
@@ -123,13 +124,6 @@
                 <!--Buttons on the right side-->
                 <div class="col-auto ms-auto">
                     <button
-                        id="button-visualization-id"
-                        class="btn btn-sm btn-secondary"
-                        onclick="toggleVisualizationTabContent()"
-                    >
-                        Visualization Off
-                    </button>
-                    <button
                         id="button-settings-id"
                         class="btn btn-sm control-button"
                         title="settings"
@@ -143,14 +137,10 @@
         </nav>
 
         <!--Main Content-->
-        <div
-            id="main-content-container"
-            class="d-flex justify-content-between py-3 px-3"
-            role="main"
-        >
+        <div id="main-content-container" class="split py-3 px-3" role="main">
             <div
                 id="text-content-container"
-                class="d-flex justify-content-between flex-grow-1"
+                class="d-flex justify-content-between"
             >
                 <!--Text Editor-->
                 <div
@@ -220,6 +210,7 @@
                     <div id="output-field-id"></div>
                 </div>
             </div>
+            <div id="visualizations-container-id"></div>
         </div>
 
         <!--Help Modal-->
@@ -529,6 +520,7 @@
             type="text/javascript"
             src="https://cdn.jsdelivr.net/pyodide/v0.22.1/full/pyodide.js"
         ></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.0/split.min.js"></script>
         <script type="text/javascript" src="js/util.js"></script>
         <script type="text/javascript" src="js/riscv_documentation.js"></script>
         <script type="text/javascript" src="js/toy_documentation.js"></script>
