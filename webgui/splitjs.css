@@ -4,7 +4,7 @@
 }
 
 .gutter {
-    background-color: #eee;
+    background-color: var(--bs-secondary-bg);
     background-repeat: no-repeat;
     background-position: 50%;
 }

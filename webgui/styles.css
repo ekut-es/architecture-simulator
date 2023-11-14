@@ -1,6 +1,7 @@
 :root {
     --main-accent-color: #252d73;
     --main-bg-color: #f5f5f5;
+    --main-border-color: #a9a9a9;
     --content-margin: 1em;
 }
 /* Header */
@@ -25,6 +26,7 @@
 
 nav {
     background-color: var(--bs-secondary-bg);
+    border-bottom: 1px solid var(--main-border-color);
 }
 
 #button-run-simulation-id {
@@ -51,12 +53,6 @@ nav {
     display: none;
 }
 
-/* Main Content */
-
-#main-content-container {
-    background-color: var(--main-bg-color);
-}
-
 /* Text Content Area */
 
 .mono-table {
@@ -67,10 +63,12 @@ nav {
     text-align: center;
 }
 
-#text-content-container {
-    border: 0.1em solid darkgrey;
-    border-radius: 0.5em;
+#text-content-container,
+#visualizations-container-id > object {
     padding: 1em;
+}
+
+#text-content-container {
     overflow-x: scroll;
 }
 
@@ -90,6 +88,11 @@ nav {
     min-width: 10em;
     max-width: 60em;
     flex-grow: 1;
+}
+
+.CodeMirror {
+    border: 1px solid var(--main-border-color);
+    border-radius: 0.5em;
 }
 
 .main-content-column {
@@ -137,10 +140,7 @@ nav {
 }
 
 /* Modals */
-.modal-content {
+.modal-header,
+.modal-footer {
     background-color: var(--main-accent-color);
-}
-
-.modal-body {
-    background-color: var(--main-bg-color);
 }

@@ -854,7 +854,6 @@ function createSplit() {
             ["#text-content-container", "#visualizations-container-id"],
             {
                 minSize: 0,
-                snapOffset: 100,
                 sizes: [35, 65],
             }
         );
