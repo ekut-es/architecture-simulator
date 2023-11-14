@@ -43,7 +43,7 @@ def toyUpdateMemoryTable(
     address: str,
     value_representations: tuple,
     instruction_representation: str,
-    is_current_instruction: bool,
+    cycle: str,
 ) -> None: ...
 def toyClearMemoryTable() -> None: ...
 def update_toy_visualization(

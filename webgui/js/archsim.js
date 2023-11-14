@@ -39,13 +39,13 @@ const archsim_js = {
      * @param {string} address The memory address
      * @param value_representations A Python Tuple containing the representations (binary, unsigned decimal, hexadecimal, signed decimal) for one value in the memory.
      * @param {string} instruction_representation The instruction the value represents.
-     * @param {boolean} is_current_instruction Whether this entry is the current instruction. This will be marked in the table.
+     * @param {string} cycle The cycle the instruction is currently in ("1" or "2"). An empty string will not display anything.
      */
     toyUpdateMemoryTable: function (
         address,
         value_representations,
         instruction_representation,
-        is_current_instruction
+        cycle
     ) {
         value_representations_array = Array.from(value_representations);
         const value = value_representations_array[mem_representation_mode];
@@ -62,8 +62,13 @@ const archsim_js = {
             previous_memory[address] = value_representations_array[1];
             cell2.style.backgroundColor = "yellow";
         }
-        if (is_current_instruction) {
-            cell1.innerHTML = instructionArrow + cell1.innerHTML;
+        if (cycle !== "") {
+            cell1.innerHTML = html`<span
+                    class="toy-current-cycle"
+                    title="cycle ${cycle}"
+                    >${cycle + instructionArrow}</span
+                >
+                ${cell1.innerHTML}`;
         }
     },
     get_selected_isa: function () {
