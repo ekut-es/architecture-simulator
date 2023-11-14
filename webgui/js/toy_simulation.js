@@ -4,7 +4,7 @@
 function getMemoryAndAccuColumn() {
     return createNode(html`<div
         id="toy-main-text-container-id"
-        class="main-content-column"
+        class="main-content-column d-flex flex-column"
     >
         <div class="mb-3">
             <table
