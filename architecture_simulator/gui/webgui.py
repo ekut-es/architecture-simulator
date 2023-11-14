@@ -253,11 +253,12 @@ def update_toy_tables():
                 simulation.state.address_of_current_instruction is not None
                 and address == simulation.state.address_of_current_instruction
             )
+            current_cycle = "1" if simulation.next_cycle == 2 else "2"
             archsim_js.toyUpdateMemoryTable(
                 "0x{:03X}".format(address),
                 value_representations,
                 instruction_representation,
-                is_current_instruction,
+                current_cycle if is_current_instruction else "",
             )
 
 
