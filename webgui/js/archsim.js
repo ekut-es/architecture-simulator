@@ -64,7 +64,7 @@ const archsim_js = {
         }
         if (cycle !== "") {
             cell1.innerHTML = html`<span
-                    class="toy-current-cycle"
+                    class="toy-current-cycle text-light bg-dark"
                     title="cycle ${cycle}"
                     >${cycle + instructionArrow}</span
                 >
