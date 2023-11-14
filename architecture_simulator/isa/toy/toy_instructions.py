@@ -17,7 +17,7 @@ class ToyInstruction(Instruction):
 
     length: int = 1
 
-    def __init__(self, **kwargs):
+    def __init__(self, address=0, **kwargs):
         """"""
         """NOTE: I use **kwargs here because otherwise, the parser has to create objects from the 'class objects'.
         Since it only knows if the instruction it is currently looking at is an AddressTypeInstruction or a
@@ -27,6 +27,7 @@ class ToyInstruction(Instruction):
         if-case for each instruction), go ahead and change this."""
         self.mnemonic = kwargs["mnemonic"].upper()
         self.opcode = int(kwargs["opcode"]) % 16
+        self.address = address % 4096
 
     def __repr__(self):
         return self.mnemonic.upper()
@@ -46,7 +47,7 @@ class ToyInstruction(Instruction):
         Returns:
             int: machine code
         """
-        return self.opcode << 12
+        return (self.opcode << 12) + self.address
 
     def __int__(self) -> int:
         return self.to_integer()
@@ -108,15 +109,15 @@ class ToyInstruction(Instruction):
         elif opcode == 7:
             return XOR(address)
         elif opcode == 8:
-            return NOT()
+            return NOT(address)
         elif opcode == 9:
-            return INC()
+            return INC(address)
         elif opcode == 10:
-            return DEC()
+            return DEC(address)
         elif opcode == 11:
-            return ZRO()
+            return ZRO(address)
         else:
-            return NOP()
+            return NOP(address)
 
 
 class AddressTypeInstruction(ToyInstruction):
@@ -133,9 +134,6 @@ class AddressTypeInstruction(ToyInstruction):
         if isinstance(other, AddressTypeInstruction):
             return super().__eq__(other) and self.address == other.address
         return False
-
-    def to_integer(self):
-        return (self.opcode << 12) + self.address
 
 
 class STO(AddressTypeInstruction):
@@ -249,8 +247,8 @@ class XOR(AddressTypeInstruction):
 
 
 class NOT(ToyInstruction):
-    def __init__(self):
-        super().__init__(mnemonic="NOT", opcode=8)
+    def __init__(self, address=0) -> None:
+        super().__init__(mnemonic="NOT", opcode=8, address=address)
 
     def behavior(self, state: ToyArchitecturalState):
         """ACCU = ~ACCU"""
@@ -261,8 +259,8 @@ class NOT(ToyInstruction):
 
 
 class INC(ToyInstruction):
-    def __init__(self):
-        super().__init__(mnemonic="INC", opcode=9)
+    def __init__(self, address=0) -> None:
+        super().__init__(mnemonic="INC", opcode=9, address=address)
 
     def behavior(self, state: ToyArchitecturalState):
         """ACCU += 1"""
@@ -274,8 +272,8 @@ class INC(ToyInstruction):
 
 
 class DEC(ToyInstruction):
-    def __init__(self):
-        super().__init__(mnemonic="DEC", opcode=10)
+    def __init__(self, address=0) -> None:
+        super().__init__(mnemonic="DEC", opcode=10, address=address)
 
     def behavior(self, state: ToyArchitecturalState):
         """ACCU -= 1"""
@@ -287,8 +285,8 @@ class DEC(ToyInstruction):
 
 
 class ZRO(ToyInstruction):
-    def __init__(self) -> None:
-        super().__init__(mnemonic="ZRO", opcode=11)
+    def __init__(self, address=0) -> None:
+        super().__init__(mnemonic="ZRO", opcode=11, address=address)
 
     def behavior(self, state: ToyArchitecturalState):
         """ACCU = 0"""
@@ -297,8 +295,8 @@ class ZRO(ToyInstruction):
 
 
 class NOP(ToyInstruction):
-    def __init__(self) -> None:
-        super().__init__(mnemonic="NOP", opcode=12)
+    def __init__(self, address=0) -> None:
+        super().__init__(mnemonic="NOP", opcode=12, address=address)
 
     def behavior(self, state: ToyArchitecturalState):
         """no operation"""

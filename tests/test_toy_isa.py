@@ -321,3 +321,13 @@ class TestToyInstructions(unittest.TestCase):
             [bool(i) for i in [1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1]],
         )
         self.assertFalse(MicroProgram.get_mp_var_value(type(STO(12)), "set[accu]"))
+
+    def test_address_on_non_address_instructions(self):
+        test_number = 0xA00F  # INC
+        self.assertEqual(int(ToyInstruction.from_integer(test_number)), test_number)
+
+        test_number = 0x3ABC  # ADD 0xABC
+        self.assertEqual(ToyInstruction.from_integer(test_number), ADD(0xABC))
+
+        with self.assertRaises(TypeError):
+            STO()
