@@ -79,22 +79,22 @@ class TestToySimulation(unittest.TestCase):
         self.assertEqual(simulation.state.accu, 0)
         self.assertEqual(simulation.state.performance_metrics.instruction_count, 13)
         self.assertEqual(simulation.state.performance_metrics.branch_count, 3)
+        self.assertEqual(simulation.state.performance_metrics.cycles, 26)
         self.assertGreater(simulation.state.performance_metrics.get_execution_time(), 0)
 
     def test_program(self):
         simulation = ToySimulation()
         program = """    # computes the sum of the numbers from 1 to n
     # result gets saved in MEM[1025]
-    Loopcount = 0x400
-    Result = 0x401
-    :0x400:20 # enter n here
-
+    .data
+    Loopcount: .word 20 # enter n here
+    .text
     LDA Loopcount # skip to the end if n=0
     BRZ end
     loop:
-        LDA Result
+        LDA 0x401
         ADD Loopcount
-        STO Result
+        STO 0x401
         LDA Loopcount
         DEC
         STO Loopcount
@@ -132,8 +132,9 @@ INC"""
         sim = ToySimulation()
         sim.load_program(
             """
-            num = 0x400
-            :0x400:11
+            .data
+            num: .word 11
+            .text
             LDA num
             INC
             DEC
@@ -145,7 +146,7 @@ INC"""
             """
         )
         self.assertEqual(sim.state.visualisation_values.alu_out, None)
-        self.assertEqual(sim.state.visualisation_values.ram_out, int(LDA(0x400)))
+        self.assertEqual(sim.state.visualisation_values.ram_out, int(LDA(0xFFF)))
         self.assertEqual(sim.state.visualisation_values.jump, False)
         # LDA
         sim.first_cycle_step()

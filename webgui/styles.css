@@ -17,7 +17,8 @@
 
 /* Control bar */
 
-.control-button > img {
+.control-button > img,
+.control-button > svg {
     width: 25px;
     height: 25px;
 }
@@ -54,12 +55,6 @@ nav {
     display: none;
 }
 
-/* Main Content */
-
-#main-content-container {
-    background-color: var(--main-bg-color);
-}
-
 /* Text Content Area */
 
 .mono-table {
@@ -70,10 +65,12 @@ nav {
     text-align: center;
 }
 
-#text-content-container {
-    border: 0.1em solid darkgrey;
-    border-radius: 0.5em;
+#text-content-container,
+#visualizations-container-id > object {
     padding: 1em;
+}
+
+#text-content-container {
     overflow-x: scroll;
 }
 
@@ -90,14 +87,18 @@ nav {
 }
 
 #codemirror-container {
-    min-width: 25em;
+    min-width: 10em;
     max-width: 60em;
     flex-grow: 1;
 }
 
+.CodeMirror {
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.5em;
+}
+
 .main-content-column {
     flex-shrink: 0;
-    flex-grow: 1;
     margin: 0 var(--content-margin);
     overflow-y: scroll;
 }
@@ -116,20 +117,29 @@ nav {
     text-align: right;
 }
 
+#output-field-id {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5em;
+    padding: 1em;
+}
+
+.toy-current-cycle {
+    padding: 0em 0.2em;
+    border-radius: 0.3em;
+}
+
 /* Visualization */
 
 #riscv-visualization,
 #toy-visualization {
-    max-width: 60%;
+    height: 100%;
+    width: 100%;
     display: none;
-    margin-left: var(--content-margin);
 }
 
 /* Modals */
-.modal-content {
+.modal-header,
+.modal-footer {
     background-color: var(--main-accent-color);
-}
-
-.modal-body {
-    background-color: var(--main-bg-color);
 }

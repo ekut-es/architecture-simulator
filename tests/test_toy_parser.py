@@ -15,6 +15,15 @@ from architecture_simulator.uarch.toy.toy_architectural_state import (
     ToyArchitecturalState,
 )
 
+from architecture_simulator.simulation.toy_simulation import ToySimulation
+
+from architecture_simulator.isa.parser_exceptions import (
+    ParserDirectiveException,
+    ParserDataSyntaxException,
+    ParserSyntaxException,
+    DuplicateLabelException,
+)
+
 
 class TestToyParser(unittest.TestCase):
     def test_sanitize(self):
@@ -91,23 +100,26 @@ class TestToyParser(unittest.TestCase):
     def test_write_data(self):
         parser = ToyParser()
         state = ToyArchitecturalState()
-        program = """ADD 0x400
-        SUB 1025
-        :1025:30
-        :0x1400:0x1000F # test for overflow
-        ADD 1025
+        program = """
+        .data
+        num1: .word 30
+        num2: .word 0x1000F # test for overflow
+        .text
+        ADD 0x400
+        SUB num1
+        ADD num1
         #:13141:11111"""
         parser.parse(program=program, state=state)
-        self.assertEqual(state.memory.read_halfword(1025), 30)
-        self.assertEqual(state.memory.read_halfword(1024), 15)
+        self.assertEqual(state.memory.read_halfword(4095), 30)
+        self.assertEqual(state.memory.read_halfword(4094), 15)
         self.assertEqual(
             ToyInstruction.from_integer(int(state.memory.read_halfword(0))), ADD(1024)
         )
         self.assertEqual(
-            ToyInstruction.from_integer(int(state.memory.read_halfword(1))), SUB(1025)
+            ToyInstruction.from_integer(int(state.memory.read_halfword(1))), SUB(4095)
         )
         self.assertEqual(
-            ToyInstruction.from_integer(int(state.memory.read_halfword(2))), ADD(1025)
+            ToyInstruction.from_integer(int(state.memory.read_halfword(2))), ADD(4095)
         )
 
     def test_labels(self):
@@ -123,20 +135,6 @@ class TestToyParser(unittest.TestCase):
         parser.parse(program=program, state=state)
         expected = {0: ADD(0), 1: INC(), 2: BRZ(0), 3: STO(2)}
 
-    def test_variables(self):
-        parser = ToyParser()
-        state = ToyArchitecturalState()
-        program = """_test = 0x400
-        test2 = 22
-        INC
-        sto _test
-        add _test
-        sto test2
-        lol:
-        brz lol"""
-        parser.parse(program=program, state=state)
-        expected = {0: INC(), 1: STO(1024), 2: ADD(1024), 3: STO(22), 4: BRZ(4)}
-
     def test_load_instructions(self):
         parser = ToyParser()
         state = ToyArchitecturalState()
@@ -145,3 +143,81 @@ class TestToyParser(unittest.TestCase):
         parser.parse(program, state)
         self.assertEqual(state.max_pc, 1)
         self.assertEqual(state.loaded_instruction, INC())
+
+    def test_data_section(self):
+        sim = ToySimulation()
+        program = """
+        .data
+        arr_ptr: .word 1, 0x002, 3, 0x004, 5
+        arr_len: .word 5
+        sum: .word 0
+        .text
+        loop:
+        LDA sum # add array element to sum
+        add_instr:
+        ADD arr_ptr
+        STO sum
+        LDA add_instr # inc array element address
+        INC
+        STO add_instr
+        LDA arr_len # check if done?
+        DEC
+        STO arr_len
+        BRZ end
+        ZRO
+        BRZ loop
+        end:
+        NOP
+        """
+        sim.load_program(program)
+        state = sim.state
+        self.assertEqual(state.memory.read_halfword(4090), 5)
+        sim.run()
+        self.assertEqual(state.memory.read_halfword(4091), 1)
+        self.assertEqual(state.memory.read_halfword(4092), 2)
+        self.assertEqual(state.memory.read_halfword(4093), 3)
+        self.assertEqual(state.memory.read_halfword(4094), 4)
+        self.assertEqual(state.memory.read_halfword(4095), 5)
+        self.assertEqual(state.memory.read_halfword(4090), 0)
+        self.assertEqual(state.memory.read_halfword(4089), 15)
+
+        program = """
+        #comment
+        .data
+        p_1: .word 11 #comment
+        p_2: .word 12, 13, 0x00E, 0x00F
+        p_3: .word 16
+        #comment
+        """
+        sim.load_program(program)
+        state = sim.state
+        self.assertEqual(state.memory.read_halfword(4095), 11)
+        self.assertEqual(state.memory.read_halfword(4094), 15)
+        self.assertEqual(state.memory.read_halfword(4093), 14)
+        self.assertEqual(state.memory.read_halfword(4092), 13)
+        self.assertEqual(state.memory.read_halfword(4091), 12)
+        self.assertEqual(state.memory.read_halfword(4090), 16)
+
+        with self.assertRaises(ParserDataSyntaxException):
+            sim.load_program(".data \n INC")
+
+        with self.assertRaises(ParserDirectiveException):
+            sim.load_program(".data \n .text \n .text \n")
+
+        with self.assertRaises(ParserSyntaxException):
+            sim.load_program(".ljksadflkj \n")
+
+        with self.assertRaises(ParserSyntaxException):
+            sim.load_program(".data label: .word")
+
+        with self.assertRaises(ParserSyntaxException):
+            sim.load_program(".ljksadflkj \n")
+
+        with self.assertRaises(DuplicateLabelException):
+            sim.load_program("label:\n .data\n label: .word 0")
+
+        with self.assertRaises(DuplicateLabelException):
+            sim.load_program(".data\n label: .word 0\n label: .word 0")
+
+        # Does not raise a exception:
+        sim.load_program("INC\nINC\n.data\n addr: .word 0")

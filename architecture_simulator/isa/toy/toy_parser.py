@@ -8,6 +8,9 @@ from ..parser_exceptions import (
     ParserSyntaxException,
     ParserLabelException,
     DuplicateLabelException,
+    ParserDirectiveException,
+    ParserDataSyntaxException,
+    MemorySizeException,
 )
 from architecture_simulator.uarch.toy.SvgVisValues import SvgVisValues
 
@@ -36,30 +39,31 @@ class ToyParser:
         "mnemonic"
     )
 
-    _pattern_write_data = (
-        ":" + _pattern_value("address") + ":" + _pattern_value("value")
-    )
-
     _pattern_label_declaration = _pattern_label("label") + ":"
 
-    _pattern_variable_declaration = (
-        _pattern_label("label") + "=" + _pattern_value("value")
+    _directives = ["text", "data"]
+    _type_directives = ["word"]
+
+    _DOT = pp.Literal(".")
+    _D_COL = pp.Literal(":").suppress()
+
+    _pattern_directive = pp.Group(_DOT + pp.oneOf(_directives)("directive"))
+    _pattern_type_directive = pp.Group(_DOT + pp.oneOf(_type_directives)("type"))
+
+    _pattern_variable_declaration = pp.Group(
+        _pattern_label("name")
+        + _D_COL
+        + _pattern_type_directive("type")
+        + pp.delimitedList(_pattern_value, delim=",")("values")
     )
 
     _pattern_line = (
-        _pattern_address_instruction
-        ^ _pattern_no_address_instruction
-        ^ _pattern_write_data("write_data")
-        ^ _pattern_label_declaration("label_declaration")
+        _pattern_directive
         ^ _pattern_variable_declaration("variable_declaration")
+        ^ _pattern_address_instruction
+        ^ _pattern_no_address_instruction
+        ^ _pattern_label_declaration("label_declaration")
     ) + pp.StringEnd().suppress()
-
-    # def __init__(self):
-    #     #self.state: ToyArchitecturalState
-    #     self.program: str = ""
-    #     #self.sanitized_program: list[int, str] = []
-    #     self.token_list: list[int, str, pp.ParseResults] = []
-    #     self.labels: dict[str, int] = {}
 
     def parse(self, program: str, state: ToyArchitecturalState):
         """Parses the text format assembly program and loads it into the architectural state.
@@ -75,9 +79,10 @@ class ToyParser:
         self.program = program
         self._sanitize()
         self._tokenize()
-        self._process_labels_and_variables()
-        self._load_instructions()
+        self._segment()
+        self._process_labels()
         self._write_data()
+        self._load_instructions()
 
     def _sanitize(self):
         """Removes leading/trailing whitespaces, empty lines, comments from self.program. Gives each line a linenumber (starting at 1). Stores the result in self.sanitized_program."""
@@ -105,8 +110,55 @@ class ToyParser:
             except pp.ParseException:
                 raise ParserSyntaxException(line_number=linenumber, line=line)
 
-    def _process_labels_and_variables(self):
-        """Takes the variables and computes the addresses for the labels from self.token_list and stores both in self.labels."""
+    def _segment(self) -> None:
+        """Determines the segments of the program (data and text) and stores them in self.data and self.text."""
+
+        self.data: list[tuple[int, str, pp.ParseResults]] = []
+        self.text: list[tuple[int, str, pp.ParseResults]] = []
+
+        if self.token_list == []:
+            return
+
+        data_exists = False
+        text_exists = True
+        self.text = self.token_list
+
+        # first line is segment directive
+        if not isinstance(self.token_list[0][2][0], str):
+            # [0] -> first element in list, [2] -> ParseResult, [0] -> outer layer of parse result
+            if self.token_list[0][2][0].get("directive") == "data":
+                data_exists = True
+                text_exists = False
+                self.data = self.token_list[1:]
+                self.text = []
+            elif self.token_list[0][2][0].get("directive") == "text":
+                self.text = self.token_list[1:]
+
+        for line_number, line, line_parsed in self.token_list[1:]:
+            if isinstance(line_parsed[0], str):
+                continue
+            line_parsed[0].get("directive")
+            if line_parsed[0].get("directive") == "data":
+                if not data_exists:
+                    data_exists = True
+                    index = self.text.index((line_number, line, line_parsed))
+                    self.data = self.text[index + 1 :]
+                    self.text = self.text[:index]
+                else:
+                    raise ParserDirectiveException(line_number=line_number, line=line)
+            elif line_parsed[0].get("directive") == "text":
+                if not text_exists:
+                    text_exists = True
+                    index = self.data.index((line_number, line, line_parsed))
+                    self.text = self.data[index + 1 :]
+                    self.data = self.data[:index]
+                else:
+                    raise ParserDirectiveException(line_number=line_number, line=line)
+            elif line_parsed.get("directive") is not None:
+                raise ParserDirectiveException(line_number=line_number, line=line)
+
+    def _process_labels(self):
+        """Takes the labels and computes the addresses for the labels from self.token_list and stores both in self.labels."""
         program_counter = 0
         self.labels = {}
         for line_number, line, tokens in self.token_list:
@@ -117,19 +169,45 @@ class ToyParser:
                     line=line,
                     line_number=line_number,
                 )
-            elif tokens.get_name() == "variable_declaration":
-                value = self._value_to_int(tokens.value)
-                self._add_label_mapping(
-                    label=tokens.label, value=value, line=line, line_number=line_number
-                )
             elif tokens.mnemonic:  # if it is an instruction
                 program_counter += 1
+
+    def _write_data(self) -> None:
+        """Looks for data write commands in self.data. Stores the variables in self.labels and writes them to the memory of self.state."""
+
+        self.last_address_not_used_by_data = max(self.state.memory.address_range)
+
+        for line_number, line, line_parsed in self.data:
+            if isinstance(line_parsed, str) or (
+                line_parsed.get_name() != "variable_declaration"
+            ):
+                raise ParserDataSyntaxException(line_number=line_number, line=line)
+            else:
+                values_to_write = line_parsed[0].get("values")
+                self.last_address_not_used_by_data -= len(values_to_write)
+                write_address = self.last_address_not_used_by_data + 1
+                if write_address < 0:
+                    raise MemorySizeException(max(self.state.memory.address_range) + 1)
+                self._add_label_mapping(
+                    label=line_parsed[0].get("name"),
+                    value=write_address,
+                    line=line,
+                    line_number=line_number,
+                )
+                for value in values_to_write:
+                    self.state.memory.write_halfword(
+                        write_address, MutableUInt16(self._value_to_int(value))
+                    )
+                    write_address += 1
 
     def _load_instructions(self):
         """Instantiates the instructions from self.token_list and writes them to the instruction memory of self.state."""
         instructions = []
-        for linenumber, line, tokens in self.token_list:
+        for linenumber, line, tokens in self.text:
             if not tokens.mnemonic:
+                # check if a variable is beeing declared in a .text section
+                if tokens.variable_declaration:
+                    raise ParserDataSyntaxException(linenumber, line)
                 # skip if the tokens dont belong to an instruction
                 continue
             mnemonic = tokens.mnemonic.upper()
@@ -147,7 +225,10 @@ class ToyParser:
                 instructions.append(instruction_class(address=address))
             else:  # else it is an instruction without an address
                 instructions.append(instruction_class())
+
         # write instructions to memory and init state:
+        if len(instructions) - 1 > self.last_address_not_used_by_data:
+            raise MemorySizeException(max(self.state.memory.address_range) + 1)
         self.state.max_pc = len(instructions) - 1
         for addr, instr in enumerate(instructions):
             self.state.memory.write_halfword(addr, MutableUInt16(int(instr)))
@@ -156,14 +237,6 @@ class ToyParser:
             self.state.visualisation_values = SvgVisValues(
                 pc_old=MutableUInt16(0), ram_out=MutableUInt16(int(instructions[0]))
             )
-
-    def _write_data(self):
-        """Looks for data write commands in self.token_list and then write the data to the data memory of self.state if applicable."""
-        for _, _, tokens in self.token_list:
-            if tokens.write_data:
-                address = self._value_to_int(tokens.address) % 4096
-                value = MutableUInt16(self._value_to_int(tokens.value) % (2**16))
-                self.state.memory.write_halfword(address=address, value=value)
 
     def _value_to_int(self, address: str) -> int:
         """Convert addresses to ints. Hex addresses (starting with '0x') and decimal addresses are supported.
@@ -180,16 +253,16 @@ class ToyParser:
             return int(address)
 
     def _add_label_mapping(self, label: str, value: int, line_number: int, line: str):
-        """Add label value mapping to self.labels. Raise an error if the label already exists.
+        """Add label/variable value mapping to self.labels. Raise an error if the label, ... already exists.
 
         Args:
-            label (str): Label to be added.
+            name (str): Label/Variable to be added.
             value (int): The value to which the label should be mapped.
             line_number (int): The line number in which the label gets declared.
             line (str): The line in which the label gets declared.
 
         Raises:
-            DuplicateLabelException: An error gets raised if the label already exists, since this is most likely unwanted.
+            DuplicateNamingException: An error gets raised if the label, ... already exists, since this is most likely unwanted.
         """
         if label in self.labels:
             raise DuplicateLabelException(

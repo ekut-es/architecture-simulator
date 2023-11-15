@@ -12,6 +12,7 @@
             crossorigin="anonymous"
         />
         <link rel="stylesheet" href="styles.css" />
+        <link rel="stylesheet" href="splitjs.css" />
     </head>
     <body>
         <!--Header-->
@@ -63,10 +64,52 @@
                     </button>
                     <button
                         id="button-reset-simulation-id"
-                        class="btn btn-danger btn-sm control-button"
+                        class="btn btn-danger btn-sm control-button me-1"
                         title="reset simulation"
                     >
                         <img src="svg/reset.svg" />
+                    </button>
+                    <button
+                        id="upload-button-id"
+                        class="btn btn-secondary btn-sm control-button me-1"
+                        title="upload"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            class="bi bi-file-earmark-arrow-up"
+                            viewBox="0 0 16 16"
+                        >
+                            <path
+                                d="M8.5 11.5a.5.5 0 0 1-1 0V7.707L6.354 8.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 7.707V11.5z"
+                            />
+                            <path
+                                d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"
+                            />
+                        </svg>
+                    </button>
+                    <button
+                        class="btn btn-secondary btn-sm control-button me-1"
+                        title="download"
+                        onclick="saveTextAsFile();"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            class="bi bi-file-earmark-arrow-down"
+                            viewBox="0 0 16 16"
+                        >
+                            <path
+                                d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293V6.5z"
+                            />
+                            <path
+                                d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"
+                            />
+                        </svg>
                     </button>
                     <img
                         src="loading.gif"
@@ -81,13 +124,6 @@
                 <!--Buttons on the right side-->
                 <div class="col-auto ms-auto">
                     <button
-                        id="button-visualization-id"
-                        class="btn btn-sm btn-secondary"
-                        onclick="toggleVisualizationTabContent()"
-                    >
-                        Visualization Off
-                    </button>
-                    <button
                         id="button-settings-id"
                         class="btn btn-sm control-button"
                         title="settings"
@@ -101,14 +137,10 @@
         </nav>
 
         <!--Main Content-->
-        <div
-            id="main-content-container"
-            class="d-flex justify-content-between py-3 px-3"
-            role="main"
-        >
+        <div id="main-content-container" class="split" role="main">
             <div
                 id="text-content-container"
-                class="d-flex justify-content-between flex-grow-1"
+                class="d-flex justify-content-between"
             >
                 <!--Text Editor-->
                 <div
@@ -171,14 +203,14 @@
                     </table>
                 </div>
                 <!--Output Field-->
-                <div class="main-content-column height-100">
-                    <textarea
-                        id="output-field-id"
-                        class="form-control"
-                        disabled
-                    ></textarea>
+                <div
+                    id="riscv-output-container-id"
+                    class="main-content-column height-100"
+                >
+                    <div id="output-field-id"></div>
                 </div>
             </div>
+            <div id="visualizations-container-id"></div>
         </div>
 
         <!--Help Modal-->
@@ -469,12 +501,6 @@
         />
         <link
             rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/darcula.min.css"
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"
-        />
-        <link
-            rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/hint/show-hint.min.css"
             crossorigin="anonymous"
             referrerpolicy="no-referrer"
@@ -488,6 +514,7 @@
             type="text/javascript"
             src="https://cdn.jsdelivr.net/pyodide/v0.22.1/full/pyodide.js"
         ></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.0/split.min.js"></script>
         <script type="text/javascript" src="js/util.js"></script>
         <script type="text/javascript" src="js/riscv_documentation.js"></script>
         <script type="text/javascript" src="js/toy_documentation.js"></script>

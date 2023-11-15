@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Any
 import archsim_js
 import pyodide.ffi  # type: ignore
 from architecture_simulator.settings.settings import Settings
@@ -19,6 +19,10 @@ from architecture_simulator.uarch.riscv.pipeline_registers import (
 )
 from architecture_simulator.uarch.riscv.pipeline import InstructionExecutionException
 from architecture_simulator.isa.toy.toy_instructions import ToyInstruction
+from architecture_simulator.gui.toy_svg_directives import (
+    ToySvgDirectives,
+    SvgFillDirectiveControlUnit,
+)
 
 simulation: Optional[Simulation] = None
 first_refresh: bool = True
@@ -238,6 +242,9 @@ def update_toy_tables():
         # memory table
         archsim_js.toyClearMemoryTable()
         representations = simulation.state.memory.memory_repr()
+        if simulation.state.max_pc is None:
+            return
+
         for address, value_representations in sorted(representations.items()):
             if address <= simulation.state.max_pc:
                 instruction_representation = str(
@@ -249,11 +256,12 @@ def update_toy_tables():
                 simulation.state.address_of_current_instruction is not None
                 and address == simulation.state.address_of_current_instruction
             )
+            current_cycle = "1" if simulation.next_cycle == 2 else "2"
             archsim_js.toyUpdateMemoryTable(
                 "0x{:03X}".format(address),
                 value_representations,
                 instruction_representation,
-                is_current_instruction,
+                current_cycle if is_current_instruction else "",
             )
 
 
@@ -596,180 +604,128 @@ from architecture_simulator.isa.toy.toy_instructions import (
 )
 
 
-def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, str | bool]]:
+def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, Any]]:
     """Take a Toy simulation and return all information needed to update the svg.
 
     Args:
         sim (ToySimulation): ToySimulation object
 
     Returns:
-        list[tuple[str, str, str | bool]]: each tuple is [svg-id, what update function to use, argument for update function (str | bool)].
-            They can be one of ("<id>","highlight", <bool>), ("<id>", "write", "<content>"), ("<id>", "show", <bool>)
+        list[tuple[str, str, Any]]: each tuple is [svg-id, what update function to use, argument for update function (Any)].
+            They can be one of ("<id>","highlight", <#hexcolor>), ("<id>", "write", <content>), ("<id>", "show", <bool>)
     """
+    result = ToySvgDirectives()
+    if sim.has_instructions():
+        loaded_instruction = sim.state.loaded_instruction
+        visualisation_values = sim.state.visualisation_values
+        control_unit_values: list[bool]
 
-    result: list[tuple[str, str, str | bool]] = []
-    loaded_instruction = sim.state.loaded_instruction
-    visualisation_values = sim.state.visualisation_values
-    control_unit_values: list[bool]
-
-    if sim.next_cycle == 2:
-        if loaded_instruction is not None:
-            control_unit_values = MicroProgram.get_mp_values(type(loaded_instruction))
+        if sim.next_cycle == 2:
+            if loaded_instruction is not None:
+                control_unit_values = MicroProgram.get_mp_values(
+                    type(loaded_instruction)
+                )
+            else:
+                control_unit_values = [False for i in range(12)]
         else:
-            control_unit_values = [False for i in range(12)]
-    else:
-        control_unit_values = MicroProgram.second_half_micro_program
+            control_unit_values = MicroProgram.second_half_micro_program
 
-    # Arrows:
-    result.append(("path-accu-pc-accu-is-zero", "highlight", visualisation_values.jump))
-    result.append(
-        (
-            "path-accu-alu",
-            "highlight",
+        # Arrows:
+        result.path_accu_pc_accu_is_zero.do_highlight = visualisation_values.jump
+        result.path_accu_alu.do_highlight = (
             visualisation_values.alu_out is not None
-            and not type(loaded_instruction) in [LDA, ZRO],
+            and not type(loaded_instruction)
+            in [
+                LDA,
+                ZRO,
+            ]
         )
-    )
-    result.append(
-        (
-            "path-alu-junction",
-            "highlight",
-            visualisation_values.alu_out is not None,
-        )
-    )
-    result.append(
-        ("path-junction-accu", "highlight", control_unit_values[5])
-    )  # 5 -> SET[ACCU]
-    result.append(
-        ("path-junction-ram", "highlight", control_unit_values[0])
-    )  # 0 -> WRITE[RAM]
-    result.append(("path-opcode-control-unit", "highlight", True))
-    result.append(
-        (
-            "path-instaddress-junction",
-            "highlight",
-            (
-                visualisation_values.ram_out is not None
-                or visualisation_values.jump
-                or isinstance(loaded_instruction, STO)
-            )
-            and not control_unit_values[4],
-        )
-    )
-    result.append(("path-junction-pc", "highlight", visualisation_values.jump))
-    result.append(
-        (
-            "path-junction-multiplexer",
-            "highlight",
-            (
-                visualisation_values.ram_out is not None
-                or isinstance(loaded_instruction, STO)
-            )
-            and not control_unit_values[4],
-        )
-    )  # 4 -> SET[IR]
-    result.append(
-        ("path-pc-multiplexer", "highlight", control_unit_values[4])
-    )  # 4 -> SET[IR]
-    result.append(
-        (
-            "path-multiplexer-ram",
-            "highlight",
+        result.path_alu_junction.do_highlight = visualisation_values.alu_out is not None
+        result.path_junction_accu.do_highlight = control_unit_values[
+            5
+        ]  # 5 _> SET[ACCU]
+        result.path_junction_ram.do_highlight = control_unit_values[
+            0
+        ]  # 0 _> WRITE[RAM]
+        result.path_opcode_control_unit.do_highlight = True
+        result.path_instaddress_junction.do_highlight = (
             visualisation_values.ram_out is not None
-            or isinstance(loaded_instruction, STO),
-        )
-    )
-    result.append(
-        (
-            "path-ram-junction",
-            "highlight",
-            visualisation_values.ram_out is not None,
-        )
-    )
-    result.append(
-        (
-            "path-junction-alu",
-            "highlight",
+            or visualisation_values.jump
+            or isinstance(loaded_instruction, STO)
+        ) and not control_unit_values[4]
+        result.path_junction_pc.do_highlight = visualisation_values.jump
+        result.path_junction_multiplexer.do_highlight = (
             visualisation_values.ram_out is not None
-            and visualisation_values.alu_out is not None,
+            or isinstance(loaded_instruction, STO)
+        ) and not control_unit_values[
+            4
+        ]  # 4 _> SET[IR]
+        result.path_pc_multiplexer.do_highlight = control_unit_values[4]  # 4 _> SET[IR]
+        result.path_multiplexer_ram.do_highlight = (
+            visualisation_values.ram_out is not None
+            or isinstance(loaded_instruction, STO)
         )
-    )
-    result.append(
-        ("path-junction-ir", "highlight", control_unit_values[4])
-    )  # 4 -> SET[IR]
-
-    # Text:
-    if loaded_instruction is not None:
-        result.append(("text-mnemonic", "write", loaded_instruction.mnemonic))
-        result.append(("text-opcode", "write", str(loaded_instruction.op_code_value())))
-        result.append(
-            ("text-address", "write", str(loaded_instruction.address_section_value()))
+        result.path_ram_junction.do_highlight = visualisation_values.ram_out is not None
+        result.path_junction_alu.do_highlight = (
+            visualisation_values.ram_out is not None
+            and visualisation_values.alu_out is not None
         )
-    else:
-        for name in ["text-mnemonic", "text-opcode", "text-address"]:
-            result.append((name, "write", ""))
-    result.append(("text-program-counter", "write", str(sim.state.program_counter)))
-    alu_out = visualisation_values.alu_out
-    ram_out = visualisation_values.ram_out
-    result.append(
-        ("text-alu-out", "write", str(alu_out) if alu_out is not None else "")
-    )
-    result.append(("group-alu-out", "show", alu_out is not None))
-    result.append(
-        ("text-ram-out", "write", str(ram_out) if ram_out is not None else "")
-    )
-    result.append(("text-accu", "write", str(sim.state.accu)))
+        result.path_junction_ir.do_highlight = control_unit_values[4]  # 4 _> SET[IR]
 
-    # Textblocks over Arrows:
-    old_opcode = visualisation_values.op_code_old
-    result.append(("group-old-opcode-and-mnemonic", "show", old_opcode is not None))
-    if old_opcode is not None:  # do not remove is not None
-        result.append(
-            (
-                "text-old-opcode-and-mnemonic",
-                "write",
+        # Text:
+        if loaded_instruction is not None:
+            result.text_mnemonic.text = loaded_instruction.mnemonic
+            result.text_opcode.text = str(loaded_instruction.op_code_value())
+            result.text_address.text = str(loaded_instruction.address_section_value())
+        result.text_program_counter.text = str(sim.state.program_counter)
+        alu_out = visualisation_values.alu_out
+        ram_out = visualisation_values.ram_out
+        result.text_alu_out.text = str(alu_out) if alu_out is not None else ""
+        result.group_alu_out.do_show = alu_out is not None
+        result.text_ram_out.text = str(ram_out) if ram_out is not None else ""
+        result.text_accu.text = str(sim.state.accu)
+
+        # Textblocks over Arrows:
+        old_opcode = visualisation_values.op_code_old
+        result.group_old_opcode_and_mnemonic.do_show = old_opcode is not None
+        if old_opcode is not None:  # do not remove is not None
+            result.text_old_opcode_and_mnemonic.text = (
                 str(old_opcode)
                 + " "
-                + ToyInstruction.from_integer(old_opcode << 12).mnemonic,
+                + ToyInstruction.from_integer(old_opcode << 12).mnemonic
             )
-        )
-    else:
-        result.append(("text-old-opcode-and-mnemonic", "write", ""))
+        old_pc = visualisation_values.pc_old
+        result.group_old_pc.do_show = old_pc is not None
+        if old_pc is not None:  # do not remove is not None
+            result.text_old_pc.text = str(old_pc)
+        old_accu = visualisation_values.accu_old
+        result.group_old_accu.do_show = old_accu is not None
+        if old_accu is not None:  # do not remove is not None
+            result.text_old_accu.text = str(old_accu)
 
-    old_pc = visualisation_values.pc_old
-    result.append(("group-old-pc", "show", old_pc is not None))
-    if old_pc is not None:  # do not remove is not None
-        result.append(("text-old-pc", "write", str(old_pc)))
-    else:
-        result.append(("text-old-pc", "write", ""))
-
-    old_accu = visualisation_values.accu_old
-    result.append(("group-old-accu", "show", old_accu is not None))
-    if old_accu is not None:  # do not remove is not None
-        result.append(("text-old-accu", "write", str(old_accu)))
-    else:
-        result.append(("text-old-accu", "write", ""))
-
-    # Control Unit:
-    control_unit_names = [
-        "write-ram",
-        "inc-pc",
-        "set-pc",
-        "addr-ir",
-        "set-ir",
-        "set-accu",
-        "alucin",
-        "alumode",
-        "alu3",
-        "alu2",
-        "alu1",
-        "alu0",
-    ]
-    for name, value in zip(control_unit_names, control_unit_values):
-        result.append(("path-control-unit-" + name, "highlight", value))
-        result.append(("text-" + name, "highlight", value))
-
-    return result
+        # Control Unit:
+        control_unit_names = [
+            "write_ram",
+            "inc_pc",
+            "set_pc",
+            "addr_ir",
+            "set_ir",
+            "set_accu",
+            "alucin",
+            "alumode",
+            "alu3",
+            "alu2",
+            "alu1",
+            "alu0",
+        ]
+        for name, value in zip(control_unit_names, control_unit_values):
+            control_unit_path = getattr(result, "path_control_unit_" + name)
+            control_unit_text = getattr(result, "text_" + name)
+            assert isinstance(control_unit_path, SvgFillDirectiveControlUnit)
+            assert isinstance(control_unit_text, SvgFillDirectiveControlUnit)
+            control_unit_path.do_highlight = value
+            control_unit_text.do_highlight = value
+    return result.export()
 
 
 def toy_get_next_cycle():
@@ -781,29 +737,37 @@ def toy_get_next_cycle():
         return simulation.next_cycle
 
 
-def toy_single_step(program: str):
-    if isinstance(simulation, ToySimulation):
-        # Variable to tell js whether there was an exception
-        exception_flag = False
+def toy_single_step(program: str) -> tuple[str, bool, bool]:
+    """Executes a single cycle of the toy simulation.
 
-        # parse the instr json string into a python dict
-        if not simulation.has_instructions():
-            try:
-                simulation.load_program(program)
-            except ParserException as Parser_Exception:
-                archsim_js.set_output(Parser_Exception.__repr__())
-                exception_flag = True
+    Args:
+        program (str): Text program. Will be loaded if no instructions have been loaded yet.
 
-        # step the simulation
-        if simulation.next_cycle == 1:
-            simulation.first_cycle_step()
-        else:
-            simulation.second_cycle_step()
-        simulation_not_ended_flag = not simulation.is_done()
-        update_ui()
+    Returns:
+        tuple[str, bool, bool]: Tuple of (performance metrics string, whether the simulation has not yet finished, whether there was an exception)
+    """
+    assert isinstance(simulation, ToySimulation)
+    # Variable to tell js whether there was an exception
+    exception_flag = False
 
-        return (
-            str(simulation.get_performance_metrics()),
-            simulation_not_ended_flag,
-            exception_flag,
-        )
+    # parse the instr json string into a python dict
+    if not simulation.has_instructions():
+        try:
+            simulation.load_program(program)
+        except ParserException as Parser_Exception:
+            archsim_js.set_output(Parser_Exception.__repr__())
+            exception_flag = True
+
+    # step the simulation
+    if simulation.next_cycle == 1:
+        simulation.first_cycle_step()
+    else:
+        simulation.second_cycle_step()
+    simulation_not_ended_flag = not simulation.is_done()
+    update_ui()
+
+    return (
+        str(simulation.get_performance_metrics()),
+        simulation_not_ended_flag,
+        exception_flag,
+    )

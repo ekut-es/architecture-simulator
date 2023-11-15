@@ -1,4 +1,3 @@
-const output = document.getElementById("output-field-id");
 const input = document.getElementById("input");
 
 var previous_pc = 0;
@@ -14,7 +13,8 @@ var previous_memory = {};
  * @param {string} s -  string to paste to the output field.
  */
 function addToOutput(s) {
-    output.value += ">>>" + input.value + "\n" + s + "\n";
+    const output = document.getElementById("output-field-id");
+    output.innerText += ">>>" + input.value + "\n" + s + "\n";
     output.scrollTop = output.scrollHeight;
 }
 
@@ -39,13 +39,13 @@ const archsim_js = {
      * @param {string} address The memory address
      * @param value_representations A Python Tuple containing the representations (binary, unsigned decimal, hexadecimal, signed decimal) for one value in the memory.
      * @param {string} instruction_representation The instruction the value represents.
-     * @param {boolean} is_current_instruction Whether this entry is the current instruction. This will be marked in the table.
+     * @param {string} cycle The cycle the instruction is currently in ("1" or "2"). An empty string will not display anything.
      */
     toyUpdateMemoryTable: function (
         address,
         value_representations,
         instruction_representation,
-        is_current_instruction
+        cycle
     ) {
         value_representations_array = Array.from(value_representations);
         const value = value_representations_array[mem_representation_mode];
@@ -62,8 +62,13 @@ const archsim_js = {
             previous_memory[address] = value_representations_array[1];
             cell2.style.backgroundColor = "yellow";
         }
-        if (is_current_instruction) {
-            cell1.innerHTML = instructionArrow + cell1.innerHTML;
+        if (cycle !== "") {
+            cell1.innerHTML = html`<span
+                    class="toy-current-cycle text-light bg-dark"
+                    title="cycle ${cycle}"
+                    >${cycle + instructionArrow}</span
+                >
+                ${cell1.innerHTML}`;
         }
     },
     get_selected_isa: function () {
@@ -209,7 +214,8 @@ const archsim_js = {
      * @param {string} str - string to set the output field to.
      */
     set_output: function (str) {
-        output.value = str;
+        const output = document.getElementById("output-field-id");
+        output.innerText = str;
     },
     /**
      * Highlights a line in the text editor and displays the given message as hint.
@@ -274,22 +280,20 @@ const archsim_js = {
         table.rows[position].cells[1].style.backgroundColor = "yellow";
     },
     update_toy_visualization: function (update_values) {
-        console.log("===update_toy_visualization===");
         for (let i = 0; i < update_values.length; i++) {
             const update = update_values.get(i);
             const id = update.get(0);
             const action = update.get(1);
             const value = update.get(2);
-            console.log(action + ' "' + value + '" ' + id);
             switch (action) {
                 case "highlight":
-                    toy_svg_highlight(id, value);
+                    toySvgHighlight(id, value);
                     break;
                 case "write":
-                    toy_svg_set_text(id, value);
+                    toySvgSetText(id, value);
                     break;
                 case "show":
-                    toy_svg_show(id, value);
+                    toySvgShow(id, value);
                     break;
             }
             update.destroy();
@@ -929,7 +933,8 @@ async function main() {
 from architecture_simulator.gui.webgui import *
 sim_init()
     `);
-    output.value += "Ready!\n";
+    const output = document.getElementById("output-field-id");
+    output.innerText += "Ready!\n";
     stop_loading_visuals();
     return pyodide;
 }
@@ -1027,7 +1032,8 @@ async function update_performance_metrics() {
 }
 
 function set_output_message(str) {
-    output.value = str;
+    const output = document.getElementById("output-field-id");
+    output.innerText = str;
 }
 
 /**
@@ -1045,7 +1051,7 @@ async function evaluatePython_reset_sim(pipeline_mode) {
         previous_pc = 0; // resets the PC for the visualization
         reset_sim = pyodide.globals.get("reset_sim");
         reset_sim();
-        output.value = "";
+        set_output_message("");
     } catch (err) {
         addToOutput(err);
     }

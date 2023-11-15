@@ -63,3 +63,6 @@ make -C tests/c_programs all
 ```
 
 * (Alternatively use [Compiler Explorer](https://godbolt.org/), RISC-V rv32gc gcc 12.2.0)
+
+## GET Parameters
+You can specify the ISA that should be selected by default in the web UI with the GET parameter `isa` which can be one of `riscv` or `toy`.
