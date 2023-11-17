@@ -922,9 +922,13 @@ async function main() {
                 "/dist/architecture_simulator-0.1.0-py3-none-any.whl"
         );
     } else {
+        // Find out the URL of the server, but dont include any parameters or index.html
+        let url = window.location.origin + window.location.pathname;
+        if (url.endsWith("index.html")) {
+            url = url.slice(0, -10);
+        }
         await micropip.install(
-            window.location.href +
-                "/dist/architecture_simulator-0.1.0-py3-none-any.whl"
+            url + "/dist/architecture_simulator-0.1.0-py3-none-any.whl"
         );
     }
 
