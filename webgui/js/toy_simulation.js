@@ -20,6 +20,7 @@ function getMemoryAndAccuColumn() {
         </div>
         <div class="mb-3" style="overflow: scroll;">
             <table
+                id="toy-memory-table-id"
                 class="table table-sm table-hover table-bordered mono-table mb-0"
             >
                 <thead>
