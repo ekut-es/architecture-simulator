@@ -83,7 +83,7 @@ nav {
 }
 
 #text-content-container {
-    overflow-x: scroll;
+    overflow-x: hidden;
 }
 
 #text-content-container > .height-100 > * {
@@ -98,15 +98,11 @@ nav {
     margin-right: 0;
 }
 
-#codemirror-container {
-    min-width: 10em;
-    max-width: 60em;
-    flex-grow: 1;
-}
-
-.CodeMirror {
+#codemirror-id {
+    flex: 1 0 50%;
     border: 1px solid var(--bs-border-color);
     border-radius: 0.5em;
+    height: 100%;
 }
 
 .main-content-column {
@@ -140,6 +136,20 @@ nav {
     padding: 0em 0.2em;
     border-radius: 0.3em;
     float: left;
+}
+
+#text-editor-separator {
+    display: none;
+}
+
+#toy-main-text-container-id {
+    flex: 0 0 calc(50%-1em);
+    margin-left: var(--content-margin);
+    overflow: auto;
+}
+
+#toy-main-text-container-id > * {
+    overflow: auto;
 }
 
 /* Visualization */

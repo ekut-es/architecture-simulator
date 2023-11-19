@@ -7,6 +7,7 @@ const editor = CodeMirror.fromTextArea(document.getElementById("input"), {
         architecture: "ARM",
     },
 });
+editor.getWrapperElement().id = "codemirror-id";
 
 /**
  * Downloads the content of the editor.

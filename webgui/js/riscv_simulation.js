@@ -83,7 +83,7 @@ function getRiscvOutputField() {
  */
 function insertRiscvElements() {
     document
-        .getElementById("codemirror-container")
+        .getElementById("text-editor-separator")
         .after(
             getRiscvInstructionTable(),
             getRiscvRegisterTable(),

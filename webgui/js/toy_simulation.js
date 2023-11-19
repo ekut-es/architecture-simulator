@@ -4,7 +4,7 @@
 function getMemoryAndAccuColumn() {
     return createNode(html`<div
         id="toy-main-text-container-id"
-        class="main-content-column d-flex flex-column"
+        class="d-flex flex-column"
     >
         <div class="mb-3">
             <table
@@ -18,7 +18,7 @@ function getMemoryAndAccuColumn() {
                 </thead>
             </table>
         </div>
-        <div class="mb-3" style="overflow: scroll;">
+        <div class="mb-3">
             <table
                 id="toy-memory-table-id"
                 class="table table-sm table-hover table-bordered mono-table mb-0"
@@ -33,9 +33,7 @@ function getMemoryAndAccuColumn() {
                 <tbody id="toy-memory-table-body-id"></tbody>
             </table>
         </div>
-        <div id="toy-output-container-id">
-            <div id="output-field-id"></div>
-        </div>
+        <div id="output-field-id"></div>
     </div>`);
 }
 
@@ -57,7 +55,7 @@ function getDoubleStepButton() {
  */
 function insertToyElements() {
     document
-        .getElementById("codemirror-container")
+        .getElementById("text-editor-separator")
         .after(getMemoryAndAccuColumn());
     const doubleStepButton = getDoubleStepButton();
     document
