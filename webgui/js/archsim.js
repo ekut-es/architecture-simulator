@@ -27,6 +27,7 @@ const archsim_js = {
     toyUpdateAccu: function (representations) {
         document.getElementById("toy-accu-id").innerText =
             Array.from(representations)[reg_representation_mode];
+        representations.destroy();
     },
     /**
      * Clears the TOY memory table.
@@ -70,6 +71,7 @@ const archsim_js = {
                 >
                 ${cell1.innerHTML}`;
         }
+        value_representations.destroy();
     },
     get_selected_isa: function () {
         return selected_isa;
@@ -105,6 +107,7 @@ const archsim_js = {
         tr.appendChild(td1);
         tr.appendChild(td2);
         document.getElementById("riscv-register-table-body-id").appendChild(tr);
+        representations.destroy();
     },
     /**
      * Appends one row to the memory table.
@@ -126,6 +129,7 @@ const archsim_js = {
         tr.appendChild(td1);
         tr.appendChild(td2);
         document.getElementById("riscv-memory-table-body-id").appendChild(tr);
+        representations.destroy();
     },
     /**
      * Appends one row to the instruction memory table.
