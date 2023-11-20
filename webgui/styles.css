@@ -21,6 +21,7 @@ th#toy-accu-id {
 
 #toy-memory-table-id th:first-child {
     width: 7em;
+    min-width: 7em;
 }
 
 .instruction-arrow {
@@ -143,7 +144,6 @@ nav {
 }
 
 #toy-main-text-container-id {
-    flex: 0 0 calc(50%-1em);
     margin-left: var(--content-margin);
     overflow: auto;
 }
