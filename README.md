@@ -1,14 +1,26 @@
-# Architecture Simulator (rv32i)
+# Architecture Simulator
 
-This repository contains a modular computer architecture simulator which is developed as python package.
-The simulator can be executed and visualized in a web browser with the help of [pyodide](https://github.com/pyodide/pyodide).
-
-Currently, supported architectures are:
-  - Single cycle execution of the RISC-V RV32I ISA
-  - 5-staged pipeline execution of the RISC-V RV32I ISA
-  - Simple toy architecture, based on *Microcoded vs. hard-wired control* by Philip Koopman, 1997.
+This repository contains a modular computer architecture simulator designed for education, which provides a visualization of the processor internals while executing machine code instructions.
+The simulator is implemented in python and can be executed on the command line or in a web browser with the help of [pyodide](https://github.com/pyodide/pyodide).
+The simulation and web user interface are executed locally in the browser environment, so no server backend for processing user input is needed.
 
 The original implementation was developed as part of the team project course in the summer semester 2023 at the University of Tübingen.
+
+## Features
+- Code editor for assembly code
+- Step through the code execution cycle by cycle
+- Structure diagrams of the processor that show current signals and values
+- Help page containing information about all supported instructions and special assembly syntax (like labels and pseudo instructions)
+- Support for data section to preload values into the memory
+- The default ISA can be selected with the GET parameter `isa` which can be one of `riscv` or `toy`.
+
+## Supported Architectures
+  - RISC-V RV32I ISA
+    - Single cycle execution
+    - 5-staged pipeline with hazard detection
+  - Simple toy architecture, based on *Microcoded vs. hard-wired control* by Philip Koopman, 1997.
+    - Two-cycle execution for every instruction
+    - Support for self modifying code
 
 ## Setup dev environment
 - Linux / WSL / macOS
@@ -23,7 +35,7 @@ The original implementation was developed as part of the team project course in 
 
 ```bash
 pyenv install 3.10.8
-git clone git@es-git.cs.uni-tuebingen.de:teamprojekt/2023-sose/architecture-simulator.git
+git clone https://github.com/ekut-es/architecture-simulator.git
 cd architecture-simulator
 pyenv local 3.10.8
 python -m venv .venv
@@ -50,7 +62,8 @@ python -m build
 
 ## Branch Naming Convention
 
-* `main` current MVP
+* `main`
+* `dev`
 * `devel/*` all branches for feature development
 * `fix/*` all branches that fix bugs
 
@@ -73,6 +86,3 @@ make -C tests/c_programs all
 ```
 
 * (Alternatively use [Compiler Explorer](https://godbolt.org/), RISC-V rv32gc gcc 12.2.0)
-
-## GET Parameters
-You can specify the ISA that should be selected by default in the web UI with the GET parameter `isa` which can be one of `riscv` or `toy`.
