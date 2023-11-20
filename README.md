@@ -1,5 +1,15 @@
 # Architecture Simulator (rv32i)
 
+This repository contains a modular computer architecture simulator which is developed as python package.
+The simulator can be executed and visualized in a web browser with the help of [pyodide](https://github.com/pyodide/pyodide).
+
+Currently, supported architectures are:
+  - Single cycle execution of the RISC-V RV32I ISA
+  - 5-staged pipeline execution of the RISC-V RV32I ISA
+  - Simple toy architecture, based on *Microcoded vs. hard-wired control* by Philip Koopman, 1997.
+
+The original implementation was developed as part of the team project course in the summer semester 2023 at the University of Tübingen.
+
 ## Setup dev environment
 - Linux / WSL / macOS
 - VSCode as editor
