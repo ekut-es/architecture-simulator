@@ -6,7 +6,7 @@ function getMemoryAndAccuColumn() {
         id="toy-main-text-container-id"
         class="d-flex flex-column"
     >
-        <div class="mb-3">
+        <div class="mb-3 flex-shrink-0">
             <table
                 class="table table-sm table-hover table-bordered mono-table mb-0"
             >
@@ -33,7 +33,7 @@ function getMemoryAndAccuColumn() {
                 <tbody id="toy-memory-table-body-id"></tbody>
             </table>
         </div>
-        <div id="output-field-id"></div>
+        <div id="output-field-id" class="flex-shrink-0"></div>
     </div>`);
 }
 
