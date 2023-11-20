@@ -84,8 +84,7 @@ def step_sim(program: str, is_run_simulation: bool) -> tuple[str, bool, bool]:
     if not simulation.has_instructions():
         try:
             simulation.load_program(program)
-        except ParserException as Parser_Exception:
-            archsim_js.set_output(Parser_Exception.__repr__())
+        except ParserException:
             exception_flag = True
 
     # step the simulation
@@ -189,16 +188,13 @@ def parse_input(instr: str):
     # reset the whole simulation because there might be things like a data section that also modify the data memory
     # so resetting the instruction memory is not enough
     simulation = reset_sim()
-    selected_isa = archsim_js.get_selected_isa()
-    if selected_isa == "riscv":
-        archsim_js.remove_all_highlights()
+    archsim_js.remove_all_highlights()
     try:
         simulation.load_program(instr)
         if not first_refresh:
             archsim_js.set_output(Settings().get()["default_no_error_output"])
         first_refresh = False
     except ParserException as Parser_Exception:
-        archsim_js.set_output(Parser_Exception.__repr__())
         archsim_js.highlight(
             Parser_Exception.line_number, str=Parser_Exception.__repr__()
         )
@@ -753,8 +749,7 @@ def toy_single_step(program: str) -> tuple[str, bool, bool]:
     if not simulation.has_instructions():
         try:
             simulation.load_program(program)
-        except ParserException as Parser_Exception:
-            archsim_js.set_output(Parser_Exception.__repr__())
+        except ParserException:
             exception_flag = True
 
     # step the simulation

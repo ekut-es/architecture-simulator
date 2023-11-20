@@ -61,7 +61,7 @@ const archsim_js = {
         cell3.innerText = instruction_representation;
         if (previous_memory[address] !== value_representations_array[1]) {
             previous_memory[address] = value_representations_array[1];
-            cell2.style.backgroundColor = "yellow";
+            cell2.classList.add("highlight");
         }
         if (cycle !== "") {
             cell1.innerHTML = html`<span
@@ -97,7 +97,7 @@ const archsim_js = {
         td2.innerText = Array.from(representations)[reg_representation_mode];
         td2.id = "val_x" + reg;
         if (previous_registers[reg] != Array.from(representations)[1]) {
-            td2.style.backgroundColor = "yellow";
+            td2.classList.add("highlight");
             previous_registers[reg] = Array.from(representations)[1];
         }
         td3 = document.createElement("td");
@@ -123,7 +123,7 @@ const archsim_js = {
         td2.innerText = Array.from(representations)[mem_representation_mode];
         td2.id = "memory" + address;
         if (previous_memory[address] != Array.from(representations)[1]) {
-            td2.style.backgroundColor = "yellow";
+            td2.classList.add("highlight");
             previous_memory[address] = Array.from(representations)[1];
         }
         tr.appendChild(td1);
@@ -234,7 +234,7 @@ const archsim_js = {
         str.toString = function () {
             return this.str;
         };
-        output_str = str.toString();
+        output_str = `Syntax Error in line ${position}`;
         var error_description = {
             hint: function () {
                 return {
@@ -280,8 +280,8 @@ const archsim_js = {
                 break;
             }
         }
-        table.rows[position].cells[0].style.backgroundColor = "yellow";
-        table.rows[position].cells[1].style.backgroundColor = "yellow";
+        table.rows[position].cells[0].classList.add("highlight");
+        table.rows[position].cells[1].classList.add("highlight");
     },
     update_toy_visualization: function (update_values) {
         for (let i = 0; i < update_values.length; i++) {

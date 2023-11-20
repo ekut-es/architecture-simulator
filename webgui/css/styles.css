@@ -2,6 +2,7 @@
     --main-accent-color: #252d73;
     --main-bg-color: #f5f5f5;
     --content-margin: 1em;
+    --highlight-color: #f4f312;
 }
 /* Header */
 
@@ -69,6 +70,10 @@ nav {
 }
 
 /* Text Content Area */
+
+.highlight {
+    background-color: var(--highlight-color) !important;
+}
 
 .mono-table {
     font-family: monospace;
