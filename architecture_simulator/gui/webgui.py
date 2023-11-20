@@ -199,10 +199,9 @@ def parse_input(instr: str):
         first_refresh = False
     except ParserException as Parser_Exception:
         archsim_js.set_output(Parser_Exception.__repr__())
-        if selected_isa == "riscv":
-            archsim_js.highlight(
-                Parser_Exception.line_number, str=Parser_Exception.__repr__()
-            )
+        archsim_js.highlight(
+            Parser_Exception.line_number, str=Parser_Exception.__repr__()
+        )
     update_ui()
 
 
