@@ -853,8 +853,9 @@ function createSplit() {
         split = Split(
             ["#text-content-container", "#visualizations-container-id"],
             {
-                minSize: 0,
+                minSize: 200,
                 sizes: [35, 65],
+                snapOffset: 0,
             }
         );
     }

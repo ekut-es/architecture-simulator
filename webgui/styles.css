@@ -79,7 +79,7 @@ nav {
 }
 
 #text-content-container,
-#visualizations-container-id > object {
+#visualizations-container-id {
     padding: 1em;
 }
 
