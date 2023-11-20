@@ -1,4 +1,19 @@
-# Architecture Simulator (rv32i)
+# Architecture Simulator
+This is a processor architecture simulator which is designed for education. It runs in the browser and so it should be supported on most devices. We currently support the RISC-V (most of RV32I) and TOY ISAs.
+
+The project is mainly written in python. We use pyodide to run the simulator in the browser where we also provide a GUI. This also means that there is no backend on the server for processing user input.
+
+This project started out as a student programming project at the University of Tübingen.
+
+## Features
+- Enter assembly code to be parsed
+- Stepping through the code cycle by cycle
+- RISC-V supports a 5-Stage pipeline with hazard detection
+- Structure diagrams of the processor that show all of the current signals and values
+- A help page containing information about all supported instructions and special assembly syntax (like labels and pseudo instructions)
+- A data section for preloading values into the memory
+- The TOY simulator supports self modifying code
+- The default ISA can be selected with the GET parameter `isa` which can be one of `riscv` or `toy`.
 
 ## Setup dev environment
 - Linux / WSL / macOS
@@ -13,7 +28,7 @@
 
 ```bash
 pyenv install 3.10.8
-git clone git@es-git.cs.uni-tuebingen.de:teamprojekt/2023-sose/architecture-simulator.git
+git clone <url>
 cd architecture-simulator
 pyenv local 3.10.8
 python -m venv .venv
@@ -40,7 +55,8 @@ python -m build
 
 ## Branch Naming Convention
 
-* `main` current MVP
+* `main`
+* `dev`
 * `devel/*` all branches for feature development
 * `fix/*` all branches that fix bugs
 
@@ -63,6 +79,3 @@ make -C tests/c_programs all
 ```
 
 * (Alternatively use [Compiler Explorer](https://godbolt.org/), RISC-V rv32gc gcc 12.2.0)
-
-## GET Parameters
-You can specify the ISA that should be selected by default in the web UI with the GET parameter `isa` which can be one of `riscv` or `toy`.
