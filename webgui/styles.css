@@ -81,6 +81,7 @@ nav {
 #text-content-container,
 #visualizations-container-id {
     padding: 1em;
+    height: 100%;
 }
 
 #text-content-container {
@@ -100,7 +101,7 @@ nav {
 }
 
 #codemirror-id {
-    flex: 1 0 50%;
+    flex: 1 0 5em;
     border: 1px solid var(--bs-border-color);
     border-radius: 0.5em;
     height: 100%;

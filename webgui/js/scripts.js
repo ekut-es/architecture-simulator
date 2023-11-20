@@ -850,6 +850,9 @@ function destroyCurrentIsaElements() {
 
 function createSplit() {
     if (split === null) {
+        document
+            .getElementById("main-content-container")
+            .classList.add("split");
         split = Split(
             ["#text-content-container", "#visualizations-container-id"],
             {
@@ -863,6 +866,9 @@ function createSplit() {
 
 function destroySplit() {
     if (split !== null) {
+        document
+            .getElementById("main-content-container")
+            .classList.remove("split");
         split.destroy();
         split = null;
     }
