@@ -49,7 +49,7 @@ function getDoubleStepButton() {
         class="btn btn-primary btn-sm control-button me-1"
         title="double step"
     >
-        <img src="svg/double-step.svg" />
+        <img src="img/double-step.svg" />
     </button>`);
 }
 

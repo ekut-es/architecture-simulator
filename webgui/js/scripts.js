@@ -111,7 +111,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
     // Insert RISC-V SVG
     const riscvSvgElement = document.createElement("object");
-    riscvSvgElement.data = "svg/riscv_pipeline.svg";
+    riscvSvgElement.data = "img/riscv_pipeline.svg";
     riscvSvgElement.type = "image/svg+xml";
     riscvSvgElement.id = "riscv-visualization";
     riscvSvgElement.addEventListener("load", function () {
@@ -124,7 +124,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
     // Insert TOY SVG
     const toySvgElement = document.createElement("object");
-    toySvgElement.data = "svg/toy_structure.svg";
+    toySvgElement.data = "img/toy_structure.svg";
     toySvgElement.type = "image/svg+xml";
     toySvgElement.id = "toy-visualization";
     toySvgElement.addEventListener("load", function () {
