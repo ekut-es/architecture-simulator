@@ -33,7 +33,10 @@ function getMemoryAndAccuColumn() {
                 <tbody id="toy-memory-table-body-id"></tbody>
             </table>
         </div>
-        <div id="output-field-id" class="flex-shrink-0"></div>
+        <div
+            id="output-field-id"
+            class="flex-shrink-0 archsim-default-border"
+        ></div>
     </div>`);
 }
 

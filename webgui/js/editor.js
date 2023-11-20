@@ -8,6 +8,7 @@ const editor = CodeMirror.fromTextArea(document.getElementById("input"), {
     },
 });
 editor.getWrapperElement().id = "codemirror-id";
+editor.getWrapperElement().classList.add("archsim-default-border");
 
 /**
  * Downloads the content of the editor.
