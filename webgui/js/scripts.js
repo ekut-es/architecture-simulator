@@ -300,6 +300,16 @@ window.addEventListener("DOMContentLoaded", function () {
                 selected_isa = "riscv";
                 document.getElementById("help-heading-id").textContent =
                     "RISC-V";
+                document
+                    .getElementById(
+                        "mem_button_signed_decimal_representation_id"
+                    )
+                    .click();
+                document
+                    .getElementById(
+                        "reg_button_signed_decimal_representation_id"
+                    )
+                    .click();
                 document.getElementById("riscv-help").style.display = "block";
                 document.getElementById("button_SingleStage").disabled = false;
                 document.getElementById("button_5-Stage").disabled = false;
@@ -336,6 +346,9 @@ window.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("help-heading-id").textContent = "Toy";
                 document
                     .getElementById("mem_button_decimal_representation_id")
+                    .click();
+                document
+                    .getElementById("reg_button_decimal_representation_id")
                     .click();
                 showCurrentVisualization();
                 createSplit();
