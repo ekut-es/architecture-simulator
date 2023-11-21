@@ -16,19 +16,6 @@
     vertical-align: middle;
 }
 
-th#toy-accu-id {
-    width: 100%;
-}
-
-#toy-memory-table-id th:first-child {
-    width: 7em;
-    min-width: 7em;
-}
-
-.instruction-arrow {
-    float: left;
-}
-
 /* Control bar */
 
 .control-button > img,
@@ -137,6 +124,7 @@ nav {
 #output-field-id {
     background-color: #ffffff;
     padding: 1em;
+    min-width: 12em;
 }
 
 .toy-current-cycle {
@@ -156,6 +144,41 @@ nav {
 
 #toy-main-text-container-id > * {
     overflow: auto;
+}
+
+.full-width {
+    width: 100%;
+}
+
+#toy-memory-table-id th:first-child {
+    width: 7em;
+    min-width: 7em;
+}
+
+.instruction-arrow {
+    float: left;
+}
+
+#toy-register-table td:first-child {
+    font-weight: bold;
+}
+
+#toy-register-table td:last-child {
+    text-align: right;
+    width: 100%;
+}
+
+#toy-output-wrapper,
+#toy-registers-wrapper {
+    flex: 0 0 auto;
+}
+
+#toy-memory-wrapper {
+    flex: 1 0 min(auto, 1em);
+}
+
+.text-element-heading {
+    font-size: 1.5em;
 }
 
 /* Visualization */

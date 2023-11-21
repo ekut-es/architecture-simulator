@@ -23,6 +23,10 @@ from architecture_simulator.gui.toy_svg_directives import (
     ToySvgDirectives,
     SvgFillDirectiveControlUnit,
 )
+from architecture_simulator.util.integer_representations import (
+    get_12_bit_representations,
+    get_16_bit_representations,
+)
 
 simulation: Optional[Simulation] = None
 first_refresh: bool = True
@@ -228,11 +232,27 @@ def update_toy_visualization():
 
 
 def update_toy_tables():
-    """Updates the accu and the memory table for toy"""
+    """Updates the register and memory table for toy"""
     if isinstance(simulation, ToySimulation):
         # accu
-        accu_representation = simulation.state.get_accu_representation()
-        archsim_js.toyUpdateAccu(accu_representation)
+        accu_representation = (
+            simulation.state.get_accu_representation()
+            if simulation.has_instructions()
+            else ("", "", "", "")
+        )
+        pc_representation = (
+            get_12_bit_representations(int(simulation.state.program_counter))
+            if simulation.has_instructions()
+            else ("", "", "", "")
+        )
+        ir_representation = (
+            get_16_bit_representations(int(simulation.state.loaded_instruction))
+            if simulation.state.loaded_instruction is not None
+            else ("", "", "", "")
+        )
+        archsim_js.toyUpdateRegisters(
+            accu_representation, pc_representation, ir_representation
+        )
 
         # memory table
         archsim_js.toyClearMemoryTable()
