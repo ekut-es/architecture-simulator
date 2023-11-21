@@ -5,14 +5,13 @@ from fixedint import MutableUInt16
 
 from .toy_instructions import AddressTypeInstruction, instruction_map
 from ..parser_exceptions import (
-    ParserSyntaxException,
     ParserLabelException,
-    DuplicateLabelException,
-    ParserDirectiveException,
     ParserDataSyntaxException,
     MemorySizeException,
+    DuplicateLabelException,
 )
 from architecture_simulator.uarch.toy.SvgVisValues import SvgVisValues
+from architecture_simulator.isa.parser import Parser
 
 if TYPE_CHECKING:
     from architecture_simulator.uarch.toy.toy_architectural_state import (
@@ -20,7 +19,10 @@ if TYPE_CHECKING:
     )
 
 
-class ToyParser:
+class ToyParser(Parser):
+    _DOT = pp.Literal(".")
+    _D_COL = pp.Literal(":").suppress()
+
     _address_mnemonics = ["STO", "LDA", "BRZ", "ADD", "SUB", "OR", "AND", "XOR"]
     _no_address_mnemonics = ["NOT", "INC", "DEC", "ZRO", "NOP"]
 
@@ -31,6 +33,8 @@ class ToyParser:
 
     _pattern_value = _pattern_hex_value | _pattern_dec_value
 
+    _pattern_label_declaration = _pattern_label("label") + _D_COL
+
     _pattern_address_instruction = pp.oneOf(_address_mnemonics, caseless=True)(
         "mnemonic"
     ) + (_pattern_value("address") ^ _pattern_label("label"))
@@ -39,13 +43,12 @@ class ToyParser:
         "mnemonic"
     )
 
-    _pattern_label_declaration = _pattern_label("label") + ":"
+    _pattern_instruction = pp.Optional(_pattern_label_declaration)("in_line_label") + (
+        _pattern_address_instruction ^ _pattern_no_address_instruction
+    )
 
     _directives = ["text", "data"]
     _type_directives = ["word"]
-
-    _DOT = pp.Literal(".")
-    _D_COL = pp.Literal(":").suppress()
 
     _pattern_directive = pp.Group(_DOT + pp.oneOf(_directives)("directive"))
     _pattern_type_directive = pp.Group(_DOT + pp.oneOf(_type_directives)("type"))
@@ -60,12 +63,11 @@ class ToyParser:
     _pattern_line = (
         _pattern_directive
         ^ _pattern_variable_declaration("variable_declaration")
-        ^ _pattern_address_instruction
-        ^ _pattern_no_address_instruction
+        ^ _pattern_instruction
         ^ _pattern_label_declaration("label_declaration")
     ) + pp.StringEnd().suppress()
 
-    def parse(self, program: str, state: ToyArchitecturalState):
+    def parse(self, program: str, state: ToyArchitecturalState, **kwargs):
         """Parses the text format assembly program and loads it into the architectural state.
 
         Args:
@@ -75,7 +77,7 @@ class ToyParser:
         Raises:
             ParserSyntaxException: Indicates a syntax error.
         """
-        self.state = state
+        self.state: ToyArchitecturalState = state
         self.program = program
         self._sanitize()
         self._tokenize()
@@ -83,94 +85,6 @@ class ToyParser:
         self._process_labels()
         self._write_data()
         self._load_instructions()
-
-    def _sanitize(self):
-        """Removes leading/trailing whitespaces, empty lines, comments from self.program. Gives each line a linenumber (starting at 1). Stores the result in self.sanitized_program."""
-        lines = self.program.splitlines()
-        self.sanitized_program: list[tuple[int, str]] = []
-        for index, line in enumerate(lines):
-            # remove leading/trailing whitespaces
-            line = line.strip()
-            # skip empty lines and lines that start with a # (comments)
-            if (not line) or line.startswith("#"):
-                continue
-            # strip comments that start after (possible) instructions
-            instruction_part = line.split("#", maxsplit=1)[0].strip()
-            # append linenumber (index+1) and instruction string
-            self.sanitized_program.append((index + 1, instruction_part))
-
-    def _tokenize(self):
-        """Turns self.sanitized_program into tokens and stores them (together with the line numbers and the original line) in self.token_list."""
-        self.token_list: list[tuple[int, str, pp.ParseResults]] = []
-        for linenumber, line in self.sanitized_program:
-            try:
-                self.token_list.append(
-                    (linenumber, line, self._pattern_line.parse_string(line))
-                )
-            except pp.ParseException:
-                raise ParserSyntaxException(line_number=linenumber, line=line)
-
-    def _segment(self) -> None:
-        """Determines the segments of the program (data and text) and stores them in self.data and self.text."""
-
-        self.data: list[tuple[int, str, pp.ParseResults]] = []
-        self.text: list[tuple[int, str, pp.ParseResults]] = []
-
-        if self.token_list == []:
-            return
-
-        data_exists = False
-        text_exists = True
-        self.text = self.token_list
-
-        # first line is segment directive
-        if not isinstance(self.token_list[0][2][0], str):
-            # [0] -> first element in list, [2] -> ParseResult, [0] -> outer layer of parse result
-            if self.token_list[0][2][0].get("directive") == "data":
-                data_exists = True
-                text_exists = False
-                self.data = self.token_list[1:]
-                self.text = []
-            elif self.token_list[0][2][0].get("directive") == "text":
-                self.text = self.token_list[1:]
-
-        for line_number, line, line_parsed in self.token_list[1:]:
-            if isinstance(line_parsed[0], str):
-                continue
-            line_parsed[0].get("directive")
-            if line_parsed[0].get("directive") == "data":
-                if not data_exists:
-                    data_exists = True
-                    index = self.text.index((line_number, line, line_parsed))
-                    self.data = self.text[index + 1 :]
-                    self.text = self.text[:index]
-                else:
-                    raise ParserDirectiveException(line_number=line_number, line=line)
-            elif line_parsed[0].get("directive") == "text":
-                if not text_exists:
-                    text_exists = True
-                    index = self.data.index((line_number, line, line_parsed))
-                    self.text = self.data[index + 1 :]
-                    self.data = self.data[:index]
-                else:
-                    raise ParserDirectiveException(line_number=line_number, line=line)
-            elif line_parsed.get("directive") is not None:
-                raise ParserDirectiveException(line_number=line_number, line=line)
-
-    def _process_labels(self):
-        """Takes the labels and computes the addresses for the labels from self.token_list and stores both in self.labels."""
-        program_counter = 0
-        self.labels = {}
-        for line_number, line, tokens in self.token_list:
-            if tokens.get_name() == "label_declaration":
-                self._add_label_mapping(
-                    label=tokens.label,
-                    value=program_counter,
-                    line=line,
-                    line_number=line_number,
-                )
-            elif tokens.mnemonic:  # if it is an instruction
-                program_counter += 1
 
     def _write_data(self) -> None:
         """Looks for data write commands in self.data. Stores the variables in self.labels and writes them to the memory of self.state."""
@@ -252,20 +166,24 @@ class ToyParser:
         else:
             return int(address)
 
-    def _add_label_mapping(self, label: str, value: int, line_number: int, line: str):
-        """Add label/variable value mapping to self.labels. Raise an error if the label, ... already exists.
-
-        Args:
-            name (str): Label/Variable to be added.
-            value (int): The value to which the label should be mapped.
-            line_number (int): The line number in which the label gets declared.
-            line (str): The line in which the label gets declared.
-
-        Raises:
-            DuplicateNamingException: An error gets raised if the label, ... already exists, since this is most likely unwanted.
-        """
-        if label in self.labels:
-            raise DuplicateLabelException(
-                line_number=line_number, line=line, label=label
-            )
-        self.labels[label] = value
+    def _process_labels(self):
+        """Takes the labels and computes the addresses for the labels from self.token_list and stores both in self.labels."""
+        program_counter = 0
+        for line_number, line, tokens in self.token_list:
+            if tokens.get_name() == "label_declaration":
+                self._add_label_mapping(
+                    label=tokens.label,
+                    value=program_counter,
+                    line=line,
+                    line_number=line_number,
+                )
+                continue
+            if tokens.in_line_label:
+                self._add_label_mapping(
+                    label=tokens.in_line_label[0],
+                    value=program_counter,
+                    line=line,
+                    line_number=line_number,
+                )
+            if tokens.mnemonic:  # if it is an instruction
+                program_counter += 1

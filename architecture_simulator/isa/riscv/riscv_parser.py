@@ -13,9 +13,10 @@ from ..parser_exceptions import (
     ParserSyntaxException,
     ParserDataDuplicateException,
     ParserDataSyntaxException,
-    ParserDirectiveException,
     ParserVariableException,
 )
+
+from architecture_simulator.isa.parser import Parser
 
 if TYPE_CHECKING:
     from architecture_simulator.isa.riscv.instruction_types import RiscvInstruction
@@ -24,7 +25,7 @@ if TYPE_CHECKING:
     )
 
 
-class RiscvParser:
+class RiscvParser(Parser):
     """A parser for RISC-V programs. It is capable of turning a text form program into instruction objects."""
 
     _directives = ["text", "data"]
@@ -256,32 +257,34 @@ class RiscvParser:
         + _pattern_imm("imm")
     )
 
+    _pattern_instruction = pp.Optional(_pattern_label + _D_COL)("in_line_label") + (
+        _pattern_r_type_instruction
+        ^ _pattern_u_type_instruction
+        ^ _pattern_b_type_instruction
+        ^ _pattern_memory_instruction
+        ^ _pattern_memory_pseudo_instruction
+        ^ _pattern_s_pseudo_instruction
+        ^ _pattern_reg_csr_reg_instruction
+        ^ _pattern_reg_csr_imm_instruction
+        ^ _pattern_reg_reg_imm_instruction
+        ^ _pattern_fence_instruction
+        ^ _pattern_jal_instruction
+        ^ _pattern_ecall_ebreak_instruction
+        ^ _pattern_nop_instruction
+        ^ _pattern_li_instruction
+    )("instruction")
+
     _pattern_line = (
         (
             _pattern_directive
             ^ _pattern_variable_declaration("variable_declaration")
             ^ _pattern_string_declaration("variable_declaration")
-            ^ _pattern_r_type_instruction
-            ^ _pattern_u_type_instruction
-            ^ _pattern_b_type_instruction
-            ^ _pattern_memory_instruction
-            ^ _pattern_memory_pseudo_instruction
-            ^ _pattern_s_pseudo_instruction
-            ^ _pattern_reg_csr_reg_instruction
-            ^ _pattern_reg_csr_imm_instruction
-            ^ _pattern_reg_reg_imm_instruction
-            ^ _pattern_fence_instruction
-            ^ _pattern_jal_instruction
-            ^ _pattern_ecall_ebreak_instruction
-            ^ _pattern_nop_instruction
-            ^ _pattern_li_instruction
+            ^ _pattern_instruction
             ^ (_pattern_label + _D_COL)("label_declaration")
         )
     ) + pp.StringEnd().suppress()
 
-    def parse(
-        self, program: str, state: RiscvArchitecturalState, start_address: int = 0
-    ) -> None:
+    def parse(self, program: str, state: RiscvArchitecturalState, **kwargs) -> None:
         """Parses the text format assembly program and loads it into the architectural state.
 
         Args:
@@ -289,91 +292,39 @@ class RiscvParser:
             state (RiscvArchitecturalState): The architectural state into which the program should get loaded.
         """
 
-        self.state = state
+        self.state: RiscvArchitecturalState = state
         self.program = program
         self.start_address = (
             state.instruction_memory.address_range.start
-            if start_address == 0
-            else start_address
+            if not "start_address" in kwargs
+            else kwargs["start_address"]
         )
         self._sanitize()
         self._tokenize()
         self._segment()
+        self._list_access_at_zero_and_remove_inline_labels()
         self._write_data()
         self._process_pseudo_instructions()
         self._process_labels()
         self._write_instructions()
 
-    def _sanitize(self) -> None:
-        """Removes leading/trailing whitespace, empty lines, comments from self.program. Gives each line a line number (starting at 1). Stores the result in self.sanitized_program."""
+    def _list_access_at_zero_and_remove_inline_labels(self) -> None:
+        """
+        Removes in line labels from self.text and saves them in self.in_line_labels.
+        """
+        self.data = [(n, l, p[0]) for (n, l, p) in self.data]
 
-        # remove empty lines, lines that only contain white space and comment lines. Enumerate all lines before removing lines.
-        self.sanitized_program = [
-            (index + 1, line)
-            for index, line in enumerate(self.program.splitlines())
-            if line.strip() and not line.strip().startswith("#")
-        ]
-        # remove comments from lines that also contain an instruction and strip the line
-        self.sanitized_program = [
-            (index, line.split("#", 1)[0].strip())
-            for index, line in self.sanitized_program
-        ]
+        temp: list[tuple[int, str, pp.ParseResults]] = []
+        self.in_line_labels: dict[int, str] = {}
 
-    def _tokenize(self) -> None:
-        """Turns self.sanitized_program into tokens and stores them in self.token_list (together with the line numbers and the original line)."""
-        self.token_list: list[tuple[int, str, pp.ParseResults]] = []
-        for line_number, line in self.sanitized_program:
-            try:
-                self.token_list.append(
-                    (line_number, line, self._pattern_line.parseString(line)[0])
-                )
-            except pp.ParseException:
-                raise ParserSyntaxException(line_number=line_number, line=line)
-
-    def _segment(self) -> None:
-        """Determines the segments of the program (data and text) and stores them in self.data and self.text."""
-
-        self.data: list[tuple[int, str, pp.ParseResults]] = []
-        self.text: list[tuple[int, str, pp.ParseResults]] = []
-
-        if self.token_list == []:
-            return
-
-        data_exists = False
-        text_exists = True
-        self.text = self.token_list
-
-        # first line is segment directive
-        if not isinstance(self.token_list[0][2], str):
-            if self.token_list[0][2].get("directive") == "data":
-                data_exists = True
-                text_exists = False
-                self.data = self.token_list[1:]
-                self.text = []
-            elif self.token_list[0][2].get("directive") == "text":
-                self.text = self.token_list[1:]
-
-        for line_number, line, line_parsed in self.token_list[1:]:
-            if isinstance(line_parsed, str):
-                continue
-            if line_parsed.get("directive") == "data":
-                if not data_exists:
-                    data_exists = True
-                    index = self.text.index((line_number, line, line_parsed))
-                    self.data = self.text[index + 1 :]
-                    self.text = self.text[:index]
-                else:
-                    raise ParserDirectiveException(line_number=line_number, line=line)
-            elif line_parsed.get("directive") == "text":
-                if not text_exists:
-                    text_exists = True
-                    index = self.data.index((line_number, line, line_parsed))
-                    self.text = self.data[index + 1 :]
-                    self.data = self.data[:index]
-                else:
-                    raise ParserDirectiveException(line_number=line_number, line=line)
-            elif line_parsed.get("directive") is not None:
-                raise ParserDirectiveException(line_number=line_number, line=line)
+        for (n, l, p) in self.text:
+            if not isinstance(p, str) and len(p) == 2:
+                temp.append((n, l, p[1]))
+                assert isinstance(p[0], str)
+                self.in_line_labels[n] = p[0]
+            else:
+                temp.append((n, l, p[0]))
+        self.text = temp
 
     def _write_data(self) -> None:
         """Looks for data write commands in self.data. Stores the variables in self.variables and writes them to the memory of self.state."""
@@ -618,16 +569,28 @@ class RiscvParser:
 
     def _process_labels(self) -> None:
         """Computes the addresses of all labels in the text segment and stores them in self.labels"""
-        self.labels: dict[str, int] = {}
         instruction_address = self.start_address
+
         for line_number, line, line_parsed in self.text:
+            # line is a label
             if (
                 isinstance(line_parsed, str)
                 and line_parsed != "ecall"
                 and line_parsed != "ebreak"
             ):
-                self.labels.update({line_parsed: instruction_address})
+                self._add_label_mapping(
+                    line_parsed, instruction_address, line_number, line
+                )
             else:
+                # in line label
+                if line_number in self.in_line_labels:
+                    self._add_label_mapping(
+                        self.in_line_labels[line_number],
+                        instruction_address,
+                        line_number,
+                        line,
+                    )
+                # instruction
                 mnemonic = (
                     line_parsed if type(line_parsed) == str else line_parsed.mnemonic
                 )

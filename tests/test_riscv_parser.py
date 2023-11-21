@@ -125,8 +125,12 @@ beq zero, ra, Ban0n3
         parser.program = self.program
         parser._sanitize()
         parser._tokenize()
-
-        instr = [instr for line_num, line, instr in parser.token_list]
+        instr = [
+            instr
+            for line_num, line, instr in [
+                (n, l, p[0]) for (n, l, p) in parser.token_list
+            ]
+        ]
         self.assertEqual(
             [result if type(result) == str else result.as_list() for result in instr],
             self.expected,
@@ -153,15 +157,7 @@ beq zero, ra, Ban0n3
         }
         parser = RiscvParser()
         state = RiscvArchitecturalState()
-        parser.state = state
-        parser.start_address = 0
-        parser.program = self.program
-        parser._sanitize()
-        parser._tokenize()
-        parser._segment()
-        parser._write_data()
-        parser._process_pseudo_instructions()
-        parser._process_labels()
+        parser.parse(self.program, state)
 
         self.assertEqual(parser.labels, expected_labels)
 
@@ -546,7 +542,9 @@ fibonacci:
         parser._sanitize()
         parser._tokenize()
 
-        parsed = [result[2] for result in parser.token_list]
+        parsed = [
+            result[2] for result in [(n, l, p[0]) for (n, l, p) in parser.token_list]
+        ]
         self.assertEqual(
             [result if type(result) == str else result.as_list() for result in parsed],
             [
@@ -1404,3 +1402,42 @@ fibonacci:
             state.register_file.registers[6],
             fixedint.MutableUInt32(-1234567),
         )
+
+    def test_in_line_labels(self):
+        program = """
+        Banane:
+        Birne: ADD x0, x0, x0
+        Label: JAL x0, Birne
+        _Apf_el: ADDI x0, x0, 0xFF
+        Kirsche: SB x0, x0, 0xFF
+        Hambeere:
+        Himbeere: BEQ x0, x0, Kirsche
+        Blaubeere: LUI x0, 0xFF
+        CSR: csrrw x0, 0xa, x0
+        NOP: NOP
+        e_c_all: ecall # Comment
+        # ...
+        """
+
+        parser = RiscvParser()
+        state = RiscvArchitecturalState()
+        parser.parse(program, state)
+        self.assertEqual(parser.labels["Banane"], parser.labels["Birne"])
+        self.assertEqual(parser.labels["Hambeere"], parser.labels["Himbeere"])
+        self.assertEqual(parser.labels["Hambeere"], 16)
+        self.assertEqual(parser.labels["NOP"], 28)
+
+        program = """
+        .text
+        addi x1, x0, 10
+        start: add x2, x2, x1 # comment
+        label:
+        addi x1, x1, -1
+        bne x0, x1, start
+        end: # comment
+        """
+        sim = RiscvSimulation()
+        sim.load_program(program)
+        for _ in range(100):
+            sim.step()
+        self.assertEqual(sim.state.register_file.registers[2], 55)

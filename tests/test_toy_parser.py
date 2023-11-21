@@ -125,15 +125,20 @@ class TestToyParser(unittest.TestCase):
     def test_labels(self):
         parser = ToyParser()
         state = ToyArchitecturalState()
-        program = """Ameisenkuchen:
-        _Apfeltarte:
-        ADD Ameisenkuchen
-        INC
-        Banan3nkuch3n3:
-        BRZ _Apfeltarte
-        STO Banan3nkuch3n3"""
+        program = """
+        Banane:
+        SUB Kirsche
+        ADD Banane
+        _Apfel_: INC
+        ADD _Apfel_
+        ADD _Apfel_
+        Kirsche: INC
+        """
         parser.parse(program=program, state=state)
-        expected = {0: ADD(0), 1: INC(), 2: BRZ(0), 3: STO(2)}
+        self.assertEqual(state.memory.read_halfword(0), int(SUB(5)))
+        self.assertEqual(state.memory.read_halfword(1), int(ADD(0)))
+        self.assertEqual(state.memory.read_halfword(3), int(ADD(2)))
+        self.assertEqual(state.memory.read_halfword(4), int(ADD(2)))
 
     def test_load_instructions(self):
         parser = ToyParser()
