@@ -160,18 +160,18 @@ class SvgFillDirectiveMain(SvgFillDirective):
     """SVG Fill Directive for normal paths."""
 
     def __init__(self):
-        super().__init__(color_on="#ff3300", color_off="#5f5f5f")
+        super().__init__(color_on="#ED6B03", color_off="#5f5f5f")
 
 
 class SvgFillDirectiveAlt(SvgFillDirective):
     """SVG Fill Directive for secondary paths."""
 
     def __init__(self):
-        super().__init__(color_on="#ff3300", color_off="#000000")
+        super().__init__(color_on="#ED6B03", color_off="#000000")
 
 
 class SvgFillDirectiveControlUnit(SvgFillDirective):
     """SVG Fill Directive for the control unit signals."""
 
     def __init__(self):
-        super().__init__(color_on="#ff3300", color_off="#000000")
+        super().__init__(color_on="#ED6B03", color_off="#000000")
