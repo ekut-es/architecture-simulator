@@ -6,10 +6,16 @@ function getMemoryAndAccuColumn() {
         id="toy-main-text-container-id"
         class="d-flex flex-column"
     >
-        <div class="mb-3 flex-shrink-0">
+        <div class="mb-3" id="toy-registers-wrapper">
             <table
                 class="table table-sm table-hover table-bordered mono-table mb-0"
+                id="toy-register-table"
             >
+                <colgroup>
+                    <col />
+                    <col id="toy-registers-second-column" />
+                    <col />
+                </colgroup>
                 <tr>
                     <td>ACCU</td>
                     <td colspan="2" id="toy-accu-id">0</td>
@@ -20,12 +26,12 @@ function getMemoryAndAccuColumn() {
                 </tr>
                 <tr>
                     <td>IR</td>
-                    <td id="toy-ir-value-id"></td>
                     <td id="toy-ir-instruction-id"></td>
+                    <td id="toy-ir-value-id"></td>
                 </tr>
             </table>
         </div>
-        <div class="mb-3">
+        <div class="mb-3" id="toy-memory-wrapper">
             <table
                 id="toy-memory-table-id"
                 class="table table-sm table-hover table-bordered mono-table mb-0"
@@ -40,10 +46,12 @@ function getMemoryAndAccuColumn() {
                 <tbody id="toy-memory-table-body-id"></tbody>
             </table>
         </div>
-        <div
-            id="output-field-id"
-            class="flex-shrink-0 archsim-default-border"
-        ></div>
+        <div id="toy-output-wrapper">
+            <div
+                id="output-field-id"
+                class="flex-shrink-0 archsim-default-border"
+            ></div>
+        </div>
     </div>`);
 }
 
