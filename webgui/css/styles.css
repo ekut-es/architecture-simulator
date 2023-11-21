@@ -154,10 +154,6 @@ nav {
     float: left;
 }
 
-#toy-ir-instruction-id {
-    width: 7em;
-    min-width: 7em;
-}
 #toy-register-table td:first-child {
     font-weight: bold;
 }

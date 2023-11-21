@@ -14,16 +14,15 @@ function getMemoryAndAccuColumn() {
             >
                 <tr>
                     <td>ACCU</td>
-                    <td colspan="2" id="toy-accu-id">0</td>
+                    <td id="toy-accu-id">0</td>
                 </tr>
                 <tr>
                     <td>PC</td>
-                    <td colspan="2" id="toy-pc-id"></td>
+                    <td id="toy-pc-id"></td>
                 </tr>
                 <tr>
                     <td>IR</td>
-                    <td id="toy-ir-instruction-id"></td>
-                    <td id="toy-ir-value-id"></td>
+                    <td id="toy-ir-id"></td>
                 </tr>
             </table>
         </div>

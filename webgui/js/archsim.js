@@ -38,10 +38,9 @@ const archsim_js = {
         document.getElementById("toy-pc-id").innerText = pcRepresentations.get(
             reg_representation_mode
         );
-        document.getElementById("toy-ir-value-id").innerText =
-            irRepresentations.get(reg_representation_mode);
-        document.getElementById("toy-ir-instruction-id").innerText =
-            instruction;
+        document.getElementById("toy-ir-id").innerText = irRepresentations.get(
+            reg_representation_mode
+        );
         accuRepresentations.destroy();
         pcRepresentations.destroy();
         irRepresentations.destroy();
