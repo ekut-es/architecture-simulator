@@ -12,11 +12,6 @@ function getMemoryAndAccuColumn() {
                 class="table table-sm table-hover table-bordered mono-table mb-0"
                 id="toy-register-table"
             >
-                <colgroup>
-                    <col />
-                    <col id="toy-registers-second-column" />
-                    <col />
-                </colgroup>
                 <tr>
                     <td>ACCU</td>
                     <td colspan="2" id="toy-accu-id">0</td>
