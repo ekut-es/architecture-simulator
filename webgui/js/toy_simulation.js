@@ -10,12 +10,19 @@ function getMemoryAndAccuColumn() {
             <table
                 class="table table-sm table-hover table-bordered mono-table mb-0"
             >
-                <thead>
-                    <tr>
-                        <th>ACCU</th>
-                        <th id="toy-accu-id">0</th>
-                    </tr>
-                </thead>
+                <tr>
+                    <td>ACCU</td>
+                    <td colspan="2" id="toy-accu-id">0</td>
+                </tr>
+                <tr>
+                    <td>PC</td>
+                    <td colspan="2" id="toy-pc-id"></td>
+                </tr>
+                <tr>
+                    <td>IR</td>
+                    <td id="toy-ir-value-id"></td>
+                    <td id="toy-ir-instruction-id"></td>
+                </tr>
             </table>
         </div>
         <div class="mb-3">

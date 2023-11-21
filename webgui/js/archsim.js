@@ -21,13 +21,30 @@ function addToOutput(s) {
 // Object containing functions to be exported to python
 const archsim_js = {
     /**
-     * Updates the TOY accu.
-     * @param representations A Python Tuple containing the representations (binary, unsigned decimal, hexadecimal, signed decimal) for the accu.
+     * Updates the TOY Register.
+     * @param accuRepresentations A Python Tuple containing the representations (binary, unsigned decimal, hexadecimal, signed decimal) for the accu.
+     * @param pcRepresentations A Python Tuple containing the representations (binary, unsigned decimal, hexadecimal, signed decimal) for the PC.
+     * @param irRepresentations A Python Tuple containing the representations (binary, unsigned decimal, hexadecimal, signed decimal) for the IR.
+     * @param {string} instruction A string representation of the instruction in the IR.
      */
-    toyUpdateAccu: function (representations) {
+    toyUpdateRegisters: function (
+        accuRepresentations,
+        pcRepresentations,
+        irRepresentations,
+        instruction
+    ) {
         document.getElementById("toy-accu-id").innerText =
-            Array.from(representations)[reg_representation_mode];
-        representations.destroy();
+            accuRepresentations.get(reg_representation_mode);
+        document.getElementById("toy-pc-id").innerText = pcRepresentations.get(
+            reg_representation_mode
+        );
+        document.getElementById("toy-ir-value-id").innerText =
+            irRepresentations.get(reg_representation_mode);
+        document.getElementById("toy-ir-instruction-id").innerText =
+            instruction;
+        accuRepresentations.destroy();
+        pcRepresentations.destroy();
+        irRepresentations.destroy();
     },
     /**
      * Clears the TOY memory table.
