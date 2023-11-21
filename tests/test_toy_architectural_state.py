@@ -11,6 +11,7 @@ from architecture_simulator.isa.toy.toy_instructions import (
     ZRO,
     ToyInstruction,
 )
+from architecture_simulator.simulation.toy_simulation import ToySimulation
 
 
 class TestToyArchitecture(unittest.TestCase):
@@ -83,3 +84,10 @@ class TestToyArchitecture(unittest.TestCase):
             state.get_accu_representation(),
             ("01101010 11111110", "27390", "6A FE", "27390"),
         )
+
+    def test_pc_overflow(self):
+        simulation = ToySimulation()
+        simulation.load_program("NOP\n" * 4096)
+        for _ in range(4095):
+            simulation.step()
+        self.assertEqual(simulation.state.program_counter, 0)

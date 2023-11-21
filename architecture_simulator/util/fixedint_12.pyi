@@ -1,0 +1,3 @@
+from fixedint.base import MutableFixedInt
+
+class MutableUInt12(MutableFixedInt): ...
