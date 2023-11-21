@@ -177,6 +177,10 @@ nav {
     flex: 1 0 min(auto, 1em);
 }
 
+.text-element-heading {
+    font-size: 1.5em;
+}
+
 /* Visualization */
 
 #riscv-visualization,
