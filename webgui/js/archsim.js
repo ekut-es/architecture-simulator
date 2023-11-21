@@ -30,8 +30,7 @@ const archsim_js = {
     toyUpdateRegisters: function (
         accuRepresentations,
         pcRepresentations,
-        irRepresentations,
-        instruction
+        irRepresentations
     ) {
         document.getElementById("toy-accu-id").innerText =
             accuRepresentations.get(reg_representation_mode);

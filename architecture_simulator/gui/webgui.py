@@ -239,7 +239,11 @@ def update_toy_tables():
     """Updates the register and memory table for toy"""
     if isinstance(simulation, ToySimulation):
         # accu
-        accu_representation = simulation.state.get_accu_representation()
+        accu_representation = (
+            simulation.state.get_accu_representation()
+            if simulation.has_instructions()
+            else ("", "", "", "")
+        )
         pc_representation = (
             get_12_bit_representations(int(simulation.state.program_counter))
             if simulation.has_instructions()
@@ -250,16 +254,8 @@ def update_toy_tables():
             if simulation.state.loaded_instruction is not None
             else ("", "", "", "")
         )
-        ir_instruction = (
-            str(simulation.state.loaded_instruction)
-            if simulation.state.loaded_instruction is not None
-            else ""
-        )
         archsim_js.toyUpdateRegisters(
-            accu_representation,
-            pc_representation,
-            ir_representation,
-            ir_instruction,
+            accu_representation, pc_representation, ir_representation
         )
 
         # memory table
