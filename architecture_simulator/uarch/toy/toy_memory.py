@@ -3,6 +3,9 @@ from fixedint import MutableUInt16
 
 from architecture_simulator.settings.settings import Settings
 from ..memory import MemoryAddressError
+from architecture_simulator.util.integer_representations import (
+    get_16_bit_representations,
+)
 
 
 @dataclass
@@ -68,18 +71,5 @@ class ToyMemory:
         res: dict[int, tuple[str, str, str, str]] = {}
         for key in self.memory_file.keys():
             word = self.memory_file[key]
-            unsigned_decimal = int(word)
-            signed_decimal = (
-                unsigned_decimal - 2**16
-                if unsigned_decimal >= 2**15
-                else unsigned_decimal
-            )
-            bin = "{:016b}".format(int(word))
-            hex = "{:04X}".format(int(word))
-            res[key] = (
-                bin[0:8] + " " + bin[8:16],
-                str(unsigned_decimal),
-                hex[0:2] + " " + hex[2:4],
-                str(signed_decimal),
-            )
+            res[key] = get_16_bit_representations(int(word))
         return res

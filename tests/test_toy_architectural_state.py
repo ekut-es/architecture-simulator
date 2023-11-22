@@ -75,11 +75,3 @@ class TestToyArchitecture(unittest.TestCase):
             entries[4094], ("11011110 10101101", "57005", "DE AD", "-8531")
         )
         self.assertEqual(entries[4095], ("00010010 00111010", "4666", "12 3A", "4666"))
-
-    def test_accu_repr(self):
-        state = ToyArchitecturalState()
-        state.accu = MutableUInt16(0x6AFE)
-        self.assertEqual(
-            state.get_accu_representation(),
-            ("01101010 11111110", "27390", "6A FE", "27390"),
-        )

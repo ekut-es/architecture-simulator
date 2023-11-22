@@ -2,6 +2,9 @@ from dataclasses import dataclass, field
 import fixedint
 
 from architecture_simulator.settings.settings import Settings
+from architecture_simulator.util.integer_representations import (
+    get_32_bit_representations,
+)
 
 
 class Registers(list):
@@ -40,34 +43,7 @@ class RegisterFile:
         reg_repr: dict[int, tuple[str, str, str, str]] = dict()
         index = 0
         for reg in self.registers:
-            val = int(reg)
-            signed_decimal = val - 2**32 if val >= 2**31 else val
-            bin_reg = "{:032b}".format(int(reg))
-            hex_reg = "{:08X}".format(int(reg))
-            bin_reg_with_spaces = (
-                bin_reg[0:8]
-                + " "
-                + bin_reg[8:16]
-                + " "
-                + bin_reg[16:24]
-                + " "
-                + bin_reg[24:32]
-            )
-            hex_reg_with_spaces = (
-                hex_reg[0:2]
-                + " "
-                + hex_reg[2:4]
-                + " "
-                + hex_reg[4:6]
-                + " "
-                + hex_reg[6:8]
-            )
-            reg_repr[index] = (
-                bin_reg_with_spaces,
-                str(reg),
-                hex_reg_with_spaces,
-                str(signed_decimal),
-            )
+            reg_repr[index] = get_32_bit_representations(int(reg))
             index += 1
         return reg_repr
 

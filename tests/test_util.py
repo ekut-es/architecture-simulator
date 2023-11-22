@@ -2,6 +2,7 @@ import unittest
 from architecture_simulator.util.integer_representations import (
     get_12_bit_representations,
     get_16_bit_representations,
+    get_32_bit_representations,
 )
 
 
@@ -89,4 +90,14 @@ class TestUtil(unittest.TestCase):
         self.assertEqual(
             get_16_bit_representations(-32767),
             ("10000000 00000001", "32769", "80 01", "-32767"),
+        )
+
+    def test_32_bit_representation(self):
+        self.assertEqual(
+            get_32_bit_representations(1),
+            ("00000000 00000000 00000000 00000001", "1", "00 00 00 01", "1"),
+        )
+        self.assertEqual(
+            get_32_bit_representations(0),
+            ("00000000 00000000 00000000 00000000", "0", "00 00 00 00", "0"),
         )

@@ -6,6 +6,9 @@ from .toy_memory import ToyMemory
 from architecture_simulator.isa.toy.toy_instructions import ToyInstruction
 from .toy_performance_metrics import ToyPerformanceMetrics
 from .SvgVisValues import SvgVisValues
+from architecture_simulator.util.integer_representations import (
+    get_16_bit_representations,
+)
 
 
 class ToyArchitecturalState:
@@ -43,28 +46,3 @@ class ToyArchitecturalState:
             bool: Whether a instructions is currently loaded.
         """
         return self.loaded_instruction is not None
-
-    def get_accu_representation(self) -> tuple[str, str, str, str]:
-        """Returns the values of the accu as binary, unsigned decimal, hexadecimal, signed decimal strings.
-
-        Returns:
-            tuple[str, str, str]: tuple of the binary, unsigned decimal, hexadecimal, signed decimal representation strings of the accu.
-        """
-        unsigned_decimal = int(self.accu)
-        signed_decimal = (
-            unsigned_decimal - 2**16
-            if unsigned_decimal >= 2**15
-            else unsigned_decimal
-        )
-        binary = "{:016b}".format(unsigned_decimal)
-        hexadecimal = "{:04X}".format(unsigned_decimal)
-        return (
-            binary[:8] + " " + binary[8:],
-            str(unsigned_decimal),
-            hexadecimal[:2] + " " + hexadecimal[2:],
-            str(signed_decimal),
-        )
-
-    def get_repr(self):
-        ...
-        # TODO: Implement for alu_out, ram_out, accu

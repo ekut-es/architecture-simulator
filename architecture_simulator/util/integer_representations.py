@@ -11,6 +11,11 @@ def get_16_bit_representations(number: int) -> tuple[str, str, str, str]:
     return get_n_bit_representations(number=number, n=16)
 
 
+def get_32_bit_representations(number: int) -> tuple[str, str, str, str]:
+    """Shorthand function for get_n_bit_representations(number, n=32)"""
+    return get_n_bit_representations(number=number, n=32)
+
+
 def get_n_bit_representations(number: int, n: int) -> tuple[str, str, str, str]:
     """Returns (bin, udec, hex, sdec) representations for the given number, assuming the number has n bits. Twos complement is used for bin and hex strings.
 

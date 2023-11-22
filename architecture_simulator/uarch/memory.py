@@ -1,6 +1,9 @@
 from dataclasses import dataclass, field
 import fixedint
 from architecture_simulator.settings.settings import Settings
+from architecture_simulator.util.integer_representations import (
+    get_32_bit_representations,
+)
 
 
 @dataclass
@@ -39,34 +42,7 @@ class Memory:
             if aligned_address in wordwise_mem:
                 continue
             word = self.read_word(address=aligned_address)
-            val = int(word)
-            signed_decimal = val - 2**32 if val >= 2**31 else val
-            bin_word = "{:032b}".format(val)
-            hex_word = "{:08X}".format(val)
-            bin_word_with_spaces = (
-                bin_word[0:8]
-                + " "
-                + bin_word[8:16]
-                + " "
-                + bin_word[16:24]
-                + " "
-                + bin_word[24:32]
-            )
-            hex_word_with_spaces = (
-                hex_word[0:2]
-                + " "
-                + hex_word[2:4]
-                + " "
-                + hex_word[4:6]
-                + " "
-                + hex_word[6:8]
-            )
-            wordwise_mem[aligned_address] = (
-                bin_word_with_spaces,
-                str(word),
-                hex_word_with_spaces,
-                str(signed_decimal),
-            )
+            wordwise_mem[aligned_address] = get_32_bit_representations(int(word))
         return wordwise_mem
 
     def read_byte(self, address: int) -> fixedint.MutableUInt8:

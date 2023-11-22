@@ -236,7 +236,7 @@ def update_toy_tables():
     if isinstance(simulation, ToySimulation):
         # accu
         accu_representation = (
-            simulation.state.get_accu_representation()
+            get_16_bit_representations(int(simulation.state.accu))
             if simulation.has_instructions()
             else ("", "", "", "")
         )
