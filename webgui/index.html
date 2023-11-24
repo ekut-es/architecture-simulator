@@ -145,66 +145,6 @@
                 <!--Text Editor-->
                 <textarea id="input" class="archsim-default-border"></textarea>
                 <div id="text-editor-separator"></div>
-                <!--Instruction Table-->
-                <div
-                    id="riscv-instruction-table-container-id"
-                    class="main-content-column"
-                >
-                    <table
-                        id="riscv-instruction-table-id"
-                        class="table table-sm table-hover table-bordered mono-table mb-0"
-                    >
-                        <thead>
-                            <tr>
-                                <th>Address</th>
-                                <th>Command</th>
-                                <th>Stage</th>
-                            </tr>
-                        </thead>
-                        <tbody id="riscv-instruction-table-body-id"></tbody>
-                    </table>
-                </div>
-                <!--Register Table-->
-                <div
-                    id="riscv-register-table-container-id"
-                    class="main-content-column"
-                >
-                    <table
-                        class="table table-sm table-hover table-bordered mono-table mb-0"
-                    >
-                        <thead>
-                            <tr>
-                                <th colspan="2">Register</th>
-                                <th>Value</th>
-                            </tr>
-                        </thead>
-                        <tbody id="riscv-register-table-body-id"></tbody>
-                    </table>
-                </div>
-                <!--Memory Table-->
-                <div
-                    id="riscv-memory-table-container-id"
-                    class="main-content-column"
-                >
-                    <table
-                        class="table table-sm table-hover table-bordered mono-table mb-0"
-                    >
-                        <thead>
-                            <tr>
-                                <th>Address</th>
-                                <th>Value</th>
-                            </tr>
-                        </thead>
-                        <tbody id="riscv-memory-table-body-id"></tbody>
-                    </table>
-                </div>
-                <!--Output Field-->
-                <div
-                    id="riscv-output-container-id"
-                    class="main-content-column height-100"
-                >
-                    <div id="output-field-id"></div>
-                </div>
             </div>
             <div id="visualizations-container-id"></div>
         </div>
@@ -523,9 +463,11 @@
         <script type="text/javascript" src="js/toy_documentation.js"></script>
         <script type="text/javascript" src="js/riscv_simulation.js"></script>
         <script type="text/javascript" src="js/toy_simulation.js"></script>
-        <script type="text/javascript" src="js/scripts.js"></script>
-        <script type="text/javascript" src="js/archsim.js"></script>
         <script type="text/javascript" src="js/editor.js"></script>
+        <script
+            type="text/javascript"
+            src="js/initialize_simulator.js"
+        ></script>
         <script type="text/javascript" src="js/bootstrap.min.js"></script>
     </body>
 </html>
