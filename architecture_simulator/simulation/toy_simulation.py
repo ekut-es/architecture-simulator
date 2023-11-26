@@ -28,6 +28,7 @@ class ToySimulation(Simulation):
     ):
         self.state = ToyArchitecturalState(unified_memory_size)
         self.next_cycle = 1
+        super().__init__()
 
     def first_cycle_step(self):
         """
@@ -40,6 +41,7 @@ class ToySimulation(Simulation):
             raise StepSequenceError(
                 "Before you can call this function again, you have to call second_cycle_step()"
             )
+        self.has_started = True
         self.next_cycle = 2
         self.state.loaded_instruction.behavior(self.state)
         self.state.address_of_current_instruction = (

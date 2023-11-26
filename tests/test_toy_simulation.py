@@ -208,3 +208,23 @@ INC"""
         self.assertEqual(register_representations["accu"][1], "0")
         self.assertEqual(register_representations["pc"][1], "1")
         self.assertEqual(register_representations["ir"][1], "4097")
+
+    def test_single_step(self):
+        sim = ToySimulation()
+        sim.load_program("INC\nNOP")
+        for _ in range(4):
+            self.assertTrue(not sim.is_done())
+            sim.single_step()
+        self.assertTrue(sim.is_done())
+
+    def test_has_started(self):
+        sim = ToySimulation()
+        self.assertTrue(not sim.has_started)
+        sim.load_program("NOP\nINC")
+        self.assertTrue(not sim.has_started)
+        sim.single_step()
+        self.assertTrue(sim.has_started)
+        sim.single_step()
+        self.assertTrue(sim.has_started)
+        sim.step()
+        self.assertTrue(sim.has_started)

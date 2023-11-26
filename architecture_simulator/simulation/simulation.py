@@ -7,6 +7,9 @@ if TYPE_CHECKING:
 
 
 class Simulation(ABC):
+    def __init__(self):
+        self.has_started = False
+
     @abstractmethod
     def step(self) -> bool:
         """Execute the next instruction. Does nothing if there are no more instructions to execute.

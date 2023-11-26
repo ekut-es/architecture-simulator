@@ -30,12 +30,31 @@ class ToySimulation {
      * Executes a single cycle of the simulation.
      */
     step() {
-        if (!this.simIsRunning) {
+        if (!this.pythonSimulation.has_started) {
             if (!this.parseInput()) {
                 return;
             }
         }
         this.pythonSimulation.single_step();
+        this.updateUI();
+    }
+
+    /**
+     * Executes two cycles of the simulation.
+     * Should only be called if the next cycle to be executed is the first cycle of the current instruction,
+     * otherwise it will print an error to the output field.
+     */
+    doubleStep() {
+        if (!this.pythonSimulation.has_started) {
+            if (!this.parseInput()) {
+                return;
+            }
+        }
+        this.pythonSimulation.step();
+        this.updateUI();
+    }
+
+    updateUI() {
         this.updateRegisters();
         this.updateMemoryTable();
         this.updatePerformanceMetrics();
@@ -193,6 +212,7 @@ class ToySimulation {
             id="button-double-step-simulation-id"
             class="btn btn-primary btn-sm control-button me-1"
             title="double step"
+            onclick="simulation.doubleStep();"
         >
             <img src="img/double-step.svg" />
         </button>`);
@@ -209,7 +229,6 @@ class ToySimulation {
         document
             .getElementById("button-step-simulation-id")
             .after(doubleStepButton);
-        // doubleStepButton.addEventListener("click", doubleStep);
         document.getElementById("page-heading-id").innerText = "TOY Simulator";
         document.title = "TOY Simulator";
     }

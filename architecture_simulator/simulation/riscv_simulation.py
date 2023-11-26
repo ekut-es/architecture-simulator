@@ -43,10 +43,12 @@ class RiscvSimulation(Simulation):
             else state
         )
         self.mode = mode
+        super().__init__()
 
     def step(self) -> bool:
         if not self.is_done():
             self.state.pipeline.step()
+            self.has_started = True
         return not self.is_done()
 
     def run(self):
