@@ -16,7 +16,7 @@ class ToySimulation {
      * @returns {boolean} Whether parsing the input was successful
      */
     parseInput() {
-        const input = document.getElementById("input").value;
+        const input = editor.getValue();
         try {
             this.pythonSimulation.load_program(input);
             return true;
@@ -74,8 +74,6 @@ class ToySimulation {
      */
     updateRegisters() {
         const registers = this.pythonSimulation.get_register_representations();
-        const accu = registers.get("accu");
-        const accuValue = accu.get(this.regRepresentationMode);
         document.getElementById("toy-accu-id").innerText = registers
             .get("accu")
             .get(this.regRepresentationMode);

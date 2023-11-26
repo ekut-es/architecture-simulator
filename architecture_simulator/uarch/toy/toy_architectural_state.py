@@ -6,9 +6,6 @@ from .toy_memory import ToyMemory
 from architecture_simulator.isa.toy.toy_instructions import ToyInstruction
 from .toy_performance_metrics import ToyPerformanceMetrics
 from .SvgVisValues import SvgVisValues
-from architecture_simulator.util.integer_representations import (
-    get_16_bit_representations,
-)
 
 
 class ToyArchitecturalState:
