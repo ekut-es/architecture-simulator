@@ -4,9 +4,14 @@ class ToySimulation {
         this.insertToyElements();
         this.outputField = document.getElementById("output-field-id");
         this.previousMemoryValues = [];
-        this.simIsRunning = false;
-        this.regRepresentationMode = 1;
+        this.regRepresentationMode = 1; // TODO: Make this user-selectable
         this.memRepresentationMode = 1;
+    }
+
+    reset(pythonSimulation) {
+        this.pythonSimulation = pythonSimulation;
+        this.previousMemoryValues = [];
+        this.updateUI();
     }
 
     /**
@@ -16,7 +21,7 @@ class ToySimulation {
      * @returns {boolean} Whether parsing the input was successful
      */
     parseInput() {
-        const input = editor.getValue();
+        const input = editor.getValue(); // TODO: Maybe put static elements into an object that gets handed over to the simulation
         try {
             this.pythonSimulation.load_program(input);
             return true;
@@ -28,6 +33,7 @@ class ToySimulation {
 
     /**
      * Executes a single cycle of the simulation.
+     * Errors will be printed to the output field.
      */
     step() {
         if (!this.pythonSimulation.has_started) {
@@ -35,8 +41,12 @@ class ToySimulation {
                 return;
             }
         }
-        this.pythonSimulation.single_step();
-        this.updateUI();
+        try {
+            this.pythonSimulation.single_step();
+            this.updateUI();
+        } catch (error) {
+            this.setOutputFieldContent(error);
+        }
     }
 
     /**
@@ -46,14 +56,22 @@ class ToySimulation {
      */
     doubleStep() {
         if (!this.pythonSimulation.has_started) {
+            // TODO: Duplicate code
             if (!this.parseInput()) {
                 return;
             }
         }
-        this.pythonSimulation.step();
-        this.updateUI();
+        try {
+            this.pythonSimulation.step();
+            this.updateUI();
+        } catch (error) {
+            this.setOutputFieldContent(error);
+        }
     }
 
+    /**
+     * Updates all UI elements.
+     */
     updateUI() {
         this.updateRegisters();
         this.updateMemoryTable();
@@ -65,10 +83,6 @@ class ToySimulation {
     }
 
     pause() {
-        throw Error("Not implemented.");
-    }
-
-    reset() {
         throw Error("Not implemented.");
     }
 

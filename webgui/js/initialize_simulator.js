@@ -22,8 +22,12 @@ async function initialize() {
     await pyodide.runPython(`
 from architecture_simulator.gui.new_webgui import *
     `);
-    let pythonSimulation = pyodide.globals.get("simulation");
-    simulation = new ToySimulation(pythonSimulation);
+    getPythonSimulation = pyodide.globals.get("get_simulation");
+    simulation = new ToySimulation(getPythonSimulation("toy")); // TODO: Allow other ISAs
+}
+
+function resetSimulation() {
+    simulation.reset(getPythonSimulation("toy")); // TODO: Allow other ISAs
 }
 
 initialize();
