@@ -87,6 +87,13 @@ class ToySimulation(Simulation):
         self.second_cycle_step()
         return not self.is_done()
 
+    def single_step(self):
+        """Executes a single cycle."""
+        if self.next_cycle == 1:
+            self.first_cycle_step()
+        else:
+            self.second_cycle_step()
+
     def is_done(self) -> bool:
         return not self.state.instruction_loaded()
 
@@ -133,3 +140,51 @@ class ToySimulation(Simulation):
             "pc": pc_representation,
             "ir": ir_representation,
         }
+
+    def get_memory_table_entries(
+        self,
+    ) -> list[tuple[int, tuple[str, str, str, str], str, str]]:
+        """Returns the values to display in the memory table.
+
+        Returns:
+            list[tuple[int, tuple[str, str, str, str], str, str]]: Sorted list of (address, representatinos, instruction_representation, current_cycle).
+                instruction_representation will be "-" if the address doesn't count as storing an instruction.
+                current_cycle will be "1", "2" or "".
+        """
+        entries = self.state.memory.memory_repr()
+        result: list[tuple[int, tuple[str, str, str, str], str, str]] = []
+        current_cycle = "1" if self.next_cycle == 2 else "2"
+        # iterate over all entries in the memory
+        for address, values in entries:
+            # get instruction string representation
+            instruction_representation = self._get_instruction_representation(
+                address=address, value=int(values[1])
+            )
+            # find out if the current address is loaded as instruction and in which cycle it is
+            is_current_instruction = (
+                self.state.address_of_current_instruction is not None
+                and address == self.state.address_of_current_instruction
+            )
+            result.append(
+                (
+                    address,
+                    values,
+                    instruction_representation,
+                    current_cycle if is_current_instruction else "",
+                )
+            )
+        return result
+
+    def _get_instruction_representation(self, address: int, value: int) -> str:
+        """Returns the string to show as instruction in the memory table.
+
+        Args:
+            address (int): Memory address
+            value (int): Value at the given address in memory.
+
+        Returns:
+            str: String representation of the given value, if the simulator considers it a valid instruction (address <= max_pc), else "-".
+        """
+        if self.state.max_pc is not None and address <= self.state.max_pc:
+            return str(ToyInstruction.from_integer(value))
+        return "-"

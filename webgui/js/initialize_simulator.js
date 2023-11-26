@@ -1,3 +1,5 @@
+var simulation;
+
 async function initialize() {
     const pyodide = await loadPyodide();
     await pyodide.loadPackage("micropip");
@@ -17,8 +19,11 @@ async function initialize() {
             url + "/dist/architecture_simulator-0.1.0-py3-none-any.whl"
         );
     }
+    await pyodide.runPython(`
+from architecture_simulator.gui.new_webgui import *
+    `);
     let pythonSimulation = pyodide.globals.get("simulation");
-    let simulation = new ToySimulation(pythonSimulation);
+    simulation = new ToySimulation(pythonSimulation);
 }
 
 initialize();

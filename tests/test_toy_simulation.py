@@ -200,3 +200,11 @@ INC"""
         self.assertEqual(sim.state.loaded_instruction, None)
         self.assertEqual(sim.state.program_counter, 2)
         self.assertTrue(sim.is_done())
+
+    def test_register_representations(self):
+        sim = ToySimulation()
+        sim.load_program("LDA 1")
+        register_representations = sim.get_register_representations()
+        self.assertEqual(register_representations["accu"][1], "0")
+        self.assertEqual(register_representations["pc"][1], "1")
+        self.assertEqual(register_representations["ir"][1], "4097")

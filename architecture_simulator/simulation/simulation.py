@@ -50,3 +50,10 @@ class Simulation(ABC):
         Returns:
             PerformanceMetrics: The performance metrics which contain statistics about the simulation.
         """
+
+    def get_performance_metrics_str(self) -> str:
+        """
+        Returns:
+            str: The string representation of the performance metrics.
+        """
+        return str(self.get_performance_metrics)

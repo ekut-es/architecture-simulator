@@ -2,75 +2,135 @@ class ToySimulation {
     constructor(pythonSimulation) {
         this.pythonSimulation = pythonSimulation;
         this.insertToyElements();
+        this.outputField = document.getElementById("output-field-id");
+        this.previousMemoryValues = [];
+        this.simIsRunning = false;
+        this.regRepresentationMode = 1;
+        this.memRepresentationMode = 1;
     }
 
     /**
      * Parses and loads the content of the input field into the simulation.
      * If there was an error during parsing, the output field content will be set to the error message.
+     *
+     * @returns {boolean} Whether parsing the input was successful
      */
     parseInput() {
         const input = document.getElementById("input").value;
         try {
             this.pythonSimulation.load_program(input);
+            return true;
         } catch (err) {
-            addToOutput(err);
+            this.setOutputFieldContent(err);
+            return false;
         }
+    }
+
+    /**
+     * Executes a single cycle of the simulation.
+     */
+    step() {
+        if (!this.simIsRunning) {
+            if (!this.parseInput()) {
+                return;
+            }
+        }
+        this.pythonSimulation.single_step();
+        this.updateRegisters();
+        this.updateMemoryTable();
+        this.updatePerformanceMetrics();
+    }
+
+    run() {
+        throw Error("Not implemented.");
+    }
+
+    pause() {
+        throw Error("Not implemented.");
+    }
+
+    reset() {
+        throw Error("Not implemented.");
+    }
+
+    /**
+     * Sets the content of the output field to the current performance metrics.
+     */
+    updatePerformanceMetrics() {
+        this.setOutputFieldContent(
+            this.pythonSimulation.get_performance_metrics()
+        );
+    }
+
+    /**
+     * @param {string} str The string that the output field's content will be set to.
+     */
+    setOutputFieldContent(str) {
+        this.outputField.innerText = str;
     }
 
     /**
      * Updates the values in the register table.
      */
     updateRegisters() {
-        const registers = simulation.get_register_representations();
+        const registers = this.pythonSimulation.get_register_representations();
+        const accu = registers.get("accu");
+        const accuValue = accu.get(this.regRepresentationMode);
         document.getElementById("toy-accu-id").innerText = registers
             .get("accu")
-            .get(reg_representation_mode);
+            .get(this.regRepresentationMode);
         document.getElementById("toy-pc-id").innerText = registers
             .get("pc")
-            .get(reg_representation_mode);
+            .get(this.regRepresentationMode);
         document.getElementById("toy-ir-id").innerText = registers
             .get("ir")
-            .get(reg_representation_mode);
+            .get(this.regRepresentationMode);
         registers.destroy();
     }
 
     /**
      * Clears the TOY memory table.
      */
-    toyClearMemoryTable() {
+    clearMemoryTable() {
         document.getElementById("toy-memory-table-body-id").innerHTML = "";
     }
 
     /**
-     * Updates the TOY memory table.
+     * Clears and updates the TOY memory table.
      */
-    toyUpdateMemoryTable() {
+    updateMemoryTable() {
+        this.clearMemoryTable();
         const valueRepresentations =
-            this.pythonSimulation.state.memory.memory_repr();
-        value_representations_array = Array.from(value_representations);
-        const value = value_representations_array[mem_representation_mode];
-        const row = document
-            .getElementById("toy-memory-table-body-id")
-            .insertRow();
-        const cell1 = row.insertCell();
-        const cell2 = row.insertCell();
-        const cell3 = row.insertCell();
-        cell1.innerText = address;
-        cell2.innerText = value;
-        cell3.innerText = instruction_representation;
-        if (previous_memory[address] !== value_representations_array[1]) {
-            previous_memory[address] = value_representations_array[1];
-            cell2.classList.add("highlight");
+            this.pythonSimulation.get_memory_table_entries();
+        for (const entry of valueRepresentations) {
+            const address = entry.get(0);
+            const values = entry.get(1);
+            const value = values.get(this.memRepresentationMode);
+            const instructionRepresentation = entry.get(2);
+            const cycle = entry.get(3);
+            const row = document
+                .getElementById("toy-memory-table-body-id")
+                .insertRow();
+            const cell1 = row.insertCell();
+            const cell2 = row.insertCell();
+            const cell3 = row.insertCell();
+            cell1.innerText = address;
+            cell2.innerText = value;
+            cell3.innerText = instructionRepresentation;
+            if (this.previousMemoryValues[address] !== values[1]) {
+                this.previousMemoryValues[address] = values[1];
+                cell2.classList.add("highlight");
+            }
+            if (cycle !== "") {
+                cell1.innerHTML = html`<span
+                        class="toy-current-cycle text-light bg-dark"
+                        title="cycle ${cycle}"
+                        >${cycle + instructionArrow}</span
+                    >
+                    ${cell1.innerHTML}`;
+            }
         }
-        if (cycle !== "") {
-            cell1.innerHTML = html`<span
-                    class="toy-current-cycle text-light bg-dark"
-                    title="cycle ${cycle}"
-                    >${cycle + instructionArrow}</span
-                >
-                ${cell1.innerHTML}`;
-        }
-        value_representations.destroy();
+        valueRepresentations.destroy();
     }
 
     /**
