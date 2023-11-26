@@ -68,10 +68,16 @@ class TestToyArchitecture(unittest.TestCase):
         state.memory.write_halfword(address=4094, value=MutableUInt16(0xDEAD))
         state.memory.write_halfword(address=4095, value=MutableUInt16(0x123A))
         entries = state.memory.memory_repr()
-        self.assertEqual(entries[1024], ("00000000 00000000", "0", "00 00", "0"))
-        self.assertEqual(entries[1025], ("11111111 11111111", "65535", "FF FF", "-1"))
-        self.assertEqual(entries[2000], ("00001111 00001111", "3855", "0F 0F", "3855"))
+        self.assertEqual(entries[0], (1024, ("00000000 00000000", "0", "00 00", "0")))
         self.assertEqual(
-            entries[4094], ("11011110 10101101", "57005", "DE AD", "-8531")
+            entries[1], (1025, ("11111111 11111111", "65535", "FF FF", "-1"))
         )
-        self.assertEqual(entries[4095], ("00010010 00111010", "4666", "12 3A", "4666"))
+        self.assertEqual(
+            entries[2], (2000, ("00001111 00001111", "3855", "0F 0F", "3855"))
+        )
+        self.assertEqual(
+            entries[3], (4094, ("11011110 10101101", "57005", "DE AD", "-8531"))
+        )
+        self.assertEqual(
+            entries[4], (4095, ("00010010 00111010", "4666", "12 3A", "4666"))
+        )
