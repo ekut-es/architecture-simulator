@@ -10,6 +10,10 @@ from .simulation import Simulation
 from .runtime_errors import StepSequenceError
 from fixedint import MutableUInt16
 from architecture_simulator.uarch.toy.SvgVisValues import SvgVisValues
+from architecture_simulator.util.integer_representations import (
+    get_12_bit_representations,
+    get_16_bit_representations,
+)
 
 if TYPE_CHECKING:
     from architecture_simulator.uarch.toy.toy_performance_metrics import (
@@ -102,3 +106,30 @@ class ToySimulation(Simulation):
 
     def get_performance_metrics(self) -> ToyPerformanceMetrics:
         return self.state.performance_metrics
+
+    def get_register_representations(self) -> dict[str, tuple[str, str, str, str]]:
+        """Returns representations for the registers.
+
+        Returns:
+            dict[str, tuple[str, str, str, str]]: The keys "accu", "pc" and "ir" hold representations of their respective values as (bin, udec, hex, sdec) tuples.
+        """
+        accu_representation = (
+            get_16_bit_representations(int(self.state.accu))
+            if self.has_instructions()
+            else ("", "", "", "")
+        )
+        pc_representation = (
+            get_12_bit_representations(int(self.state.program_counter))
+            if self.has_instructions()
+            else ("", "", "", "")
+        )
+        ir_representation = (
+            get_16_bit_representations(int(self.state.loaded_instruction))
+            if self.state.loaded_instruction is not None
+            else ("", "", "", "")
+        )
+        return {
+            "accu": accu_representation,
+            "pc": pc_representation,
+            "ir": ir_representation,
+        }

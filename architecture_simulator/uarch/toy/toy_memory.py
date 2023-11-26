@@ -62,7 +62,7 @@ class ToyMemory:
                 memory_type="data memory",
             )
 
-    def memory_repr(self) -> dict[int, tuple[str, str, str, str]]:
+    def memory_repr(self) -> list[tuple[int, tuple[str, str, str, str]]]:
         """Returns the contents of the memory as binary, decimal and hexadecimal values, all nicely formatted.
 
         Returns:
@@ -72,4 +72,4 @@ class ToyMemory:
         for key in self.memory_file.keys():
             word = self.memory_file[key]
             res[key] = get_16_bit_representations(int(word))
-        return res
+        return sorted(res.items())

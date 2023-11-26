@@ -3,6 +3,76 @@ class ToySimulation {
         this.pythonSimulation = pythonSimulation;
         this.insertToyElements();
     }
+
+    /**
+     * Parses and loads the content of the input field into the simulation.
+     * If there was an error during parsing, the output field content will be set to the error message.
+     */
+    parseInput() {
+        const input = document.getElementById("input").value;
+        try {
+            this.pythonSimulation.load_program(input);
+        } catch (err) {
+            addToOutput(err);
+        }
+    }
+
+    /**
+     * Updates the values in the register table.
+     */
+    updateRegisters() {
+        const registers = simulation.get_register_representations();
+        document.getElementById("toy-accu-id").innerText = registers
+            .get("accu")
+            .get(reg_representation_mode);
+        document.getElementById("toy-pc-id").innerText = registers
+            .get("pc")
+            .get(reg_representation_mode);
+        document.getElementById("toy-ir-id").innerText = registers
+            .get("ir")
+            .get(reg_representation_mode);
+        registers.destroy();
+    }
+
+    /**
+     * Clears the TOY memory table.
+     */
+    toyClearMemoryTable() {
+        document.getElementById("toy-memory-table-body-id").innerHTML = "";
+    }
+
+    /**
+     * Updates the TOY memory table.
+     */
+    toyUpdateMemoryTable() {
+        const valueRepresentations =
+            this.pythonSimulation.state.memory.memory_repr();
+        value_representations_array = Array.from(value_representations);
+        const value = value_representations_array[mem_representation_mode];
+        const row = document
+            .getElementById("toy-memory-table-body-id")
+            .insertRow();
+        const cell1 = row.insertCell();
+        const cell2 = row.insertCell();
+        const cell3 = row.insertCell();
+        cell1.innerText = address;
+        cell2.innerText = value;
+        cell3.innerText = instruction_representation;
+        if (previous_memory[address] !== value_representations_array[1]) {
+            previous_memory[address] = value_representations_array[1];
+            cell2.classList.add("highlight");
+        }
+        if (cycle !== "") {
+            cell1.innerHTML = html`<span
+                    class="toy-current-cycle text-light bg-dark"
+                    title="cycle ${cycle}"
+                    >${cycle + instructionArrow}</span
+                >
+                ${cell1.innerHTML}`;
+        }
+        value_representations.destroy();
+    }
+
     /**
      * @returns {Node} A Node containing the TOY accu and memory table.
      */
