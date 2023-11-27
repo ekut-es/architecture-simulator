@@ -1,5 +1,6 @@
 class ToySimulation {
     constructor(pythonSimulation) {
+        // TODO: Add comments for these properties
         this.pythonSimulation = pythonSimulation;
         this.insertToyElements();
         this.outputField = document.getElementById("output-field-id");
@@ -7,6 +8,8 @@ class ToySimulation {
         this.regRepresentationMode = 1; // TODO: Make this user-selectable
         this.memRepresentationMode = 1;
         this.hasUnparsedChanges = true;
+        this.isRunning = false;
+        this.doPause = false;
         this.debouncedAutoParsing = this.getDebouncedAutoParsing();
         this.error = "";
         editor.on("change", () => {
@@ -69,15 +72,19 @@ class ToySimulation {
 
     /**
      * Executes a single cycle of the simulation.
-     * Sets this.error accordingly and updates the UI.
+     * Sets this.error accordingly and updates the UI unless specified otherwise.
      * Will not parse the input before stepping.
+     *
+     * @param {bool} updateUI Whether to update the UI or not.
      */
-    step() {
+    step(updateUI = true) {
         try {
             this.pythonSimulation.single_step();
-            this.updateUI();
         } catch (error) {
             this.error = String(error);
+        }
+        if (updateUI) {
+            this.updateUI();
         }
     }
 
@@ -110,6 +117,10 @@ class ToySimulation {
         const doubleStepButton = document.getElementById(
             "button-double-step-simulation-id"
         );
+        const pauseButton = document.getElementById(
+            "button-pause-simulation-id"
+        );
+        const runButton = document.getElementById("button-run-simulation-id");
         const resetButton = document.getElementById(
             "button-reset-simulation-id"
         );
@@ -118,7 +129,9 @@ class ToySimulation {
         if (this.hasUnparsedChanges) {
             stepButton.disabled = true;
             doubleStepButton.disabled = true;
+            runButton.disabled = true;
             resetButton.disabled = true;
+            pauseButton.disabled = true;
             return;
         }
 
@@ -128,7 +141,9 @@ class ToySimulation {
         if (this.error !== "") {
             stepButton.disabled = true;
             doubleStepButton.disabled = true;
+            runButton.disabled = true;
             resetButton.disabled = !hasStarted;
+            pauseButton.disabled = true;
             this.setOutputFieldContent(this.error);
             return;
         }
@@ -138,7 +153,9 @@ class ToySimulation {
             this.setOutputFieldContent("Ready!");
             stepButton.disabled = true;
             doubleStepButton.disabled = true;
+            runButton.disabled = true;
             resetButton.disabled = true;
+            pauseButton.disabled = true;
             return;
         }
 
@@ -148,7 +165,9 @@ class ToySimulation {
             this.setOutputFieldContent("Ready!");
             stepButton.disabled = false;
             doubleStepButton.disabled = false;
+            runButton.disabled = false;
             resetButton.disabled = true;
+            pauseButton.disabled = true;
             return;
         }
 
@@ -156,23 +175,70 @@ class ToySimulation {
         this.updatePerformanceMetrics();
         editor.setOption("readOnly", true);
 
+        if (this.isRunning) {
+            stepButton.disabled = true;
+            doubleStepButton.disabled = true;
+            runButton.disabled = true;
+            resetButton.disabled = true;
+            pauseButton.disabled = false;
+            return;
+        }
+
+        pauseButton.disabled = true;
+
+        // The "run" button was not pressed
         if (hasFinished) {
             stepButton.disabled = true;
             doubleStepButton.disabled = true;
+            runButton.disabled = true;
             resetButton.disabled = false;
         } else {
             stepButton.disabled = false;
             resetButton.disabled = false;
             doubleStepButton.disabled = !doubleStepAllowed;
+            runButton.disabled = false;
         }
     }
 
+    /**
+     * Starts calling this.step() in a loop until the simulation has finished,
+     * or until this.doPause is true.
+     */
     run() {
-        throw Error("Not implemented.");
+        this.isRunning = true;
+        let stopCondition = () => {
+            return (
+                this.pythonSimulation.is_done() ||
+                this.doPause ||
+                this.error !== ""
+            );
+        };
+        let stepLoop = () => {
+            console.log(this.isRunning);
+            console.log("stepLoop");
+            setTimeout(() => {
+                for (let i = 0; i <= 1000; i++) {
+                    this.step(false);
+                }
+                if (!stopCondition()) {
+                    stepLoop();
+                } else {
+                    this.isRunning = false;
+                    this.doPause = false;
+                }
+                this.updateUI();
+            }, 25);
+        };
+        stepLoop();
     }
 
+    /**
+     * Sets this.pause so that this.run() will stop running the simulation.
+     */
     pause() {
-        throw Error("Not implemented.");
+        if (this.isRunning) {
+            this.doPause = true;
+        }
     }
 
     /**
