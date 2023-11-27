@@ -6,17 +6,28 @@ class ToySimulation {
         this.previousMemoryValues = [];
         this.regRepresentationMode = 1; // TODO: Make this user-selectable
         this.memRepresentationMode = 1;
+        this.error = "";
+        this.parseInput();
+        this.updateUI();
+        editor.on("change", this.debounceAutoParsing());
     }
 
+    /**
+     * Resets the internal state. Uses the given pythonSimulation. Parses the input and updates the UI.
+     *
+     * @param pythonSimulation pyProxy of a ToySimution Object
+     */
     reset(pythonSimulation) {
         this.pythonSimulation = pythonSimulation;
         this.previousMemoryValues = [];
+        this.error = "";
+        this.parseInput();
         this.updateUI();
     }
 
     /**
      * Parses and loads the content of the input field into the simulation.
-     * If there was an error during parsing, the output field content will be set to the error message.
+     * Sets the error attribute accordingly.
      *
      * @returns {boolean} Whether parsing the input was successful
      */
@@ -24,11 +35,23 @@ class ToySimulation {
         const input = editor.getValue(); // TODO: Maybe put static elements into an object that gets handed over to the simulation
         try {
             this.pythonSimulation.load_program(input);
+            this.error = "";
             return true;
         } catch (err) {
-            this.setOutputFieldContent(err);
+            this.error = String(err);
             return false;
         }
+    }
+
+    debounceAutoParsing(timeout = 500) {
+        let timer;
+        return () => {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                this.parseInput();
+                this.updateUI();
+            }, timeout);
+        };
     }
 
     /**
@@ -73,9 +96,43 @@ class ToySimulation {
      * Updates all UI elements.
      */
     updateUI() {
+        const hasInstructions = this.pythonSimulation.has_instructions();
+        const hasStarted = this.pythonSimulation.has_started;
+        const hasFinished = this.pythonSimulation.is_done();
+
+        const stepButton = document.getElementById("button-step-simulation-id");
+        const resetButton = document.getElementById(
+            "button-reset-simulation-id"
+        );
+
         this.updateRegisters();
         this.updateMemoryTable();
-        this.updatePerformanceMetrics();
+        if (this.error === "") {
+            if (!hasInstructions) {
+                this.setOutputFieldContent("Ready!");
+                stepButton.disabled = true;
+                resetButton.disabled = true;
+            } else {
+                if (!hasStarted) {
+                    this.setOutputFieldContent("Ready!");
+                    stepButton.disabled = false;
+                    resetButton.disabled = true;
+                } else {
+                    this.updatePerformanceMetrics();
+                    if (hasFinished) {
+                        stepButton.disabled = true;
+                        resetButton.disabled = false;
+                    } else {
+                        stepButton.disabled = false;
+                        resetButton.disabled = false;
+                    }
+                }
+            }
+        } else {
+            stepButton.disabled = true;
+            resetButton.disabled = !hasStarted;
+            this.setOutputFieldContent(this.error);
+        }
     }
 
     run() {
