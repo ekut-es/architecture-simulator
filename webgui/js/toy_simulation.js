@@ -6,10 +6,16 @@ class ToySimulation {
         this.previousMemoryValues = [];
         this.regRepresentationMode = 1; // TODO: Make this user-selectable
         this.memRepresentationMode = 1;
+        this.hasUnparsedChanges = true;
+        this.debouncedAutoParsing = this.getDebouncedAutoParsing();
         this.error = "";
+        editor.on("change", () => {
+            this.hasUnparsedChanges = true;
+            this.debouncedAutoParsing();
+            this.updateUI();
+        });
         this.parseInput();
         this.updateUI();
-        editor.on("change", this.debounceAutoParsing());
     }
 
     /**
@@ -33,6 +39,7 @@ class ToySimulation {
      */
     parseInput() {
         const input = editor.getValue(); // TODO: Maybe put static elements into an object that gets handed over to the simulation
+        this.hasUnparsedChanges = false;
         try {
             this.pythonSimulation.load_program(input);
             this.error = "";
@@ -43,7 +50,13 @@ class ToySimulation {
         }
     }
 
-    debounceAutoParsing(timeout = 500) {
+    /**
+     * Returns a debounce function for the auto parsing timer.
+     *
+     * @param {number} timeout Time after which the input should be parsed.
+     * @returns {function} Auto parsing debounce function. Does update the UI after parsing.
+     */
+    getDebouncedAutoParsing(timeout = 500) {
         let timer;
         return () => {
             clearTimeout(timer);
@@ -56,34 +69,26 @@ class ToySimulation {
 
     /**
      * Executes a single cycle of the simulation.
-     * Errors will be printed to the output field.
+     * Sets this.error accordingly and updates the UI.
+     * Will not parse the input before stepping.
      */
     step() {
-        if (!this.pythonSimulation.has_started) {
-            if (!this.parseInput()) {
-                return;
-            }
-        }
         try {
             this.pythonSimulation.single_step();
             this.updateUI();
         } catch (error) {
-            this.setOutputFieldContent(error);
+            this.error = String(error);
         }
     }
 
     /**
      * Executes two cycles of the simulation.
      * Should only be called if the next cycle to be executed is the first cycle of the current instruction,
-     * otherwise it will print an error to the output field.
+     * otherwise it will create an error.
+     * Sets this.error accordingly and updates the UI.
+     * Will not parse the input before stepping.
      */
     doubleStep() {
-        if (!this.pythonSimulation.has_started) {
-            // TODO: Duplicate code
-            if (!this.parseInput()) {
-                return;
-            }
-        }
         try {
             this.pythonSimulation.step();
             this.updateUI();
@@ -99,39 +104,66 @@ class ToySimulation {
         const hasInstructions = this.pythonSimulation.has_instructions();
         const hasStarted = this.pythonSimulation.has_started;
         const hasFinished = this.pythonSimulation.is_done();
+        const doubleStepAllowed = this.pythonSimulation.next_cycle == "1";
 
         const stepButton = document.getElementById("button-step-simulation-id");
+        const doubleStepButton = document.getElementById(
+            "button-double-step-simulation-id"
+        );
         const resetButton = document.getElementById(
             "button-reset-simulation-id"
         );
 
+        // If there are unparsed changes, do not update the tables and disable all buttons
+        if (this.hasUnparsedChanges) {
+            stepButton.disabled = true;
+            doubleStepButton.disabled = true;
+            resetButton.disabled = true;
+            return;
+        }
+
+        // No changes since the last parsing
         this.updateRegisters();
         this.updateMemoryTable();
-        if (this.error === "") {
-            if (!hasInstructions) {
-                this.setOutputFieldContent("Ready!");
-                stepButton.disabled = true;
-                resetButton.disabled = true;
-            } else {
-                if (!hasStarted) {
-                    this.setOutputFieldContent("Ready!");
-                    stepButton.disabled = false;
-                    resetButton.disabled = true;
-                } else {
-                    this.updatePerformanceMetrics();
-                    if (hasFinished) {
-                        stepButton.disabled = true;
-                        resetButton.disabled = false;
-                    } else {
-                        stepButton.disabled = false;
-                        resetButton.disabled = false;
-                    }
-                }
-            }
-        } else {
+        if (this.error !== "") {
             stepButton.disabled = true;
+            doubleStepButton.disabled = true;
             resetButton.disabled = !hasStarted;
             this.setOutputFieldContent(this.error);
+            return;
+        }
+
+        // There was no error
+        if (!hasInstructions) {
+            this.setOutputFieldContent("Ready!");
+            stepButton.disabled = true;
+            doubleStepButton.disabled = true;
+            resetButton.disabled = true;
+            return;
+        }
+
+        // There are instructions
+        if (!hasStarted) {
+            editor.setOption("readOnly", false);
+            this.setOutputFieldContent("Ready!");
+            stepButton.disabled = false;
+            doubleStepButton.disabled = false;
+            resetButton.disabled = true;
+            return;
+        }
+
+        // The simulation has already started
+        this.updatePerformanceMetrics();
+        editor.setOption("readOnly", true);
+
+        if (hasFinished) {
+            stepButton.disabled = true;
+            doubleStepButton.disabled = true;
+            resetButton.disabled = false;
+        } else {
+            stepButton.disabled = false;
+            resetButton.disabled = false;
+            doubleStepButton.disabled = !doubleStepAllowed;
         }
     }
 
