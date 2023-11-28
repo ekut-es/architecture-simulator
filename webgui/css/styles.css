@@ -32,27 +32,27 @@ nav {
     background-color: var(--bs-secondary-bg);
 }
 
-#button-run-simulation-id {
+#button-run-simulation {
     background-color: rgb(169, 245, 169);
 }
 
-#button-pause-simulation-id {
+#button-pause-simulation {
     background-color: rgb(255, 221, 120);
 }
 
-#button-step-simulation-id {
+#button-step-simulation {
     background-color: rgb(169, 208, 245);
 }
 
-#button-double-step-simulation-id {
+#button-double-step-simulation {
     background-color: rgb(169, 208, 245);
 }
 
-#button-reset-simulation-id {
+#button-reset-simulation {
     background-color: rgb(247, 129, 129);
 }
 
-#button-visualization-id {
+#button-visualization {
     display: none;
 }
 
@@ -71,7 +71,7 @@ nav {
 }
 
 #text-content-container,
-#visualizations-container-id {
+#visualizations-container {
     padding: 1em;
     height: 100%;
 }
@@ -92,7 +92,7 @@ nav {
     margin-right: 0;
 }
 
-#codemirror-id {
+#codemirror-input {
     flex: 1 0 5em;
     height: 100%;
 }
@@ -107,21 +107,21 @@ nav {
     overflow-y: scroll;
 }
 
-#toy-accu-memory-container-id {
+#toy-accu-memory-container {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
 }
 
-#register-table-body-id > tr > td:nth-child(3),
-#memory-table-body-id > tr > td:nth-child(2),
-#toy-memory-table-body-id > tr > td:nth-child(1),
-#toy-memory-table-body-id > tr > td:nth-child(2),
-#toy-accu-id {
+#register-table-body > tr > td:nth-child(3),
+#memory-table-body > tr > td:nth-child(2),
+#toy-memory-table-body > tr > td:nth-child(1),
+#toy-memory-table-body > tr > td:nth-child(2),
+#toy-accu {
     text-align: right;
 }
 
-#output-field-id {
+#output-field {
     background-color: #ffffff;
     padding: 1em;
     min-width: 12em;
@@ -137,12 +137,12 @@ nav {
     display: none;
 }
 
-#toy-main-text-container-id {
+#toy-main-text-container {
     margin-left: var(--content-margin);
     overflow: auto;
 }
 
-#toy-main-text-container-id > * {
+#toy-main-text-container > * {
     overflow: auto;
 }
 
@@ -150,7 +150,7 @@ nav {
     width: 100%;
 }
 
-#toy-memory-table-id th:first-child {
+#toy-memory-table th:first-child {
     width: 7em;
     min-width: 7em;
 }
@@ -187,7 +187,6 @@ nav {
 #toy-visualization {
     height: 100%;
     width: 100%;
-    display: none;
 }
 
 /* Modals */

@@ -7,7 +7,7 @@ const editor = CodeMirror.fromTextArea(document.getElementById("input"), {
         architecture: "ARM",
     },
 });
-editor.getWrapperElement().id = "codemirror-id";
+editor.getWrapperElement().id = "codemirror-input";
 editor.getWrapperElement().classList.add("archsim-default-border");
 
 /**
@@ -68,6 +68,6 @@ const fileSelector = document.createElement("input");
 fileSelector.setAttribute("type", "file");
 fileSelector.onchange = uploadFile;
 // make the pretty button click the ugly button
-document.getElementById("upload-button-id").onclick = () => {
+document.getElementById("upload-button").onclick = () => {
     fileSelector.click();
 };

@@ -9,6 +9,8 @@ class ToySimulation {
         /**@type {object} An object holding all relevant DOM Nodes.*/
         this.domNodes = domNodes;
 
+        /**@type {boolean} Whether the SVG element has finished loading.*/
+        this.visualizationLoaded = false;
         /**@type {Number} The selected representation mode for the registers. 0: bin, 1: udec, 2: hex, 3: sdec.*/
         this.regRepresentationMode = 1;
         /**@type {Number} The selected representation mode for the memory. 0: bin, 1: udec, 2: hex, 3: sdec.*/
@@ -24,7 +26,7 @@ class ToySimulation {
         /**@type {str} The last error message. Will be empty if there was no error.*/
         this.error = "";
 
-        this.insertContentIntoDOM();
+        this.parseInput();
         /**@type{Function} Debounces (triggers) auto parsing.*/
         this.debouncedAutoParsing = this.getDebouncedAutoParsing();
         editor.on("change", () => {
@@ -32,8 +34,8 @@ class ToySimulation {
             this.debouncedAutoParsing();
             this.updateUI();
         });
-        this.parseInput();
-        this.updateUI();
+        // Insert everything into the DOM. The SVG will cause a UI update once it has finished loading.
+        this.insertContentIntoDOM();
     }
 
     /**
@@ -56,7 +58,7 @@ class ToySimulation {
      * @returns {boolean} Whether parsing the input was successful
      */
     parseInput() {
-        const input = editor.getValue(); // TODO: Maybe put static elements into an object that gets handed over to the simulation
+        const input = editor.getValue(); // TODO: Replace by this.domNodes
         this.hasUnparsedChanges = false;
         try {
             this.pythonSimulation.load_program(input);
@@ -147,6 +149,9 @@ class ToySimulation {
         // No changes since the last parsing
         this.updateRegisters();
         this.updateMemoryTable();
+        if (this.visualizationLoaded) {
+            this.updateVisualization();
+        }
         if (this.error !== "") {
             stepButton.disabled = true;
             doubleStepButton.disabled = true;
@@ -313,6 +318,23 @@ class ToySimulation {
     }
 
     /**
+     * Inserts the Toy SVG into the DOM.
+     * Once the svg has loaded, it will update the UI and add SVG's contentDocument to this.domNodes.
+     */
+    insertVisualization() {
+        const toySvgElement = document.createElement("object");
+        toySvgElement.data = "img/toy_structure.svg";
+        toySvgElement.type = "image/svg+xml";
+        toySvgElement.id = "toy-visualization";
+        this.domNodes.visualizationsContainer.append(toySvgElement);
+        toySvgElement.addEventListener("load", () => {
+            this.domNodes.toyVisualization = toySvgElement.contentDocument;
+            this.visualizationLoaded = true;
+            this.updateUI();
+        });
+    }
+
+    /**
      * Starts calling this.step() in a loop until the simulation has finished,
      * or until this.doPause is true.
      */
@@ -434,7 +456,7 @@ class ToySimulation {
      */
     getMainColumn() {
         const column = createNode(html`<div
-            id="toy-main-text-container-id"
+            id="toy-main-text-container"
             class="d-flex flex-column"
         >
             <div class="mb-3" id="toy-registers-wrapper">
@@ -445,22 +467,22 @@ class ToySimulation {
                 >
                     <tr>
                         <td>ACCU</td>
-                        <td id="toy-accu-id">0</td>
+                        <td id="toy-accu">0</td>
                     </tr>
                     <tr>
                         <td>PC</td>
-                        <td id="toy-pc-id"></td>
+                        <td id="toy-pc"></td>
                     </tr>
                     <tr>
                         <td>IR</td>
-                        <td id="toy-ir-id"></td>
+                        <td id="toy-ir"></td>
                     </tr>
                 </table>
             </div>
             <div class="mb-3" id="toy-memory-wrapper">
                 <span class="text-element-heading">Memory</span>
                 <table
-                    id="toy-memory-table-id"
+                    id="toy-memory-table"
                     class="table table-sm table-hover table-bordered mono-table mb-0"
                 >
                     <thead>
@@ -470,24 +492,24 @@ class ToySimulation {
                             <th>Instruction</th>
                         </tr>
                     </thead>
-                    <tbody id="toy-memory-table-body-id"></tbody>
+                    <tbody id="toy-memory-table-body"></tbody>
                 </table>
             </div>
             <div id="toy-output-wrapper">
                 <span class="text-element-heading">Output</span>
                 <div
-                    id="output-field-id"
+                    id="output-field"
                     class="flex-shrink-0 archsim-default-border"
                 ></div>
             </div>
         </div>`);
-        this.domNodes.accu = column.querySelector("#toy-accu-id");
-        this.domNodes.pc = column.querySelector("#toy-pc-id");
-        this.domNodes.ir = column.querySelector("#toy-ir-id");
+        this.domNodes.accu = column.querySelector("#toy-accu");
+        this.domNodes.pc = column.querySelector("#toy-pc");
+        this.domNodes.ir = column.querySelector("#toy-ir");
         this.domNodes.memoryTableBody = column.querySelector(
-            "#toy-memory-table-body-id"
+            "#toy-memory-table-body"
         );
-        this.domNodes.outputField = column.querySelector("#output-field-id");
+        this.domNodes.outputField = column.querySelector("#output-field");
         return column;
     }
 
@@ -498,7 +520,7 @@ class ToySimulation {
      */
     getDoubleStepButton() {
         const button = createNode(html`<button
-            id="button-double-step-simulation-id"
+            id="button-double-step-simulation"
             class="btn btn-primary btn-sm control-button me-1"
             title="double step"
             onclick="simulation.doubleStep();"
@@ -520,17 +542,42 @@ class ToySimulation {
         this.domNodes.helpModalBody.innerHTML = toyDocumentation;
         this.domNodes.helpModalHeading.textContent = "TOY";
         this.insertSettings();
+        this.insertVisualization();
     }
 
     /**
      * Removes all of TOY's custom elements from the DOM.
      */
     removeContentFromDOM() {
-        document.getElementById("toy-main-text-container-id").remove();
+        document.getElementById("toy-main-text-container").remove();
         this.domNodes.doubleStepButton.remove();
         this.domNodes.helpModalBody.innerHTML = "";
         this.domNodes.helpModalHeading.textContent = "";
         this.domNodes.customSettingsContainer.innerHTML = "";
+        this.domNodes.visualizationsContainer.innerHTML = "";
+    }
+
+    updateVisualization() {
+        const updateValues = this.pythonSimulation.get_toy_svg_update_values();
+        for (let i = 0; i < updateValues.length; i++) {
+            const update = updateValues.get(i);
+            const id = update.get(0);
+            const action = update.get(1);
+            const value = update.get(2);
+            switch (action) {
+                case "highlight":
+                    this.toySvgHighlight(id, value);
+                    break;
+                case "write":
+                    this.toySvgSetText(id, value);
+                    break;
+                case "show":
+                    this.toySvgShow(id, value);
+                    break;
+            }
+            update.destroy();
+        }
+        updateValues.destroy();
     }
 
     /**
@@ -539,9 +586,9 @@ class ToySimulation {
      * @param {string} color hex color string.
      */
     toySvgHighlight(id, color) {
-        const svg =
-            document.getElementById("toy-visualization").contentDocument;
-        svg.getElementById(id).setAttribute("style", "fill: " + color);
+        this.domNodes.toyVisualization
+            .querySelector("#" + id)
+            .setAttribute("style", "fill: " + color);
     }
 
     /**
@@ -550,9 +597,8 @@ class ToySimulation {
      * @param {string} text text to set as the content of the element.
      */
     toySvgSetText(id, text) {
-        const svg =
-            document.getElementById("toy-visualization").contentDocument;
-        svg.getElementById(id).textContent = text;
+        this.domNodes.toyVisualization.querySelector("#" + id).textContent =
+            text;
     }
 
     /**
@@ -562,8 +608,7 @@ class ToySimulation {
      */
     toySvgShow(id, doShow) {
         const display = doShow ? "block" : "none";
-        const svg =
-            document.getElementById("toy-visualization").contentDocument;
-        svg.getElementById(id).style.display = display;
+        this.domNodes.toyVisualization.querySelector("#" + id).style.display =
+            display;
     }
 }

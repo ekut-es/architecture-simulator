@@ -29,13 +29,13 @@ from architecture_simulator.gui.new_webgui import *
     `);
     // Register all the relevant non-isa-specific nodes in an object.
     const domNodes = {
-        runButton: document.getElementById("button-run-simulation-id"),
-        pauseButton: document.getElementById("button-pause-simulation-id"),
-        stepButton: document.getElementById("button-step-simulation-id"),
-        resetButton: document.getElementById("button-reset-simulation-id"),
-        uploadButton: document.getElementById("upload-button-id"),
-        downloadButton: document.getElementById("download-button-id"),
-        loadingIcon: document.getElementById("loading-spinner-id"),
+        runButton: document.getElementById("button-run-simulation"),
+        pauseButton: document.getElementById("button-pause-simulation"),
+        stepButton: document.getElementById("button-step-simulation"),
+        resetButton: document.getElementById("button-reset-simulation"),
+        uploadButton: document.getElementById("upload-button"),
+        downloadButton: document.getElementById("download-button"),
+        loadingIcon: document.getElementById("loading-spinner"),
         customSettingsContainer: document.getElementById(
             "isa-specific-settings-container"
         ),
@@ -43,10 +43,10 @@ from architecture_simulator.gui.new_webgui import *
         helpModalBody: document.getElementById("help-modal-body"),
         textContentContainer: document.getElementById("text-content-container"),
         visualizationsContainer: document.getElementById(
-            "visualizations-container-id"
+            "visualizations-container"
         ),
         textEditorSeparator: document.getElementById("text-editor-separator"),
-        pageHeading: document.getElementById("page-heading-id"),
+        pageHeading: document.getElementById("page-heading"),
     };
     getPythonSimulation = pyodide.globals.get("get_simulation");
     // Create a JS Simulation object.
