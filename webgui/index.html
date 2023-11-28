@@ -173,18 +173,11 @@
                                 width="35px"
                                 height="35px"
                             />
-                            <span id="help-heading-id"> RISC-V </span>
+                            <span id="help-modal-heading"></span>
                         </h1>
                     </div>
-                    <div class="modal-body">
-                        <!--RISC-V User Documentation/Help-->
-                        <div id="riscv-help" style="display: block">
-                            <!--Filled in by js-->
-                        </div>
-                        <!--Toy User Documentation/Help-->
-                        <div id="toy-help" style="display: none">
-                            <!--Filled in by js-->
-                        </div>
+                    <div id="help-modal-body" class="modal-body">
+                        <!--Filled in by js-->
                     </div>
                     <div class="modal-footer">
                         <a
@@ -255,7 +248,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <div id="isa-specific-settings-container"></div>
+                        <!-- <div class="row">
                             <h2 class="fs-5">Representation Mode</h2>
                         </div>
                         <div class="row">
@@ -411,7 +405,7 @@
                                     </label>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                     <div class="modal-footer">
                         <button

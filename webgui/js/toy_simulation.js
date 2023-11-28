@@ -2,16 +2,18 @@ class ToySimulation {
     constructor(pythonSimulation) {
         // TODO: Add comments for these properties
         this.pythonSimulation = pythonSimulation;
-        this.insertToyElements();
-        this.outputField = document.getElementById("output-field-id");
-        this.previousMemoryValues = [];
-        this.regRepresentationMode = 1; // TODO: Make this user-selectable
+
+        this.regRepresentationMode = 1;
         this.memRepresentationMode = 1;
+        this.previousMemoryValues = [];
         this.hasUnparsedChanges = true;
         this.isRunning = false;
         this.doPause = false;
-        this.debouncedAutoParsing = this.getDebouncedAutoParsing();
         this.error = "";
+
+        this.insertContentIntoDOM();
+        this.outputField = document.getElementById("output-field-id");
+        this.debouncedAutoParsing = this.getDebouncedAutoParsing();
         editor.on("change", () => {
             this.hasUnparsedChanges = true;
             this.debouncedAutoParsing();
@@ -201,6 +203,110 @@ class ToySimulation {
     }
 
     /**
+     * Inserts the needed settings into the DOM. They will already have the necessary listeners added.
+     */
+    insertSettings() {
+        const settingsContainer = document.getElementById(
+            "isa-specific-settings-container"
+        );
+        const registerRepresentation = this.getRepresentationsSettingsRow(
+            "Registers",
+            "register-representation",
+            (mode) => {
+                this.regRepresentationMode = mode;
+                this.updateUI();
+            },
+            this.regRepresentationMode
+        );
+        const memoryRepresentation = this.getRepresentationsSettingsRow(
+            "Memory",
+            "memory-representation",
+            (mode) => {
+                this.memRepresentationMode = mode;
+                this.updateUI();
+            },
+            this.memRepresentationMode
+        );
+        settingsContainer.appendChild(registerRepresentation);
+        settingsContainer.appendChild(memoryRepresentation);
+    }
+
+    /**
+     * Generates a Node for selecting the representation (bin, udec, sdec, hex) of some setting.
+     * Adds an event listener and calls the given function with the selected value (bin: 0, udec: 1, sdec: 3, hex: 2).
+     * The listener will NOT cause a UI update.
+     * The provided default mode will be used to check one option but it will not trigger the event listener.
+     *
+     * @param {string} displayName Name to display next to the buttons.
+     * @param {string} id A unique id. Several ids will be generated from this base string.
+     * @param {function(number):void} callback The function to call after a button was clicked.
+     * @param {number} defaultMode The default representation mode.
+     * @returns {Node} The Node to insert into the settings.
+     */
+    getRepresentationsSettingsRow(displayName, id, callback, defaultMode) {
+        const row = createNode(html`<div class="row">
+            <div class="col-4">
+                <h3 class="fs-6">${displayName}:</h3>
+            </div>
+            <div id="${id}-container" class="col-8">
+                <input
+                    type="radio"
+                    id="${id}-bin"
+                    name="${id}-group"
+                    value="0"
+                    ${defaultMode == 0 ? "checked" : ""}
+                />
+                <label for="${id}-bin"> binary </label>
+                <input
+                    type="radio"
+                    id="${id}-udec"
+                    name="${id}-group"
+                    value="1"
+                    ${defaultMode == 1 ? "checked" : ""}
+                />
+                <label for="${id}-udec"> unsigned decimal </label>
+                <input
+                    type="radio"
+                    id="${id}-sdec"
+                    name="${id}-group"
+                    value="3"
+                    ${defaultMode == 3 ? "checked" : ""}
+                />
+                <label for="${id}-sdec"> signed decimal </label>
+                <input
+                    type="radio"
+                    id="${id}-hex"
+                    name="${id}-group"
+                    value="2"
+                    ${defaultMode == 2 ? "checked" : ""}
+                />
+                <label for="${id}-hex"> hexadecimal </label>
+            </div>
+        </div>`);
+        row.querySelector(`#${id}-container`).addEventListener(
+            "click",
+            (event) => {
+                // make sure the user actually clicked an option, not just somewhere in the container
+                if (
+                    event.target.matches("label") ||
+                    event.target.matches("input")
+                ) {
+                    // the user might have clicked the label, but the value is only stored in the input
+                    let selectedMode;
+                    if (event.target.matches("label")) {
+                        const inputId = event.target.getAttribute("for");
+                        selectedMode = row.querySelector(`#${inputId}`).value;
+                    } else {
+                        selectedMode = event.target.value;
+                    }
+                    callback(Number(selectedMode));
+                }
+            }
+        );
+        return row;
+    }
+
+    /**
      * Starts calling this.step() in a loop until the simulation has finished,
      * or until this.doPause is true.
      */
@@ -214,8 +320,6 @@ class ToySimulation {
             );
         };
         let stepLoop = () => {
-            console.log(this.isRunning);
-            console.log("stepLoop");
             setTimeout(() => {
                 for (let i = 0; i <= 1000; i++) {
                     this.step(false);
@@ -390,7 +494,7 @@ class ToySimulation {
     /**
      * Inserts all of TOY's coustom elements into the DOM.
      */
-    insertToyElements() {
+    insertContentIntoDOM() {
         document
             .getElementById("text-editor-separator")
             .after(this.getMemoryAndAccuColumn());
@@ -400,14 +504,21 @@ class ToySimulation {
             .after(doubleStepButton);
         document.getElementById("page-heading-id").innerText = "TOY Simulator";
         document.title = "TOY Simulator";
+        document.getElementById("help-modal-body").innerHTML = toyDocumentation;
+        document.getElementById("help-modal-heading").textContent = "TOY";
+        this.insertSettings();
     }
 
     /**
      * Removes all of TOY's custom elements from the DOM.
      */
-    destroyToyElements() {
+    removeContentFromDOM() {
         document.getElementById("toy-main-text-container-id").remove();
         document.getElementById("button-double-step-simulation-id").remove();
+        document.getElementById("help-modal-body").innerHTML = "";
+        document.getElementById("help-modal-heading").textContent = "";
+        document.getElementById("isa-specific-settings-container").innerHTML =
+            "";
     }
 
     // /**
