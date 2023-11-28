@@ -1,18 +1,31 @@
 class ToySimulation {
+    /**
+     * @param {pyProxy} pythonSimulation pyProxy of a ToySimulation.
+     * @param {object} domNodes Object holding all the relevant nodes from the default page.
+     */
     constructor(pythonSimulation, domNodes) {
-        // TODO: Add comments for these properties
+        /**@type {pyProxy} A pyProxy of the ToySimulation object.*/
         this.pythonSimulation = pythonSimulation;
+        /**@type {object} An object holding all relevant DOM Nodes.*/
         this.domNodes = domNodes;
 
+        /**@type {Number} The selected representation mode for the registers. 0: bin, 1: udec, 2: hex, 3: sdec.*/
         this.regRepresentationMode = 1;
+        /**@type {Number} The selected representation mode for the memory. 0: bin, 1: udec, 2: hex, 3: sdec.*/
         this.memRepresentationMode = 1;
+        /**@type {?} The values of the memory from the last cycle.*/
         this.previousMemoryValues = [];
+        /**@type {boolean} Whether the editor content has been changed since the last time it was parsed.*/
         this.hasUnparsedChanges = true;
+        /**@type {boolean} Whether the user has clicked the run button and the simulation is still running. Not to be confused with this.pythonSimulation.has_started*/
         this.isRunning = false;
+        /**@type {boolean} Indicates that the simulation should be paused if it is currently running.*/
         this.doPause = false;
+        /**@type {str} The last error message. Will be empty if there was no error.*/
         this.error = "";
 
         this.insertContentIntoDOM();
+        /**@type{Function} Debounces (triggers) auto parsing.*/
         this.debouncedAutoParsing = this.getDebouncedAutoParsing();
         editor.on("change", () => {
             this.hasUnparsedChanges = true;

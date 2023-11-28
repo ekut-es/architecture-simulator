@@ -1,6 +1,11 @@
+/**@type{ToySimulation} Holds the JS Simulation object.*/
 var simulation;
 
+/**
+ * Loads pyodide, installs the archsim package and creates a ToySimulation.
+ */
 async function initialize() {
+    // Load pyodide and install the package
     const pyodide = await loadPyodide();
     await pyodide.loadPackage("micropip");
     const micropip = pyodide.pyimport("micropip");
@@ -22,6 +27,7 @@ async function initialize() {
     await pyodide.runPython(`
 from architecture_simulator.gui.new_webgui import *
     `);
+    // Register all the relevant non-isa-specific nodes in an object.
     const domNodes = {
         runButton: document.getElementById("button-run-simulation-id"),
         pauseButton: document.getElementById("button-pause-simulation-id"),
@@ -43,9 +49,13 @@ from architecture_simulator.gui.new_webgui import *
         pageHeading: document.getElementById("page-heading-id"),
     };
     getPythonSimulation = pyodide.globals.get("get_simulation");
+    // Create a JS Simulation object.
     simulation = new ToySimulation(getPythonSimulation("toy"), { ...domNodes }); // TODO: Allow other ISAs
 }
 
+/**
+ * Tells the current Simulation object to reset and take a new ToySimulation pyProxy (because we dont reset those, we just throw them away).
+ */
 function resetSimulation() {
     simulation.reset(getPythonSimulation("toy")); // TODO: Allow other ISAs
 }
