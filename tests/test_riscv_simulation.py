@@ -2,7 +2,11 @@ import unittest
 import fixedint
 
 from architecture_simulator.uarch.riscv.register_file import RegisterFile
-from architecture_simulator.uarch.memory import Memory, MemoryAddressError
+from architecture_simulator.uarch.memory import (
+    Memory,
+    MemoryAddressError,
+    AddressingType,
+)
 from architecture_simulator.uarch.instruction_memory import InstructionMemory
 from architecture_simulator.uarch.riscv.riscv_architectural_state import (
     RiscvArchitecturalState,
@@ -17,7 +21,7 @@ class TestRiscvSimulation(unittest.TestCase):
         simulation = RiscvSimulation(
             state=RiscvArchitecturalState(
                 register_file=RegisterFile(registers=[0, 2, 0, 0]),
-                memory=Memory(memory_file=()),
+                memory=Memory(AddressingType.BYTE, 32),
             )
         )
         simulation.load_program("add x0, x0, x1\nadd x0, x0, x1")
@@ -130,10 +134,10 @@ class TestRiscvSimulation(unittest.TestCase):
     def test_against_class_variables(self):
         """Some tests against class variables (some things used to be class variables and were thus shared between objects, which was undesired)"""
         simulation1 = RiscvSimulation(
-            state=RiscvArchitecturalState(memory=Memory(min_bytes=0))
+            state=RiscvArchitecturalState(memory=Memory(AddressingType.BYTE, 32))
         )
         simulation2 = RiscvSimulation(
-            state=RiscvArchitecturalState(memory=Memory(min_bytes=0))
+            state=RiscvArchitecturalState(memory=Memory(AddressingType.BYTE, 32))
         )
 
         simulation1.state.register_file.registers[5] = fixedint.MutableUInt32(12)
@@ -229,7 +233,7 @@ class TestRiscvSimulation(unittest.TestCase):
 
         simulation = RiscvSimulation(
             state=RiscvArchitecturalState(
-                register_file=RegisterFile(), memory=Memory(min_bytes=0)
+                register_file=RegisterFile(), memory=Memory(AddressingType.BYTE, 32)
             ),
             mode="five_stage_pipeline",
         )

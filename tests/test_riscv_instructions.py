@@ -52,7 +52,7 @@ from architecture_simulator.uarch.riscv.register_file import RegisterFile
 from architecture_simulator.uarch.riscv.riscv_architectural_state import (
     RiscvArchitecturalState,
 )
-from architecture_simulator.uarch.memory import Memory
+from architecture_simulator.uarch.memory import Memory, AddressingType
 from architecture_simulator.uarch.riscv.csr_registers import CSRError
 from architecture_simulator.isa.riscv.riscv_parser import RiscvParser
 
@@ -1098,19 +1098,17 @@ class TestRiscvInstructions(unittest.TestCase):
     def test_lb(self):
         state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[0, 1, -1, pow(2, 32) - 1]),
-            memory=Memory(
-                memory_file=dict(
-                    [
-                        (0, fixedint.MutableUInt8(1)),
-                        (1, fixedint.MutableUInt8(2)),
-                        (2, fixedint.MutableUInt8(3)),
-                        (3, fixedint.MutableUInt8(-1)),
-                        (pow(2, 32) - 1, fixedint.MutableUInt8(4)),
-                        (2047, fixedint.MutableUInt8(5)),
-                    ]
-                ),
-                min_bytes=0,
-            ),
+            memory=Memory(AddressingType.BYTE, 32, True),
+        )
+        state.memory.memory_file = dict(
+            [
+                (0, fixedint.MutableUInt8(1)),
+                (1, fixedint.MutableUInt8(2)),
+                (2, fixedint.MutableUInt8(3)),
+                (3, fixedint.MutableUInt8(-1)),
+                (pow(2, 32) - 1, fixedint.MutableUInt8(4)),
+                (2047, fixedint.MutableUInt8(5)),
+            ]
         )
         # imm=0, rs1=0 try with both values at 0
         state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
@@ -1179,24 +1177,22 @@ class TestRiscvInstructions(unittest.TestCase):
     def test_lh(self):
         state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[0, 2, -2, pow(2, 32) - 1]),
-            memory=Memory(
-                memory_file=dict(
-                    [
-                        (0, fixedint.MutableUInt8(1)),
-                        (1, fixedint.MutableUInt8(2)),
-                        (2, fixedint.MutableUInt8(3)),
-                        (3, fixedint.MutableUInt8(4)),
-                        (4, fixedint.MutableUInt8(5)),
-                        (5, fixedint.MutableUInt8(6)),
-                        (6, fixedint.MutableUInt8(-1)),
-                        (7, fixedint.MutableUInt8(-1)),
-                        (pow(2, 32) - 2, fixedint.MutableUInt8(7)),
-                        (pow(2, 32) - 1, fixedint.MutableUInt8(8)),
-                        (2047, fixedint.MutableUInt8(5)),
-                    ]
-                ),
-                min_bytes=0,
-            ),
+            memory=Memory(AddressingType.BYTE, 32, True),
+        )
+        state.memory.memory_file = dict(
+            [
+                (0, fixedint.MutableUInt8(1)),
+                (1, fixedint.MutableUInt8(2)),
+                (2, fixedint.MutableUInt8(3)),
+                (3, fixedint.MutableUInt8(4)),
+                (4, fixedint.MutableUInt8(5)),
+                (5, fixedint.MutableUInt8(6)),
+                (6, fixedint.MutableUInt8(-1)),
+                (7, fixedint.MutableUInt8(-1)),
+                (pow(2, 32) - 2, fixedint.MutableUInt8(7)),
+                (pow(2, 32) - 1, fixedint.MutableUInt8(8)),
+                (2047, fixedint.MutableUInt8(5)),
+            ]
         )
         # imm=0, rs1=0 try with both values at 0
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
@@ -1271,34 +1267,32 @@ class TestRiscvInstructions(unittest.TestCase):
     def test_lw(self):
         state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[0, 4, -4, pow(2, 32) - 1]),
-            memory=Memory(
-                memory_file=dict(
-                    [
-                        (0, fixedint.MutableUInt8(1)),
-                        (1, fixedint.MutableUInt8(1)),
-                        (2, fixedint.MutableUInt8(1)),
-                        (3, fixedint.MutableUInt8(1)),
-                        (4, fixedint.MutableUInt8(2)),
-                        (5, fixedint.MutableUInt8(2)),
-                        (6, fixedint.MutableUInt8(2)),
-                        (7, fixedint.MutableUInt8(2)),
-                        (8, fixedint.MutableUInt8(3)),
-                        (9, fixedint.MutableUInt8(3)),
-                        (10, fixedint.MutableUInt8(3)),
-                        (11, fixedint.MutableUInt8(3)),
-                        (12, fixedint.MutableUInt8(-1)),
-                        (13, fixedint.MutableUInt8(-1)),
-                        (14, fixedint.MutableUInt8(-1)),
-                        (15, fixedint.MutableUInt8(-1)),
-                        (pow(2, 32) - 4, fixedint.MutableUInt8(4)),
-                        (pow(2, 32) - 3, fixedint.MutableUInt8(4)),
-                        (pow(2, 32) - 2, fixedint.MutableUInt8(4)),
-                        (pow(2, 32) - 1, fixedint.MutableUInt8(4)),
-                        (2047, fixedint.MutableUInt8(5)),
-                    ]
-                ),
-                min_bytes=0,
-            ),
+            memory=Memory(AddressingType.BYTE, 32, True),
+        )
+        state.memory.memory_file = dict(
+            [
+                (0, fixedint.MutableUInt8(1)),
+                (1, fixedint.MutableUInt8(1)),
+                (2, fixedint.MutableUInt8(1)),
+                (3, fixedint.MutableUInt8(1)),
+                (4, fixedint.MutableUInt8(2)),
+                (5, fixedint.MutableUInt8(2)),
+                (6, fixedint.MutableUInt8(2)),
+                (7, fixedint.MutableUInt8(2)),
+                (8, fixedint.MutableUInt8(3)),
+                (9, fixedint.MutableUInt8(3)),
+                (10, fixedint.MutableUInt8(3)),
+                (11, fixedint.MutableUInt8(3)),
+                (12, fixedint.MutableUInt8(-1)),
+                (13, fixedint.MutableUInt8(-1)),
+                (14, fixedint.MutableUInt8(-1)),
+                (15, fixedint.MutableUInt8(-1)),
+                (pow(2, 32) - 4, fixedint.MutableUInt8(4)),
+                (pow(2, 32) - 3, fixedint.MutableUInt8(4)),
+                (pow(2, 32) - 2, fixedint.MutableUInt8(4)),
+                (pow(2, 32) - 1, fixedint.MutableUInt8(4)),
+                (2047, fixedint.MutableUInt8(5)),
+            ]
         )
         # imm=0, rs1=0 try with both values at 0
         state.register_file.registers = [0, 4, -4, pow(2, 32) - 1]
@@ -1389,19 +1383,17 @@ class TestRiscvInstructions(unittest.TestCase):
     def test_lbu(self):
         state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[0, 1, -1, pow(2, 32) - 1]),
-            memory=Memory(
-                memory_file=dict(
-                    [
-                        (0, fixedint.MutableUInt8(1)),
-                        (1, fixedint.MutableUInt8(2)),
-                        (2, fixedint.MutableUInt8(3)),
-                        (3, fixedint.MutableUInt8(-1)),
-                        (pow(2, 32) - 1, fixedint.MutableUInt8(4)),
-                        (2047, fixedint.MutableUInt8(5)),
-                    ]
-                ),
-                min_bytes=0,
-            ),
+            memory=Memory(AddressingType.BYTE, 32, True),
+        )
+        state.memory.memory_file = dict(
+            [
+                (0, fixedint.MutableUInt8(1)),
+                (1, fixedint.MutableUInt8(2)),
+                (2, fixedint.MutableUInt8(3)),
+                (3, fixedint.MutableUInt8(-1)),
+                (pow(2, 32) - 1, fixedint.MutableUInt8(4)),
+                (2047, fixedint.MutableUInt8(5)),
+            ]
         )
         # imm=0, rs1=0 try with both values at 0
         state.register_file.registers = [0, 1, -1, pow(2, 32) - 1]
@@ -1467,24 +1459,22 @@ class TestRiscvInstructions(unittest.TestCase):
     def test_lhu(self):
         state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[0, 2, -2, pow(2, 32) - 1]),
-            memory=Memory(
-                memory_file=dict(
-                    [
-                        (0, fixedint.MutableUInt8(1)),
-                        (1, fixedint.MutableUInt8(2)),
-                        (2, fixedint.MutableUInt8(3)),
-                        (3, fixedint.MutableUInt8(4)),
-                        (4, fixedint.MutableUInt8(5)),
-                        (5, fixedint.MutableUInt8(6)),
-                        (6, fixedint.MutableUInt8(-1)),
-                        (7, fixedint.MutableUInt8(-1)),
-                        (pow(2, 32) - 2, fixedint.MutableUInt8(7)),
-                        (pow(2, 32) - 1, fixedint.MutableUInt8(8)),
-                        (2047, fixedint.MutableUInt8(5)),
-                    ]
-                ),
-                min_bytes=0,
-            ),
+            memory=Memory(AddressingType.BYTE, 32, True),
+        )
+        state.memory.memory_file = dict(
+            [
+                (0, fixedint.MutableUInt8(1)),
+                (1, fixedint.MutableUInt8(2)),
+                (2, fixedint.MutableUInt8(3)),
+                (3, fixedint.MutableUInt8(4)),
+                (4, fixedint.MutableUInt8(5)),
+                (5, fixedint.MutableUInt8(6)),
+                (6, fixedint.MutableUInt8(-1)),
+                (7, fixedint.MutableUInt8(-1)),
+                (pow(2, 32) - 2, fixedint.MutableUInt8(7)),
+                (pow(2, 32) - 1, fixedint.MutableUInt8(8)),
+                (2047, fixedint.MutableUInt8(5)),
+            ]
         )
         # imm=0, rs1=0 try with both values at 0
         state.register_file.registers = [0, 2, -2, pow(2, 32) - 1]
@@ -1629,7 +1619,7 @@ class TestRiscvInstructions(unittest.TestCase):
                     fixedint.MutableUInt32(1024),
                 ]
             ),
-            memory=Memory(min_bytes=0),
+            memory=Memory(AddressingType.BYTE, 32, True),
         )
         sb_0 = SB(rs1=0, rs2=0, imm=0)
         state = sb_0.behavior(state)
@@ -1674,7 +1664,7 @@ class TestRiscvInstructions(unittest.TestCase):
                     fixedint.MutableUInt32(65535),
                 ]
             ),
-            memory=Memory(min_bytes=0),
+            memory=Memory(AddressingType.BYTE, 32, True),
         )
 
         sh_0 = SH(rs1=0, rs2=0, imm=0)
@@ -1723,7 +1713,7 @@ class TestRiscvInstructions(unittest.TestCase):
                     fixedint.MutableUInt32(4294967295),
                 ]
             ),
-            memory=Memory(min_bytes=0),
+            memory=Memory(AddressingType.BYTE, 32, True),
         )
 
         sw_0 = SW(rs1=0, rs2=0, imm=0)

@@ -2,13 +2,10 @@ from fixedint import MutableUInt16
 from typing import Optional
 
 from architecture_simulator.settings.settings import Settings
-from .toy_memory import ToyMemory
+from architecture_simulator.uarch.memory import Memory, AddressingType
 from architecture_simulator.isa.toy.toy_instructions import ToyInstruction
 from .toy_performance_metrics import ToyPerformanceMetrics
 from .SvgVisValues import SvgVisValues
-from architecture_simulator.util.integer_representations import (
-    get_16_bit_representations,
-)
 
 
 class ToyArchitecturalState:
@@ -19,12 +16,12 @@ class ToyArchitecturalState:
         self.address_of_current_instruction: Optional[int] = None
         self.address_of_next_instruction = 0
         self.accu = MutableUInt16(0)
-        self.memory = ToyMemory(
-            address_range=(
-                range(unified_memory_size)
-                if unified_memory_size
-                else range(Settings().get()["toy_memory_max_bytes"])
-            )
+        self.memory = Memory(
+            AddressingType.HALF_WORD,
+            12,
+            address_range=range(unified_memory_size)
+            if unified_memory_size
+            else range(Settings().get()["toy_memory_max_bytes"]),
         )
         self.performance_metrics = ToyPerformanceMetrics()
         self.max_pc: Optional[int] = None  # init by parser

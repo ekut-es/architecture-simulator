@@ -2,7 +2,11 @@ import unittest
 import fixedint
 
 from architecture_simulator.uarch.riscv.register_file import RegisterFile
-from architecture_simulator.uarch.memory import Memory, MemoryAddressError
+from architecture_simulator.uarch.memory import (
+    Memory,
+    MemoryAddressError,
+    AddressingType,
+)
 from architecture_simulator.uarch.riscv.riscv_architectural_state import (
     RiscvArchitecturalState,
 )
@@ -73,37 +77,38 @@ class TestRiscvArchitecture(unittest.TestCase):
 
     def test_mem(self):
         # test the wordwise repr method
-        state = RiscvArchitecturalState(memory=Memory(min_bytes=0))
+        state = RiscvArchitecturalState(memory=Memory(AddressingType.BYTE, 32))
         state.memory.write_word(0, fixedint.MutableUInt32(1))
         state.memory.write_word(6, fixedint.MutableUInt32(6))
         state.memory.write_byte(21, fixedint.MutableUInt32(20))
         self.assertEqual(
-            state.memory.memory_wordwise_repr()[0][0],
+            state.memory.wordwise_repr()[0][0],
             "00000000 00000000 00000000 00000001",
         )
-        self.assertEqual(state.memory.memory_wordwise_repr()[0][1], "1")
-        self.assertEqual(state.memory.memory_wordwise_repr()[0][2], "00 00 00 01")
+        self.assertEqual(state.memory.wordwise_repr()[0][1], "1")
+        self.assertEqual(state.memory.wordwise_repr()[0][2], "00 00 00 01")
         self.assertEqual(
-            state.memory.memory_wordwise_repr()[4][0],
+            state.memory.wordwise_repr()[4][0],
             "00000000 00000110 00000000 00000000",
         )
-        self.assertEqual(state.memory.memory_wordwise_repr()[4][1], str(6 << 16))
-        self.assertEqual(state.memory.memory_wordwise_repr()[4][2], "00 06 00 00")
+        self.assertEqual(state.memory.wordwise_repr()[4][1], str(6 << 16))
+        self.assertEqual(state.memory.wordwise_repr()[4][2], "00 06 00 00")
         self.assertEqual(
-            state.memory.memory_wordwise_repr()[8][0],
+            state.memory.wordwise_repr()[8][0],
             "00000000 00000000 00000000 00000000",
         )
-        self.assertEqual(state.memory.memory_wordwise_repr()[8][1], "0")
-        self.assertEqual(state.memory.memory_wordwise_repr()[8][2], "00 00 00 00")
+        self.assertEqual(state.memory.wordwise_repr()[8][1], "0")
+        self.assertEqual(state.memory.wordwise_repr()[8][2], "00 00 00 00")
         self.assertEqual(
-            state.memory.memory_wordwise_repr()[20][0],
+            state.memory.wordwise_repr()[20][0],
             "00000000 00000000 00010100 00000000",
         )
-        self.assertEqual(state.memory.memory_wordwise_repr()[20][1], str(20 << 8))
-        self.assertEqual(state.memory.memory_wordwise_repr()[20][2], "00 00 14 00")
+        self.assertEqual(state.memory.wordwise_repr()[20][1], str(20 << 8))
+        self.assertEqual(state.memory.wordwise_repr()[20][2], "00 00 14 00")
 
         state = RiscvArchitecturalState(
-            register_file=RegisterFile(registers=()), memory=Memory(min_bytes=0)
+            register_file=RegisterFile(registers=()),
+            memory=Memory(AddressingType.BYTE, 32),
         )
         # store_byte test
         state.memory.write_byte(0, fixedint.MutableUInt8(1))
@@ -144,7 +149,7 @@ class TestRiscvArchitecture(unittest.TestCase):
         # tests are now with 16 bit length of memory
         state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=()),
-            memory=Memory(memory_file={}, address_length=16, min_bytes=0),
+            memory=Memory(AddressingType.BYTE, 16, True),
         )
 
         # store_byte test

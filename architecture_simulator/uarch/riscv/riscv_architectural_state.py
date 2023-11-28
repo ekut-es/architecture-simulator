@@ -3,7 +3,7 @@ from typing import Optional
 from architecture_simulator.settings.settings import Settings
 from .riscv_performance_metrics import RiscvPerformanceMetrics
 from .register_file import RegisterFile
-from ..memory import Memory
+from architecture_simulator.uarch.memory import Memory, AddressingType
 from ..instruction_memory import InstructionMemory
 from .csr_registers import CsrRegisterFile
 from architecture_simulator.isa.riscv.instruction_types import RiscvInstruction
@@ -44,7 +44,19 @@ class RiscvArchitecturalState:
             stages=stages, execution_ordering=execution_ordering, state=self
         )
         self.instruction_memory = InstructionMemory[RiscvInstruction]()
-        self.memory = Memory() if memory is None else memory
+        address_length: int = Settings().get()["memory_address_length"]
+        self.memory = (
+            Memory(
+                AddressingType.BYTE,
+                address_length,
+                True,
+                range(
+                    Settings().get()["memory_address_min_bytes"], 2**address_length
+                ),
+            )
+            if memory is None
+            else memory
+        )
         self.register_file = RegisterFile() if register_file is None else register_file
         self.csr_registers = CsrRegisterFile()
         self.program_counter = self.instruction_memory.address_range.start  # 0

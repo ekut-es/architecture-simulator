@@ -1,14 +1,14 @@
 import fixedint
 from dataclasses import dataclass
 
-from ..memory import Memory
+from architecture_simulator.uarch.memory import Memory, AddressingType
 
 
 class CsrRegisterFile(Memory):
     """A class for the CSR memory."""
 
     def __init__(self, privilege_level: int = 0, min_bytes: int = 0):
-        super().__init__()
+        super().__init__(AddressingType.BYTE, 32, True)  # TODO: Fix me
         self.privilege_level = privilege_level
         self.min_bytes = min_bytes
 
