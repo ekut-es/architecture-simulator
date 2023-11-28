@@ -1,6 +1,6 @@
 import unittest
 import fixedint
-from architecture_simulator.uarch.memory import Memory
+from architecture_simulator.uarch.memory import Memory, AddressingType
 from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 
 
@@ -548,19 +548,17 @@ class TestRiscvPipeline(unittest.TestCase):
         lb x9, 47(x4)"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
 
-        simulation.state.memory = Memory(
-            memory_file=dict(
-                [
-                    (0, fixedint.MutableUInt8(1)),
-                    (1, fixedint.MutableUInt8(2)),
-                    (2, fixedint.MutableUInt8(3)),
-                    (3, fixedint.MutableUInt8(-1)),
-                    (4, fixedint.MutableUInt8(255)),
-                    (2**32 - 1, fixedint.MutableUInt8(4)),
-                    (2047, fixedint.MutableUInt8(5)),
-                ]
-            ),
-            min_bytes=0,
+        simulation.state.memory = Memory(AddressingType.BYTE, 32, True)
+        simulation.state.memory.memory_file = dict(
+            [
+                (0, fixedint.MutableUInt8(1)),
+                (1, fixedint.MutableUInt8(2)),
+                (2, fixedint.MutableUInt8(3)),
+                (3, fixedint.MutableUInt8(-1)),
+                (4, fixedint.MutableUInt8(255)),
+                (2**32 - 1, fixedint.MutableUInt8(4)),
+                (2047, fixedint.MutableUInt8(5)),
+            ]
         )
         simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
         simulation.state.register_file.registers[2] = fixedint.MutableUInt32(20)
@@ -594,20 +592,18 @@ class TestRiscvPipeline(unittest.TestCase):
         """
         simulation = RiscvSimulation(mode="five_stage_pipeline")
 
-        simulation.state.memory = Memory(
-            memory_file=dict(
-                [
-                    (0, fixedint.MutableUInt8(1)),
-                    (1, fixedint.MutableUInt8(1)),
-                    (2, fixedint.MutableUInt8(0)),
-                    (3, fixedint.MutableUInt8(-1)),
-                    (12, fixedint.MutableUInt8(255)),
-                    (13, fixedint.MutableUInt8(255)),
-                    (2**32 - 1, fixedint.MutableUInt8(0)),
-                    (2048, fixedint.MutableUInt8(5)),
-                ]
-            ),
-            min_bytes=0,
+        simulation.state.memory = Memory(AddressingType.BYTE, 32, True)
+        simulation.state.memory.memory_file = dict(
+            [
+                (0, fixedint.MutableUInt8(1)),
+                (1, fixedint.MutableUInt8(1)),
+                (2, fixedint.MutableUInt8(0)),
+                (3, fixedint.MutableUInt8(-1)),
+                (12, fixedint.MutableUInt8(255)),
+                (13, fixedint.MutableUInt8(255)),
+                (2**32 - 1, fixedint.MutableUInt8(0)),
+                (2048, fixedint.MutableUInt8(5)),
+            ]
         )
         simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
         simulation.state.register_file.registers[2] = fixedint.MutableUInt32(20)
@@ -641,18 +637,16 @@ class TestRiscvPipeline(unittest.TestCase):
         lw x9, 48(x4)"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
 
-        simulation.state.memory = Memory(
-            memory_file=dict(
-                [
-                    (0, fixedint.MutableUInt8(1)),
-                    (1, fixedint.MutableUInt8(1)),
-                    (2, fixedint.MutableUInt8(1)),
-                    (3, fixedint.MutableUInt8(1)),
-                    (2**32 - 1, fixedint.MutableUInt8(0)),
-                    (2048, fixedint.MutableUInt8(5)),
-                ]
-            ),
-            min_bytes=0,
+        simulation.state.memory = Memory(AddressingType.BYTE, 32, True)
+        simulation.state.memory.memory_file = dict(
+            [
+                (0, fixedint.MutableUInt8(1)),
+                (1, fixedint.MutableUInt8(1)),
+                (2, fixedint.MutableUInt8(1)),
+                (3, fixedint.MutableUInt8(1)),
+                (2**32 - 1, fixedint.MutableUInt8(0)),
+                (2048, fixedint.MutableUInt8(5)),
+            ]
         )
         simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
         simulation.state.register_file.registers[2] = fixedint.MutableUInt32(20)
@@ -685,19 +679,17 @@ class TestRiscvPipeline(unittest.TestCase):
         """
         simulation = RiscvSimulation(mode="five_stage_pipeline")
 
-        simulation.state.memory = Memory(
-            memory_file=dict(
-                [
-                    (0, fixedint.MutableUInt8(1)),
-                    (1, fixedint.MutableUInt8(1)),
-                    (2, fixedint.MutableUInt8(5)),
-                    (3, fixedint.MutableUInt8(-1)),
-                    (4, fixedint.MutableUInt8(255)),
-                    (2**32 - 1, fixedint.MutableUInt8(5)),
-                    (2048, fixedint.MutableUInt8(5)),
-                ]
-            ),
-            min_bytes=0,
+        simulation.state.memory = Memory(AddressingType.BYTE, 32)
+        simulation.state.memory.memory_file = dict(
+            [
+                (0, fixedint.MutableUInt8(1)),
+                (1, fixedint.MutableUInt8(1)),
+                (2, fixedint.MutableUInt8(5)),
+                (3, fixedint.MutableUInt8(-1)),
+                (4, fixedint.MutableUInt8(255)),
+                (2**32 - 1, fixedint.MutableUInt8(5)),
+                (2048, fixedint.MutableUInt8(5)),
+            ]
         )
         simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
         simulation.state.register_file.registers[2] = fixedint.MutableUInt32(20)
@@ -733,20 +725,18 @@ class TestRiscvPipeline(unittest.TestCase):
         """
         simulation = RiscvSimulation(mode="five_stage_pipeline")
 
-        simulation.state.memory = Memory(
-            memory_file=dict(
-                [
-                    (0, fixedint.MutableUInt8(1)),
-                    (1, fixedint.MutableUInt8(1)),
-                    (2, fixedint.MutableUInt8(0)),
-                    (3, fixedint.MutableUInt8(-1)),
-                    (4, fixedint.MutableUInt8(255)),
-                    (5, fixedint.MutableUInt8(255)),
-                    (2**32 - 1, fixedint.MutableUInt8(5)),
-                    (2048, fixedint.MutableUInt8(5)),
-                ]
-            ),
-            min_bytes=0,
+        simulation.state.memory = Memory(AddressingType.BYTE, 32, True)
+        simulation.state.memory.memory_file = dict(
+            [
+                (0, fixedint.MutableUInt8(1)),
+                (1, fixedint.MutableUInt8(1)),
+                (2, fixedint.MutableUInt8(0)),
+                (3, fixedint.MutableUInt8(-1)),
+                (4, fixedint.MutableUInt8(255)),
+                (5, fixedint.MutableUInt8(255)),
+                (2**32 - 1, fixedint.MutableUInt8(5)),
+                (2048, fixedint.MutableUInt8(5)),
+            ]
         )
         simulation.state.register_file.registers[1] = fixedint.MutableUInt32(1)
         simulation.state.register_file.registers[2] = fixedint.MutableUInt32(20)

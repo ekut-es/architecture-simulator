@@ -15,6 +15,7 @@ from architecture_simulator.uarch.riscv.riscv_architectural_state import (
     RiscvArchitecturalState,
     RegisterFile,
     Memory,
+    AddressingType,
 )
 from fixedint import MutableUInt32
 
@@ -23,7 +24,7 @@ def fibonacci_recursive_simulation(n: int) -> RiscvSimulation:
     simulation = RiscvSimulation(
         state=RiscvArchitecturalState(
             register_file=RegisterFile(registers=[MutableUInt32(0)] * 32),
-            memory=Memory(min_bytes=0),
+            memory=Memory(AddressingType.BYTE, 32, True),
         ),
     )
     simulation.state.instruction_memory.instructions = {

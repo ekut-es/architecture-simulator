@@ -256,7 +256,7 @@ def update_toy_tables():
 
         # memory table
         archsim_js.toyClearMemoryTable()
-        representations = simulation.state.memory.memory_repr()
+        representations = simulation.state.memory.half_wordwise_repr()
         if simulation.state.max_pc is None:
             return
 
@@ -306,7 +306,7 @@ def update_tables():
             archsim_js.update_register_table(reg_i, reg_val, reg_abi)  # int(reg_val)
 
         # memory table
-        representations = simulation.state.memory.memory_wordwise_repr()
+        representations = simulation.state.memory.wordwise_repr()
         for address, address_value in sorted(
             representations.items(),
             key=lambda item: item[0],

@@ -331,7 +331,7 @@ class RiscvParser(Parser):
 
         # variables are stored as (name: (address, byte_length))
         self.variables: dict[str, tuple[int, int]] = {}
-        address_counter = self.state.memory.min_bytes
+        address_counter = self.state.memory.address_range.start
 
         for line_number, line, line_parsed in self.data:
             if isinstance(line_parsed, str) or (

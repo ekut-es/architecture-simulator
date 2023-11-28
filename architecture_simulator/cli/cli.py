@@ -2,7 +2,6 @@ from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 from architecture_simulator.simulation.toy_simulation import ToySimulation
 from typing import Optional, Union
 from architecture_simulator.uarch.memory import Memory
-from architecture_simulator.uarch.toy.toy_memory import ToyMemory
 from architecture_simulator.uarch.riscv.register_file import RegisterFile
 
 from architecture_simulator.uarch.riscv.pipeline import (
@@ -303,7 +302,7 @@ def memory_repr(mem: Memory, display_mode: str) -> str:
     Returns:
     str
     """
-    repr_dict = mem.memory_wordwise_repr()
+    repr_dict = mem.wordwise_repr()
 
     if not bool(repr_dict):
         return "Memory: empty\n"
@@ -355,7 +354,7 @@ def five_stage_pipeline_repr(registers: list[PipelineRegister]) -> str:
     return res
 
 
-def toy_memory_repr(mem: ToyMemory, display_mode: str) -> str:
+def toy_memory_repr(mem: Memory, display_mode: str) -> str:
     """
     Produces a representation of the toy processor memory
 
@@ -366,7 +365,7 @@ def toy_memory_repr(mem: ToyMemory, display_mode: str) -> str:
         Returns:
         str
     """
-    repr_dict = mem.memory_repr()
+    repr_dict = mem.half_wordwise_repr()
     if not bool(repr_dict):
         return "Memory: empty\n"
     if display_mode not in display_modes:

@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 
 from architecture_simulator.settings.settings import Settings
 from architecture_simulator.isa.instruction import Instruction
-from .memory import MemoryAddressError
+from architecture_simulator.uarch.memory import MemoryAddressError
 
 
 T = TypeVar("T", bound=Instruction)
