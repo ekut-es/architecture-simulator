@@ -25,6 +25,8 @@ class ToySimulation {
         this.doPause = false;
         /**@type {str} The last error message. Will be empty if there was no error.*/
         this.error = "";
+        /**SplitsJS object*/
+        this.split = null;
 
         this.parseInput();
         /**@type{Function} Debounces (triggers) auto parsing.*/
@@ -543,6 +545,7 @@ class ToySimulation {
         this.domNodes.helpModalHeading.textContent = "TOY";
         this.insertSettings();
         this.insertVisualization();
+        this.createSplit();
     }
 
     /**
@@ -555,6 +558,7 @@ class ToySimulation {
         this.domNodes.helpModalHeading.textContent = "";
         this.domNodes.customSettingsContainer.innerHTML = "";
         this.domNodes.visualizationsContainer.innerHTML = "";
+        this.destroySplit();
     }
 
     updateVisualization() {
@@ -610,5 +614,36 @@ class ToySimulation {
         const display = doShow ? "block" : "none";
         this.domNodes.toyVisualization.querySelector("#" + id).style.display =
             display;
+    }
+
+    /**
+     * Creates a SplitJS split between the text and visualization containers.
+     */
+    createSplit() {
+        if (this.split === null) {
+            this.domNodes.mainContentContainer.classList.add("split");
+            this.split = Split(
+                [
+                    "#" + this.domNodes.textContentContainer.id,
+                    "#" + this.domNodes.visualizationsContainer.id,
+                ],
+                {
+                    minSize: 200,
+                    sizes: [35, 65],
+                    snapOffset: 0,
+                }
+            );
+        }
+    }
+
+    /**
+     * Removes the splits.
+     */
+    destroySplit() {
+        if (this.split !== null) {
+            this.domNodes.classList.remove("split");
+            this.split.destroy();
+            this.split = null;
+        }
     }
 }

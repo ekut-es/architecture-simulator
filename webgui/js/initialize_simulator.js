@@ -47,6 +47,7 @@ from architecture_simulator.gui.new_webgui import *
         ),
         textEditorSeparator: document.getElementById("text-editor-separator"),
         pageHeading: document.getElementById("page-heading"),
+        mainContentContainer: document.getElementById("main-content-container"),
     };
     getPythonSimulation = pyodide.globals.get("get_simulation");
     // Create a JS Simulation object.
