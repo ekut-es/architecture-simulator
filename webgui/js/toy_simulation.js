@@ -1,7 +1,8 @@
 class ToySimulation {
-    constructor(pythonSimulation) {
+    constructor(pythonSimulation, domNodes) {
         // TODO: Add comments for these properties
         this.pythonSimulation = pythonSimulation;
+        this.domNodes = domNodes;
 
         this.regRepresentationMode = 1;
         this.memRepresentationMode = 1;
@@ -12,7 +13,6 @@ class ToySimulation {
         this.error = "";
 
         this.insertContentIntoDOM();
-        this.outputField = document.getElementById("output-field-id");
         this.debouncedAutoParsing = this.getDebouncedAutoParsing();
         editor.on("change", () => {
             this.hasUnparsedChanges = true;
@@ -115,17 +115,11 @@ class ToySimulation {
         const hasFinished = this.pythonSimulation.is_done();
         const doubleStepAllowed = this.pythonSimulation.next_cycle == "1";
 
-        const stepButton = document.getElementById("button-step-simulation-id");
-        const doubleStepButton = document.getElementById(
-            "button-double-step-simulation-id"
-        );
-        const pauseButton = document.getElementById(
-            "button-pause-simulation-id"
-        );
-        const runButton = document.getElementById("button-run-simulation-id");
-        const resetButton = document.getElementById(
-            "button-reset-simulation-id"
-        );
+        const stepButton = this.domNodes.stepButton;
+        const doubleStepButton = this.domNodes.doubleStepButton;
+        const pauseButton = this.domNodes.pauseButton;
+        const runButton = this.domNodes.runButton;
+        const resetButton = this.domNodes.resetButton;
 
         // If there are unparsed changes, do not update the tables and disable all buttons
         if (this.hasUnparsedChanges) {
@@ -206,9 +200,6 @@ class ToySimulation {
      * Inserts the needed settings into the DOM. They will already have the necessary listeners added.
      */
     insertSettings() {
-        const settingsContainer = document.getElementById(
-            "isa-specific-settings-container"
-        );
         const registerRepresentation = this.getRepresentationsSettingsRow(
             "Registers",
             "register-representation",
@@ -227,8 +218,10 @@ class ToySimulation {
             },
             this.memRepresentationMode
         );
-        settingsContainer.appendChild(registerRepresentation);
-        settingsContainer.appendChild(memoryRepresentation);
+        this.domNodes.customSettingsContainer.appendChild(
+            registerRepresentation
+        );
+        this.domNodes.customSettingsContainer.appendChild(memoryRepresentation);
     }
 
     /**
@@ -358,7 +351,7 @@ class ToySimulation {
      * @param {string} str The string that the output field's content will be set to.
      */
     setOutputFieldContent(str) {
-        this.outputField.innerText = str;
+        this.domNodes.outputField.innerText = str;
     }
 
     /**
@@ -366,13 +359,13 @@ class ToySimulation {
      */
     updateRegisters() {
         const registers = this.pythonSimulation.get_register_representations();
-        document.getElementById("toy-accu-id").innerText = registers
+        this.domNodes.accu.innerText = registers
             .get("accu")
             .get(this.regRepresentationMode);
-        document.getElementById("toy-pc-id").innerText = registers
+        this.domNodes.pc.innerText = registers
             .get("pc")
             .get(this.regRepresentationMode);
-        document.getElementById("toy-ir-id").innerText = registers
+        this.domNodes.ir.innerText = registers
             .get("ir")
             .get(this.regRepresentationMode);
         registers.destroy();
@@ -382,7 +375,7 @@ class ToySimulation {
      * Clears the TOY memory table.
      */
     clearMemoryTable() {
-        document.getElementById("toy-memory-table-body-id").innerHTML = "";
+        this.domNodes.memoryTableBody.innerHTML = "";
     }
 
     /**
@@ -398,9 +391,7 @@ class ToySimulation {
             const value = values.get(this.memRepresentationMode);
             const instructionRepresentation = entry.get(2);
             const cycle = entry.get(3);
-            const row = document
-                .getElementById("toy-memory-table-body-id")
-                .insertRow();
+            const row = this.domNodes.memoryTableBody.insertRow();
             const cell1 = row.insertCell();
             const cell2 = row.insertCell();
             const cell3 = row.insertCell();
@@ -424,10 +415,12 @@ class ToySimulation {
     }
 
     /**
-     * @returns {Node} A Node containing the TOY accu and memory table.
+     * Returns a Node containnig the accu and memory table and the output field.
+     * The accu, pc, ir, memory table body and output field will be registered in this.domNodes.
+     * @returns {Node} A Node containing the accu and memory table and the output field.
      */
-    getMemoryAndAccuColumn() {
-        return createNode(html`<div
+    getMainColumn() {
+        const column = createNode(html`<div
             id="toy-main-text-container-id"
             class="d-flex flex-column"
         >
@@ -475,13 +468,23 @@ class ToySimulation {
                 ></div>
             </div>
         </div>`);
+        this.domNodes.accu = column.querySelector("#toy-accu-id");
+        this.domNodes.pc = column.querySelector("#toy-pc-id");
+        this.domNodes.ir = column.querySelector("#toy-ir-id");
+        this.domNodes.memoryTableBody = column.querySelector(
+            "#toy-memory-table-body-id"
+        );
+        this.domNodes.outputField = column.querySelector("#output-field-id");
+        return column;
     }
 
     /**
+     * Returns a Node containing the double step button.
+     * Also registers this node in this.domNodes.
      * @returns {Node} A Node containing the double step button.
      */
     getDoubleStepButton() {
-        return createNode(html`<button
+        const button = createNode(html`<button
             id="button-double-step-simulation-id"
             class="btn btn-primary btn-sm control-button me-1"
             title="double step"
@@ -489,23 +492,20 @@ class ToySimulation {
         >
             <img src="img/double-step.svg" />
         </button>`);
+        this.domNodes.doubleStepButton = button;
+        return button;
     }
 
     /**
      * Inserts all of TOY's coustom elements into the DOM.
      */
     insertContentIntoDOM() {
-        document
-            .getElementById("text-editor-separator")
-            .after(this.getMemoryAndAccuColumn());
-        const doubleStepButton = this.getDoubleStepButton();
-        document
-            .getElementById("button-step-simulation-id")
-            .after(doubleStepButton);
-        document.getElementById("page-heading-id").innerText = "TOY Simulator";
+        this.domNodes.textEditorSeparator.after(this.getMainColumn());
+        this.domNodes.stepButton.after(this.getDoubleStepButton());
+        this.domNodes.pageHeading.innerText = "TOY Simulator";
         document.title = "TOY Simulator";
-        document.getElementById("help-modal-body").innerHTML = toyDocumentation;
-        document.getElementById("help-modal-heading").textContent = "TOY";
+        this.domNodes.helpModalBody.innerHTML = toyDocumentation;
+        this.domNodes.helpModalHeading.textContent = "TOY";
         this.insertSettings();
     }
 
@@ -514,44 +514,11 @@ class ToySimulation {
      */
     removeContentFromDOM() {
         document.getElementById("toy-main-text-container-id").remove();
-        document.getElementById("button-double-step-simulation-id").remove();
-        document.getElementById("help-modal-body").innerHTML = "";
-        document.getElementById("help-modal-heading").textContent = "";
-        document.getElementById("isa-specific-settings-container").innerHTML =
-            "";
+        this.domNodes.doubleStepButton.remove();
+        this.domNodes.helpModalBody.innerHTML = "";
+        this.domNodes.helpModalHeading.textContent = "";
+        this.domNodes.customSettingsContainer.innerHTML = "";
     }
-
-    // /**
-    //  * Executes the first cycle step and the second cycle step.
-    //  */
-    // doubleStep() {
-    //     is_run_simulation = false;
-    //     manual_run = true;
-    //     editor.save();
-    //     disable_editor();
-    //     evaluatePython_step_sim();
-    //     enable_run();
-    //     disable_pause();
-    //     enable_step();
-    // }
-
-    // /**
-    //  * Disables the double step button.
-    //  */
-    // disable_double_step() {
-    //     document.getElementById(
-    //         "button-double-step-simulation-id"
-    //     ).disabled = true;
-    // }
-
-    // /**
-    //  * Enables the double step button.
-    //  */
-    // enable_double_step() {
-    //     document.getElementById(
-    //         "button-double-step-simulation-id"
-    //     ).disabled = false;
-    // }
 
     /**
      * Sets the fill color of an element.
