@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Type
 from fixedint import MutableUInt16
 from ..instruction import Instruction
 from architecture_simulator.uarch.toy.SvgVisValues import SvgVisValues
+from architecture_simulator.util.fixedint_12 import MutableUInt12
 
 if TYPE_CHECKING:
     from architecture_simulator.uarch.toy.toy_architectural_state import (
@@ -167,7 +168,7 @@ class BRZ(AddressTypeInstruction):
         """PC = ADDRESS if (ACCU == 0)"""
         state.visualisation_values = SvgVisValues(jump=not state.accu)
         if not state.accu:
-            state.set_current_pc(MutableUInt16(self.address))
+            state.set_current_pc(MutableUInt12(self.address))
             state.performance_metrics.branch_count += 1
 
 
