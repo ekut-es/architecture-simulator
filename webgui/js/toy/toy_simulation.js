@@ -132,36 +132,64 @@ class ToySimulation {
     }
 
     /**
+     * Function for the step button.
      * Executes a single cycle of the simulation.
-     * Sets this.error accordingly and updates the UI unless specified otherwise.
+     * Sets this.error accordingly and updates the UI.
+     * Does start and stop the timer for the performance metrics to meassure execution time.
      * Will not parse the input before stepping.
-     *
-     * @param {bool} updateUI Whether to update the UI or not.
      */
-    step(updateUI = true) {
+    step() {
+        this.pythonSimulation.get_performance_metrics().resume_timer();
+        this.executeSingleStep();
+        this.pythonSimulation.get_performance_metrics().stop_timer();
+        this.updateUI();
+    }
+
+    /**
+     * Executes a single cycle of the simulation.
+     * Sets this.error accordingly.
+     * Does not start and stop the timer for the performance metrics.
+     * Will not update the UI.
+     * Will not parse the input before stepping.
+     */
+    executeSingleStep() {
         try {
             this.pythonSimulation.single_step();
         } catch (error) {
             this.error = String(error);
         }
-        if (updateUI) {
-            this.updateUI();
-        }
+    }
+
+    /**
+     * Function for the double step button.
+     * Executes two cycles of the simulation.
+     * Should only be called if the next cycle to be executed is the first cycle of the current instruction,
+     * otherwise it will create an error.
+     * Sets this.error accordingly and updates the UI.
+     * Does start and stop the timer for the performance metrics to meassure execution time.
+     * Will not parse the input before stepping.
+     */
+    doubleStep() {
+        this.pythonSimulation.get_performance_metrics().resume_timer();
+        this.executeDoubleStep();
+        this.pythonSimulation.get_performance_metrics().stop_timer();
+        this.updateUI();
     }
 
     /**
      * Executes two cycles of the simulation.
      * Should only be called if the next cycle to be executed is the first cycle of the current instruction,
      * otherwise it will create an error.
-     * Sets this.error accordingly and updates the UI.
+     * Sets this.error accordingly.
+     * Does not start and stop the timer for the performance metrics.
+     * Will not update the UI.
      * Will not parse the input before stepping.
      */
-    doubleStep() {
+    executeDoubleStep() {
         try {
             this.pythonSimulation.step();
-            this.updateUI();
         } catch (error) {
-            this.setOutputFieldContent(error);
+            this.error = String(error);
         }
     }
 
@@ -264,6 +292,7 @@ class ToySimulation {
      */
     run() {
         this.isRunning = true;
+        this.pythonSimulation.get_performance_metrics().resume_timer();
         let stopCondition = () => {
             return (
                 this.pythonSimulation.is_done() ||
@@ -274,17 +303,21 @@ class ToySimulation {
         let stepLoop = () => {
             setTimeout(() => {
                 for (let i = 0; i <= 1000; i++) {
-                    this.step(false);
+                    this.executeSingleStep();
                 }
                 if (!stopCondition()) {
                     stepLoop();
                 } else {
                     this.isRunning = false;
                     this.doPause = false;
+                    this.pythonSimulation
+                        .get_performance_metrics()
+                        .stop_timer();
                 }
                 this.updateUI();
             }, 25);
         };
+        this.updateUI();
         stepLoop();
     }
 
