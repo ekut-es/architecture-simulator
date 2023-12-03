@@ -862,18 +862,35 @@ function destroyCurrentIsaElements() {
 }
 
 function createSplit() {
-    if (split === null) {
-        document
-            .getElementById("main-content-container")
-            .classList.add("split");
-        split = Split(
-            ["#text-content-container", "#visualizations-container-id"],
-            {
-                minSize: 200,
-                sizes: [35, 65],
-                snapOffset: 0,
-            }
-        );
+    var mainContentContainer = document.getElementById(
+        "main-content-container"
+    );
+
+    if (split === null && mainContentContainer) {
+        if (window.innerWidth < window.innerHeight) {
+            // Vertical split
+            mainContentContainer.classList.add("vertical-split");
+            split = Split(
+                ["#text-content-container", "#visualizations-container-id"],
+                {
+                    direction: "vertical",
+                    minSize: 200,
+                    sizes: [60, 40],
+                    snapOffset: 0,
+                }
+            );
+        } else {
+            // Horizontal split
+            mainContentContainer.classList.add("horizontal-split");
+            split = Split(
+                ["#text-content-container", "#visualizations-container-id"],
+                {
+                    minSize: 200,
+                    sizes: [35, 65],
+                    snapOffset: 0,
+                }
+            );
+        }
     }
 }
 
@@ -881,8 +898,25 @@ function destroySplit() {
     if (split !== null) {
         document
             .getElementById("main-content-container")
-            .classList.remove("split");
+            .classList.remove("vertical-split", "horizontal-split");
         split.destroy();
         split = null;
     }
 }
+
+function handleResize() {
+    var mainContentContainer = document.getElementById(
+        "main-content-container"
+    );
+    if (
+        (mainContentContainer.classList.contains("vertical-split") &&
+            window.innerWidth >= window.innerHeight) ||
+        (mainContentContainer.classList.contains("horizontal-split") &&
+            window.innerWidth < window.innerHeight)
+    ) {
+        destroySplit();
+        createSplit();
+    }
+}
+
+window.addEventListener("resize", handleResize);
