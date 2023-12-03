@@ -1,5 +1,6 @@
 class ToySimulation {
     /**
+     * Constructor for ToySimulation. Creates all the HTML Nodes and adds the needed event listeners.
      * @param {pyProxy} pythonSimulation pyProxy of a ToySimulation.
      * @param {object} domNodes Object holding all the relevant nodes from the default page.
      */
@@ -37,7 +38,48 @@ class ToySimulation {
             this.updateUI();
         });
         // Insert everything into the DOM. The SVG will cause a UI update once it has finished loading.
-        this.insertContentIntoDOM();
+        this.domNodes = { ...this.domNodes, ...toyGetMainColumn() };
+        this.domNodes.textEditorSeparator.after(this.domNodes.mainColumn);
+        this.domNodes.doubleStepButton = toyGetDoubleStepButton();
+        this.domNodes.stepButton.after(this.domNodes.doubleStepButton);
+        this.domNodes.pageHeading.innerText = "TOY Simulator";
+        document.title = "TOY Simulator";
+        this.domNodes.helpModalBody.innerHTML = toyDocumentation;
+        this.domNodes.helpModalHeading.textContent = "TOY";
+        const registerRepresentation = getRepresentationsSettingsRow(
+            "Registers",
+            "register-representation",
+            (mode) => {
+                this.regRepresentationMode = mode;
+                this.updateUI();
+            },
+            this.regRepresentationMode
+        );
+        const memoryRepresentation = getRepresentationsSettingsRow(
+            "Memory",
+            "memory-representation",
+            (mode) => {
+                this.memRepresentationMode = mode;
+                this.updateUI();
+            },
+            this.memRepresentationMode
+        );
+        this.domNodes.customSettingsContainer.appendChild(
+            registerRepresentation
+        );
+        this.domNodes.customSettingsContainer.appendChild(memoryRepresentation);
+        // Note: The constructor doesn't update the UI itself but the svg will once it has loaded
+        const toySvgObject = toyGetVisualization(() => {
+            this.domNodes.toyVisualization = toySvgObject.contentDocument;
+            this.visualizationLoaded = true;
+            this.updateUI();
+        });
+        this.domNodes.visualizationsContainer.append(toySvgObject);
+        this.split = createSplit(
+            this.domNodes.mainContentContainer,
+            this.domNodes.textContentContainer,
+            this.domNodes.visualizationsContainer
+        );
     }
 
     /**
@@ -217,126 +259,6 @@ class ToySimulation {
     }
 
     /**
-     * Inserts the needed settings into the DOM. They will already have the necessary listeners added.
-     */
-    insertSettings() {
-        const registerRepresentation = this.getRepresentationsSettingsRow(
-            "Registers",
-            "register-representation",
-            (mode) => {
-                this.regRepresentationMode = mode;
-                this.updateUI();
-            },
-            this.regRepresentationMode
-        );
-        const memoryRepresentation = this.getRepresentationsSettingsRow(
-            "Memory",
-            "memory-representation",
-            (mode) => {
-                this.memRepresentationMode = mode;
-                this.updateUI();
-            },
-            this.memRepresentationMode
-        );
-        this.domNodes.customSettingsContainer.appendChild(
-            registerRepresentation
-        );
-        this.domNodes.customSettingsContainer.appendChild(memoryRepresentation);
-    }
-
-    /**
-     * Generates a Node for selecting the representation (bin, udec, sdec, hex) of some setting.
-     * Adds an event listener and calls the given function with the selected value (bin: 0, udec: 1, sdec: 3, hex: 2).
-     * The listener will NOT cause a UI update.
-     * The provided default mode will be used to check one option but it will not trigger the event listener.
-     *
-     * @param {string} displayName Name to display next to the buttons.
-     * @param {string} id A unique id. Several ids will be generated from this base string.
-     * @param {function(number):void} callback The function to call after a button was clicked.
-     * @param {number} defaultMode The default representation mode.
-     * @returns {Node} The Node to insert into the settings.
-     */
-    getRepresentationsSettingsRow(displayName, id, callback, defaultMode) {
-        const row = createNode(html`<div class="row">
-            <div class="col-4">
-                <h3 class="fs-6">${displayName}:</h3>
-            </div>
-            <div id="${id}-container" class="col-8">
-                <input
-                    type="radio"
-                    id="${id}-bin"
-                    name="${id}-group"
-                    value="0"
-                    ${defaultMode == 0 ? "checked" : ""}
-                />
-                <label for="${id}-bin"> binary </label>
-                <input
-                    type="radio"
-                    id="${id}-udec"
-                    name="${id}-group"
-                    value="1"
-                    ${defaultMode == 1 ? "checked" : ""}
-                />
-                <label for="${id}-udec"> unsigned decimal </label>
-                <input
-                    type="radio"
-                    id="${id}-sdec"
-                    name="${id}-group"
-                    value="3"
-                    ${defaultMode == 3 ? "checked" : ""}
-                />
-                <label for="${id}-sdec"> signed decimal </label>
-                <input
-                    type="radio"
-                    id="${id}-hex"
-                    name="${id}-group"
-                    value="2"
-                    ${defaultMode == 2 ? "checked" : ""}
-                />
-                <label for="${id}-hex"> hexadecimal </label>
-            </div>
-        </div>`);
-        row.querySelector(`#${id}-container`).addEventListener(
-            "click",
-            (event) => {
-                // make sure the user actually clicked an option, not just somewhere in the container
-                if (
-                    event.target.matches("label") ||
-                    event.target.matches("input")
-                ) {
-                    // the user might have clicked the label, but the value is only stored in the input
-                    let selectedMode;
-                    if (event.target.matches("label")) {
-                        const inputId = event.target.getAttribute("for");
-                        selectedMode = row.querySelector(`#${inputId}`).value;
-                    } else {
-                        selectedMode = event.target.value;
-                    }
-                    callback(Number(selectedMode));
-                }
-            }
-        );
-        return row;
-    }
-
-    /**
-     * Inserts the Toy SVG into the DOM.
-     * Once the svg has loaded, it will update the UI and add SVG's contentDocument to this.domNodes.
-     */
-    insertVisualization() {
-        const toySvgElement = document.createElement("object");
-        toySvgElement.data = "img/toy_structure.svg";
-        toySvgElement.type = "image/svg+xml";
-        toySvgElement.id = "toy-visualization";
-        this.domNodes.visualizationsContainer.append(toySvgElement);
-        toySvgElement.addEventListener("load", () => {
-            this.domNodes.toyVisualization = toySvgElement.contentDocument;
-            this.visualizationLoaded = true;
-            this.updateUI();
-        });
-    }
-
-    /**
      * Starts calling this.step() in a loop until the simulation has finished,
      * or until this.doPause is true.
      */
@@ -452,103 +374,6 @@ class ToySimulation {
     }
 
     /**
-     * Returns a Node containnig the accu and memory table and the output field.
-     * The accu, pc, ir, memory table body and output field will be registered in this.domNodes.
-     * @returns {Node} A Node containing the accu and memory table and the output field.
-     */
-    getMainColumn() {
-        const column = createNode(html`<div
-            id="toy-main-text-container"
-            class="d-flex flex-column"
-        >
-            <div class="mb-3" id="toy-registers-wrapper">
-                <span class="text-element-heading">Registers</span>
-                <table
-                    class="table table-sm table-hover table-bordered mono-table mb-0"
-                    id="toy-register-table"
-                >
-                    <tr>
-                        <td>ACCU</td>
-                        <td id="toy-accu">0</td>
-                    </tr>
-                    <tr>
-                        <td>PC</td>
-                        <td id="toy-pc"></td>
-                    </tr>
-                    <tr>
-                        <td>IR</td>
-                        <td id="toy-ir"></td>
-                    </tr>
-                </table>
-            </div>
-            <div class="mb-3" id="toy-memory-wrapper">
-                <span class="text-element-heading">Memory</span>
-                <table
-                    id="toy-memory-table"
-                    class="table table-sm table-hover table-bordered mono-table mb-0"
-                >
-                    <thead>
-                        <tr>
-                            <th>Address</th>
-                            <th>Value</th>
-                            <th>Instruction</th>
-                        </tr>
-                    </thead>
-                    <tbody id="toy-memory-table-body"></tbody>
-                </table>
-            </div>
-            <div id="toy-output-wrapper">
-                <span class="text-element-heading">Output</span>
-                <div
-                    id="output-field"
-                    class="flex-shrink-0 archsim-default-border"
-                ></div>
-            </div>
-        </div>`);
-        this.domNodes.accu = column.querySelector("#toy-accu");
-        this.domNodes.pc = column.querySelector("#toy-pc");
-        this.domNodes.ir = column.querySelector("#toy-ir");
-        this.domNodes.memoryTableBody = column.querySelector(
-            "#toy-memory-table-body"
-        );
-        this.domNodes.outputField = column.querySelector("#output-field");
-        return column;
-    }
-
-    /**
-     * Returns a Node containing the double step button.
-     * Also registers this node in this.domNodes.
-     * @returns {Node} A Node containing the double step button.
-     */
-    getDoubleStepButton() {
-        const button = createNode(html`<button
-            id="button-double-step-simulation"
-            class="btn btn-primary btn-sm control-button me-1"
-            title="double step"
-            onclick="simulation.doubleStep();"
-        >
-            <img src="img/double-step.svg" />
-        </button>`);
-        this.domNodes.doubleStepButton = button;
-        return button;
-    }
-
-    /**
-     * Inserts all of TOY's coustom elements into the DOM.
-     */
-    insertContentIntoDOM() {
-        this.domNodes.textEditorSeparator.after(this.getMainColumn());
-        this.domNodes.stepButton.after(this.getDoubleStepButton());
-        this.domNodes.pageHeading.innerText = "TOY Simulator";
-        document.title = "TOY Simulator";
-        this.domNodes.helpModalBody.innerHTML = toyDocumentation;
-        this.domNodes.helpModalHeading.textContent = "TOY";
-        this.insertSettings();
-        this.insertVisualization();
-        this.createSplit();
-    }
-
-    /**
      * Removes all of TOY's custom elements from the DOM.
      */
     removeContentFromDOM() {
@@ -614,26 +439,6 @@ class ToySimulation {
         const display = doShow ? "block" : "none";
         this.domNodes.toyVisualization.querySelector("#" + id).style.display =
             display;
-    }
-
-    /**
-     * Creates a SplitJS split between the text and visualization containers.
-     */
-    createSplit() {
-        if (this.split === null) {
-            this.domNodes.mainContentContainer.classList.add("split");
-            this.split = Split(
-                [
-                    "#" + this.domNodes.textContentContainer.id,
-                    "#" + this.domNodes.visualizationsContainer.id,
-                ],
-                {
-                    minSize: 200,
-                    sizes: [35, 65],
-                    snapOffset: 0,
-                }
-            );
-        }
     }
 
     /**
