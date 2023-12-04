@@ -30,20 +30,22 @@ class Memory:
     min_bytes: int = Settings().get()["memory_address_min_bytes"]  # 2**14
     memory_file: dict[int, fixedint.MutableUInt8] = field(default_factory=dict)
 
-    def memory_wordwise_repr(self) -> list[tuple[int, tuple[str, str, str, str]]]:
+    def memory_wordwise_repr(self) -> list[tuple[str, tuple[str, str, str, str]]]:
         """Returns the contents of the memory as binary, unsigned decimal, hexadecimal, signed decimal values, all nicely formatted.
 
         Returns:
-            dict[int, tuple[str, str, str, str]]: keys: addresses. Values: Tuples of (binary, unsigned decimal, hexadecimal, signed decimal) strings.
+            dict[str, tuple[str, str, str, str]]: keys: addresses in hex. Values: Tuples of (binary, unsigned decimal, hexadecimal, signed decimal) strings.
         """
-        wordwise_mem: dict[int, tuple[str, str, str, str]] = dict()
-        for address in self.memory_file.keys():
+        wordwise_mem: dict[str, tuple[str, str, str, str]] = dict()
+        for address in sorted(self.memory_file.keys()):
             aligned_address = address - (address % 4)
             if aligned_address in wordwise_mem:
                 continue
             word = self.read_word(address=aligned_address)
-            wordwise_mem[aligned_address] = get_32_bit_representations(int(word))
-        return sorted(wordwise_mem.items())
+            wordwise_mem[
+                "0x" + "{:x}".format(aligned_address)
+            ] = get_32_bit_representations(int(word))
+        return list(wordwise_mem.items())
 
     def read_byte(self, address: int) -> fixedint.MutableUInt8:
         address_with_overflow = address % pow(2, self.address_length)
