@@ -303,9 +303,9 @@ def memory_repr(mem: Memory, display_mode: str) -> str:
     Returns:
     str
     """
-    repr_dict = mem.memory_wordwise_repr()
+    repr_list = mem.memory_wordwise_repr()
 
-    if not bool(repr_dict):
+    if not bool(repr_list):
         return "Memory: empty\n"
     if display_mode not in display_modes:
         return ""
@@ -320,17 +320,16 @@ def memory_repr(mem: Memory, display_mode: str) -> str:
             + "\n"
         )
 
-    for key in sorted(repr_dict.keys()):
-        key_hex = (str(hex(key))[2:]).upper()
-        key_repr = "0" * (8 - len(key_hex)) + key_hex
+    for address, values in repr_list:
+        key_repr = "0" * (8 - len(address)) + address
         if display_mode == "sdec":
-            res += f"{key_repr} {pad_num(repr_dict[key][3], 12)}\n"
+            res += f"{key_repr} {pad_num(values[3], 12)}\n"
         elif display_mode == "udec":
-            res += f"{key_repr} {pad_num(repr_dict[key][1], 12)}\n"
+            res += f"{key_repr} {pad_num(values[1], 12)}\n"
         elif display_mode == "hex":
-            res += f"{key_repr} | {repr_dict[key][2]}\n"
+            res += f"{key_repr} | {values[2]}\n"
         else:  # 'bin' case
-            res += f"{key_repr} | {repr_dict[key][0]}\n"
+            res += f"{key_repr} | {values[0]}\n"
 
     return res
 

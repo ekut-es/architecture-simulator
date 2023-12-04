@@ -78,71 +78,25 @@ function toyGetDoubleStepButton() {
 
 /**
  * Generates a Node for selecting the representation (bin, udec, sdec, hex) of some setting.
- * Adds an event listener and calls the given function with the selected value (bin: 0, udec: 1, sdec: 3, hex: 2).
+ * Adds an event listener and calls the given function with the selected value (bin: "0", udec: "1", sdec: "3", hex: "2").
  * The listener will NOT cause a UI update.
  * The provided default mode will be used to check one option but it will not trigger the event listener.
  *
  * @param {string} displayName Name to display next to the buttons.
  * @param {string} id A unique id. Several ids will be generated from this base string.
- * @param {function(number):void} callback The function to call after a button was clicked.
- * @param {number} defaultMode The default representation mode.
+ * @param {function(string):void} callback The function to call after a button was clicked.
+ * @param {string} defaultMode The default representation mode.
  * @returns {Node} The Node to insert into the settings.
  */
 function getRepresentationsSettingsRow(displayName, id, callback, defaultMode) {
-    const row = createNode(html`<div class="row">
-        <div class="col-4">
-            <h3 class="fs-6">${displayName}:</h3>
-        </div>
-        <div id="${id}-container" class="col-8">
-            <input
-                type="radio"
-                id="${id}-bin"
-                name="${id}-group"
-                value="0"
-                ${defaultMode == 0 ? "checked" : ""}
-            />
-            <label for="${id}-bin"> binary </label>
-            <input
-                type="radio"
-                id="${id}-udec"
-                name="${id}-group"
-                value="1"
-                ${defaultMode == 1 ? "checked" : ""}
-            />
-            <label for="${id}-udec"> unsigned decimal </label>
-            <input
-                type="radio"
-                id="${id}-sdec"
-                name="${id}-group"
-                value="3"
-                ${defaultMode == 3 ? "checked" : ""}
-            />
-            <label for="${id}-sdec"> signed decimal </label>
-            <input
-                type="radio"
-                id="${id}-hex"
-                name="${id}-group"
-                value="2"
-                ${defaultMode == 2 ? "checked" : ""}
-            />
-            <label for="${id}-hex"> hexadecimal </label>
-        </div>
-    </div>`);
-    row.querySelector(`#${id}-container`).addEventListener("click", (event) => {
-        // make sure the user actually clicked an option, not just somewhere in the container
-        if (event.target.matches("label") || event.target.matches("input")) {
-            // the user might have clicked the label, but the value is only stored in the input
-            let selectedMode;
-            if (event.target.matches("label")) {
-                const inputId = event.target.getAttribute("for");
-                selectedMode = row.querySelector(`#${inputId}`).value;
-            } else {
-                selectedMode = event.target.value;
-            }
-            callback(Number(selectedMode));
-        }
-    });
-    return row;
+    return getRadioSettingsRow(
+        displayName,
+        ["binary", "unsigned decimal", "signed decimal", "hexadecimal"],
+        ["0", "1", "3", "2"],
+        id,
+        callback,
+        defaultMode
+    );
 }
 
 /**

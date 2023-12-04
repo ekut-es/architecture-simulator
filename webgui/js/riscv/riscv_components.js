@@ -1,8 +1,8 @@
 /**
- * @returns {Node} A Node containing the RISC-V register table.
+ * @returns {Object} An Object containing the RISC-V register table container and tbody.
  */
 function getRiscvRegisterTable() {
-    return createNode(html`<div
+    const table = createNode(html`<div
         id="riscv-register-table-container"
         class="main-content-column"
     >
@@ -179,6 +179,10 @@ function getRiscvRegisterTable() {
             </tbody>
         </table>
     </div>`);
+    return {
+        registerTableContainer: table,
+        registerTableBody: table.querySelector("tbody"),
+    };
 }
 
 /**
@@ -204,7 +208,7 @@ function getRiscvInstructionTable() {
         </table>
     </div>`);
     return {
-        instructionTable: table,
+        instructionTableContainer: table,
         instructionTableBody: table.querySelector("tbody"),
     };
 }
@@ -230,7 +234,7 @@ function getRiscvMemoryTable() {
         </table>
     </div>`);
     return {
-        memoryTable: table,
+        memoryTableContainer: table,
         memoryTableBody: table.querySelector("tbody"),
     };
 }

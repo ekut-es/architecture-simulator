@@ -31,8 +31,8 @@ class Simulation {
             this.debouncedAutoParsing();
             this.updateUI();
         });
-        this.domNodes.pageHeading.innerText = this.getIsaName();
-        document.title = this.getIsaName();
+        this.domNodes.pageHeading.innerText = this.getIsaName() + " Simulator";
+        document.title = this.getIsaName() + " Simulator";
         this.domNodes.helpModalBody.innerHTML = this.getDocumentation();
         this.domNodes.helpModalHeading.textContent = this.getIsaName();
 
@@ -51,8 +51,6 @@ class Simulation {
                 this.domNodes.textContentContainer,
                 this.domNodes.visualizationsContainer
             );
-        } else {
-            this.updateUI();
         }
     }
 
@@ -171,7 +169,7 @@ class Simulation {
      */
     executeStep() {
         try {
-            this.pythonSimulation.single_step();
+            this.pythonSimulation.step();
         } catch (error) {
             this.error = String(error);
         }
@@ -235,7 +233,7 @@ class Simulation {
      */
     destroySplit() {
         if (this.split !== null) {
-            this.domNodes.classList.remove("split");
+            this.domNodes.mainContentContainer.classList.remove("split");
             this.split.destroy();
             this.split = null;
         }

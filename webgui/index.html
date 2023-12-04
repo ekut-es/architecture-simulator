@@ -219,27 +219,10 @@
                         </h1>
                     </div>
                     <div class="modal-body">
-                        <div class="row border-bottom mb-2">
-                            <div class="col-4">
-                                <h2 class="fs-5">ISA:</h2>
-                            </div>
-                            <div id="select-isa-container" class="col-8">
-                                <input
-                                    type="radio"
-                                    name="isa-group"
-                                    id="isa-button-riscv"
-                                    value="riscv"
-                                />
-                                <label for="isa-button-riscv">RISC-V</label>
-                                <input
-                                    type="radio"
-                                    name="isa-group"
-                                    id="isa-button-toy"
-                                    value="toy"
-                                />
-                                <label for="isa-button-toy">TOY</label>
-                            </div>
-                        </div>
+                        <div
+                            id="isa-selector-settings-container"
+                            class="border-bottom mb-2"
+                        ></div>
                         <div id="isa-specific-settings-container"></div>
                     </div>
                     <div class="modal-footer">
@@ -293,6 +276,11 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.0/split.min.js"></script>
         <script type="text/javascript" src="js/util.js"></script>
         <script type="text/javascript" src="js/simulation.js"></script>
+
+        <script
+            type="text/javascript"
+            src="js/riscv/riscv_components.js"
+        ></script>
         <script
             type="text/javascript"
             src="js/riscv/riscv_documentation.js"

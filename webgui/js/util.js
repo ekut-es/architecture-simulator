@@ -33,3 +33,47 @@ function createVisualization(path, onLoad) {
     svgElement.addEventListener("load", onLoad);
     return svgElement;
 }
+
+function getRadioSettingsRow(
+    displayName,
+    optionNames,
+    optionValues,
+    id,
+    callback,
+    defaultSelection
+) {
+    let optionsString = "";
+    for (let i = 0; i < optionNames.length; i++) {
+        let name = optionNames[i];
+        let value = optionValues[i];
+        optionsString += html`<input
+                type="radio"
+                id="${id}-${value}"
+                name="${id}-group"
+                value="${value}"
+                ${defaultSelection === value ? "checked" : ""}
+            />
+            <label for="${id}-${value}" class="pe-2"> ${name} </label>`;
+    }
+    const row = createNode(html`<div class="row">
+        <div class="col-4">
+            <h3 class="fs-6">${displayName}:</h3>
+        </div>
+        <div id="${id}-container" class="col-8">${optionsString}</div>
+    </div>`);
+    row.querySelector(`#${id}-container`).addEventListener("click", (event) => {
+        // make sure the user actually clicked an option, not just somewhere in the container
+        if (event.target.matches("label") || event.target.matches("input")) {
+            // the user might have clicked the label, but the value is only stored in the input
+            let selected;
+            if (event.target.matches("label")) {
+                const inputId = event.target.getAttribute("for");
+                selected = row.querySelector(`#${inputId}`).value;
+            } else {
+                selected = event.target.value;
+            }
+            callback(selected);
+        }
+    });
+    return row;
+}

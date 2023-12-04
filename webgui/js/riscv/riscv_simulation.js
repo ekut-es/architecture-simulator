@@ -11,15 +11,15 @@ class RiscvSimulation extends Simulation {
 
         this.domNodes = {
             ...this.domNodes,
-            registerTable: getRiscvRegisterTable(),
             outputField: getRiscvOutputField(),
+            ...getRiscvRegisterTable(),
             ...getRiscvMemoryTable(),
             ...getRiscvInstructionTable(),
         };
         this.domNodes.textEditorSeparator.after(
-            this.domNodes.instructionTable,
-            this.domNodes.registerTable,
-            this.domNodes.memoryTable,
+            this.domNodes.instructionTableContainer,
+            this.domNodes.registerTableContainer,
+            this.domNodes.memoryTableContainer,
             this.domNodes.outputField
         );
 
@@ -27,35 +27,36 @@ class RiscvSimulation extends Simulation {
             "Registers",
             "register-representation",
             (mode) => {
-                this.regRepresentationMode = mode;
+                this.regRepresentationMode = Number(mode);
                 this.updateUI();
             },
-            this.regRepresentationMode
+            String(this.regRepresentationMode)
         );
         const memoryRepresentation = getRepresentationsSettingsRow(
             "Memory",
             "memory-representation",
             (mode) => {
-                this.memRepresentationMode = mode;
+                this.memRepresentationMode = Number(mode);
                 this.updateUI();
             },
-            this.memRepresentationMode
+            String(this.memRepresentationMode)
         );
         this.domNodes.customSettingsContainer.appendChild(
             registerRepresentation
         );
         this.domNodes.customSettingsContainer.appendChild(memoryRepresentation);
+        this.updateUI();
     }
 
     /**
      * Updates the register table.
      */
     updateRegisterTable() {
-        const valueRepresentations = (representations =
-            this.pythonSimulation.register_file.reg_repr());
-        for (let i = 0; i <= valueRepresentations.length; i++) {
-            entry = valueRepresentations.get(i);
-            const row = this.domNodes.memoryTable.children.item(i);
+        const valueRepresentations =
+            this.pythonSimulation.state.register_file.reg_repr();
+        for (let i = 0; i < valueRepresentations.length; i++) {
+            let entry = valueRepresentations.get(i);
+            const row = this.domNodes.registerTableBody.children.item(i);
             const cell = row.children.item(2);
             cell.innerText = entry.get(this.regRepresentationMode);
             entry.destroy();
@@ -69,7 +70,7 @@ class RiscvSimulation extends Simulation {
     updateMemoryTable() {
         this.clearMemoryTable();
         const valueRepresentations =
-            this.pythonSimulation.memory.memory_wordwise_repr();
+            this.pythonSimulation.state.memory.memory_wordwise_repr();
         for (const entry of valueRepresentations) {
             const address = entry.get(0);
             const values = entry.get(1);
@@ -104,9 +105,9 @@ class RiscvSimulation extends Simulation {
         const valueRepresentations =
             this.pythonSimulation.get_instruction_memory_repr();
         for (const entry of valueRepresentations) {
-            const address = entry[0];
-            const instruction = entry[1];
-            const stage = entry[2];
+            const address = entry.get(0);
+            const instruction = entry.get(1);
+            const stage = entry.get(2);
             const row = this.domNodes.instructionTableBody.insertRow();
             const cell1 = row.insertCell();
             const cell2 = row.insertCell();
@@ -217,7 +218,10 @@ class RiscvSimulation extends Simulation {
         }
     }
 
-    reset(pythonSimulation) {}
+    reset(pythonSimulation) {
+        this.previousMemoryValues = [];
+        super.reset(pythonSimulation);
+    }
 
     supportsVisualization() {
         return false;

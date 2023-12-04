@@ -17,19 +17,19 @@ class ToySimulation extends Simulation {
             "Registers",
             "register-representation",
             (mode) => {
-                this.regRepresentationMode = mode;
+                this.regRepresentationMode = Number(mode);
                 this.updateUI();
             },
-            this.regRepresentationMode
+            String(this.regRepresentationMode)
         );
         const memoryRepresentation = getRepresentationsSettingsRow(
             "Memory",
             "memory-representation",
             (mode) => {
-                this.memRepresentationMode = mode;
+                this.memRepresentationMode = Number(mode);
                 this.updateUI();
             },
-            this.memRepresentationMode
+            String(this.memRepresentationMode)
         );
         this.domNodes.customSettingsContainer.appendChild(
             registerRepresentation
@@ -191,6 +191,21 @@ class ToySimulation extends Simulation {
             resetButton.disabled = false;
             doubleStepButton.disabled = !doubleStepAllowed;
             runButton.disabled = false;
+        }
+    }
+
+    /**
+     * Executes a single cycle of the simulation.
+     * Sets this.error accordingly.
+     * Does not start and stop the timer for the performance metrics.
+     * Will not update the UI.
+     * Will not parse the input before stepping.
+     */
+    executeStep() {
+        try {
+            this.pythonSimulation.single_step();
+        } catch (error) {
+            this.error = String(error);
         }
     }
 
