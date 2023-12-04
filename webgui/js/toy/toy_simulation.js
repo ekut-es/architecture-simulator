@@ -1,7 +1,6 @@
 class ToySimulation extends Simulation {
     constructor(pythonSimulation, domNodes) {
         super(pythonSimulation, domNodes);
-        console.log("New ToySimulation constructed");
         /**@type {Number} The selected representation mode for the registers. 0: bin, 1: udec, 2: hex, 3: sdec.*/
         this.regRepresentationMode = 1;
         /**@type {Number} The selected representation mode for the memory. 0: bin, 1: udec, 2: hex, 3: sdec.*/
@@ -63,6 +62,10 @@ class ToySimulation extends Simulation {
         this.domNodes.mainColumn.remove();
         this.domNodes.doubleStepButton.remove();
         super.removeContentFromDOM();
+    }
+
+    setOutputFieldContent(str) {
+        this.domNodes.outputField.innerText = str;
     }
 
     /**
@@ -248,6 +251,8 @@ class ToySimulation extends Simulation {
                     >
                     ${cell1.innerHTML}`;
             }
+            values.destroy();
+            entry.destroy();
         }
         valueRepresentations.destroy();
     }

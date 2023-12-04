@@ -108,6 +108,11 @@ class Simulation {
     getPathToVisualization() {}
 
     /**
+     * @param {string} str The string that the output field's content will be set to.
+     */
+    setOutputFieldContent(str) {}
+
+    /**
      * Parses and loads the content of the input field into the simulation.
      * Sets the error attribute accordingly.
      *
@@ -223,13 +228,6 @@ class Simulation {
         this.setOutputFieldContent(
             this.pythonSimulation.get_performance_metrics()
         );
-    }
-
-    /**
-     * @param {string} str The string that the output field's content will be set to.
-     */
-    setOutputFieldContent(str) {
-        this.domNodes.outputField.innerText = str;
     }
 
     /**

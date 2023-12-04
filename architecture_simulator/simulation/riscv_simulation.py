@@ -74,3 +74,27 @@ class RiscvSimulation(Simulation):
 
     def get_performance_metrics(self) -> RiscvPerformanceMetrics:
         return self.state.performance_metrics
+
+    def get_instruction_memory_repr(self) -> list[tuple[str, str, str]]:
+        """Returns a list of the address (in hex), instruction and stage of the instruction for all instructions in the instruction memory.
+
+        Returns:
+            list[tuple[str, str, str]]: List of (address, instruction, stage).
+        """
+        pipeline_stages_addresses: dict[int, str] = {}
+        for pipeline_register in self.state.pipeline.pipeline_registers:
+            if pipeline_register.address_of_instruction is not None:
+                pipeline_stages_addresses[
+                    pipeline_register.address_of_instruction
+                ] = pipeline_register.abbreviation
+
+        return [
+            (
+                "0x" + "{:x}".format(address),
+                instruction,
+                pipeline_stages_addresses[address]
+                if address in pipeline_stages_addresses
+                else "",
+            )
+            for address, instruction in self.state.instruction_memory.get_representation()
+        ]
