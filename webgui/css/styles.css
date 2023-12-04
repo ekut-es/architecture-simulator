@@ -207,8 +207,7 @@ nav {
 
 /* Visualization */
 
-#riscv-visualization,
-#toy-visualization {
+.visualization {
     height: 100%;
     width: 100%;
 }
