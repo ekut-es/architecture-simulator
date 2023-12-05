@@ -37,6 +37,18 @@ async function initialize() {
 from architecture_simulator.gui.new_webgui import *
     `);
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const isaParam = urlParams.get("isa");
+    if (isaParam !== null) {
+        switch (isaParam.toLowerCase()) {
+            case "riscv":
+                currentISA = "riscv";
+                break;
+            default:
+                currentISA = "toy";
+        }
+    }
+
     const isaSelector = getRadioSettingsRow(
         "ISA",
         ["RISC-V", "TOY"],
