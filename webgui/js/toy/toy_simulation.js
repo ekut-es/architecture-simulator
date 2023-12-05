@@ -1,12 +1,14 @@
 class ToySimulation extends Simulation {
-    constructor(pythonSimulation, domNodes) {
-        super(pythonSimulation, domNodes);
+    constructor(domNodes) {
+        super(domNodes);
         /**@type {Number} The selected representation mode for the registers. 0: bin, 1: udec, 2: hex, 3: sdec.*/
         this.regRepresentationMode = 1;
         /**@type {Number} The selected representation mode for the memory. 0: bin, 1: udec, 2: hex, 3: sdec.*/
         this.memRepresentationMode = 1;
         /**@type {?} The values of the memory from the last cycle.*/
         this.previousMemoryValues = [];
+
+        this.pythonSimulation = getToyPythonSimulation();
 
         // Insert everything into the DOM. The SVG will cause a UI update once it has finished loading.
         this.domNodes = { ...this.domNodes, ...toyGetMainColumn() };
@@ -35,6 +37,8 @@ class ToySimulation extends Simulation {
             registerRepresentation
         );
         this.domNodes.customSettingsContainer.appendChild(memoryRepresentation);
+        this.parseInput();
+        this.activateVisualization();
     }
 
     getIsaName() {
@@ -45,17 +49,14 @@ class ToySimulation extends Simulation {
         return toyDocumentation;
     }
 
-    supportsVisualization() {
-        return true;
-    }
-
     getPathToVisualization() {
         return "img/toy_structure.svg";
     }
 
-    reset(pythonSimulation) {
+    resetCustom() {
         this.previousMemoryValues = [];
-        super.reset(pythonSimulation);
+        this.pythonSimulation = getToyPythonSimulation();
+        super.resetBase();
     }
 
     removeContentFromDOM() {

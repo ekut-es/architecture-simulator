@@ -1,12 +1,11 @@
 class Simulation {
     /**
      * Constructor for Simulation.
-     * @param {pyProxy} pythonSimulation pyProxy of a ToySimulation.
      * @param {object} domNodes Object holding all the relevant nodes from the default page.
      */
-    constructor(pythonSimulation, domNodes) {
+    constructor(domNodes) {
         /**@type {pyProxy} A pyProxy of the ToySimulation object.*/
-        this.pythonSimulation = pythonSimulation;
+        this.pythonSimulation = null;
         /**@type {object} An object holding all relevant DOM Nodes.*/
         this.domNodes = domNodes;
 
@@ -23,7 +22,6 @@ class Simulation {
         /**SplitsJS object*/
         this.split = null;
 
-        this.parseInput();
         /**@type{Function} Debounces (triggers) auto parsing.*/
         this.debouncedAutoParsing = this.getDebouncedAutoParsing();
         editor.on("change", () => {
@@ -35,23 +33,6 @@ class Simulation {
         document.title = this.getIsaName() + " Simulator";
         this.domNodes.helpModalBody.innerHTML = this.getDocumentation();
         this.domNodes.helpModalHeading.textContent = this.getIsaName();
-
-        if (this.supportsVisualization()) {
-            const svgObject = createVisualization(
-                this.getPathToVisualization(),
-                () => {
-                    this.domNodes.visualization = svgObject.contentDocument;
-                    this.visualizationLoaded = true;
-                    this.updateUI();
-                }
-            );
-            this.domNodes.visualizationsContainer.append(svgObject);
-            this.split = createSplit(
-                this.domNodes.mainContentContainer,
-                this.domNodes.textContentContainer,
-                this.domNodes.visualizationsContainer
-            );
-        }
     }
 
     /**
@@ -70,13 +51,17 @@ class Simulation {
     updateUI() {}
 
     /**
-     * Resets the entire simulation. Updates the UI. Takes a
-     * pyproxy Simulation Object because we don't reset those,
-     * we just create new ones.
-     * @param {pyProxy} pythonSimulation python Simulation object
+     * Should be implemented by all subclasses.
+     * Resets the entire simulation.
+     * You should also call this.resetBase(pythonSimulation).
+     * You will need to create the pythonSimulation on you own if you need one (see js/initialize_simulators.js).
      */
-    reset(pythonSimulation) {
-        this.pythonSimulation = pythonSimulation;
+    resetCustom() {}
+
+    /**
+     * Resets the entire simulation base class. Updates the UI.
+     */
+    resetBase() {
         this.error = "";
         this.parseInput();
         this.updateUI();
@@ -94,13 +79,6 @@ class Simulation {
     }
 
     /**
-     * @returns {boolean} Whether the ISA supports a visualization or not.
-     */
-    supportsVisualization() {
-        return false;
-    }
-
-    /**
      * @returns {str} The path to the visualization SVG file.
      */
     getPathToVisualization() {}
@@ -109,6 +87,41 @@ class Simulation {
      * @param {string} str The string that the output field's content will be set to.
      */
     setOutputFieldContent(str) {}
+
+    /**
+     * Activates the visualization and inserts it into the DOM.
+     * this.getPathToVisualization must be implemented for this to work.
+     * Will also create a Split. Calls updateUI once the visualization has finished loading.
+     * Also sets this.visualizationLoaded = true one it has loaded.
+     */
+    activateVisualization() {
+        const svgObject = createVisualization(
+            this.getPathToVisualization(),
+            () => {
+                this.domNodes.visualization = svgObject.contentDocument;
+                this.visualizationLoaded = true;
+                this.updateUI();
+            }
+        );
+        this.domNodes.visualizationsContainer.append(svgObject);
+        this.split = createSplit(
+            this.domNodes.mainContentContainer,
+            this.domNodes.textContentContainer,
+            this.domNodes.visualizationsContainer
+        );
+    }
+
+    /**
+     * Removes the split, deactivates the visualization, removes it from the DOM.
+     * Also sets this.visualizationLoaded = false and calls this.updateUI().
+     */
+    deactivateVisualization() {
+        this.domNodes.visualizationsContainer.innerHTML = "";
+        this.destroySplit();
+        delete this.domNodes.visualization;
+        this.visualizationLoaded = false;
+        this.updateUI();
+    }
 
     /**
      * Parses and loads the content of the input field into the simulation.

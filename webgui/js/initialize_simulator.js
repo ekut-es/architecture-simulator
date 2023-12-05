@@ -7,8 +7,14 @@ let currentISA = "riscv";
 /**@type{Object} Stores some nodes that the simulations can use.*/
 let domNodes;
 
-/**@type{function(str):pyProxy} Returns a pyProxy Simulation object for the given ISA.*/
-let getPythonSimulation;
+/**@type{function():pyProxy} Returns a pyProxy Toy Simulation object.*/
+let getToyPythonSimulation;
+
+/**@type{function(string, boolean):pyProxy} Returns a pyProxy RiscvSimulation object. arg0 is the pipeline mode,
+ * which must be either "five_stage_pipeline" or "single_stage_pipeline".
+ * arg1 is whether to enable data hazard detection or not (only relevant for five_stage_pipeline)
+ */
+let getRiscvPythonSimulation;
 
 /**
  * Loads pyodide, installs the archsim package and creates a ToySimulation.
@@ -84,15 +90,16 @@ from architecture_simulator.gui.new_webgui import *
         mainContentContainer: document.getElementById("main-content-container"),
         isaSelector: isaSelector,
     };
-    getPythonSimulation = pyodide.globals.get("get_simulation");
+    getRiscvPythonSimulation = pyodide.globals.get("get_riscv_simulation");
+    getToyPythonSimulation = pyodide.globals.get("get_toy_simulation");
     switchIsa(currentISA);
 }
 
 /**
- * Tells the current Simulation object to reset and take a new ToySimulation pyProxy (because we dont reset those, we just throw them away).
+ * Tells the current Simulation object to reset.
  */
 function resetSimulation() {
-    simulation.reset(getPythonSimulation(currentISA));
+    simulation.resetCustom();
 }
 
 /**
@@ -107,12 +114,12 @@ function switchIsa(isa) {
 
     switch (isa) {
         case "riscv":
-            simulation = new RiscvSimulation(getPythonSimulation("riscv"), {
+            simulation = new RiscvSimulation({
                 ...domNodes,
             });
             break;
         case "toy":
-            simulation = new ToySimulation(getPythonSimulation("toy"), {
+            simulation = new ToySimulation({
                 ...domNodes,
             });
             break;

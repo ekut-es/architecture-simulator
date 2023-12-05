@@ -116,19 +116,3 @@ function toyGetVisualization(onLoad) {
     toySvgElement.addEventListener("load", onLoad);
     return toySvgElement;
 }
-
-/**
- * Creates a SplitJS split between the given elements
- * @param {Node} container Container of the split
- * @param {Node} firstElement First element to be resizable
- * @param {Node} secondElement Second element that should be resizable
- * @returns Split object
- */
-function createSplit(container, firstElement, secondElement) {
-    container.classList.add("split");
-    return Split(["#" + firstElement.id, "#" + secondElement.id], {
-        minSize: 200,
-        sizes: [35, 65],
-        snapOffset: 0,
-    });
-}

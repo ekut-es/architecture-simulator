@@ -25,6 +25,13 @@ const instructionArrow = html`<svg
     />
 </svg>`;
 
+/**
+ * Creates a node for the visualization with the given path.
+ *
+ * @param {string} path path to the visualization.
+ * @param {function():void} onLoad Callback that will be called when the visualization has loaded.
+ * @returns {Node} The object node for the svg.
+ */
 function createVisualization(path, onLoad) {
     const svgElement = document.createElement("object");
     svgElement.data = path;
@@ -34,6 +41,18 @@ function createVisualization(path, onLoad) {
     return svgElement;
 }
 
+/**
+ * Creates a radio settings row and attaches a listener to it.
+ * The given callback will only be called if the user selects a different item,
+ * not if the same item is clicked again.
+ * @param {string} displayName Name to display next to the settings row.
+ * @param {array<string>} optionNames The names to display next to each option.
+ * @param {array<string>} optionValues
+ * @param {string} id A unique id that will be used to create several other ids.
+ * @param {function(str):void} callback A function that will be called if the user selects a different option.
+ * @param {string} defaultSelection The value whose button should be selected by default.
+ * @returns {Node} The entire settings row.
+ */
 function getRadioSettingsRow(
     displayName,
     optionNames,
@@ -61,6 +80,9 @@ function getRadioSettingsRow(
         </div>
         <div id="${id}-container" class="col-8">${optionsString}</div>
     </div>`);
+
+    let lastSelected = defaultSelection;
+
     row.querySelector(`#${id}-container`).addEventListener("click", (event) => {
         // make sure the user actually clicked an option, not just somewhere in the container
         if (event.target.matches("label") || event.target.matches("input")) {
@@ -72,8 +94,27 @@ function getRadioSettingsRow(
             } else {
                 selected = event.target.value;
             }
-            callback(selected);
+            if (lastSelected !== selected) {
+                lastSelected = selected;
+                callback(selected);
+            }
         }
     });
     return row;
+}
+
+/**
+ * Creates a SplitJS split between the given elements
+ * @param {Node} container Container of the split
+ * @param {Node} firstElement First element to be resizable
+ * @param {Node} secondElement Second element that should be resizable
+ * @returns Split object
+ */
+function createSplit(container, firstElement, secondElement) {
+    container.classList.add("split");
+    return Split(["#" + firstElement.id, "#" + secondElement.id], {
+        minSize: 200,
+        sizes: [35, 65],
+        snapOffset: 0,
+    });
 }
