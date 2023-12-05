@@ -16,6 +16,9 @@ let getToyPythonSimulation;
  */
 let getRiscvPythonSimulation;
 
+/**@type{function():string} Returns the last error message from python. */
+let getLastPythonError;
+
 /**
  * Loads pyodide, installs the archsim package and creates a ToySimulation.
  */
@@ -92,6 +95,7 @@ from architecture_simulator.gui.new_webgui import *
     };
     getRiscvPythonSimulation = pyodide.globals.get("get_riscv_simulation");
     getToyPythonSimulation = pyodide.globals.get("get_toy_simulation");
+    getLastPythonError = pyodide.globals.get("get_last_error");
     switchIsa(currentISA);
 }
 

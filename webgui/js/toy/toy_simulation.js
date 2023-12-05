@@ -98,7 +98,7 @@ class ToySimulation extends Simulation {
         try {
             this.pythonSimulation.step();
         } catch (error) {
-            this.error = String(error);
+            this.error = getLastPythonError();
         }
     }
 
@@ -130,16 +130,37 @@ class ToySimulation extends Simulation {
         // No changes since the last parsing
         this.updateRegisters();
         this.updateMemoryTable();
+        this.removeEditorHighlights();
+        this.removeMemoryTableHighlights();
         if (this.visualizationLoaded) {
             this.updateVisualization();
         }
-        if (this.error !== "") {
+        if (this.error !== null) {
             stepButton.disabled = true;
             doubleStepButton.disabled = true;
             runButton.disabled = true;
             resetButton.disabled = !hasStarted;
             pauseButton.disabled = true;
-            this.setOutputFieldContent(this.error);
+            const errorType = this.error.get(0);
+            switch (errorType) {
+                case "ParserException": {
+                    this.highlightEditorLine(this.error.get(2));
+                    break;
+                }
+                case "InstructionExecutionException": {
+                    const address = this.error.get(1);
+                    this.highlightMemoryTableRow(address);
+                    const errorMessage = this.error.get(1);
+                    this.setOutputFieldContent(errorMessage);
+                    break;
+                }
+                default: {
+                    const errorMessage = this.error.get(1);
+                    this.setOutputFieldContent(errorMessage);
+                    break;
+                }
+            }
+
             return;
         }
 
@@ -195,6 +216,19 @@ class ToySimulation extends Simulation {
         }
     }
 
+    highlightMemoryTableRow(address) {
+        const row = this.domNodes.memoryTableBody.children.item(address);
+        for (cell of row.children) {
+            cell.classList.add("highlight");
+        }
+    }
+
+    removeMemoryTableHighlights() {
+        for (let cell of this.domNodes.memoryTableBody.querySelectorAll("td")) {
+            cell.classList.remove("highlight");
+        }
+    }
+
     /**
      * Executes a single cycle of the simulation.
      * Sets this.error accordingly.
@@ -206,7 +240,7 @@ class ToySimulation extends Simulation {
         try {
             this.pythonSimulation.single_step();
         } catch (error) {
-            this.error = String(error);
+            this.error = getLastPythonError();
         }
     }
 

@@ -145,7 +145,7 @@ nav {
     text-align: right;
 }
 
-#output-field {
+.output-field {
     background-color: #ffffff;
     padding: 1em;
     min-width: 12em;

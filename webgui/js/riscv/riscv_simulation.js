@@ -87,6 +87,7 @@ class RiscvSimulation extends Simulation {
         this.pythonSimulation.destroy();
         this.pipelineMode = mode;
         this.pythonSimulation = this.getNewPythonSimulation();
+        this.parseInput();
         if (mode === "five_stage_pipeline") {
             this.activateVisualization();
         } else {
@@ -204,16 +205,35 @@ class RiscvSimulation extends Simulation {
         this.updateRegisterTable();
         this.updateMemoryTable();
         this.updateInstructionTable();
+        this.removeEditorHighlights();
         if (this.visualizationLoaded) {
             this.updateVisualization();
         }
 
-        if (this.error !== "") {
+        if (this.error !== null) {
             stepButton.disabled = true;
             runButton.disabled = true;
             resetButton.disabled = !hasStarted;
             pauseButton.disabled = true;
-            this.setOutputFieldContent(this.error);
+            const errorType = this.error.get(0);
+            switch (errorType) {
+                case "ParserException": {
+                    this.highlightEditorLine(this.error.get(2));
+                    break;
+                }
+                case "InstructionExecutionException": {
+                    const address = this.error.get(2);
+                    this.highlightInstructionTableRow(address);
+                    const errorMessage = this.error.get(1);
+                    this.setOutputFieldContent(errorMessage);
+                    break;
+                }
+                default: {
+                    const errorMessage = this.error.get(1);
+                    this.setOutputFieldContent(errorMessage);
+                    break;
+                }
+            }
             return;
         }
 
@@ -287,6 +307,18 @@ class RiscvSimulation extends Simulation {
         document.getElementById("riscv-instruction-table-container").remove();
         document.getElementById("riscv-output-container").remove();
         super.removeContentFromDOM();
+    }
+
+    highlightInstructionTableRow(address) {
+        const tbody = this.domNodes.instructionTableBody;
+        for (let position = 0; position < tbody.rows.length; position++) {
+            const row = tbody.rows[position];
+            if (Number(row.cells[0].innerHTML) == address) {
+                for (let cell of row.cells) {
+                    cell.classList.add("highlight");
+                }
+            }
+        }
     }
 
     // TODO: Replace all the code below.

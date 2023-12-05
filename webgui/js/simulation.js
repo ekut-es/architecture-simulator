@@ -17,8 +17,8 @@ class Simulation {
         this.isRunning = false;
         /**@type {boolean} Indicates that the simulation should be paused if it is currently running.*/
         this.doPause = false;
-        /**@type {str} The last error message. Will be empty if there was no error.*/
-        this.error = "";
+        /**@type {pyProxy} The latest error.*/
+        this.error = null;
         /**SplitsJS object*/
         this.split = null;
 
@@ -62,7 +62,7 @@ class Simulation {
      * Resets the entire simulation base class. Updates the UI.
      */
     resetBase() {
-        this.error = "";
+        this.error = null;
         this.parseInput();
         this.updateUI();
     }
@@ -134,10 +134,10 @@ class Simulation {
         this.hasUnparsedChanges = false;
         try {
             this.pythonSimulation.load_program(input);
-            this.error = "";
+            this.error = null;
             return true;
         } catch (err) {
-            this.error = String(err);
+            this.error = getLastPythonError();
             return false;
         }
     }
@@ -184,7 +184,7 @@ class Simulation {
         try {
             this.pythonSimulation.step();
         } catch (error) {
-            this.error = String(error);
+            this.error = getLastPythonError();
         }
     }
 
@@ -199,7 +199,7 @@ class Simulation {
             return (
                 this.pythonSimulation.is_done() ||
                 this.doPause ||
-                this.error !== ""
+                this.error !== null
             );
         };
         let stepLoop = () => {
@@ -250,5 +250,49 @@ class Simulation {
             this.split.destroy();
             this.split = null;
         }
+    }
+
+    /**
+     * Highlights a line in the text editor and displays an error message as a hint.
+     * Can be used to display parser exceptions.
+     *
+     * @param {number} position - line number (starting at 1).
+     * @param {string} errorMessage - string to display.
+     */
+    highlightEditorLine(position) {
+        editor.addLineClass(position - 1, "background", "highlight");
+        editor.refresh();
+        const output_str = `Syntax Error in line ${position}`;
+        const error_description = {
+            hint: function () {
+                return {
+                    from: position,
+                    to: position,
+                    list: [output_str, ""],
+                };
+            },
+            customKeys: {
+                Up: function (cm, handle) {
+                    CodeMirror.commands.goLineUp(cm);
+                    handle.close();
+                },
+                Down: function (cm, handle) {
+                    CodeMirror.commands.goLineDown(cm);
+                    handle.close();
+                },
+            },
+        };
+        editor.showHint(error_description);
+    }
+
+    /**
+     * Removes all highlights from the editor.
+     */
+    removeEditorHighlights() {
+        for (let i = 0; i < editor.lineCount(); i++) {
+            editor.removeLineClass(i, "background", "highlight");
+        }
+        editor.refresh();
+        editor.closeHint();
     }
 }

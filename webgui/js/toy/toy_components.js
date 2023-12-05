@@ -46,8 +46,7 @@ function toyGetMainColumn() {
         <div id="toy-output-wrapper">
             <span class="text-element-heading">Output</span>
             <div
-                id="output-field"
-                class="flex-shrink-0 archsim-default-border"
+                class="flex-shrink-0 archsim-default-border output-field"
             ></div>
         </div>
     </div>`);
@@ -56,7 +55,7 @@ function toyGetMainColumn() {
         pc: column.querySelector("#toy-pc"),
         ir: column.querySelector("#toy-ir"),
         memoryTableBody: column.querySelector("#toy-memory-table-body"),
-        outputField: column.querySelector("#output-field"),
+        outputField: column.querySelector(".output-field"),
         mainColumn: column,
     };
 }

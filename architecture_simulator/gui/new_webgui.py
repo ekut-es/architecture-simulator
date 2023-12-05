@@ -1,5 +1,11 @@
+import sys
+
 from architecture_simulator.simulation.toy_simulation import ToySimulation
 from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
+from architecture_simulator.isa.parser_exceptions import ParserException
+from architecture_simulator.simulation.runtime_errors import (
+    InstructionExecutionException,
+)
 
 
 def get_riscv_simulation(
@@ -25,3 +31,18 @@ def get_toy_simulation() -> ToySimulation:
         ToySimulation: The simulation object.
     """
     return ToySimulation()
+
+
+def get_last_error() -> tuple[str, str, int] | tuple[str, str]:
+    """Returns the last error.
+
+    Returns:
+        tuple[str, str, int] | tuple[str, str]: Either ("ParserException", error message, line number),
+        ("InstructionExecutionException", error message, address) or ("Unknown", error message)
+    """
+    error = sys.last_value
+    if isinstance(error, ParserException):
+        return ("ParserException", error.__repr__(), error.line_number)
+    if isinstance(error, InstructionExecutionException):
+        return ("InstructionExecutionException", error.__repr__(), error.address)
+    return ("Unknown", error.__repr__())

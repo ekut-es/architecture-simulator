@@ -245,7 +245,7 @@ function getRiscvMemoryTable() {
 function getRiscvOutputField() {
     return createNode(html`<div
         id="riscv-output-container"
-        class="main-content-column height-100 archsim-default-border"
+        class="main-content-column height-100 archsim-default-border output-field"
     >
         <div id="output-field"></div>
     </div>`);
