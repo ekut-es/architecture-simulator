@@ -53,10 +53,11 @@ class ToySimulation extends Simulation {
         return "img/toy_structure.svg";
     }
 
-    resetCustom() {
+    reset() {
         this.previousMemoryValues = [];
+        this.pythonSimulation.destroy();
         this.pythonSimulation = getToyPythonSimulation();
-        super.resetBase();
+        super.reset();
     }
 
     removeContentFromDOM() {

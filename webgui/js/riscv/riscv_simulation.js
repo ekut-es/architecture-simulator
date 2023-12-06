@@ -83,16 +83,41 @@ class RiscvSimulation extends Simulation {
         return "img/riscv_pipeline.svg";
     }
 
+    /**
+     * Switches the pipeline mode.
+     * Resets the simulation, parses the input and updates the UI.
+     * Adds a setting for enabling and disabling data hazard detection.
+     * @param {string} mode pipeline mode ("five_stage_pipeline" or "single_stage_pipeline")
+     */
     switchPipelineMode(mode) {
-        this.pythonSimulation.destroy();
         this.pipelineMode = mode;
-        this.pythonSimulation = this.getNewPythonSimulation();
-        this.parseInput();
+        if (mode !== "five_stage_pipeline") {
+            this.deactivateVisualization();
+            this.domNodes.dataHazardDetectionSettings.remove();
+            delete this.domNodes.dataHazardDetectionSettings;
+        }
+        this.reset();
         if (mode === "five_stage_pipeline") {
             this.activateVisualization();
-        } else {
-            this.deactivateVisualization();
+            this.domNodes.dataHazardDetectionSettings =
+                getRiscvDataHazardSettings(
+                    this.dataHazardDetection,
+                    (doEnable) => this.switchDataHazardDetection(doEnable)
+                );
+            this.domNodes.customSettingsContainer.appendChild(
+                this.domNodes.dataHazardDetectionSettings
+            );
         }
+    }
+
+    /**
+     * Enables or disables data hazard detection (only relevant for five stage pipeline).
+     * Resets the simulation, parses the input and updates the UI.
+     * @param {boolean} doEnable Whether to enable data hazard detection or not
+     */
+    switchDataHazardDetection(doEnable) {
+        this.dataHazardDetection = doEnable;
+        this.reset();
     }
 
     /**
@@ -284,10 +309,11 @@ class RiscvSimulation extends Simulation {
         }
     }
 
-    resetCustom() {
+    reset() {
         this.previousMemoryValues = [];
+        this.pythonSimulation.destroy();
         this.pythonSimulation = this.getNewPythonSimulation();
-        super.resetBase();
+        super.reset();
     }
 
     supportsVisualization() {

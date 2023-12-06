@@ -24,6 +24,7 @@ class Simulation {
 
         /**@type{Function} Debounces (triggers) auto parsing.*/
         this.debouncedAutoParsing = this.getDebouncedAutoParsing();
+        editor.setOption("readOnly", false);
         editor.on("change", () => {
             this.hasUnparsedChanges = true;
             this.debouncedAutoParsing();
@@ -59,9 +60,9 @@ class Simulation {
     resetCustom() {}
 
     /**
-     * Resets the entire simulation base class. Updates the UI.
+     * Resets the entire simulation. Updates the UI.
      */
-    resetBase() {
+    reset() {
         this.error = null;
         this.parseInput();
         this.updateUI();

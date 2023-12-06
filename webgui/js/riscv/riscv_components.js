@@ -250,3 +250,31 @@ function getRiscvOutputField() {
         <div id="output-field"></div>
     </div>`);
 }
+
+/**
+ * Generates the row for enabling/disabling data hazard detection.
+ * Attaches the given callback function to the state change event of the checkbox.
+ *
+ * @param {boolean} isEnabled Whether to check the settings by default.
+ * @param {function(boolean):void} callback Function that gets called if the setting gets changed. arg0 is the state of the checkbox.
+ * @returns {Node} The settings row.
+ */
+function getRiscvDataHazardSettings(isEnabled, callback) {
+    const row = createNode(html`<div class="row">
+        <div class="col-4"></div>
+        <div class="col-8">
+            <input
+                id="button-data-hazard-detection"
+                type="checkbox"
+                checked=${isEnabled}
+            />
+            <label type="checkbox" for="button-data-hazard-detection">
+                Data Hazard detection
+            </label>
+        </div>
+    </div>`);
+    row.querySelector("input").addEventListener("change", () => {
+        callback(this.checked);
+    });
+    return row;
+}

@@ -103,7 +103,7 @@ from architecture_simulator.gui.new_webgui import *
  * Tells the current Simulation object to reset.
  */
 function resetSimulation() {
-    simulation.resetCustom();
+    simulation.reset();
 }
 
 /**
