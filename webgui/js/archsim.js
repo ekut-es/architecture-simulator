@@ -249,13 +249,12 @@ const archsim_js = {
         str.toString = function () {
             return this.str;
         };
-        output_str = `Syntax Error in line ${position}`;
         var error_description = {
             hint: function () {
                 return {
                     from: position,
                     to: position,
-                    list: [output_str, ""],
+                    list: [str.str, ""],
                 };
             },
             customKeys: {
