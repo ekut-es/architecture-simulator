@@ -27,6 +27,9 @@ if TYPE_CHECKING:
 class Stage:
     """Stage superclass. Every stage needs to implement a behavior method"""
 
+    # An abbreviation for the stage. May be used as display name.
+    abbreviation: str
+
     def behavior(
         self,
         pipeline_registers: list[PipelineRegister],
@@ -46,6 +49,8 @@ class Stage:
 
 
 class InstructionFetchStage(Stage):
+    abbreviation = "IF"
+
     def behavior(
         self,
         pipeline_registers: list[PipelineRegister],
@@ -81,6 +86,8 @@ class InstructionFetchStage(Stage):
 
 
 class InstructionDecodeStage(Stage):
+    abbreviation = "ID"
+
     def __init__(self, stages_until_writeback=2, detect_data_hazards=True) -> None:
         self.stages_until_writeback = stages_until_writeback
         self.detect_data_hazards = detect_data_hazards
@@ -164,6 +171,8 @@ class InstructionDecodeStage(Stage):
 
 
 class ExecuteStage(Stage):
+    abbreviation = "EX"
+
     def behavior(
         self,
         pipeline_registers: list[PipelineRegister],
@@ -226,6 +235,8 @@ class ExecuteStage(Stage):
 
 
 class MemoryAccessStage(Stage):
+    abbreviation = "MA"
+
     def behavior(
         self,
         pipeline_registers: list[PipelineRegister],
@@ -306,6 +317,8 @@ class MemoryAccessStage(Stage):
 
 
 class RegisterWritebackStage(Stage):
+    abbreviation = "WB"
+
     def behavior(
         self,
         pipeline_registers: list[PipelineRegister],

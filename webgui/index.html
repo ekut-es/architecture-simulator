@@ -18,9 +18,7 @@
         <!--Header-->
         <header id="header" class="header container-fluid">
             <div class="row align-items-center">
-                <div id="page-heading-id" class="h1 col-auto">
-                    RISC-V Simulator
-                </div>
+                <div id="page-heading" class="h1 col-auto">Simulator</div>
                 <div class="col-auto ms-auto">
                     <button class="btn btn-sm px-0 py-0">
                         <img
@@ -41,36 +39,40 @@
                 <!--Buttons on the left side-->
                 <div class="col-auto">
                     <button
-                        id="button-run-simulation-id"
+                        id="button-run-simulation"
                         class="btn btn-success btn-sm control-button me-1"
                         title="run simulation"
+                        onclick="simulation.run();"
                     >
                         <img src="img/run.svg" />
                     </button>
                     <button
-                        id="button-pause-simulation-id"
+                        id="button-pause-simulation"
                         class="btn btn-warning btn-sm control-button me-1"
                         title="pause simulation"
+                        onclick="simulation.pause();"
                         disabled
                     >
                         <img src="img/pause.svg" />
                     </button>
                     <button
-                        id="button-step-simulation-id"
+                        id="button-step-simulation"
                         class="btn btn-primary btn-sm control-button me-1"
                         title="step"
+                        onclick="simulation.step();"
                     >
                         <img src="img/step.svg" />
                     </button>
                     <button
-                        id="button-reset-simulation-id"
+                        id="button-reset-simulation"
                         class="btn btn-danger btn-sm control-button me-1"
                         title="reset simulation"
+                        onclick="resetSimulation();"
                     >
                         <img src="img/reset.svg" />
                     </button>
                     <button
-                        id="upload-button-id"
+                        id="upload-button"
                         class="btn btn-secondary btn-sm control-button me-1"
                         title="upload"
                     >
@@ -115,7 +117,7 @@
                         src="img/loading.gif"
                         width="25px"
                         height="25px"
-                        id="loading-spinner-id"
+                        id="loading-spinner"
                         title="loading"
                         disabled
                         style="visibility: hidden"
@@ -124,7 +126,6 @@
                 <!--Buttons on the right side-->
                 <div class="col-auto ms-auto">
                     <button
-                        id="button-settings-id"
                         class="btn btn-sm control-button"
                         title="settings"
                         data-bs-toggle="modal"
@@ -137,77 +138,22 @@
         </nav>
 
         <!--Main Content-->
-        <div id="main-content-container" role="main">
-            <div
-                id="text-content-container"
-                class="d-flex justify-content-between"
-            >
-                <!--Text Editor-->
-                <textarea id="input" class="archsim-default-border"></textarea>
-                <div id="text-editor-separator"></div>
-                <!--Instruction Table-->
+        <main>
+            <div id="main-content-container">
                 <div
-                    id="riscv-instruction-table-container-id"
-                    class="main-content-column"
+                    id="text-content-container"
+                    class="d-flex justify-content-between"
                 >
-                    <table
-                        id="riscv-instruction-table-id"
-                        class="table table-sm table-hover table-bordered mono-table mb-0"
-                    >
-                        <thead>
-                            <tr>
-                                <th>Address</th>
-                                <th>Command</th>
-                                <th>Stage</th>
-                            </tr>
-                        </thead>
-                        <tbody id="riscv-instruction-table-body-id"></tbody>
-                    </table>
+                    <!--Text Editor-->
+                    <textarea
+                        id="input"
+                        class="archsim-default-border"
+                    ></textarea>
+                    <div id="text-editor-separator"></div>
                 </div>
-                <!--Register Table-->
-                <div
-                    id="riscv-register-table-container-id"
-                    class="main-content-column"
-                >
-                    <table
-                        class="table table-sm table-hover table-bordered mono-table mb-0"
-                    >
-                        <thead>
-                            <tr>
-                                <th colspan="2">Register</th>
-                                <th>Value</th>
-                            </tr>
-                        </thead>
-                        <tbody id="riscv-register-table-body-id"></tbody>
-                    </table>
-                </div>
-                <!--Memory Table-->
-                <div
-                    id="riscv-memory-table-container-id"
-                    class="main-content-column"
-                >
-                    <table
-                        class="table table-sm table-hover table-bordered mono-table mb-0"
-                    >
-                        <thead>
-                            <tr>
-                                <th>Address</th>
-                                <th>Value</th>
-                            </tr>
-                        </thead>
-                        <tbody id="riscv-memory-table-body-id"></tbody>
-                    </table>
-                </div>
-                <!--Output Field-->
-                <div
-                    id="riscv-output-container-id"
-                    class="main-content-column height-100"
-                >
-                    <div id="output-field-id"></div>
-                </div>
+                <div id="visualizations-container"></div>
             </div>
-            <div id="visualizations-container-id"></div>
-        </div>
+        </main>
 
         <!--Help Modal-->
         <div
@@ -229,18 +175,11 @@
                                 width="35px"
                                 height="35px"
                             />
-                            <span id="help-heading-id"> RISC-V </span>
+                            <span id="help-modal-heading"></span>
                         </h1>
                     </div>
-                    <div class="modal-body">
-                        <!--RISC-V User Documentation/Help-->
-                        <div id="riscv-help" style="display: block">
-                            <!--Filled in by js-->
-                        </div>
-                        <!--Toy User Documentation/Help-->
-                        <div id="toy-help" style="display: none">
-                            <!--Filled in by js-->
-                        </div>
+                    <div id="help-modal-body" class="modal-body">
+                        <!--Filled in by js-->
                     </div>
                     <div class="modal-footer">
                         <a
@@ -280,194 +219,11 @@
                         </h1>
                     </div>
                     <div class="modal-body">
-                        <div class="row border-bottom mb-2">
-                            <div class="col-4">
-                                <h2 class="fs-5">ISA:</h2>
-                            </div>
-                            <div class="col-8">
-                                <div
-                                    class="btn-group-toggle align-items-center justify-content-around"
-                                    data-toggle="buttons"
-                                >
-                                    <label class="button_switch_isa">
-                                        <input
-                                            type="radio"
-                                            name="isa"
-                                            id="isa_button_riscv_id"
-                                            title="switch to riscv isa"
-                                            checked
-                                        />
-                                        RISC-V
-                                    </label>
-                                    <label class="button_switch_isa">
-                                        <input
-                                            type="radio"
-                                            name="isa"
-                                            id="isa_button_toy_id"
-                                            title="switch to toy isa"
-                                        />
-                                        Toy
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <h2 class="fs-5">Representation Mode</h2>
-                        </div>
-                        <div class="row">
-                            <div class="col-4">
-                                <h3 class="fs-6">Register Table:</h3>
-                            </div>
-                            <div class="col-8">
-                                <div
-                                    class="btn-group-toggle align-items-center justify-content-around"
-                                    data-toggle="buttons"
-                                >
-                                    <label class="button_switch_representation">
-                                        <input
-                                            type="radio"
-                                            name="reg_representation"
-                                            id="reg_button_binary_representation_id"
-                                            title="switch to binary representation"
-                                        />
-                                        binary
-                                    </label>
-                                    <label class="button_switch_representation">
-                                        <input
-                                            type="radio"
-                                            name="reg_representation"
-                                            id="reg_button_decimal_representation_id"
-                                            title="switch to decimal representation"
-                                            checked
-                                        />
-                                        decimal
-                                    </label>
-                                    <label class="button_switch_representation">
-                                        <input
-                                            type="radio"
-                                            name="reg_representation"
-                                            id="reg_button_signed_decimal_representation_id"
-                                            title="switch to signed decimal representation"
-                                            autocomplete="off"
-                                        />
-                                        signed decimal
-                                    </label>
-                                    <label class="button_switch_representation">
-                                        <input
-                                            type="radio"
-                                            name="reg_representation"
-                                            id="reg_button_hexa_representation_id"
-                                            title="switch to hexadecimal representation"
-                                        />
-                                        hexadecimal
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row border-bottom mb-2">
-                            <div class="col-4">
-                                <h3 class="fs-6">Memory Table:</h3>
-                            </div>
-                            <div class="col-8">
-                                <div
-                                    class="btn-group-toggle align-items-center justify-content-around"
-                                    data-toggle="buttons"
-                                >
-                                    <label class="button_switch_representation">
-                                        <input
-                                            type="radio"
-                                            name="mem_representation"
-                                            id="mem_button_binary_representation_id"
-                                            title="switch to binary representation"
-                                            autocomplete="off"
-                                        />
-                                        binary
-                                    </label>
-                                    <label class="button_switch_representation">
-                                        <input
-                                            type="radio"
-                                            name="mem_representation"
-                                            id="mem_button_decimal_representation_id"
-                                            title="switch to decimal representation"
-                                            autocomplete="off"
-                                            checked
-                                        />
-                                        decimal
-                                    </label>
-                                    <label class="button_switch_representation">
-                                        <input
-                                            type="radio"
-                                            name="mem_representation"
-                                            id="mem_button_signed_decimal_representation_id"
-                                            title="switch to signed decimal representation"
-                                            autocomplete="off"
-                                        />
-                                        signed decimal
-                                    </label>
-                                    <label class="button_switch_representation">
-                                        <input
-                                            type="radio"
-                                            name="mem_representation"
-                                            id="mem_button_hexa_representation_id"
-                                            title="switch to hexadecimal representation"
-                                            autocomplete="off"
-                                        />
-                                        hexadecimal
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4">
-                                <h2 id="pipeline-mode-heading-id" class="fs-5">
-                                    Pipeline Mode:
-                                </h2>
-                            </div>
-                            <div class="col-8">
-                                <div
-                                    class="btn-group-toggle align-items-center justify-content-around"
-                                    data-toggle="buttons"
-                                >
-                                    <label class="button_switch_representation">
-                                        <input
-                                            type="radio"
-                                            name="pipeline_mode"
-                                            id="button_SingleStage"
-                                            title="single stage"
-                                            autocomplete="off"
-                                            checked
-                                        />
-                                        SingleStage
-                                    </label>
-                                    <label class="button_switch_representation">
-                                        <input
-                                            type="radio"
-                                            name="pipeline_mode"
-                                            id="button_5-Stage"
-                                            title="five stage"
-                                            autocomplete="off"
-                                        />
-                                        5-Stage
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input
-                                        type="checkbox"
-                                        id="button_HazardDetection"
-                                        title="disable hazard detection"
-                                        checked
-                                        disabled
-                                    />
-                                    <label
-                                        class="form-check-label"
-                                        type="checkbox"
-                                        for="button_HazardDetection"
-                                    >
-                                        Data Hazard Detection
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
+                        <div
+                            id="isa-selector-settings-container"
+                            class="border-bottom mb-2"
+                        ></div>
+                        <div id="isa-specific-settings-container"></div>
                     </div>
                     <div class="modal-footer">
                         <button
@@ -519,13 +275,30 @@
         ></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.0/split.min.js"></script>
         <script type="text/javascript" src="js/util.js"></script>
-        <script type="text/javascript" src="js/riscv_documentation.js"></script>
-        <script type="text/javascript" src="js/toy_documentation.js"></script>
-        <script type="text/javascript" src="js/riscv_simulation.js"></script>
-        <script type="text/javascript" src="js/toy_simulation.js"></script>
-        <script type="text/javascript" src="js/scripts.js"></script>
-        <script type="text/javascript" src="js/archsim.js"></script>
+        <script type="text/javascript" src="js/simulation.js"></script>
+
+        <script
+            type="text/javascript"
+            src="js/riscv/riscv_components.js"
+        ></script>
+        <script
+            type="text/javascript"
+            src="js/riscv/riscv_documentation.js"
+        ></script>
+        <script
+            type="text/javascript"
+            src="js/riscv/riscv_simulation.js"
+        ></script>
+        <script
+            type="text/javascript"
+            src="js/toy/toy_documentation.js"
+        ></script>
+        <script type="text/javascript" src="js/toy/toy_components.js"></script>
+        <script type="text/javascript" src="js/toy/toy_simulation.js"></script>
         <script type="text/javascript" src="js/editor.js"></script>
-        <script type="text/javascript" src="js/bootstrap.min.js"></script>
+        <script
+            type="text/javascript"
+            src="js/initialize_simulator.js"
+        ></script>
     </body>
 </html>

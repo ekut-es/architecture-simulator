@@ -81,24 +81,28 @@ class TestRiscvArchitecture(unittest.TestCase):
         state.memory.write_word(0, fixedint.MutableUInt32(1))
         state.memory.write_word(6, fixedint.MutableUInt32(6))
         state.memory.write_byte(21, fixedint.MutableUInt32(20))
+
         self.assertEqual(
             state.memory.wordwise_repr()[0][0],
             "00000000 00000000 00000000 00000001",
         )
         self.assertEqual(state.memory.wordwise_repr()[0][1], "1")
         self.assertEqual(state.memory.wordwise_repr()[0][2], "00 00 00 01")
+
         self.assertEqual(
             state.memory.wordwise_repr()[4][0],
             "00000000 00000110 00000000 00000000",
         )
         self.assertEqual(state.memory.wordwise_repr()[4][1], str(6 << 16))
         self.assertEqual(state.memory.wordwise_repr()[4][2], "00 06 00 00")
+
         self.assertEqual(
             state.memory.wordwise_repr()[8][0],
             "00000000 00000000 00000000 00000000",
         )
         self.assertEqual(state.memory.wordwise_repr()[8][1], "0")
         self.assertEqual(state.memory.wordwise_repr()[8][2], "00 00 00 00")
+
         self.assertEqual(
             state.memory.wordwise_repr()[20][0],
             "00000000 00000000 00010100 00000000",

@@ -335,3 +335,13 @@ class TestRiscvSimulation(unittest.TestCase):
         self.assertEqual(simulation.state.performance_metrics.instruction_count, 32)
         self.assertEqual(simulation.state.performance_metrics.branch_count, 9)
         self.assertEqual(simulation.state.performance_metrics.flushes, 20)
+
+    def test_has_started(self):
+        sim = RiscvSimulation()
+        self.assertTrue(not sim.has_started)
+        sim.load_program("NOP\nADDI x1, x0, 3")
+        self.assertTrue(not sim.has_started)
+        sim.step()
+        self.assertTrue(sim.has_started)
+        sim.step()
+        self.assertTrue(sim.has_started)

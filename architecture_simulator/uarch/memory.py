@@ -337,7 +337,7 @@ class Memory(Generic[T]):
         Parameters:
             bits_of_one_block (int): Specifies how many bits long the value at an address should be considered.
 
-        Returns:
+         Returns:
             dict[int, tuple[str, str, str, str]]:
                 Keys: Memory addresses.
                 Values: Tuples of (binary, unsigned decimal, hexadecimal, signed decimal) strings.
@@ -371,7 +371,7 @@ class Memory(Generic[T]):
         Raises:
             UnsupportedFunctionError: If no byte-wise addressing is used.
 
-        Returns:
+         Returns:
             dict[int, tuple[str, str, str, str]]:
                 Keys: Memory addresses.
                 Values: Tuples of (binary, unsigned decimal, hexadecimal, signed decimal) strings.
@@ -389,7 +389,7 @@ class Memory(Generic[T]):
         Raises:
             UnsupportedFunctionError: If no halfword-wise addressing or smaller is used.
 
-        Returns:
+         Returns:
             dict[int, tuple[str, str, str, str]]:
                 Keys: Memory addresses.
                 Values: Tuples of (binary, unsigned decimal, hexadecimal, signed decimal) strings.
@@ -407,7 +407,7 @@ class Memory(Generic[T]):
         Raises:
             UnsupportedFunctionError: If no word-wise addressing or smaller is used.
 
-        Returns:
+         Returns:
             dict[int, tuple[str, str, str, str]]:
                 Keys: Memory addresses.
                 Values: Tuples of (binary, unsigned decimal, hexadecimal, signed decimal) strings.
@@ -425,7 +425,7 @@ class Memory(Generic[T]):
         Raises:
             UnsupportedFunctionError: If no doubleword-wise addressing or smaller is used.
 
-        Returns:
+         Returns:
             dict[int, tuple[str, str, str, str]]:
                 Keys: Memory addresses.
                 Values: Tuples of (binary, unsigned decimal, hexadecimal, signed decimal) strings.

@@ -19,12 +19,14 @@ class PipelineRegister:
     instruction: RiscvInstruction = field(default_factory=EmptyInstruction)
     address_of_instruction: Optional[int] = None
     flush_signal: Optional[FlushSignal] = None
+    abbreviation = "Single"
 
 
 @dataclass
 class InstructionFetchPipelineRegister(PipelineRegister):
     branch_prediction: Optional[bool] = None
     pc_plus_instruction_length: Optional[int] = None
+    abbreviation = "IF"
 
 
 @dataclass
@@ -38,6 +40,7 @@ class InstructionDecodePipelineRegister(PipelineRegister):
     write_register: Optional[int] = None
     branch_prediction: Optional[bool] = None
     pc_plus_instruction_length: Optional[int] = None
+    abbreviation = "ID"
 
 
 @dataclass
@@ -56,6 +59,7 @@ class ExecutePipelineRegister(PipelineRegister):
     pc_plus_imm: Optional[int] = None
     branch_prediction: Optional[bool] = None
     pc_plus_instruction_length: Optional[int] = None
+    abbreviation = "EX"
 
 
 @dataclass
@@ -72,6 +76,7 @@ class MemoryAccessPipelineRegister(PipelineRegister):
     pc_plus_imm: Optional[int] = None
     pc_plus_instruction_length: Optional[int] = None
     imm: Optional[int] = None
+    abbreviation = "MEM"
 
 
 @dataclass
@@ -83,3 +88,4 @@ class RegisterWritebackPipelineRegister(PipelineRegister):
     alu_result: Optional[int] = None
     pc_plus_instruction_length: Optional[int] = None
     imm: Optional[int] = None
+    abbreviation = "WB"
