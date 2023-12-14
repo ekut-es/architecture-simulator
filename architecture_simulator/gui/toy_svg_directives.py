@@ -196,4 +196,4 @@ class SvgFillDirectiveControlUnit(SvgFillDirective):
     """SVG Fill Directive for the control unit signals."""
 
     def __init__(self):
-        super().__init__(color_on="#ED6B03", color_off="#000000")
+        super().__init__(color_on="#ed0202", color_off="#000000")
