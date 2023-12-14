@@ -26,8 +26,8 @@
      inkscape:deskcolor="#d1d1d1"
      showgrid="true"
      inkscape:zoom="0.70710678"
-     inkscape:cx="1462.2968"
-     inkscape:cy="968.02918"
+     inkscape:cx="1460.8826"
+     inkscape:cy="1182.9896"
      inkscape:window-width="3840"
      inkscape:window-height="2071"
      inkscape:window-x="-9"
@@ -603,7 +603,7 @@
        y="1419.1312"
        id="text3260-4"><tspan
          sodipodi:role="line"
-         id="text-alu0-5"
+         id="text-alu0-2"
          x="3729.8533"
          y="1419.1312">ALU0</tspan></text><text
        xml:space="preserve"
@@ -612,7 +612,7 @@
        y="1364.4336"
        id="text3366-5"><tspan
          sodipodi:role="line"
-         id="text-alu1-4"
+         id="text-alu1-2"
          x="3729.8533"
          y="1364.4336">ALU1</tspan></text><text
        xml:space="preserve"
@@ -621,7 +621,7 @@
        y="1309.3823"
        id="text3370-2"><tspan
          sodipodi:role="line"
-         id="text-alu2-0"
+         id="text-alu2-2"
          x="3729.8533"
          y="1309.3823">ALU2</tspan></text><text
        xml:space="preserve"
@@ -630,7 +630,7 @@
        y="1254.5078"
        id="text3374-1"><tspan
          sodipodi:role="line"
-         id="text-alu3-5"
+         id="text-alu3-2"
          x="3729.8533"
          y="1254.5078">ALU3</tspan></text><text
        xml:space="preserve"
@@ -639,7 +639,7 @@
        y="1200.7373"
        id="text3378-3"><tspan
          sodipodi:role="line"
-         id="text-alumode-1"
+         id="text-alumode-2"
          x="3729.8533"
          y="1200.7373">ALUMODE</tspan></text><text
        xml:space="preserve"
@@ -648,7 +648,7 @@
        y="1144.978"
        id="text3382-8"><tspan
          sodipodi:role="line"
-         id="text-alucin-1"
+         id="text-alucin-2"
          x="3729.8533"
          y="1144.978">ALUCIN</tspan></text><path
        d="m 3724.8542,549.083 h -183.1903 v 11.46 h 183.1903 z m -177.4603,-11.46 -34.38,17.19 34.38,17.19 z"
@@ -667,7 +667,7 @@
        y="596.46436"
        id="text3378-3-2"><tspan
          sodipodi:role="line"
-         id="text-alumode-1-8"
+         id="text-set-ir-2"
          x="2091.0896"
          y="596.46436">SET[IR]</tspan></text><text
        xml:space="preserve"
@@ -676,7 +676,7 @@
        y="569.70807"
        id="text3382-8-2"><tspan
          sodipodi:role="line"
-         id="text-alucin-1-9"
+         id="text-set-accu-2"
          x="3729.8533"
          y="569.70807">SET[ACCU]</tspan></text><path
        d="m 3621.4444,1759.2089 h -183.1903 v 11.46 h 183.1903 z m -177.4603,-11.46 -34.38,17.19 34.38,17.19 z"
@@ -690,7 +690,7 @@
        y="1779.834"
        id="text3382-8-2-4"><tspan
          sodipodi:role="line"
-         id="text-alucin-1-9-3"
+         id="text-write-ram-2"
          x="3626.4436"
          y="1779.834">WRITE[RAM]</tspan></text><text
        xml:space="preserve"
@@ -740,7 +740,7 @@
        y="1892.8411"
        id="text3394-3"><tspan
          sodipodi:role="line"
-         id="text-addr-ir-3"
+         id="text-addr-ir-2"
          x="1385.394"
          y="1892.8411">ADDR=IR</tspan></text><text
        xml:space="preserve"
