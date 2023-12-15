@@ -740,6 +740,23 @@ def get_toy_svg_update_values(sim: ToySimulation) -> list[tuple[str, str, Any]]:
             assert isinstance(control_unit_text, SvgFillDirectiveControlUnit)
             control_unit_path.do_highlight = value
             control_unit_text.do_highlight = value
+
+            try:
+                control_unit_path_2 = getattr(
+                    result, "path_control_unit_" + name + "_2"
+                )
+            except AttributeError:
+                pass
+            else:
+                control_unit_path_2.do_highlight = value
+
+            try:
+                control_unit_text_2 = getattr(result, "text_" + name + "_2")
+            except AttributeError:
+                pass
+            else:
+                control_unit_text_2.do_highlight = value
+
     return result.export()
 
 
