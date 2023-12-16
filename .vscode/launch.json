@@ -5,13 +5,13 @@
             "type": "firefox",
             "request": "launch",
             "reAttach": true,
-            "name": "Launch Firefox Debugger",
-            "url": "http://127.0.0.1:3000/webgui/index.html",
+            "name": "Launch Vite Firefox Debugger",
+            "url": "http://localhost:5173/new_webgui/index.html",
             "webRoot": "${workspaceFolder}",
             "pathMappings": [
                 {
-                    "url": "http://127.0.0.1:3000/webgui",
-                    "path": "${workspaceFolder}/webgui"
+                    "url": "http://localhost:5173/src",
+                    "path": "${workspaceFolder}/new-webgui/src"
                 }
             ]
         },
