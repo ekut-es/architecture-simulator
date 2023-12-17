@@ -7,10 +7,11 @@ import {
 } from "../util.js";
 import { Simulation } from "../simulation.js";
 import { setEditorReadOnly } from "../editor.js";
+import toySvgPath from "/src/img/toy_structure.svg";
 
 export class ToySimulation extends Simulation {
     constructor(domNodes, getToyPythonSimulation, getLastPythonError) {
-        super(domNodes), getLastPythonError;
+        super(domNodes, getLastPythonError);
         /**@type {Number} The selected representation mode for the registers. 0: bin, 1: udec, 2: hex, 3: sdec.*/
         this.regRepresentationMode = 1;
         /**@type {Number} The selected representation mode for the memory. 0: bin, 1: udec, 2: hex, 3: sdec.*/
@@ -61,7 +62,7 @@ export class ToySimulation extends Simulation {
     }
 
     getPathToVisualization() {
-        return "img/toy_structure.svg";
+        return toySvgPath;
     }
 
     reset() {
@@ -201,7 +202,7 @@ export class ToySimulation extends Simulation {
 
         // The simulation has already started
         this.updatePerformanceMetrics();
-        editor.editorReadOnly(true);
+        setEditorReadOnly(true);
 
         if (this.isRunning) {
             stepButton.disabled = true;

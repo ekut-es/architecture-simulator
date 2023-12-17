@@ -9,6 +9,7 @@ import { riscvDocumentation } from "./riscv_documentation";
 import { getRadioSettingsRow, getRepresentationsSettingsRow } from "../util";
 import { Simulation } from "../simulation";
 import { setEditorReadOnly } from "../editor";
+import riscvSvgPath from "/src/img/riscv_pipeline.svg";
 
 export class RiscvSimulation extends Simulation {
     constructor(domNodes, getRiscvPythonSimulation, getLastPythonError) {
@@ -93,7 +94,7 @@ export class RiscvSimulation extends Simulation {
     }
 
     getPathToVisualization() {
-        return "img/riscv_pipeline.svg";
+        return riscvSvgPath;
     }
 
     /**
