@@ -1,16 +1,6 @@
 import { EditorView, lineNumbers, highlightActiveLine } from "@codemirror/view";
 import { EditorState, Compartment } from "@codemirror/state";
 
-// initialize codemirror textarea
-// const editor = CodeMirror.fromTextArea(document.getElementById("input"), {
-//     lineNumbers: true,
-//     styleActiveLine: true,
-//     mode: {
-//         name: "gas",
-//         architecture: "ARM",
-//     },
-// });
-
 let readOnly = new Compartment();
 let onViewChange = new Compartment();
 
@@ -52,9 +42,9 @@ export function setEditorOnChangeListener(f) {
 /**
  * Downloads the content of the editor.
  */
-function saveTextAsFile() {
+export function saveTextAsFile() {
     // thanks to https://stackoverflow.com/questions/51315044/how-do-i-save-the-content-of-the-editor-not-the-whole-html-page
-    var textToWrite = editorView.getValue();
+    var textToWrite = editorView.state.doc.toString();
     var textFileAsBlob = new Blob([textToWrite], {
         type: "text/plain;charset=utf-8",
     });
@@ -97,7 +87,13 @@ function uploadFile(event) {
     reader.readAsText(file, "UTF-8");
     reader.onload = (readerEvent) => {
         const content = readerEvent.target.result;
-        editorView.setValue(content);
+        editorView.dispatch({
+            changes: {
+                from: 0,
+                to: editorView.state.doc.length,
+                insert: content,
+            },
+        });
     };
 }
 

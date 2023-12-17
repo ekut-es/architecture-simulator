@@ -57,14 +57,6 @@ export class Simulation {
     updateUI() {}
 
     /**
-     * Should be implemented by all subclasses.
-     * Resets the entire simulation.
-     * You should also call this.resetBase(pythonSimulation).
-     * You will need to create the pythonSimulation on you own if you need one (see js/initialize_simulators.js).
-     */
-    resetCustom() {}
-
-    /**
      * Resets the entire simulation. Updates the UI.
      */
     reset() {
