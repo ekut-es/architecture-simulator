@@ -1,4 +1,5 @@
 import { html, createNode } from "../util";
+import doubleStepIconPath from "../../../node_modules/bootstrap-icons/icons/skip-forward-fill.svg";
 
 /**
  * Builds a Node containnig the accu and memory table and the output field.
@@ -73,7 +74,7 @@ function toyGetDoubleStepButton() {
         title="double step"
         onclick="simulation.doubleStep();"
     >
-        <img src="img/double-step.svg" />
+        <img src="${doubleStepIconPath}" />
     </button>`);
 }
 

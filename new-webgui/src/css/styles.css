@@ -1,3 +1,5 @@
+@import url("../../node_modules/bootstrap-icons/font/bootstrap-icons.css");
+
 :root {
     --main-accent-color: #252d73;
     --main-bg-color: #f5f5f5;
@@ -43,7 +45,8 @@ main {
 /* Control bar */
 
 .control-button > img,
-.control-button > svg {
+.control-button > svg,
+.control-button > i {
     width: 25px;
     height: 25px;
 }
