@@ -101,7 +101,7 @@ async function initializePyodide() {
         url + "/architecture_simulator-0.1.0-py3-none-any.whl"
     );
     await pyodide.runPython(`
-from architecture_simulator.gui.new_webgui import *
+from architecture_simulator.gui.webgui import *
 `);
     return pyodide;
 }
