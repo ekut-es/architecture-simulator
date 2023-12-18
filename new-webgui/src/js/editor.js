@@ -1,5 +1,11 @@
 import { EditorView, lineNumbers, highlightActiveLine } from "@codemirror/view";
 import { EditorState, Compartment } from "@codemirror/state";
+import {
+    StreamLanguage,
+    defaultHighlightStyle,
+    syntaxHighlighting,
+} from "@codemirror/language";
+import { gasArm } from "@codemirror/legacy-modes/mode/gas";
 
 let readOnly = new Compartment();
 let onViewChange = new Compartment();
@@ -10,11 +16,9 @@ export const editorView = new EditorView({
         highlightActiveLine(),
         readOnly.of(EditorState.readOnly.of(false)),
         onViewChange.of(EditorView.updateListener.of((v) => {})),
+        StreamLanguage.define(gasArm),
+        syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
     ],
-    mode: {
-        name: "gas",
-        architecture: "ARM",
-    },
 });
 
 document.getElementById("text-content-container").prepend(editorView.dom);
