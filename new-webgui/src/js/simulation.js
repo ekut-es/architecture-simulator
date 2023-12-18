@@ -23,7 +23,11 @@ export class Simulation {
         /**@type {pyProxy} The latest error.*/
         this.error = null;
         /**Object for managing the splitjs instance**/
-        this.split = new ArchsimSplit();
+        this.split = new ArchsimSplit(
+            this.domNodes.mainContentContainer,
+            this.domNodes.textContentContainer,
+            this.domNodes.visualizationsContainer
+        );
 
         this.getLastPythonError = getLastPythonError;
 
@@ -102,11 +106,7 @@ export class Simulation {
             }
         );
         this.domNodes.visualizationsContainer.append(svgObject);
-        this.split.createSplit(
-            this.domNodes.mainContentContainer,
-            this.domNodes.textContentContainer,
-            this.domNodes.visualizationsContainer
-        );
+        this.split.createSplit();
     }
 
     /**

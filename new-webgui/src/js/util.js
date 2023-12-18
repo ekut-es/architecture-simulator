@@ -129,10 +129,17 @@ function getRepresentationsSettingsRow(displayName, id, callback, defaultMode) {
 }
 
 class ArchsimSplit {
-    constructor() {
+    /**
+     * @param {Node} container Container of the split
+     * @param {Node} firstElement First element to be resizable
+     * @param {Node} secondElement Second element that should be resizable
+     */
+    constructor(container, firstElement, secondElement) {
         this.isActive = false;
         this.splitInstance = null;
-        this.container = null;
+        this.container = container;
+        this.firstElement = firstElement;
+        this.secondElement = secondElement;
         window.addEventListener("resize", () => this.handleResize());
     }
 
@@ -140,21 +147,17 @@ class ArchsimSplit {
      * Creates a SplitJS split between the given elements.
      * Will be horizontal or vertical depending on the window size.
      *
-     * @param {Node} container Container of the split
-     * @param {Node} firstElement First element to be resizable
-     * @param {Node} secondElement Second element that should be resizable
-     *
      * @throws {Error} Throws an error if there already is a split.
      */
-    createSplit(container, firstElement, secondElement) {
+    createSplit() {
         if (this.isActive) {
             throw Error("You can only create one split.");
         }
         if (window.innerWidth < window.innerHeight) {
             // Vertical split
-            container.classList.add("vertical-split");
+            this.container.classList.add("vertical-split");
             this.splitInstance = Split(
-                ["#" + firstElement.id, "#" + secondElement.id],
+                ["#" + this.firstElement.id, "#" + this.secondElement.id],
                 {
                     direction: "vertical",
                     minSize: 200,
@@ -164,9 +167,9 @@ class ArchsimSplit {
             );
         } else {
             // Horizontal split
-            container.classList.add("horizontal-split");
+            this.container.classList.add("horizontal-split");
             this.splitInstance = Split(
-                ["#" + firstElement.id, "#" + secondElement.id],
+                ["#" + this.firstElement.id, "#" + this.secondElement.id],
                 {
                     minSize: 200,
                     sizes: [35, 65],
@@ -175,7 +178,6 @@ class ArchsimSplit {
             );
         }
         this.isActive = true;
-        this.container = container;
     }
 
     /**
@@ -190,7 +192,6 @@ class ArchsimSplit {
                 "horizontal-split",
                 "vertical-split"
             );
-            this.container = null;
             this.isActive = false;
         }
     }
