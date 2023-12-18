@@ -166,8 +166,8 @@ export class RiscvSimulation extends Simulation {
             const cell2 = row.insertCell();
             cell1.innerText = address;
             cell2.innerText = value;
-            if (this.previousMemoryValues[address] !== values[1]) {
-                this.previousMemoryValues[address] = values[1];
+            if (this.previousMemoryValues[address] !== values.get(1)) {
+                this.previousMemoryValues[address] = values.get(1);
                 cell2.classList.add("highlight");
             }
             values.destroy();

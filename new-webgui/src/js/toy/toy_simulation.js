@@ -147,7 +147,6 @@ export class ToySimulation extends Simulation {
         this.updateRegisters();
         this.updateMemoryTable();
         //this.removeEditorHighlights(); // TODO
-        this.removeMemoryTableHighlights();
         if (this.visualizationLoaded) {
             this.updateVisualization();
         }
@@ -239,12 +238,6 @@ export class ToySimulation extends Simulation {
         }
     }
 
-    removeMemoryTableHighlights() {
-        for (let cell of this.domNodes.memoryTableBody.querySelectorAll("td")) {
-            cell.classList.remove("highlight");
-        }
-    }
-
     /**
      * Executes a single cycle of the simulation.
      * Sets this.error accordingly.
@@ -305,8 +298,8 @@ export class ToySimulation extends Simulation {
             cell1.innerText = address;
             cell2.innerText = value;
             cell3.innerText = instructionRepresentation;
-            if (this.previousMemoryValues[address] !== values[1]) {
-                this.previousMemoryValues[address] = values[1];
+            if (this.previousMemoryValues[address] !== values.get(1)) {
+                this.previousMemoryValues[address] = values.get(1);
                 cell2.classList.add("highlight");
             }
             if (cycle !== "") {
