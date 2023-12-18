@@ -190,4 +190,4 @@ dist
 dist-ssr
 *.local
 
-new-webgui/public/*.whl
+webgui/public/*.whl

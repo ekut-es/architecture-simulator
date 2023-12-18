@@ -6,14 +6,8 @@
             "request": "launch",
             "reAttach": true,
             "name": "Launch Vite Firefox Debugger",
-            "url": "http://localhost:5173/new_webgui/index.html",
-            "webRoot": "${workspaceFolder}",
-            "pathMappings": [
-                {
-                    "url": "http://localhost:5173/src",
-                    "path": "${workspaceFolder}/new-webgui/src"
-                }
-            ]
+            "url": "http://localhost:5173/index.html",
+            "webRoot": "${workspaceFolder}/webgui"
         },
         {
             "name": "Python: Current File",

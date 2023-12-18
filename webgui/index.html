@@ -4,15 +4,11 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>RISC-V Simulator</title>
-        <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico" />
         <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-            rel="stylesheet"
-            integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
-            crossorigin="anonymous"
+            rel="shortcut icon"
+            type="image/x-icon"
+            href="./src/img/favicon.ico"
         />
-        <link rel="stylesheet" href="css/styles.css" />
-        <link rel="stylesheet" href="css/splitjs.css" />
     </head>
     <body>
         <!--Header-->
@@ -23,7 +19,7 @@
                     <button class="btn btn-sm px-0 py-0">
                         <img
                             id="help-icon"
-                            src="img/WEB_APP_BASIC_Help.svg"
+                            src="/src/img/WEB_APP_BASIC_Help.svg"
                             titel="help"
                             data-bs-toggle="modal"
                             data-bs-target="#help-modal"
@@ -42,34 +38,38 @@
                         id="button-run-simulation"
                         class="btn btn-success btn-sm control-button me-1"
                         title="run simulation"
-                        onclick="simulation.run();"
                     >
-                        <img src="img/run.svg" />
+                        <img
+                            src="node_modules/bootstrap-icons/icons/play-fill.svg"
+                        />
                     </button>
                     <button
                         id="button-pause-simulation"
                         class="btn btn-warning btn-sm control-button me-1"
                         title="pause simulation"
-                        onclick="simulation.pause();"
                         disabled
                     >
-                        <img src="img/pause.svg" />
+                        <img
+                            src="node_modules/bootstrap-icons/icons/pause-fill.svg"
+                        />
                     </button>
                     <button
                         id="button-step-simulation"
                         class="btn btn-primary btn-sm control-button me-1"
                         title="step"
-                        onclick="simulation.step();"
                     >
-                        <img src="img/step.svg" />
+                        <img
+                            src="node_modules/bootstrap-icons/icons/skip-end-fill.svg"
+                        />
                     </button>
                     <button
                         id="button-reset-simulation"
                         class="btn btn-danger btn-sm control-button me-1"
                         title="reset simulation"
-                        onclick="resetSimulation();"
                     >
-                        <img src="img/reset.svg" />
+                        <img
+                            src="node_modules/bootstrap-icons/icons/arrow-clockwise.svg"
+                        />
                     </button>
                     <button
                         id="upload-button"
@@ -93,9 +93,9 @@
                         </svg>
                     </button>
                     <button
+                        id="download-button"
                         class="btn btn-secondary btn-sm control-button me-1"
                         title="download"
-                        onclick="saveTextAsFile();"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -114,7 +114,7 @@
                         </svg>
                     </button>
                     <img
-                        src="img/loading.gif"
+                        src="/src/img/loading.gif"
                         width="25px"
                         height="25px"
                         id="loading-spinner"
@@ -131,7 +131,7 @@
                         data-bs-toggle="modal"
                         data-bs-target="#settings-modal"
                     >
-                        <img src="img/settings.svg" />
+                        <img src="/src/img/settings.svg" />
                     </button>
                 </div>
             </div>
@@ -145,10 +145,6 @@
                     class="d-flex justify-content-between"
                 >
                     <!--Text Editor-->
-                    <textarea
-                        id="input"
-                        class="archsim-default-border"
-                    ></textarea>
                     <div id="text-editor-separator"></div>
                 </div>
                 <div id="visualizations-container"></div>
@@ -171,7 +167,7 @@
                             id="help-modal-label"
                         >
                             <img
-                                src="img/WEB_APP_BASIC_Help.svg"
+                                src="/src/img/WEB_APP_BASIC_Help.svg"
                                 width="35px"
                                 height="35px"
                             />
@@ -237,68 +233,13 @@
             </div>
         </div>
 
-        <script
-            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-            crossorigin="anonymous"
-        ></script>
-        <script
-            src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"
-        ></script>
-        <script
-            src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/hint/show-hint.min.js"
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"
-        ></script>
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css"
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"
-        />
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/hint/show-hint.min.css"
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"
-        />
+        <!--
         <script
             src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/gas/gas.min.js"
             crossorigin="anonymous"
             referrerpolicy="no-referrer"
         ></script>
-        <script
-            type="text/javascript"
-            src="https://cdn.jsdelivr.net/pyodide/v0.22.1/full/pyodide.js"
-        ></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.0/split.min.js"></script>
-        <script type="text/javascript" src="js/util.js"></script>
-        <script type="text/javascript" src="js/simulation.js"></script>
-
-        <script
-            type="text/javascript"
-            src="js/riscv/riscv_components.js"
-        ></script>
-        <script
-            type="text/javascript"
-            src="js/riscv/riscv_documentation.js"
-        ></script>
-        <script
-            type="text/javascript"
-            src="js/riscv/riscv_simulation.js"
-        ></script>
-        <script
-            type="text/javascript"
-            src="js/toy/toy_documentation.js"
-        ></script>
-        <script type="text/javascript" src="js/toy/toy_components.js"></script>
-        <script type="text/javascript" src="js/toy/toy_simulation.js"></script>
-        <script type="text/javascript" src="js/editor.js"></script>
-        <script
-            type="text/javascript"
-            src="js/initialize_simulator.js"
-        ></script>
+        -->
+        <script type="module" src="src/js/main.js"></script>
     </body>
 </html>
