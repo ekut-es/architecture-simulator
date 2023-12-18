@@ -26,6 +26,9 @@ export class ToySimulation extends Simulation {
         this.domNodes = { ...this.domNodes, ...toyGetMainColumn() };
         this.domNodes.textEditorSeparator.after(this.domNodes.mainColumn);
         this.domNodes.doubleStepButton = toyGetDoubleStepButton();
+        this.domNodes.doubleStepButton.addEventListener("click", () =>
+            this.doubleStep()
+        );
         this.domNodes.stepButton.after(this.domNodes.doubleStepButton);
         const registerRepresentation = getRepresentationsSettingsRow(
             "Registers",

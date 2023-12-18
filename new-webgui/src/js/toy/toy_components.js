@@ -65,6 +65,7 @@ function toyGetMainColumn() {
 
 /**
  * Returns a Node containing the double step button.
+ * An event listener has to be attached manually.
  * @returns {Node} A Node containing the double step button.
  */
 function toyGetDoubleStepButton() {
@@ -72,7 +73,6 @@ function toyGetDoubleStepButton() {
         id="button-double-step-simulation"
         class="btn btn-primary btn-sm control-button me-1"
         title="double step"
-        onclick="simulation.doubleStep();"
     >
         <img src="${doubleStepIconPath}" />
     </button>`);
