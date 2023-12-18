@@ -218,5 +218,5 @@ nav {
 /* Modals */
 .modal-header,
 .modal-footer {
-    background-color: var(--main-accent-color);
+    background-color: var(--main-accent-color) !important;
 }
