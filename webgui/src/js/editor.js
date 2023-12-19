@@ -1,4 +1,9 @@
-import { EditorView, lineNumbers, highlightActiveLine } from "@codemirror/view";
+import {
+    EditorView,
+    lineNumbers,
+    highlightActiveLine,
+    keymap,
+} from "@codemirror/view";
 import { EditorState, Compartment } from "@codemirror/state";
 import {
     StreamLanguage,
@@ -6,6 +11,7 @@ import {
     syntaxHighlighting,
 } from "@codemirror/language";
 import { gasArm } from "@codemirror/legacy-modes/mode/gas";
+import { defaultKeymap } from "@codemirror/commands";
 
 let readOnly = new Compartment();
 let onViewChange = new Compartment();
@@ -19,6 +25,7 @@ export const editorView = new EditorView({
         StreamLanguage.define(gasArm),
         syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
         EditorView.editorAttributes.of({ class: "archsim-default-border" }),
+        keymap.of(defaultKeymap), // new lines at end of doc don't work without this
     ],
 });
 
