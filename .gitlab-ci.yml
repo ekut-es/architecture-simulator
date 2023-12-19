@@ -53,9 +53,7 @@ build_webgui:
   stage: build
   needs:
     - "build_py"
-  before_script:
-    - apt update
-    - apt install -y nodejs npm
+  image: node:20-alpine
   script:
     - mkdir -p webgui/public
     - cp dist/*.whl webgui/public
