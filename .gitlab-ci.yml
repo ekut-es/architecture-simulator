@@ -59,6 +59,7 @@ build_webgui:
   script:
     - mkdir -p webgui/public
     - cp dist/*.whl webgui/public
+    - npm install
     - npm run build
   artifacts:
     untracked: false
@@ -86,7 +87,7 @@ deploy:
   variables:
     TARGET: "archsim@atreus.cs.uni-tuebingen.de:/opt/landing_page/archsim/"
   dependencies:
-    - "build"
+    - "build_py"
   before_script:
     - apt-get update
     - apt-get install -y rsync
