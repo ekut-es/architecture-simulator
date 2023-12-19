@@ -15,15 +15,15 @@ export const editorView = new EditorView({
         lineNumbers(),
         highlightActiveLine(),
         readOnly.of(EditorState.readOnly.of(false)),
-        onViewChange.of(EditorView.updateListener.of((v) => {})),
+        onViewChange.of(EditorView.updateListener.of((v) => {})), // for auto parsing
         StreamLanguage.define(gasArm),
         syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+        EditorView.editorAttributes.of({ class: "archsim-default-border" }),
     ],
 });
 
 document.getElementById("text-content-container").prepend(editorView.dom);
 editorView.dom.id = "codemirror-input";
-editorView.dom.classList.add("archsim-default-border");
 
 export function setEditorReadOnly(setReadOnly) {
     editorView.dispatch({
