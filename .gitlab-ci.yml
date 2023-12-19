@@ -51,7 +51,7 @@ build_py:
 
 build_webgui:
   stage: build
-  dependencies:
+  needs:
     - "build_py"
   before_script:
     - apt update
