@@ -1,5 +1,5 @@
 import { html, createNode } from "../util";
-import doubleStepIconPath from "../../../node_modules/bootstrap-icons/icons/skip-forward-fill.svg";
+import doubleStepIconPath from "bootstrap-icons/icons/skip-forward-fill.svg";
 
 /**
  * Builds a Node containnig the accu and memory table and the output field.
