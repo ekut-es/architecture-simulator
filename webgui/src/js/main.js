@@ -97,9 +97,7 @@ async function initializePyodide() {
     if (url.endsWith("index.html")) {
         url = url.slice(0, -10);
     }
-    await micropip.install(
-        url + "/architecture_simulator-0.1.0-py3-none-any.whl"
-    );
+    await micropip.install("architecture_simulator-0.1.0-py3-none-any.whl");
     await pyodide.runPython(`
 from architecture_simulator.gui.webgui import *
 `);
