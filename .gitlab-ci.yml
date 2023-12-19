@@ -55,7 +55,7 @@ build_webgui:
     - "build_py"
   before_script:
     - apt update
-    - apt install nodejs
+    - apt install -y nodejs npm
   script:
     - mkdir -p webgui/public
     - cp dist/*.whl webgui/public
