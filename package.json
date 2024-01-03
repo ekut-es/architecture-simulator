@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite webgui",
     "build": "vite build webgui",
-    "preview": "vite preview webgui"
+    "preview": "vite preview webgui",
+    "preview-docker": "vite preview webgui --host 0.0.0.0"
   },
   "devDependencies": {
     "sass": "^1.69.5",

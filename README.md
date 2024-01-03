@@ -23,10 +23,24 @@ The original implementation was developed as part of the team project course in 
     - Support for self modifying code
 
 ## Setup dev environment
+
+### docker development environment
+
+You can use docker for development. The script `docker-run.sh` builds a docker image containing all dependencies, builds the python and js packages and starts a preview server.
+
+```
+git clone https://github.com/ekut-es/architecture-simulator.git
+cd architecture-simulator
+./docker-run.sh
+```
+
+### local development environment
 - Linux / WSL / macOS
 - VSCode as editor
 - [install pyenv (tutorial)](https://k0nze.dev/posts/install-pyenv-venv-vscode/)
 - install Python 3.10 via pyenv
+- install nvm
+- install nodejs/npm
 - set Python versions to 3.10.8
 - initialize and activate venv
 - install development requirements
@@ -35,6 +49,7 @@ The original implementation was developed as part of the team project course in 
 
 ```bash
 pyenv install 3.10.8
+nvm install v20.10.0
 git clone https://github.com/ekut-es/architecture-simulator.git
 cd architecture-simulator
 pyenv local 3.10.8
@@ -45,20 +60,23 @@ pre-commit install
 pip install -e .
 ```
 
-## Build package
+#### Build packages
+
+Use the script `build.sh` to build the packages.
 
 ```
-python -m build
+./build.sh build
 ```
 
-## GUI dev environment
+#### GUI dev environment
 
-- Install the recommended VSCode extensions (you should be prompted on start).
-- Build the Python package (see above how). Ensure there is a file `dist/*.whl` present.`
-- Then use the VSCode live preview feature to serve the needed files locally.
-  - To do so just open `webgui/index.html` in the editor and click the 'show preview' button.
-  - Alternatively start a development webserver in the project base directory: `python -m http.server`.
-- Additionally you can use the *Debugger for Firefox* Extension and start a session with the given launch configuration.
+Use the script `build.sh` to build the python package and start a development server.
+
+```
+./build.sh dev
+```
+
+Additionally you can use the *Debugger for Firefox* Extension and start a session with the given vscode launch configuration.
 
 ## Branch Naming Convention
 
