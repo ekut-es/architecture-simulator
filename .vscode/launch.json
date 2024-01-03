@@ -21,7 +21,7 @@
             "type": "chrome",
             "name": "Launch Chrome Debugger",
             "request": "launch",
-            "url": "http://127.0.0.1:3000/webgui/index.html"
+            "url": "http://127.0.0.1:5173/webgui/index.html"
         }
     ]
 }
