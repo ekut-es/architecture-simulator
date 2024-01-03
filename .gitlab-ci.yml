@@ -86,6 +86,7 @@ deploy:
     TARGET: "archsim@atreus.cs.uni-tuebingen.de:/opt/landing_page/archsim/"
   dependencies:
     - "build_py"
+    - "build_webgui"
   before_script:
     - apt-get update
     - apt-get install -y rsync
