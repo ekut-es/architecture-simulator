@@ -1,21 +1,61 @@
-// initialize codemirror textarea
-const editor = CodeMirror.fromTextArea(document.getElementById("input"), {
-    lineNumbers: true,
-    styleActiveLine: true,
-    mode: {
-        name: "gas",
-        architecture: "ARM",
-    },
+import {
+    EditorView,
+    lineNumbers,
+    highlightActiveLine,
+    keymap,
+} from "@codemirror/view";
+import { EditorState, Compartment } from "@codemirror/state";
+import {
+    StreamLanguage,
+    defaultHighlightStyle,
+    syntaxHighlighting,
+} from "@codemirror/language";
+import { gasArm } from "@codemirror/legacy-modes/mode/gas";
+import { defaultKeymap } from "@codemirror/commands";
+
+let readOnly = new Compartment();
+let onViewChange = new Compartment();
+
+export const editorView = new EditorView({
+    extensions: [
+        lineNumbers(),
+        highlightActiveLine(),
+        readOnly.of(EditorState.readOnly.of(false)),
+        onViewChange.of(EditorView.updateListener.of((v) => {})), // for auto parsing
+        StreamLanguage.define(gasArm),
+        syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+        EditorView.editorAttributes.of({ class: "archsim-default-border" }),
+        keymap.of(defaultKeymap), // new lines at end of doc don't work without this
+    ],
 });
-editor.getWrapperElement().id = "codemirror-input";
-editor.getWrapperElement().classList.add("archsim-default-border");
+
+document.getElementById("text-content-container").prepend(editorView.dom);
+editorView.dom.id = "codemirror-input";
+
+export function setEditorReadOnly(setReadOnly) {
+    editorView.dispatch({
+        effects: readOnly.reconfigure(EditorState.readOnly.of(setReadOnly)),
+    });
+}
+
+export function setEditorOnChangeListener(f) {
+    editorView.dispatch({
+        effects: onViewChange.reconfigure(
+            EditorView.updateListener.of((v) => {
+                if (v.docChanged) {
+                    f();
+                }
+            })
+        ),
+    });
+}
 
 /**
  * Downloads the content of the editor.
  */
-function saveTextAsFile() {
+export function saveTextAsFile() {
     // thanks to https://stackoverflow.com/questions/51315044/how-do-i-save-the-content-of-the-editor-not-the-whole-html-page
-    var textToWrite = editor.getValue();
+    var textToWrite = editorView.state.doc.toString();
     var textFileAsBlob = new Blob([textToWrite], {
         type: "text/plain;charset=utf-8",
     });
@@ -58,7 +98,13 @@ function uploadFile(event) {
     reader.readAsText(file, "UTF-8");
     reader.onload = (readerEvent) => {
         const content = readerEvent.target.result;
-        editor.setValue(content);
+        editorView.dispatch({
+            changes: {
+                from: 0,
+                to: editorView.state.doc.length,
+                insert: content,
+            },
+        });
     };
 }
 

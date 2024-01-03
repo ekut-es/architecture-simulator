@@ -1,3 +1,5 @@
+import { html, createNode } from "../util";
+
 /**
  * @returns {Object} An Object containing the RISC-V register table container and tbody.
  */
@@ -278,3 +280,11 @@ function getRiscvDataHazardSettings(isEnabled, callback) {
     });
     return row;
 }
+
+export {
+    getRiscvDataHazardSettings,
+    getRiscvInstructionTable,
+    getRiscvMemoryTable,
+    getRiscvOutputField,
+    getRiscvRegisterTable,
+};

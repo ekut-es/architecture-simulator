@@ -1,9 +1,12 @@
-class Simulation {
+import { ArchsimSplit, createVisualization } from "./util.js";
+import { setEditorReadOnly, setEditorOnChangeListener } from "./editor.js";
+
+export class Simulation {
     /**
      * Constructor for Simulation.
      * @param {object} domNodes Object holding all the relevant nodes from the default page.
      */
-    constructor(domNodes) {
+    constructor(domNodes, getLastPythonError) {
         /**@type {pyProxy} A pyProxy of the ToySimulation object.*/
         this.pythonSimulation = null;
         /**@type {object} An object holding all relevant DOM Nodes.*/
@@ -19,13 +22,19 @@ class Simulation {
         this.doPause = false;
         /**@type {pyProxy} The latest error.*/
         this.error = null;
-        /**SplitsJS object*/
-        this.split = null;
+        /**Object for managing the splitjs instance**/
+        this.split = new ArchsimSplit(
+            this.domNodes.mainContentContainer,
+            this.domNodes.textContentContainer,
+            this.domNodes.visualizationsContainer
+        );
+
+        this.getLastPythonError = getLastPythonError;
 
         /**@type{Function} Debounces (triggers) auto parsing.*/
         this.debouncedAutoParsing = this.getDebouncedAutoParsing();
-        editor.setOption("readOnly", false);
-        editor.on("change", () => {
+        setEditorReadOnly(false);
+        setEditorOnChangeListener(() => {
             this.hasUnparsedChanges = true;
             this.debouncedAutoParsing();
             this.updateUI();
@@ -52,14 +61,6 @@ class Simulation {
     updateUI() {}
 
     /**
-     * Should be implemented by all subclasses.
-     * Resets the entire simulation.
-     * You should also call this.resetBase(pythonSimulation).
-     * You will need to create the pythonSimulation on you own if you need one (see js/initialize_simulators.js).
-     */
-    resetCustom() {}
-
-    /**
      * Resets the entire simulation. Updates the UI.
      */
     reset() {
@@ -76,7 +77,7 @@ class Simulation {
         this.domNodes.helpModalHeading.textContent = "";
         this.domNodes.customSettingsContainer.innerHTML = "";
         this.domNodes.visualizationsContainer.innerHTML = "";
-        this.destroySplit();
+        this.split.destroySplit();
     }
 
     /**
@@ -105,11 +106,7 @@ class Simulation {
             }
         );
         this.domNodes.visualizationsContainer.append(svgObject);
-        this.split = createSplit(
-            this.domNodes.mainContentContainer,
-            this.domNodes.textContentContainer,
-            this.domNodes.visualizationsContainer
-        );
+        this.split.createSplit();
     }
 
     /**
@@ -118,7 +115,7 @@ class Simulation {
      */
     deactivateVisualization() {
         this.domNodes.visualizationsContainer.innerHTML = "";
-        this.destroySplit();
+        this.split.destroySplit();
         delete this.domNodes.visualization;
         this.visualizationLoaded = false;
         this.updateUI();
@@ -131,14 +128,14 @@ class Simulation {
      * @returns {boolean} Whether parsing the input was successful
      */
     parseInput() {
-        const input = editor.getValue(); // TODO: Replace by this.domNodes
+        const input = this.domNodes.editor.state.doc.toString();
         this.hasUnparsedChanges = false;
         try {
             this.pythonSimulation.load_program(input);
             this.error = null;
             return true;
         } catch (err) {
-            this.error = getLastPythonError();
+            this.error = this.getLastPythonError();
             return false;
         }
     }
@@ -185,7 +182,7 @@ class Simulation {
         try {
             this.pythonSimulation.step();
         } catch (error) {
-            this.error = getLastPythonError();
+            this.error = this.getLastPythonError();
         }
     }
 
@@ -243,56 +240,45 @@ class Simulation {
     }
 
     /**
-     * Removes the splits.
-     */
-    destroySplit() {
-        if (this.split !== null) {
-            this.domNodes.mainContentContainer.classList.remove("split");
-            this.split.destroy();
-            this.split = null;
-        }
-    }
-
-    /**
      * Highlights a line in the text editor and displays an error message as a hint.
      * Can be used to display parser exceptions.
      *
      * @param {number} position - line number (starting at 1).
      * @param {string} errorMessage - string to display.
      */
-    highlightEditorLine(position, errorMessage) {
-        editor.addLineClass(position - 1, "background", "highlight");
-        editor.refresh();
-        const error_description = {
-            hint: function () {
-                return {
-                    from: position,
-                    to: position,
-                    list: [errorMessage, ""],
-                };
-            },
-            customKeys: {
-                Up: function (cm, handle) {
-                    CodeMirror.commands.goLineUp(cm);
-                    handle.close();
-                },
-                Down: function (cm, handle) {
-                    CodeMirror.commands.goLineDown(cm);
-                    handle.close();
-                },
-            },
-        };
-        editor.showHint(error_description);
-    }
+    // highlightEditorLine(position, errorMessage) {
+    //     this.domNodes.editor.addLineClass(position - 1, "background", "highlight");
+    //     this.domNodes.editor.refresh();
+    //     const error_description = {
+    //         hint: function () {
+    //             return {
+    //                 from: position,
+    //                 to: position,
+    //                 list: [errorMessage, ""],
+    //             };
+    //         },
+    //         customKeys: {
+    //             Up: function (cm, handle) {
+    //                 CodeMirror.commands.goLineUp(cm);
+    //                 handle.close();
+    //             },
+    //             Down: function (cm, handle) {
+    //                 CodeMirror.commands.goLineDown(cm);
+    //                 handle.close();
+    //             },
+    //         },
+    //     };
+    //     this.domNodes.editor.showHint(error_description);
+    // }
 
     /**
      * Removes all highlights from the editor.
      */
-    removeEditorHighlights() {
-        for (let i = 0; i < editor.lineCount(); i++) {
-            editor.removeLineClass(i, "background", "highlight");
-        }
-        editor.refresh();
-        editor.closeHint();
-    }
+    // removeEditorHighlights() {
+    //     for (let line of this.domNodes.editor.state.doc.iterLines) {
+    //         this.domNodes.editor.removeLineClass(i, "background", "highlight");
+    //     }
+    //     this.domNodes.editor.refresh();
+    //     this.domNodes.editor.closeHint();
+    // }
 }

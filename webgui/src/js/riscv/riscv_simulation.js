@@ -1,6 +1,19 @@
-class RiscvSimulation extends Simulation {
-    constructor(domNodes) {
-        super(domNodes);
+import {
+    getRiscvDataHazardSettings,
+    getRiscvInstructionTable,
+    getRiscvMemoryTable,
+    getRiscvOutputField,
+    getRiscvRegisterTable,
+} from "./riscv_components";
+import { riscvDocumentation } from "./riscv_documentation";
+import { getRadioSettingsRow, getRepresentationsSettingsRow } from "../util";
+import { Simulation } from "../simulation";
+import { setEditorReadOnly } from "../editor";
+import riscvSvgPath from "/src/img/riscv_pipeline.svg";
+
+export class RiscvSimulation extends Simulation {
+    constructor(domNodes, getRiscvPythonSimulation, getLastPythonError) {
+        super(domNodes, getLastPythonError);
         /**@type {Number} The selected representation mode for the registers. 0: bin, 1: udec, 2: hex, 3: sdec.*/
         this.regRepresentationMode = 1;
         /**@type {Number} The selected representation mode for the memory. 0: bin, 1: udec, 2: hex, 3: sdec.*/
@@ -12,6 +25,7 @@ class RiscvSimulation extends Simulation {
         /**@type {boolean} Whether to enable data hazard detection in the five stage pipeline*/
         this.dataHazardDetection = true;
 
+        this.getRiscvPythonSimulation = getRiscvPythonSimulation;
         this.pythonSimulation = this.getNewPythonSimulation();
 
         this.previous_pc = 0;
@@ -73,14 +87,14 @@ class RiscvSimulation extends Simulation {
     }
 
     getNewPythonSimulation() {
-        return getRiscvPythonSimulation(
+        return this.getRiscvPythonSimulation(
             this.pipelineMode,
             this.dataHazardDetection
         );
     }
 
     getPathToVisualization() {
-        return "img/riscv_pipeline.svg";
+        return riscvSvgPath;
     }
 
     /**
@@ -152,8 +166,8 @@ class RiscvSimulation extends Simulation {
             const cell2 = row.insertCell();
             cell1.innerText = address;
             cell2.innerText = value;
-            if (this.previousMemoryValues[address] !== values[1]) {
-                this.previousMemoryValues[address] = values[1];
+            if (this.previousMemoryValues[address] !== values.get(1)) {
+                this.previousMemoryValues[address] = values.get(1);
                 cell2.classList.add("highlight");
             }
             values.destroy();
@@ -230,7 +244,7 @@ class RiscvSimulation extends Simulation {
         this.updateRegisterTable();
         this.updateMemoryTable();
         this.updateInstructionTable();
-        this.removeEditorHighlights();
+        // this.removeEditorHighlights(); // TODO
         if (this.visualizationLoaded) {
             this.updateVisualization();
         }
@@ -245,7 +259,7 @@ class RiscvSimulation extends Simulation {
             switch (errorType) {
                 case "ParserException": {
                     const line = this.error.get(2);
-                    this.highlightEditorLine(line, errorMessage);
+                    //this.highlightEditorLine(line, errorMessage); // TODO Bring back line highlights
                     break;
                 }
                 case "InstructionExecutionException": {
@@ -274,7 +288,7 @@ class RiscvSimulation extends Simulation {
 
         // There are instructions
         if (!hasStarted) {
-            editor.setOption("readOnly", false);
+            setEditorReadOnly(false);
             this.setOutputFieldContent("Ready!");
             stepButton.disabled = false;
             runButton.disabled = false;
@@ -285,7 +299,7 @@ class RiscvSimulation extends Simulation {
 
         // The simulation has already started
         this.updatePerformanceMetrics();
-        editor.setOption("readOnly", true);
+        setEditorReadOnly(true);
 
         if (this.isRunning) {
             stepButton.disabled = true;

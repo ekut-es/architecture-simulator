@@ -5,15 +5,9 @@
             "type": "firefox",
             "request": "launch",
             "reAttach": true,
-            "name": "Launch Firefox Debugger",
-            "url": "http://127.0.0.1:3000/webgui/index.html",
-            "webRoot": "${workspaceFolder}",
-            "pathMappings": [
-                {
-                    "url": "http://127.0.0.1:3000/webgui",
-                    "path": "${workspaceFolder}/webgui"
-                }
-            ]
+            "name": "Launch Vite Firefox Debugger",
+            "url": "http://localhost:5173/index.html",
+            "webRoot": "${workspaceFolder}/webgui"
         },
         {
             "name": "Python: Current File",
@@ -27,7 +21,7 @@
             "type": "chrome",
             "name": "Launch Chrome Debugger",
             "request": "launch",
-            "url": "http://127.0.0.1:3000/webgui/index.html"
+            "url": "http://127.0.0.1:5173/webgui/index.html"
         }
     ]
 }

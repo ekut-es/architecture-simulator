@@ -1,3 +1,6 @@
+import { html, createNode } from "../util";
+import doubleStepIconPath from "bootstrap-icons/icons/skip-forward-fill.svg";
+
 /**
  * Builds a Node containnig the accu and memory table and the output field.
  * @returns {Object} An object containing the outer container, the accu and memory table and the output field.
@@ -62,6 +65,7 @@ function toyGetMainColumn() {
 
 /**
  * Returns a Node containing the double step button.
+ * An event listener has to be attached manually.
  * @returns {Node} A Node containing the double step button.
  */
 function toyGetDoubleStepButton() {
@@ -69,49 +73,9 @@ function toyGetDoubleStepButton() {
         id="button-double-step-simulation"
         class="btn btn-primary btn-sm control-button me-1"
         title="double step"
-        onclick="simulation.doubleStep();"
     >
-        <img src="img/double-step.svg" />
+        <img src="${doubleStepIconPath}" />
     </button>`);
 }
 
-/**
- * Generates a Node for selecting the representation (bin, udec, sdec, hex) of some setting.
- * Adds an event listener and calls the given function with the selected value (bin: "0", udec: "1", sdec: "3", hex: "2").
- * The listener will NOT cause a UI update.
- * The provided default mode will be used to check one option but it will not trigger the event listener.
- *
- * @param {string} displayName Name to display next to the buttons.
- * @param {string} id A unique id. Several ids will be generated from this base string.
- * @param {function(string):void} callback The function to call after a button was clicked.
- * @param {string} defaultMode The default representation mode.
- * @returns {Node} The Node to insert into the settings.
- */
-function getRepresentationsSettingsRow(displayName, id, callback, defaultMode) {
-    return getRadioSettingsRow(
-        displayName,
-        ["binary", "unsigned decimal", "signed decimal", "hexadecimal"],
-        ["0", "1", "3", "2"],
-        id,
-        callback,
-        defaultMode
-    );
-}
-
-/**
- * Creates the Toy SVG Element. Once the svg has loaded, the given function will be called.
- *
- */
-/**
- *
- * @param {function(): void} onLoad function that gets called when the svg has loaded
- * @returns {Node} The svg object node.
- */
-function toyGetVisualization(onLoad) {
-    const toySvgElement = document.createElement("object");
-    toySvgElement.data = "img/toy_structure.svg";
-    toySvgElement.type = "image/svg+xml";
-    toySvgElement.id = "toy-visualization";
-    toySvgElement.addEventListener("load", onLoad);
-    return toySvgElement;
-}
+export { toyGetDoubleStepButton, toyGetMainColumn };

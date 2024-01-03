@@ -38,7 +38,7 @@ cache:
     - source .venv/bin/activate
     - pip install -e .
 
-build:
+build_py:
   stage: build
   extends: .python-job
   script:
@@ -48,6 +48,23 @@ build:
     paths:
       - dist/*.whl
       - tests/c_programs/*.s
+
+build_webgui:
+  stage: build
+  needs:
+    - "build_py"
+  image: node:20-alpine
+  script:
+    - mkdir -p webgui/public
+    - cp dist/*.whl webgui/public
+    - npm install
+    - npm run build
+  artifacts:
+    untracked: false
+    when: on_success
+    expire_in: 30 days
+    paths:
+      - webgui/dist/*
 
 test:
   stage: test
@@ -68,7 +85,7 @@ deploy:
   variables:
     TARGET: "archsim@atreus.cs.uni-tuebingen.de:/opt/landing_page/archsim/"
   dependencies:
-    - "build"
+    - "build_py"
   before_script:
     - apt-get update
     - apt-get install -y rsync
@@ -79,5 +96,4 @@ deploy:
     - chmod 700 ~/.ssh
     - echo "$DEPLOY_HOST_KEY" >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
-    - rsync -ah --no-o --no-g --delete webgui/ $TARGET
-    - rsync -ah --no-o --no-g --delete dist $TARGET
+    - rsync -ah --no-o --no-g --delete webgui/dist/ $TARGET

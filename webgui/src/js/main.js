@@ -1,3 +1,14 @@
+import "/src/css/styles.css";
+import "/src/css/splitjs.css";
+import { ToySimulation } from "./toy/toy_simulation";
+import { RiscvSimulation } from "./riscv/riscv_simulation";
+import { getRadioSettingsRow } from "./util";
+import "/src/scss/bootstrap.scss";
+import * as bootstrap from "bootstrap";
+import { loadPyodide } from "pyodide";
+import { editorView } from "./editor";
+import { saveTextAsFile } from "./editor";
+
 /**@type{ToySimulation} Holds the JS Simulation object.*/
 let simulation = null;
 
@@ -24,51 +35,14 @@ let getLastPythonError;
  */
 async function initialize() {
     // Load pyodide and install the package
-    const pyodide = await loadPyodide();
-    await pyodide.loadPackage("micropip");
-    const micropip = pyodide.pyimport("micropip");
-    if (window.location.origin == "http://127.0.0.1:3000") {
-        await micropip.install(
-            window.location.origin +
-                "/dist/architecture_simulator-0.1.0-py3-none-any.whl"
-        );
-    } else {
-        // Find out the URL of the server, but dont include any parameters or index.html
-        let url = window.location.origin + window.location.pathname;
-        if (url.endsWith("index.html")) {
-            url = url.slice(0, -10);
-        }
-        await micropip.install(
-            url + "/dist/architecture_simulator-0.1.0-py3-none-any.whl"
-        );
-    }
-    await pyodide.runPython(`
-from architecture_simulator.gui.new_webgui import *
-    `);
+    const pyodide = await initializePyodide();
+    getRiscvPythonSimulation = pyodide.globals.get("get_riscv_simulation");
+    getToyPythonSimulation = pyodide.globals.get("get_toy_simulation");
+    getLastPythonError = pyodide.globals.get("get_last_error");
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const isaParam = urlParams.get("isa");
-    if (isaParam !== null) {
-        switch (isaParam.toLowerCase()) {
-            case "riscv":
-                currentISA = "riscv";
-                break;
-            default:
-                currentISA = "toy";
-        }
-    }
+    updateCurrentIsa();
 
-    const isaSelector = getRadioSettingsRow(
-        "ISA",
-        ["RISC-V", "TOY"],
-        ["riscv", "toy"],
-        "select-isa",
-        switchIsa,
-        currentISA
-    );
-    document
-        .getElementById("isa-selector-settings-container")
-        .append(isaSelector);
+    const isaSelector = installIsaSelectorSettings();
 
     // Register all the relevant non-isa-specific nodes in an object.
     domNodes = {
@@ -92,20 +66,65 @@ from architecture_simulator.gui.new_webgui import *
         pageHeading: document.getElementById("page-heading"),
         mainContentContainer: document.getElementById("main-content-container"),
         isaSelector: isaSelector,
+        editor: editorView,
     };
-    getRiscvPythonSimulation = pyodide.globals.get("get_riscv_simulation");
-    getToyPythonSimulation = pyodide.globals.get("get_toy_simulation");
-    getLastPythonError = pyodide.globals.get("get_last_error");
     switchIsa(currentISA);
 
-    window.addEventListener("resize", handleResize);
+    addButtonEventListeners(domNodes);
 }
 
-/**
- * Tells the current Simulation object to reset.
- */
-function resetSimulation() {
-    simulation.reset();
+function updateCurrentIsa() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const isaParam = urlParams.get("isa");
+    if (isaParam !== null) {
+        switch (isaParam.toLowerCase()) {
+            case "riscv":
+                currentISA = "riscv";
+                break;
+            default:
+                currentISA = "toy";
+        }
+    }
+}
+
+async function initializePyodide() {
+    const pyodide = await loadPyodide({
+        indexURL: "https://cdn.jsdelivr.net/pyodide/v0.22.1/full/",
+    });
+    await pyodide.loadPackage("micropip");
+    const micropip = pyodide.pyimport("micropip");
+    let url = window.location.origin + window.location.pathname;
+    if (url.endsWith("index.html")) {
+        url = url.slice(0, -10);
+    }
+    await micropip.install("architecture_simulator-0.1.0-py3-none-any.whl");
+    await pyodide.runPython(`
+from architecture_simulator.gui.webgui import *
+`);
+    return pyodide;
+}
+
+function installIsaSelectorSettings() {
+    const isaSelector = getRadioSettingsRow(
+        "ISA",
+        ["RISC-V", "TOY"],
+        ["riscv", "toy"],
+        "select-isa",
+        switchIsa,
+        currentISA
+    );
+    document
+        .getElementById("isa-selector-settings-container")
+        .append(isaSelector);
+    return isaSelector;
+}
+
+function addButtonEventListeners(domNodes) {
+    domNodes.runButton.addEventListener("click", () => simulation.run());
+    domNodes.pauseButton.addEventListener("click", () => simulation.pause());
+    domNodes.stepButton.addEventListener("click", () => simulation.step());
+    domNodes.resetButton.addEventListener("click", () => simulation.reset());
+    domNodes.downloadButton.addEventListener("click", () => saveTextAsFile());
 }
 
 /**
@@ -120,14 +139,22 @@ function switchIsa(isa) {
 
     switch (isa) {
         case "riscv":
-            simulation = new RiscvSimulation({
-                ...domNodes,
-            });
+            simulation = new RiscvSimulation(
+                {
+                    ...domNodes,
+                },
+                getRiscvPythonSimulation,
+                getLastPythonError
+            );
             break;
         case "toy":
-            simulation = new ToySimulation({
-                ...domNodes,
-            });
+            simulation = new ToySimulation(
+                {
+                    ...domNodes,
+                },
+                getToyPythonSimulation,
+                getLastPythonError
+            );
             break;
         default:
             console.error(`Specified isa '${isa}' does not exist.`);

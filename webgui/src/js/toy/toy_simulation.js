@@ -1,6 +1,17 @@
-class ToySimulation extends Simulation {
-    constructor(domNodes) {
-        super(domNodes);
+import { toyGetDoubleStepButton, toyGetMainColumn } from "./toy_components.js";
+import { toyDocumentation } from "./toy_documentation.js";
+import {
+    html,
+    instructionArrow,
+    getRepresentationsSettingsRow,
+} from "../util.js";
+import { Simulation } from "../simulation.js";
+import { setEditorReadOnly } from "../editor.js";
+import toySvgPath from "/src/img/toy_structure.svg";
+
+export class ToySimulation extends Simulation {
+    constructor(domNodes, getToyPythonSimulation, getLastPythonError) {
+        super(domNodes, getLastPythonError);
         /**@type {Number} The selected representation mode for the registers. 0: bin, 1: udec, 2: hex, 3: sdec.*/
         this.regRepresentationMode = 1;
         /**@type {Number} The selected representation mode for the memory. 0: bin, 1: udec, 2: hex, 3: sdec.*/
@@ -8,12 +19,16 @@ class ToySimulation extends Simulation {
         /**@type {?} The values of the memory from the last cycle.*/
         this.previousMemoryValues = [];
 
+        this.getToyPythonSimulation = getToyPythonSimulation;
         this.pythonSimulation = getToyPythonSimulation();
 
         // Insert everything into the DOM. The SVG will cause a UI update once it has finished loading.
         this.domNodes = { ...this.domNodes, ...toyGetMainColumn() };
         this.domNodes.textEditorSeparator.after(this.domNodes.mainColumn);
         this.domNodes.doubleStepButton = toyGetDoubleStepButton();
+        this.domNodes.doubleStepButton.addEventListener("click", () =>
+            this.doubleStep()
+        );
         this.domNodes.stepButton.after(this.domNodes.doubleStepButton);
         const registerRepresentation = getRepresentationsSettingsRow(
             "Registers",
@@ -50,13 +65,13 @@ class ToySimulation extends Simulation {
     }
 
     getPathToVisualization() {
-        return "img/toy_structure.svg";
+        return toySvgPath;
     }
 
     reset() {
         this.previousMemoryValues = [];
         this.pythonSimulation.destroy();
-        this.pythonSimulation = getToyPythonSimulation();
+        this.pythonSimulation = this.getToyPythonSimulation();
         super.reset();
     }
 
@@ -99,7 +114,7 @@ class ToySimulation extends Simulation {
         try {
             this.pythonSimulation.step();
         } catch (error) {
-            this.error = getLastPythonError();
+            this.error = this.getLastPythonError();
         }
     }
 
@@ -131,8 +146,7 @@ class ToySimulation extends Simulation {
         // No changes since the last parsing
         this.updateRegisters();
         this.updateMemoryTable();
-        this.removeEditorHighlights();
-        this.removeMemoryTableHighlights();
+        //this.removeEditorHighlights(); // TODO
         if (this.visualizationLoaded) {
             this.updateVisualization();
         }
@@ -147,7 +161,7 @@ class ToySimulation extends Simulation {
             switch (errorType) {
                 case "ParserException": {
                     const line = this.error.get(2);
-                    this.highlightEditorLine(line, errorMessage);
+                    // this.highlightEditorLine(line, errorMessage); // TODO Bring back line highlights
                     break;
                 }
                 case "InstructionExecutionException": {
@@ -178,7 +192,7 @@ class ToySimulation extends Simulation {
 
         // There are instructions
         if (!hasStarted) {
-            editor.setOption("readOnly", false);
+            setEditorReadOnly(false);
             this.setOutputFieldContent("Ready!");
             stepButton.disabled = false;
             doubleStepButton.disabled = false;
@@ -190,7 +204,7 @@ class ToySimulation extends Simulation {
 
         // The simulation has already started
         this.updatePerformanceMetrics();
-        editor.setOption("readOnly", true);
+        setEditorReadOnly(true);
 
         if (this.isRunning) {
             stepButton.disabled = true;
@@ -224,12 +238,6 @@ class ToySimulation extends Simulation {
         }
     }
 
-    removeMemoryTableHighlights() {
-        for (let cell of this.domNodes.memoryTableBody.querySelectorAll("td")) {
-            cell.classList.remove("highlight");
-        }
-    }
-
     /**
      * Executes a single cycle of the simulation.
      * Sets this.error accordingly.
@@ -241,7 +249,7 @@ class ToySimulation extends Simulation {
         try {
             this.pythonSimulation.single_step();
         } catch (error) {
-            this.error = getLastPythonError();
+            this.error = this.getLastPythonError();
         }
     }
 
@@ -290,8 +298,8 @@ class ToySimulation extends Simulation {
             cell1.innerText = address;
             cell2.innerText = value;
             cell3.innerText = instructionRepresentation;
-            if (this.previousMemoryValues[address] !== values[1]) {
-                this.previousMemoryValues[address] = values[1];
+            if (this.previousMemoryValues[address] !== values.get(1)) {
+                this.previousMemoryValues[address] = values.get(1);
                 cell2.classList.add("highlight");
             }
             if (cycle !== "") {
