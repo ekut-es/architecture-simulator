@@ -96,5 +96,4 @@ deploy:
     - chmod 700 ~/.ssh
     - echo "$DEPLOY_HOST_KEY" >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
-    - rsync -ah --no-o --no-g --delete webgui/ $TARGET
-    - rsync -ah --no-o --no-g --delete dist $TARGET
+    - rsync -ah --no-o --no-g --delete webgui/dist/ $TARGET
