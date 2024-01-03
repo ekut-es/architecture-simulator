@@ -58,7 +58,7 @@ build_webgui:
     - mkdir -p webgui/public
     - cp dist/*.whl webgui/public
     - npm install
-    - npm run build
+    - npm run build-dev-atreus
   artifacts:
     untracked: false
     when: on_success
