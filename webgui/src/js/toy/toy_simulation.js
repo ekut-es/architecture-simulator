@@ -8,6 +8,7 @@ import {
 import { Simulation } from "../simulation.js";
 import { setEditorReadOnly } from "../editor.js";
 import toySvgPath from "/src/img/toy_structure.svg";
+import { showLinterError, clearLinterError } from "../editor.js";
 
 export class ToySimulation extends Simulation {
     constructor(domNodes, getToyPythonSimulation, getLastPythonError) {
@@ -146,7 +147,7 @@ export class ToySimulation extends Simulation {
         // No changes since the last parsing
         this.updateRegisters();
         this.updateMemoryTable();
-        //this.removeEditorHighlights(); // TODO
+        clearLinterError();
         if (this.visualizationLoaded) {
             this.updateVisualization();
         }
@@ -161,7 +162,7 @@ export class ToySimulation extends Simulation {
             switch (errorType) {
                 case "ParserException": {
                     const line = this.error.get(2);
-                    // this.highlightEditorLine(line, errorMessage); // TODO Bring back line highlights
+                    showLinterError(line, errorMessage);
                     break;
                 }
                 case "InstructionExecutionException": {

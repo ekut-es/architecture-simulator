@@ -15,10 +15,14 @@
     "sass": "^1.69.5",
     "vite": "^5.0.8"
   },
+  "overrides": {
+    "@codemirror/state": "^6.3.3"
+  },
   "dependencies": {
     "@codemirror/commands": "^6.3.2",
     "@codemirror/language": "^6.9.3",
     "@codemirror/legacy-modes": "^6.3.3",
+    "@codemirror/lint": "^6.4.2",
     "@codemirror/state": "^6.3.3",
     "@codemirror/view": "^6.22.3",
     "@popperjs/core": "^2.11.8",

@@ -10,6 +10,7 @@ import { getRadioSettingsRow, getRepresentationsSettingsRow } from "../util";
 import { Simulation } from "../simulation";
 import { setEditorReadOnly } from "../editor";
 import riscvSvgPath from "/src/img/riscv_pipeline.svg";
+import { showLinterError, clearLinterError } from "../editor";
 
 export class RiscvSimulation extends Simulation {
     constructor(domNodes, getRiscvPythonSimulation, getLastPythonError) {
@@ -244,7 +245,7 @@ export class RiscvSimulation extends Simulation {
         this.updateRegisterTable();
         this.updateMemoryTable();
         this.updateInstructionTable();
-        // this.removeEditorHighlights(); // TODO
+        clearLinterError();
         if (this.visualizationLoaded) {
             this.updateVisualization();
         }
@@ -259,7 +260,7 @@ export class RiscvSimulation extends Simulation {
             switch (errorType) {
                 case "ParserException": {
                     const line = this.error.get(2);
-                    //this.highlightEditorLine(line, errorMessage); // TODO Bring back line highlights
+                    showLinterError(line, errorMessage);
                     break;
                 }
                 case "InstructionExecutionException": {

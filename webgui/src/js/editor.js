@@ -1,3 +1,4 @@
+import { linter, lintGutter } from "@codemirror/lint";
 import {
     EditorView,
     lineNumbers,
@@ -15,6 +16,7 @@ import { defaultKeymap } from "@codemirror/commands";
 
 let readOnly = new Compartment();
 let onViewChange = new Compartment();
+let linterCompartment = new Compartment();
 
 export const editorView = new EditorView({
     extensions: [
@@ -26,11 +28,48 @@ export const editorView = new EditorView({
         syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
         EditorView.editorAttributes.of({ class: "archsim-default-border" }),
         keymap.of(defaultKeymap), // new lines at end of doc don't work without this
+        lintGutter(),
+        linterCompartment.of([]),
     ],
 });
 
 document.getElementById("text-content-container").prepend(editorView.dom);
 editorView.dom.id = "codemirror-input";
+
+/**
+ * Replaces the existing linter in the linterCompartment with one that lints the specified line (lineNumber) and displays the provided errorMessage.
+ */
+export function showLinterError(lineNumber, errorMessage) {
+    editorView.dispatch({
+        effects: linterCompartment.reconfigure(
+            linter(
+                (view) => {
+                    const line = view.state.doc.line(lineNumber);
+                    return [
+                        {
+                            from: line.from,
+                            to: line.to,
+                            severity: "warning",
+                            message: errorMessage,
+                        },
+                    ];
+                },
+                { delay: 0 }
+            )
+        ),
+    });
+}
+
+/**
+ * Replaces the existing linter in the linterCompartment with one that essentially does nothing, thereby removing linting.
+ */
+export function clearLinterError() {
+    editorView.dispatch({
+        effects: linterCompartment.reconfigure(
+            linter((view) => [], { delay: 0 })
+        ),
+    });
+}
 
 export function setEditorReadOnly(setReadOnly) {
     editorView.dispatch({
