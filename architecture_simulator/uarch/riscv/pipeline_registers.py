@@ -89,3 +89,29 @@ class RegisterWritebackPipelineRegister(PipelineRegister):
     pc_plus_instruction_length: Optional[int] = None
     imm: Optional[int] = None
     abbreviation = "WB"
+
+
+@dataclass
+class SingleStagePipelineRegister(PipelineRegister):
+    # instruction
+    # address_of_instruction
+    control_unit_signals: ControlUnitSignals = field(
+        default_factory=ControlUnitSignals
+    )  # find out what they cover
+
+    instruction_length: Optional[int] = None
+    pc_plus_instruction_length: Optional[int] = None
+    pc_plus_imm: Optional[int] = None
+
+    register_read_addr_1: Optional[int] = None
+    register_read_addr_2: Optional[int] = None
+    register_write_register: Optional[int] = None
+    register_write_data: Optional[int] = None
+
+    imm: Optional[int] = None
+    alu_result: Optional[int] = None
+    comparison: Optional[bool] = None
+
+    memory_address: Optional[int] = None
+    memory_write_data: Optional[int] = None
+    memory_read_data: Optional[int] = None

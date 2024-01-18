@@ -148,6 +148,7 @@ class RiscvSimulation(Simulation):
             list[tuple[str, str, Any]]: each tuple is [svg-id, what update function to use, argument for update function (Any)].
             They can be one of ("<id>","highlight", <#hexcolor>), ("<id>", "write-center", <content>), ("<id>", "write-left", <content>), ("<id>", "write-right", <content>)
         """
+        assert self.mode == "five_stage_pipeline"
         return (
             self._get_riscv_five_stage_IF_svg_update_values()
             + self._get_riscv_five_stage_ID_svg_update_values()
@@ -511,3 +512,13 @@ class RiscvSimulation(Simulation):
         )
 
         return result.export()
+
+    def get_riscv_single_stage_svg_update_values(self) -> list[tuple[str, str, Any]]:
+        """Returns all information needed to update the svg.
+
+        Returns:
+            list[tuple[str, str, Any]]: each tuple is [svg-id, what update function to use, argument for update function (Any)].
+            They can be one of ("<id>","highlight", <#hexcolor>), ("<id>", "write", <content>)
+        """
+        assert self.mode == "single_stage_pipeline"
+        self.state.pipeline.pipeline_registers[0]
