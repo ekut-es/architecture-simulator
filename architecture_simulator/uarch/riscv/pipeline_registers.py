@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
 from dataclasses import dataclass, field
 
-from .control_unit_signals import ControlUnitSignals
+from .control_unit_signals import ControlUnitSignals, SingleStageControlUnitSignals
 from architecture_simulator.isa.riscv.instruction_types import EmptyInstruction
 
 if TYPE_CHECKING:
@@ -95,9 +95,9 @@ class RegisterWritebackPipelineRegister(PipelineRegister):
 class SingleStagePipelineRegister(PipelineRegister):
     # instruction
     # address_of_instruction
-    control_unit_signals: ControlUnitSignals = field(
-        default_factory=ControlUnitSignals
-    )  # find out what they cover
+    control_unit_signals: SingleStageControlUnitSignals = field(
+        default_factory=SingleStageControlUnitSignals
+    )
 
     instruction_length: Optional[int] = None
     pc_plus_instruction_length: Optional[int] = None
@@ -107,10 +107,12 @@ class SingleStagePipelineRegister(PipelineRegister):
     register_read_addr_2: Optional[int] = None
     register_write_register: Optional[int] = None
     register_write_data: Optional[int] = None
+    register_read_data_1: Optional[int] = None
+    register_read_data_2: Optional[int] = None
 
     imm: Optional[int] = None
     alu_result: Optional[int] = None
-    comparison: Optional[bool] = None
+    alu_comparison: bool = False
 
     memory_address: Optional[int] = None
     memory_write_data: Optional[int] = None
