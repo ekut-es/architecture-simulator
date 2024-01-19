@@ -21,3 +21,19 @@ class ControlUnitSignals:
     jump: Optional[bool] = None
     alu_op: Optional[int] = None
     alu_to_pc: Optional[bool] = None
+
+
+@dataclass
+class SingleStageControlUnitSignals:
+    alu_src_1: bool = (
+        False  # False if read data 1 -> needs inversion for path highlighting
+    )
+    alu_src_2: bool = (
+        False  # False if read data 2 -> no inversion for path highlighting
+    )
+    alu_control: bool = False  # False if alu is not used
+
+    wb_src: bool = False  # False if no data written to register file
+
+    branch: bool = False  # False if no branch instruction is selected
+    pc_from_alu_res: bool = False  # True if the alu result is used as new pc -> needs inversion for highlighting of control unit path
