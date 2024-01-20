@@ -9,6 +9,7 @@ from .pipeline_registers import (
     ExecutePipelineRegister,
     MemoryAccessPipelineRegister,
     RegisterWritebackPipelineRegister,
+    SingleStagePipelineRegister,
 )
 
 from architecture_simulator.isa.riscv.instruction_types import (
@@ -399,20 +400,44 @@ class SingleStage(Stage):
             PipelineRegister: returns an PipelineRegister with default values
         """
         if state.instruction_at_pc():
-            pc_before_increment = state.program_counter
-            instr = state.instruction_memory.read_instruction(state.program_counter)
-
             state.performance_metrics.instruction_count += 1
+
+            result_pr = SingleStagePipelineRegister()
+            result_pr.instruction = state.instruction_memory.read_instruction(
+                state.program_counter
+            )
+            result_pr.address_of_instruction = state.program_counter
+
+            five_stage_control_unit_signals = (
+                result_pr.instruction.control_unit_signals()
+            )
+            result_pr.control_unit_signals.alu_src_1 = (
+                not five_stage_control_unit_signals.alu_src_1
+            )
+            result_pr.control_unit_signals.alu_src_2 = bool(
+                five_stage_control_unit_signals.alu_src_2
+            )
+            result_pr.control_unit_signals.alu_control = (
+                five_stage_control_unit_signals.alu_op is not None
+            )
+            result_pr.control_unit_signals.wb_src = (
+                five_stage_control_unit_signals.wb_src is not None
+            )
+            result_pr.control_unit_signals.branch = bool(
+                five_stage_control_unit_signals.branch
+            )
+            result_pr.control_unit_signals.pc_from_alu_res = (
+                result_pr.instruction.mnemonic == "jalr"
+            )
+
             try:
-                instr.behavior(state)
-                state.program_counter += instr.length
-                return PipelineRegister(
-                    address_of_instruction=pc_before_increment,
-                )
+                result_pr.instruction.behavior(state)
+                state.program_counter += result_pr.instruction.length
+                return result_pr
             except Exception as e:
                 raise InstructionExecutionException(
-                    address=pc_before_increment,
-                    instruction_repr=instr.__repr__(),
+                    address=result_pr.address_of_instruction,
+                    instruction_repr=result_pr.instruction.__repr__(),
                     error_message=e.__repr__(),
                 )
         return PipelineRegister()
