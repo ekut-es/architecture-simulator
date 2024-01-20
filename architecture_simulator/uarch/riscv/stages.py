@@ -396,9 +396,9 @@ class RegisterWritebackStage(Stage):
 # Single stage Pipeline:
 #
 class SingleStage(Stage):
-    TYPE_MEMORY_INSTRUCTION = {type(x) for x in [SB, SH, SW, LB, LBU, LH, LHU, LW]}
-    TYPE_STORE_INSTRUCTION = {type(x) for x in [SB, SH, SW]}
-    TYPE_LOAD_INSTRUCTION = {type(x) for x in [LB, LBU, LH, LHU, LW]}
+    TYPE_MEMORY_INSTRUCTION = {SB, SH, SW, LB, LBU, LH, LHU, LW}
+    TYPE_STORE_INSTRUCTION = {SB, SH, SW}
+    TYPE_LOAD_INSTRUCTION = {LB, LBU, LH, LHU, LW}
 
     def behavior(
         self,
