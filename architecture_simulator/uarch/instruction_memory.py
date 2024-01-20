@@ -26,6 +26,10 @@ class InstructionMemory(Generic[T]):
         )
     )
 
+    def reset(self):
+        """Clears the instruction memory."""
+        self.instructions = {}
+
     def get_representation(self) -> list[tuple[int, str]]:
         """Returns a list of string representations for all instructions and their address. Sorted by address.
 

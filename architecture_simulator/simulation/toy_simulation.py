@@ -36,6 +36,7 @@ class ToySimulation(Simulation):
         self,
         unified_memory_size: Optional[int] = None,
     ):
+        self.unified_memory_size = unified_memory_size
         self.state = ToyArchitecturalState(unified_memory_size)
         self.next_cycle = 1
         super().__init__()
@@ -116,7 +117,7 @@ class ToySimulation(Simulation):
         self.state.performance_metrics.stop_timer()
 
     def load_program(self, program: str):
-        self.state = ToyArchitecturalState()
+        self.state = ToyArchitecturalState(unified_memory_size=self.unified_memory_size)
         parser = ToyParser()
         parser.parse(program=program, state=self.state)
 
@@ -155,16 +156,16 @@ class ToySimulation(Simulation):
 
     def get_memory_table_entries(
         self,
-    ) -> list[tuple[int, tuple[str, str, str, str], str, str]]:
+    ) -> list[tuple[tuple[int, str], tuple[str, str, str, str], str, str]]:
         """Returns the values to display in the memory table.
 
         Returns:
-            list[tuple[int, tuple[str, str, str, str], str, str]]: Sorted list of (address, representatinos, instruction_representation, current_cycle).
+            list[tuple[tuple[int, str], tuple[str, str, str, str], str, str]]: Sorted list of ((int address, hex address), representations, instruction_representation, current_cycle).
                 instruction_representation will be "-" if the address doesn't count as storing an instruction.
                 current_cycle will be "1", "2" or "".
         """
         entries = self.state.memory.half_wordwise_repr()
-        result: list[tuple[int, tuple[str, str, str, str], str, str]] = []
+        result = []
         current_cycle = "1" if self.next_cycle == 2 else "2"
         # iterate over all entries in the memory
         for address, values in sorted(entries.items()):
@@ -177,9 +178,11 @@ class ToySimulation(Simulation):
                 self.state.address_of_current_instruction is not None
                 and address == self.state.address_of_current_instruction
             )
+            # make a int and hex address
+            addresses = (address, "0x{:03X}".format(address))
             result.append(
                 (
-                    address,
+                    addresses,
                     values,
                     instruction_representation,
                     current_cycle if is_current_instruction else "",

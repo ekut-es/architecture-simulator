@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./webgui/src/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}

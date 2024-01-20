@@ -547,6 +547,7 @@ class TestRiscvPipeline(unittest.TestCase):
         lb x10, 4(x0)
         lb x9, 47(x4)"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
+        simulation.load_program(program)
 
         simulation.state.memory = Memory(AddressingType.BYTE, 32, True)
         simulation.state.memory.memory_file = dict(
@@ -564,7 +565,6 @@ class TestRiscvPipeline(unittest.TestCase):
         simulation.state.register_file.registers[2] = fixedint.MutableUInt32(20)
         simulation.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
         simulation.state.register_file.registers[4] = fixedint.MutableUInt32(2000)
-        simulation.load_program(program)
         for _ in range(10):
             simulation.step()
         self.assertEqual(
@@ -591,6 +591,7 @@ class TestRiscvPipeline(unittest.TestCase):
         lh x10, 12(x0)
         """
         simulation = RiscvSimulation(mode="five_stage_pipeline")
+        simulation.load_program(program)
 
         simulation.state.memory = Memory(AddressingType.BYTE, 32, True)
         simulation.state.memory.memory_file = dict(
@@ -609,7 +610,7 @@ class TestRiscvPipeline(unittest.TestCase):
         simulation.state.register_file.registers[2] = fixedint.MutableUInt32(20)
         simulation.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
         simulation.state.register_file.registers[4] = fixedint.MutableUInt32(2000)
-        simulation.load_program(program)
+
         for _ in range(10):
             simulation.step()
         self.assertEqual(
@@ -636,6 +637,7 @@ class TestRiscvPipeline(unittest.TestCase):
         lw x8, 0(x3)
         lw x9, 48(x4)"""
         simulation = RiscvSimulation(mode="five_stage_pipeline")
+        simulation.load_program(program)
 
         simulation.state.memory = Memory(AddressingType.BYTE, 32, True)
         simulation.state.memory.memory_file = dict(
@@ -652,7 +654,7 @@ class TestRiscvPipeline(unittest.TestCase):
         simulation.state.register_file.registers[2] = fixedint.MutableUInt32(20)
         simulation.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
         simulation.state.register_file.registers[4] = fixedint.MutableUInt32(2000)
-        simulation.load_program(program)
+
         for _ in range(10):
             simulation.step()
         self.assertEqual(
@@ -678,6 +680,7 @@ class TestRiscvPipeline(unittest.TestCase):
         lbu x10, 4(x0)
         """
         simulation = RiscvSimulation(mode="five_stage_pipeline")
+        simulation.load_program(program)
 
         simulation.state.memory = Memory(AddressingType.BYTE, 32)
         simulation.state.memory.memory_file = dict(
@@ -695,7 +698,7 @@ class TestRiscvPipeline(unittest.TestCase):
         simulation.state.register_file.registers[2] = fixedint.MutableUInt32(20)
         simulation.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
         simulation.state.register_file.registers[4] = fixedint.MutableUInt32(2000)
-        simulation.load_program(program)
+
         for _ in range(10):
             simulation.step()
         self.assertEqual(
@@ -724,6 +727,7 @@ class TestRiscvPipeline(unittest.TestCase):
         lhu x10, 4(x0)
         """
         simulation = RiscvSimulation(mode="five_stage_pipeline")
+        simulation.load_program(program)
 
         simulation.state.memory = Memory(AddressingType.BYTE, 32, True)
         simulation.state.memory.memory_file = dict(
@@ -742,7 +746,7 @@ class TestRiscvPipeline(unittest.TestCase):
         simulation.state.register_file.registers[2] = fixedint.MutableUInt32(20)
         simulation.state.register_file.registers[3] = fixedint.MutableUInt32(-1)
         simulation.state.register_file.registers[4] = fixedint.MutableUInt32(2000)
-        simulation.load_program(program)
+
         for _ in range(10):
             simulation.step()
         self.assertEqual(
