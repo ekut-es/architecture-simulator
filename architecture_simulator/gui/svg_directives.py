@@ -38,3 +38,21 @@ class SvgFillDirective(SvgDirective):
             "highlight",
             self._color_on if self.do_highlight else self._color_off,
         )
+
+
+class SvgWriteDirective(SvgDirective):
+    """SVG Directive for changing text."""
+
+    def __init__(self):
+        self.text = ""
+
+    def export(self, id: str) -> tuple[str, str, str]:
+        """Creates a tuple of the directive that the front end can understand.
+
+        Args:
+            id (str): The id to target.
+
+        Returns:
+            tuple[str, str, str]: Tuple of (<id>, write, <value>)
+        """
+        return (id, "write", self.text)
