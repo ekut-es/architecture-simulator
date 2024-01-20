@@ -481,18 +481,26 @@ class SingleStage(Stage):
                 if type(result_pr.instruction) in SingleStage.TYPE_MEMORY_INSTRUCTION
                 else None
             )
-            result_pr.memory_write_data = (
-                result_pr.register_read_data_2
-                if type(result_pr.instruction) in SingleStage.TYPE_STORE_INSTRUCTION
-                else None
-            )
-            result_pr.memory_read_data = (
-                result_pr.instruction.memory_access(
-                    result_pr.memory_address, None, state
+
+            try:
+                result_pr.memory_write_data = (
+                    result_pr.register_read_data_2
+                    if type(result_pr.instruction) in SingleStage.TYPE_STORE_INSTRUCTION
+                    else None
                 )
-                if type(result_pr.instruction) in SingleStage.TYPE_LOAD_INSTRUCTION
-                else None
-            )
+                result_pr.memory_read_data = (
+                    result_pr.instruction.memory_access(
+                        result_pr.memory_address, None, state
+                    )
+                    if type(result_pr.instruction) in SingleStage.TYPE_LOAD_INSTRUCTION
+                    else None
+                )
+            except Exception as e:
+                raise InstructionExecutionException(
+                    address=result_pr.address_of_instruction,
+                    instruction_repr=result_pr.instruction.__repr__(),
+                    error_message=e.__repr__(),
+                )
 
             result_pr.register_write_data = defaultdict(
                 lambda: None,
