@@ -32,7 +32,7 @@ onMounted(() => {
         } else {
             split.destroySplit();
         }
-    });
+    }, { immediate: true });
 });
 
 onUnmounted(() => {

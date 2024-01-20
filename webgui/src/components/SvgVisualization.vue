@@ -16,8 +16,7 @@ let svg;
 
 function svgLoaded(event) {
     svg = event.target.contentDocument;
-    updateVisualization(simulationStore.svgDirectives);
-    watch(() => simulationStore.svgDirectives, (updateValues) => { updateVisualization(updateValues); });
+    watch(() => simulationStore.svgDirectives, (updateValues) => { updateVisualization(updateValues); }, { immediate: true });
 }
 
 function updateVisualization(updateValues) {
