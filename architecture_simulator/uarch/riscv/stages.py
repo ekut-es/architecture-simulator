@@ -16,13 +16,25 @@ from architecture_simulator.isa.riscv.instruction_types import (
     BTypeInstruction,
     EmptyInstruction,
 )
-from architecture_simulator.isa.riscv.rv32i_instructions import JAL
+from architecture_simulator.isa.riscv.rv32i_instructions import (
+    JAL,
+    SB,
+    SH,
+    SW,
+    LB,
+    LBU,
+    LH,
+    LHU,
+    LW,
+)
 from .pipeline import InstructionExecutionException
 
 if TYPE_CHECKING:
     from architecture_simulator.uarch.riscv.riscv_architectural_state import (
         RiscvArchitecturalState,
     )
+
+from collections import defaultdict
 
 
 class Stage:
@@ -384,6 +396,10 @@ class RegisterWritebackStage(Stage):
 # Single stage Pipeline:
 #
 class SingleStage(Stage):
+    TYPE_MEMORY_INSTRUCTION = {type(x) for x in [SB, SH, SW, LB, LBU, LH, LHU, LW]}
+    TYPE_STORE_INSTRUCTION = {type(x) for x in [SB, SH, SW]}
+    TYPE_LOAD_INSTRUCTION = {type(x) for x in [LB, LBU, LH, LHU, LW]}
+
     def behavior(
         self,
         pipeline_registers: list[PipelineRegister],
@@ -429,6 +445,64 @@ class SingleStage(Stage):
             result_pr.control_unit_signals.pc_from_alu_res = (
                 result_pr.instruction.mnemonic == "jalr"
             )
+
+            (
+                result_pr.register_read_addr_1,
+                result_pr.register_read_addr_2,
+                result_pr.register_read_data_1,
+                result_pr.register_read_data_2,
+                result_pr.imm,
+            ) = result_pr.instruction.access_register_file(state)
+            result_pr.register_write_register = (
+                result_pr.instruction.get_write_register()
+            )
+
+            result_pr.instruction_length = result_pr.instruction.length
+            result_pr.pc_plus_instruction_length = (
+                state.program_counter + result_pr.instruction_length
+            )
+            if result_pr.imm is not None and result_pr.control_unit_signals.branch:
+                result_pr.pc_plus_imm = state.program_counter + result_pr.imm
+
+            a_comparison, a_result = result_pr.instruction.alu_compute(
+                state.program_counter
+                if result_pr.control_unit_signals.alu_src_1
+                else result_pr.register_read_data_1,
+                result_pr.imm
+                if result_pr.control_unit_signals.alu_src_2
+                else result_pr.register_read_data_2,
+            )
+
+            result_pr.alu_comparison = bool(a_comparison)
+            result_pr.alu_result = a_result
+
+            result_pr.memory_address = (
+                result_pr.alu_result
+                if type(result_pr.instruction) in SingleStage.TYPE_MEMORY_INSTRUCTION
+                else None
+            )
+            result_pr.memory_write_data = (
+                result_pr.register_read_data_2
+                if type(result_pr.instruction) in SingleStage.TYPE_STORE_INSTRUCTION
+                else None
+            )
+            result_pr.memory_read_data = (
+                result_pr.instruction.memory_access(
+                    result_pr.memory_address, None, state
+                )
+                if type(result_pr.instruction) in SingleStage.TYPE_LOAD_INSTRUCTION
+                else None
+            )
+
+            result_pr.register_write_data = defaultdict(
+                lambda: None,
+                {
+                    0: result_pr.pc_plus_instruction_length,
+                    1: result_pr.memory_read_data,
+                    2: result_pr.alu_result,
+                    3: result_pr.imm,
+                },
+            )[five_stage_control_unit_signals.wb_src]
 
             try:
                 result_pr.instruction.behavior(state)
