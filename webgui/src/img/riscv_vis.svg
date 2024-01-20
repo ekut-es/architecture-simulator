@@ -25,7 +25,7 @@
      inkscape:document-units="mm"
      showgrid="true"
      inkscape:zoom="0.22627417"
-     inkscape:cx="2828.4271"
+     inkscape:cx="2830.6368"
      inkscape:cy="1818.5903"
      inkscape:window-width="2560"
      inkscape:window-height="1377"
@@ -1607,7 +1607,7 @@
        d="m 1630,784.99998 h 20 V 1010 L 593.87591,1009.964 V 822.07059 H 635"
        id="path53"
        sodipodi:nodetypes="cccccc"
-       inkscape:label="4mux-to-write-data-path" /><path
+       inkscape:label="four-mux-to-write-data-path" /><path
        style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:4.99999;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker61)"
        d="m 332,394.99999 h -56.29111 v 40"
        id="path60"
@@ -1642,12 +1642,12 @@
        d="M 110,214.99999 H 65 v 544.99994 l 24.999999,5e-5"
        id="path62"
        sodipodi:nodetypes="cccc"
-       inkscape:label="2mux-to-pc-path" /><path
+       inkscape:label="two-mux-to-pc-path" /><path
        style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:4.99999;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker65)"
        d="M 220.77399,184.99849 175,184.98299"
        id="path64"
        sodipodi:nodetypes="cc"
-       inkscape:label="2mux-2mux-path" /><path
+       inkscape:label="two-mux-2mux-path" /><path
        style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:4.99999;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker67)"
        d="M 689.99999,484.99998 H 130 V 274.99999"
        id="path66"

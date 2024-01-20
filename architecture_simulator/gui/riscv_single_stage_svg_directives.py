@@ -97,12 +97,12 @@ class RiscvSingleStageSvgDirectives:
         self.add_instr_len_to_4mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
         self.add_instr_len_out_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
 
-        # self.2mux_to_2mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue -> rename svg
-        # self.2mux_to_pc_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue() -> rename svg
+        self.two_mux_2mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.two_mux_to_pc_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
 
         self.instr_len_to_add_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
 
-        # self.4mux_to_write_data_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue -> rename svg
+        self.four_mux_to_write_data_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
 
         self.data_mem_read_data_to_4mux_path: SvgFillDirectiveBlue = (
             SvgFillDirectiveBlue()
