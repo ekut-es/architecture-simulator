@@ -7,6 +7,7 @@ class RiscvSingleStageSvgDirectives:
 
     def __init__(self) -> None:
         # Text Fields
+
         self.add_imm_text: SvgWriteDirective = SvgWriteDirective()
         self.add_instr_len_text: SvgWriteDirective = SvgWriteDirective()
         self.instr_len_text: SvgWriteDirective = SvgWriteDirective()
@@ -30,6 +31,26 @@ class RiscvSingleStageSvgDirectives:
         self.data_memory_address_text: SvgWriteDirective = SvgWriteDirective()
         self.data_memory_read_data_text: SvgWriteDirective = SvgWriteDirective()
         self.data_memory_write_data_value_text: SvgWriteDirective = SvgWriteDirective()
+
+        # Paths
+
+        # Control Unit paths
+
+        # Binary signals
+        self.control_unit_2mux_pc_path: SvgFillDirectiveGreen = SvgFillDirectiveGreen()
+        self.control_unit_to_and_path: SvgFillDirectiveGreen = SvgFillDirectiveGreen()
+        self.alu_control_to_read_data_2mux_path: SvgFillDirectiveGreen = (
+            SvgFillDirectiveGreen()
+        )
+        self.alu_control_to_read_data_1_mux_path: SvgFillDirectiveGreen = (
+            SvgFillDirectiveGreen()
+        )
+
+        # Non Binary signals
+        self.control_unit_to_4mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.alu_control_to_alu_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+
+        # Other paths
 
     def export(self) -> list[tuple[str, str, Any]]:
         """Exports all SvgDirectives into a format that the front end understands.
