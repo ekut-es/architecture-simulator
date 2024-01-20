@@ -59,4 +59,4 @@ class Simulation(ABC):
         Returns:
             str: The string representation of the performance metrics.
         """
-        return str(self.get_performance_metrics)
+        return str(self.get_performance_metrics())

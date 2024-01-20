@@ -69,6 +69,10 @@ class Memory(Generic[T]):
         )
         self.memory_file: dict[int, T] = dict()
 
+    def reset(self):
+        """Clears the memory."""
+        self.memory_file = {}
+
     def assert_address_in_range(self, address: int):
         """
         Asserts that the given address is within the valid memory address range. Raises MemoryAddressError if the address is outside the allowed range.

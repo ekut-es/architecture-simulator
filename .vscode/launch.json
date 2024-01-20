@@ -2,26 +2,28 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "firefox",
+            "type": "chrome",
+            "name": "Launch Chrome Debugger",
             "request": "launch",
-            "reAttach": true,
-            "name": "Launch Vite Firefox Debugger",
             "url": "http://localhost:5173/index.html",
             "webRoot": "${workspaceFolder}/webgui"
         },
         {
-            "name": "Python: Current File",
+            "type": "firefox",
+            "name": "Launch Firefox Debugger (not recommended, use chrome instead)",
+            "request": "launch",
+            "reAttach": true,
+            "url": "http://localhost:5173/index.html",
+            "webRoot": "${workspaceFolder}/webgui",
+
+        },
+        {
             "type": "python",
+            "name": "Python: Current File",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true
-        },
-        {
-            "type": "chrome",
-            "name": "Launch Chrome Debugger",
-            "request": "launch",
-            "url": "http://127.0.0.1:5173/webgui/index.html"
         }
     ]
 }

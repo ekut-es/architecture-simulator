@@ -81,10 +81,13 @@ class RiscvSimulation(Simulation):
 
     def load_program(self, program: str):
         """Loads a text form program into the simulation.
+        Resets the state before loading the new program.
 
         Args:
             program (str): A program which complies with (a subset of) the RISC-V syntax.
         """
+        self.state.memory.reset()
+        self.state.instruction_memory.reset()
         parser = RiscvParser()
         parser.parse(program=program, state=self.state)
 
@@ -97,8 +100,16 @@ class RiscvSimulation(Simulation):
     def get_performance_metrics(self) -> RiscvPerformanceMetrics:
         return self.state.performance_metrics
 
-    def get_instruction_memory_repr(self) -> list[tuple[str, str, str]]:
-        """Returns a list of the address (in hex), instruction and stage of the instruction for all instructions in the instruction memory.
+    def get_register_entries(self) -> list[tuple[str, str, str, str]]:
+        """Returns the contents of the register file as bin, udec, hex, sdec values.
+
+        Returns:
+            list[tuple[str, str, str, str]]: Register values as tuples of (bin, udec, hex, sdec)
+        """
+        return self.state.register_file.reg_repr()
+
+    def get_instruction_memory_entries(self) -> list[tuple[str, str, str]]:
+        """Returns a list of the address (in hex), instruction and pipeline stage of the instruction for all instructions in the instruction memory.
 
         Returns:
             list[tuple[str, str, str]]: List of (address, instruction, stage).
@@ -112,7 +123,7 @@ class RiscvSimulation(Simulation):
 
         return [
             (
-                "0x" + "{:x}".format(address),
+                "0x" + "{:03X}".format(address),
                 instruction,
                 pipeline_stages_addresses[address]
                 if address in pipeline_stages_addresses
@@ -121,11 +132,13 @@ class RiscvSimulation(Simulation):
             for address, instruction in self.state.instruction_memory.get_representation()
         ]
 
-    def get_data_memory_repr(self) -> list[tuple[str, tuple[str, str, str, str]]]:
+    def get_data_memory_entries(
+        self,
+    ) -> list[tuple[tuple[int, str], tuple[str, str, str, str]]]:
         memory_repr = self.state.memory.wordwise_repr()
         result = []
         for key, values in sorted(memory_repr.items()):
-            result.append(("0x" + "{:X}".format(key), values))
+            result.append(((key, "0x" + "{:08X}".format(key)), values))
         return result
 
     def get_riscv_five_stage_svg_update_values(self) -> list[tuple[str, str, Any]]:

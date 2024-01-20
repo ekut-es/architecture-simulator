@@ -34,18 +34,13 @@ class RegisterFile:
         default_factory=lambda: Registers([fixedint.MutableUInt32(0)] * 32)
     )
 
-    def reg_repr(self) -> dict[int, tuple[str, str, str, str]]:
-        """Returns the contents of the register file as binary, unsigned decimal, hexadecimal, signed decimal values.
+    def reg_repr(self) -> list[tuple[str, str, str, str]]:
+        """Returns the contents of the register file as bin, udec, hex, sdec values.
 
         Returns:
-            dict[int, tuple[str, str, str, str]]: keys: register indices. Values: Register values as tuple of (binary, unsigned decimal, hexadecimal, signed decimal)
+            list[tuple[str, str, str, str]]: Register values as tuples of (bin, udec, hex, sdec)
         """
-        reg_repr: dict[int, tuple[str, str, str, str]] = dict()
-        index = 0
-        for reg in self.registers:
-            reg_repr[index] = get_32_bit_representations(int(reg))
-            index += 1
-        return reg_repr
+        return [get_32_bit_representations(int(reg)) for reg in self.registers]
 
     def get_abi_names(self, register: int) -> str:
         """Get the ABI name for the given register index.
