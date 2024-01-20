@@ -5,8 +5,31 @@ from .svg_directives import SvgDirective, SvgFillDirective, SvgWriteDirective
 class RiscvSingleStageSvgDirectives:
     """A Class that holds all the SvgDirectives for the RiscvSingleStage SVG."""
 
-    def __init__(self):
-        pass
+    def __init__(self) -> None:
+        # Text Fields
+        self.add_imm_text: SvgWriteDirective = SvgWriteDirective()
+        self.add_instr_len_text: SvgWriteDirective = SvgWriteDirective()
+        self.instr_len_text: SvgWriteDirective = SvgWriteDirective()
+
+        self.pc_text: SvgWriteDirective = SvgWriteDirective()
+
+        self.instr_mem_instr_text: SvgWriteDirective = SvgWriteDirective()
+        self.instr_mem_read_addr_text: SvgWriteDirective = SvgWriteDirective()
+
+        self.reg_file_read_addr1_text: SvgWriteDirective = SvgWriteDirective()
+        self.reg_file_read_addr2_text: SvgWriteDirective = SvgWriteDirective()
+        self.reg_file_read_data_1_text: SvgWriteDirective = SvgWriteDirective()
+        self.reg_file_read_data_2_text: SvgWriteDirective = SvgWriteDirective()
+        self.reg_file_write_reg_text: SvgWriteDirective = SvgWriteDirective()
+        self.reg_file_write_data_text: SvgWriteDirective = SvgWriteDirective()
+
+        self.imm_gen_value_text: SvgWriteDirective = SvgWriteDirective()
+
+        self.alu_result_text: SvgWriteDirective = SvgWriteDirective()
+
+        self.data_memory_address_text: SvgWriteDirective = SvgWriteDirective()
+        self.data_memory_read_data_text: SvgWriteDirective = SvgWriteDirective()
+        self.data_memory_write_data_value_text: SvgWriteDirective = SvgWriteDirective()
 
     def export(self) -> list[tuple[str, str, Any]]:
         """Exports all SvgDirectives into a format that the front end understands.
