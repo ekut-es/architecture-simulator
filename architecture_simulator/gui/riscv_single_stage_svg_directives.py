@@ -51,6 +51,62 @@ class RiscvSingleStageSvgDirectives:
         self.alu_control_to_alu_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
 
         # Other paths
+        self.pc_to_add_instr_len_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.pc_to_add_imm_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.pc_to_2mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.pc_to_instr_mem_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.pc_out_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+
+        self.instr_mem_to_read_addr1_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.instr_mem_read_addr2_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.instr_mem_to_write_reg_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.instr_mem_to_imm_gen_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.instr_mem_to_control_unit_path: SvgFillDirectiveBlue = (
+            SvgFillDirectiveBlue()
+        )
+
+        self.imm_gen_out_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.imm_gen_to_add_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.imm_gen_to_4mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.imm_gen_to_2mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+
+        self.read_data2_to_mem_write_data_path: SvgFillDirectiveBlue = (
+            SvgFillDirectiveBlue()
+        )
+        self.read_data_1_mux_to_alu_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.read_data_1_to_2mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.read_data_2_2mux_to_alu_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.read_data_2_to_2mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+
+        self.alu_out_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.alu_out_to_4mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.alu_out_to_2mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.alu_comparison_to_and_path: SvgFillDirectiveGreen = (
+            SvgFillDirectiveGreen()
+        )  # Green since it is a binary value
+        self.alu_to_data_memory_address_path: SvgFillDirectiveBlue = (
+            SvgFillDirectiveBlue()
+        )
+
+        self.and_to_mux_path: SvgFillDirectiveBlue = (
+            SvgFillDirectiveBlue()
+        )  # Green since it is a binary value
+
+        self.add_imm_to_mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.add_instr_len_to_2mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.add_instr_len_to_4mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.add_instr_len_out_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+
+        # self.2mux_to_2mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue -> rename svg
+        # self.2mux_to_pc_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue() -> rename svg
+
+        self.instr_len_to_add_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+
+        # self.4mux_to_write_data_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue -> rename svg
+
+        self.data_mem_read_data_to_4mux_path: SvgFillDirectiveBlue = (
+            SvgFillDirectiveBlue()
+        )
 
     def export(self) -> list[tuple[str, str, Any]]:
         """Exports all SvgDirectives into a format that the front end understands.
