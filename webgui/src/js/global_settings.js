@@ -17,4 +17,5 @@ export let globalSettings = reactive({
                 throw Error(`ISA ${name} does not exist`);
         }
     },
+    loadingStatus: "",
 });

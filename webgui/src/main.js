@@ -5,6 +5,7 @@ import "./css/splitjs.css";
 import { createApp } from "vue";
 
 import App from "./App.vue";
+import LoadingScreen from "@/components/LoadingScreen.vue";
 
 import * as bootstrap from "bootstrap";
 import { loadPyodide } from "pyodide";
@@ -51,13 +52,24 @@ function getDefaultIsa() {
 }
 
 async function main() {
-    const pyodide = await initializePyodide();
-    setToyPyodide(pyodide);
-    setRiscvPyodide(pyodide);
-    // set the initial ISA here
-    globalSettings.setSelectedIsa(getDefaultIsa());
-    let app = createApp(App);
-    app.mount("#app");
+    let loadingScreen = createApp(LoadingScreen);
+    loadingScreen.mount("#app");
+    globalSettings.loadingStatus = "Loading pyodide...";
+    try {
+        const pyodide = await initializePyodide();
+        globalSettings.loadingStatus = "Initializing...";
+        setToyPyodide(pyodide);
+        setRiscvPyodide(pyodide);
+        // set the initial ISA here
+        globalSettings.setSelectedIsa(getDefaultIsa());
+        globalSettings.loadingStatus = "Mounting the app...";
+        let app = createApp(App);
+        loadingScreen.unmount();
+        app.mount("#app");
+    } catch (error) {
+        globalSettings.loadingStatus = `An error occured during the following step: ${globalSettings.loadingStatus}`;
+        throw error;
+    }
 }
 
 main();
