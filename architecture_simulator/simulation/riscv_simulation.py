@@ -636,7 +636,7 @@ class RiscvSimulation(Simulation):
             result.reg_file_read_data_2_text.text
         )
 
-        result.alu_out_path = bool(result.alu_result_text.text)
+        result.alu_out_path.do_highlight = bool(result.alu_result_text.text)
         result.alu_to_data_memory_address_path.do_highlight = bool(
             result.data_memory_address_text.text
         )
