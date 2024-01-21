@@ -626,7 +626,7 @@ class RiscvSimulation(Simulation):
             result.data_memory_write_data_value_text.text
         )
         result.read_data_1_mux_to_alu_path.do_highlight = (
-            bool(result.reg_file_read_data_1_text)
+            bool(result.reg_file_read_data_1_text.text)
             or result.pc_to_2mux_path.do_highlight
         )
         result.read_data_2_2mux_to_alu_path.do_highlight = (
