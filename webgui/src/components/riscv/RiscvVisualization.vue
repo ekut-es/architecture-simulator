@@ -47,7 +47,21 @@ function updateVisualization(updateValues) {
             case "write-right":
                 set_svg_text_complex_right_align(id, value);
                 break;
+            case "highlight-plain":
+                break;
+            case "write":
+                set_svg_text_plain(id, value);
+                break;
         }
+    }
+}
+
+function set_svg_text_plain(id, str){
+    console.log("Test")
+    try {
+    svg.value.getElementById(id).textContent = str;
+    } catch {
+        console.log("Fail")
     }
 }
 
