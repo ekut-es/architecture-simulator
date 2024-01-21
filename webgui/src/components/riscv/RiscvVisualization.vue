@@ -57,7 +57,6 @@ function updateVisualization(updateValues) {
 }
 
 function set_svg_text_plain(id, str){
-    console.log("Test")
     try {
     svg.value.getElementById(id).textContent = str;
     } catch {
