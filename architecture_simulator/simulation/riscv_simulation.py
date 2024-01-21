@@ -629,6 +629,9 @@ class RiscvSimulation(Simulation):
             bool(result.reg_file_read_data_1_text.text)
             or result.pc_to_2mux_path.do_highlight
         )
+        result.read_data_1_to_2mux_path.do_highlight = bool(
+            bool(result.reg_file_read_data_1_text.text)
+        )
         result.read_data_2_2mux_to_alu_path.do_highlight = (
             not p_reg.control_unit_signals.alu_src_2_is_none
         )

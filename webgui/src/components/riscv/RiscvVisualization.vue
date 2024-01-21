@@ -148,9 +148,9 @@ function set_svg_marker_color(id, color) {
         .getElementById(id)
         .getAttribute("style");
     // marker must contain 'XXXXXX_ArchsimMarker' where X is a hexnum. Can be followed or prepended by other characters.
-    var marker_regex = /[\da-fA-F]{6}(?=_ArchsimMarker)/;
+    var marker_regex = /[\da-fA-F]{6}(?=_ArchsimMarker)/g;
     // create the new style string where the new color is used
-    var newStyleAttribute = styleAttribute.replace(
+    var newStyleAttribute = styleAttribute.replaceAll(
         marker_regex,
         color.substring(1)
     );
