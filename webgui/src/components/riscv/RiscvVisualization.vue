@@ -57,25 +57,23 @@ function updateVisualization(updateValues) {
     }
 }
 
+/**
+ * Sets the text content of a element that can be directly found using getElementById
+ * @param {string} id id of text field
+ * @param {string} str text to insert
+ */
 function set_svg_text_plain(id, str){
-    try {
     svg.value.getElementById(id).textContent = str;
-    } catch {
-        console.log("Fail on Text: " + id)
-    }
 }
 
+/**
+ * Sets the color of a path and all attached markers where the path can be directly found using getElementById
+ * @param {string} id id of the path
+ * @param {string} str hex color code, starting with '#'
+ */
 function set_svg_colour_plain(id, color) {
-    try {
-        svg.value.getElementById(id).style.stroke = color;
-        try {
-            set_svg_marker_color(id, color);
-        } catch {
-            console.log("Fail on marker: " + id)
-        }
-    } catch {
-        console.log("Fail on path: " + id)
-    }
+    svg.value.getElementById(id).style.stroke = color;
+    set_svg_marker_color(id, color);
 }
 
 /**set_svg_text_complex_right_align
@@ -138,7 +136,7 @@ function set_svg_colour(id, colour) {
 }
 
 /**
- * Sets the color of the marker on the given path if it has one (multiple markers will probably not work).
+ * Sets the color of all markers on the given path if it has any
  * @param {string} id id of the path that might have marker-start or marker-end
  * @param {string} str hex color code, starting with '#'
  */
@@ -148,7 +146,7 @@ function set_svg_marker_color(id, color) {
         .getElementById(id)
         .getAttribute("style");
     // marker must contain 'XXXXXX_ArchsimMarker' where X is a hexnum. Can be followed or prepended by other characters.
-    var marker_regex = /[\da-fA-F]{6}(?=_ArchsimMarker)/g;
+    var marker_regex = /[\da-fA-F]{6}(?=_ArchsimMarker)/g; // the global flag g makes the regex apply to all matches
     // create the new style string where the new color is used
     var newStyleAttribute = styleAttribute.replaceAll(
         marker_regex,
