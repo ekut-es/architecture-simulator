@@ -13,6 +13,7 @@ from architecture_simulator.uarch.riscv.pipeline_registers import (
     ExecutePipelineRegister,
     MemoryAccessPipelineRegister,
     RegisterWritebackPipelineRegister,
+    SingleStagePipelineRegister,
 )
 
 if TYPE_CHECKING:
@@ -26,6 +27,10 @@ from architecture_simulator.gui.riscv_fiveStage_svg_directives import (
     RiscvFiveStageMEMSvgDirectives,
     RiscvFiveStageWBSvgDirectives,
     RiscvFiveStageOTHERSvgDirectives,
+)
+
+from architecture_simulator.gui.riscv_single_stage_svg_directives import (
+    RiscvSingleStageSvgDirectives,
 )
 
 
@@ -521,5 +526,37 @@ class RiscvSimulation(Simulation):
             They can be one of ("<id>","highlight", <#hexcolor>), ("<id>", "write", <content>)
         """
         assert self.mode == "single_stage_pipeline"
-        self.state.pipeline.pipeline_registers[0]
-        return [("", "", "")]
+
+        p_reg = self.state.pipeline.pipeline_registers[0]
+        result = RiscvSingleStageSvgDirectives()
+
+        if not isinstance(p_reg, SingleStagePipelineRegister):
+            return result.export()
+
+        result.add_imm_text.text = save_to_str(p_reg.pc_plus_imm)
+        result.add_instr_len_text.text = save_to_str(p_reg.pc_plus_instruction_length)
+        result.instr_len_text.text = save_to_str(p_reg.instruction.length)
+
+        result.pc_text.text = save_to_str(p_reg.address_of_instruction)
+
+        result.instr_mem_instr_text.text = save_to_str(p_reg.instruction.__repr__())
+        result.instr_mem_read_addr_text.text = result.pc_text.text
+
+        result.reg_file_read_addr1_text.text = save_to_str(p_reg.register_read_addr_1)
+        result.reg_file_read_addr2_text.text = save_to_str(p_reg.register_read_addr_2)
+        result.reg_file_read_data_1_text.text = save_to_str(p_reg.register_read_data_1)
+        result.reg_file_read_data_2_text.text = save_to_str(p_reg.register_read_data_2)
+        result.reg_file_write_reg_text.text = save_to_str(p_reg.register_write_register)
+        result.reg_file_write_data_text.text = save_to_str(p_reg.register_write_data)
+
+        result.imm_gen_value_text.text = save_to_str(p_reg.imm)
+
+        result.alu_result_text.text = save_to_str(p_reg.alu_result)
+
+        result.data_memory_address_text.text = save_to_str(p_reg.memory_address)
+        result.data_memory_read_data_text.text = save_to_str(p_reg.memory_read_data)
+        result.data_memory_write_data_value_text.text = save_to_str(
+            p_reg.memory_write_data
+        )
+
+        return result.export()
