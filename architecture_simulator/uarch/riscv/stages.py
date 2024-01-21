@@ -26,6 +26,15 @@ from architecture_simulator.isa.riscv.rv32i_instructions import (
     LH,
     LHU,
     LW,
+    CSRRW,
+    CSRRS,
+    CSRRC,
+    CSRRWI,
+    CSRRSI,
+    CSRRCI,
+    ECALL,
+    EBREAK,
+    FENCE,
 )
 from .pipeline import InstructionExecutionException
 
@@ -400,6 +409,18 @@ class SingleStage(Stage):
     TYPE_STORE_INSTRUCTION = {SB, SH, SW}
     TYPE_LOAD_INSTRUCTION = {LB, LBU, LH, LHU, LW}
 
+    TYPE_NO_VISUALISATION_AVIVABLE = {
+        CSRRW,
+        CSRRS,
+        CSRRC,
+        CSRRWI,
+        CSRRSI,
+        CSRRCI,
+        ECALL,
+        EBREAK,
+        FENCE,
+    }
+
     def behavior(
         self,
         pipeline_registers: list[PipelineRegister],
@@ -417,107 +438,110 @@ class SingleStage(Stage):
         """
         if state.instruction_at_pc():
             state.performance_metrics.instruction_count += 1
-
             result_pr = SingleStagePipelineRegister()
             result_pr.instruction = state.instruction_memory.read_instruction(
                 state.program_counter
             )
-            result_pr.address_of_instruction = state.program_counter
+            if (
+                not type(result_pr.instruction)
+                in SingleStage.TYPE_NO_VISUALISATION_AVIVABLE
+            ):
+                result_pr.address_of_instruction = state.program_counter
 
-            five_stage_control_unit_signals = (
-                result_pr.instruction.control_unit_signals()
-            )
-            result_pr.control_unit_signals.alu_src_1 = (
-                not five_stage_control_unit_signals.alu_src_1
-            )
-            result_pr.control_unit_signals.alu_src_2 = bool(
-                five_stage_control_unit_signals.alu_src_2
-            )
-            result_pr.control_unit_signals.alu_src_2_is_none = (
-                five_stage_control_unit_signals.alu_src_2 is None
-            )
-            result_pr.control_unit_signals.alu_control = (
-                five_stage_control_unit_signals.alu_op is not None
-            )
-            result_pr.control_unit_signals.wb_src = (
-                five_stage_control_unit_signals.wb_src is not None
-            )
-            result_pr.control_unit_signals.wb_src_int = (
-                five_stage_control_unit_signals.wb_src
-            )
-            result_pr.control_unit_signals.branch = bool(
-                five_stage_control_unit_signals.branch
-            )
-            result_pr.control_unit_signals.pc_from_alu_res = (
-                result_pr.instruction.mnemonic == "jalr"
-            )
+                five_stage_control_unit_signals = (
+                    result_pr.instruction.control_unit_signals()
+                )
+                result_pr.control_unit_signals.alu_src_1 = (
+                    not five_stage_control_unit_signals.alu_src_1
+                )
+                result_pr.control_unit_signals.alu_src_2 = (
+                    five_stage_control_unit_signals.alu_src_2
+                )
+                result_pr.control_unit_signals.alu_control = (
+                    five_stage_control_unit_signals.alu_op is not None
+                )
+                result_pr.control_unit_signals.wb_src_int = (
+                    five_stage_control_unit_signals.wb_src
+                )
+                result_pr.control_unit_signals.branch = bool(
+                    five_stage_control_unit_signals.branch
+                )
+                result_pr.control_unit_signals.pc_from_alu_res = (
+                    result_pr.instruction.mnemonic == "jalr"
+                )
 
-            (
-                result_pr.register_read_addr_1,
-                result_pr.register_read_addr_2,
-                result_pr.register_read_data_1,
-                result_pr.register_read_data_2,
-                result_pr.imm,
-            ) = result_pr.instruction.access_register_file(state)
-            result_pr.register_write_register = (
-                result_pr.instruction.get_write_register()
-            )
+                (
+                    result_pr.register_read_addr_1,
+                    result_pr.register_read_addr_2,
+                    result_pr.register_read_data_1,
+                    result_pr.register_read_data_2,
+                    result_pr.imm,
+                ) = result_pr.instruction.access_register_file(state)
+                result_pr.register_write_register = (
+                    result_pr.instruction.get_write_register()
+                )
 
-            result_pr.instruction_length = result_pr.instruction.length
-            result_pr.pc_plus_instruction_length = (
-                state.program_counter + result_pr.instruction_length
-            )
-            if result_pr.imm is not None and result_pr.control_unit_signals.branch:
-                result_pr.pc_plus_imm = state.program_counter + result_pr.imm
+                result_pr.instruction_length = result_pr.instruction.length
+                result_pr.pc_plus_instruction_length = (
+                    state.program_counter + result_pr.instruction_length
+                )
+                if result_pr.imm is not None and result_pr.control_unit_signals.branch:
+                    result_pr.pc_plus_imm = state.program_counter + result_pr.imm
 
-            a_comparison, a_result = result_pr.instruction.alu_compute(
-                state.program_counter
-                if result_pr.control_unit_signals.alu_src_1
-                else result_pr.register_read_data_1,
-                result_pr.imm
-                if result_pr.control_unit_signals.alu_src_2
-                else result_pr.register_read_data_2,
-            )
+                a_comparison, a_result = result_pr.instruction.alu_compute(
+                    state.program_counter
+                    if result_pr.control_unit_signals.alu_src_1
+                    else result_pr.register_read_data_1,
+                    result_pr.imm
+                    if result_pr.control_unit_signals.alu_src_2
+                    else result_pr.register_read_data_2,
+                )
 
-            result_pr.alu_comparison = bool(a_comparison)
-            result_pr.alu_result = a_result
+                result_pr.alu_comparison = bool(a_comparison)
+                result_pr.alu_result = a_result
 
-            result_pr.memory_address = (
-                result_pr.alu_result
-                if type(result_pr.instruction) in SingleStage.TYPE_MEMORY_INSTRUCTION
-                else None
-            )
-
-            try:
-                result_pr.memory_write_data = (
-                    result_pr.register_read_data_2
-                    if type(result_pr.instruction) in SingleStage.TYPE_STORE_INSTRUCTION
+                result_pr.memory_address = (
+                    result_pr.alu_result
+                    if type(result_pr.instruction)
+                    in SingleStage.TYPE_MEMORY_INSTRUCTION
                     else None
                 )
-                result_pr.memory_read_data = (
-                    result_pr.instruction.memory_access(
-                        result_pr.memory_address, None, state
+
+                try:
+                    result_pr.memory_write_data = (
+                        result_pr.register_read_data_2
+                        if type(result_pr.instruction)
+                        in SingleStage.TYPE_STORE_INSTRUCTION
+                        else None
                     )
-                    if type(result_pr.instruction) in SingleStage.TYPE_LOAD_INSTRUCTION
-                    else None
-                )
-            except Exception as e:
-                raise InstructionExecutionException(
-                    address=result_pr.address_of_instruction,
-                    instruction_repr=result_pr.instruction.__repr__(),
-                    error_message=e.__repr__(),
-                )
+                    result_pr.memory_read_data = (
+                        result_pr.instruction.memory_access(
+                            result_pr.memory_address, None, state
+                        )
+                        if type(result_pr.instruction)
+                        in SingleStage.TYPE_LOAD_INSTRUCTION
+                        else None
+                    )
+                except Exception as e:
+                    raise InstructionExecutionException(
+                        address=result_pr.address_of_instruction,
+                        instruction_repr=result_pr.instruction.__repr__(),
+                        error_message=e.__repr__(),
+                    )
 
-            result_pr.register_write_data = defaultdict(
-                lambda: None,
-                {
-                    None: None,  # to stop mypy complaining
-                    0: result_pr.pc_plus_instruction_length,
-                    1: result_pr.memory_read_data,
-                    2: result_pr.alu_result,
-                    3: result_pr.imm,
-                },
-            )[five_stage_control_unit_signals.wb_src]
+                result_pr.register_write_data = defaultdict(
+                    lambda: None,
+                    {
+                        None: None,  # to stop mypy complaining
+                        0: result_pr.pc_plus_instruction_length,
+                        1: result_pr.memory_read_data,
+                        2: result_pr.alu_result,
+                        3: result_pr.imm,
+                    },
+                )[five_stage_control_unit_signals.wb_src]
+
+            else:
+                result_pr = PipelineRegister()
 
             try:
                 result_pr.instruction.behavior(state)

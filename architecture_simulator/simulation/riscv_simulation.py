@@ -570,7 +570,7 @@ class RiscvSimulation(Simulation):
             not p_reg.control_unit_signals.pc_from_alu_res
         )
         result.control_unit_to_and_path.do_highlight = p_reg.control_unit_signals.branch
-        result.alu_control_to_read_data_2mux_path.do_highlight = (
+        result.alu_control_to_read_data_2mux_path.do_highlight = bool(
             p_reg.control_unit_signals.alu_src_2
         )
         result.alu_control_to_read_data_1_mux_path.do_highlight = (
@@ -580,7 +580,7 @@ class RiscvSimulation(Simulation):
         # Non Binary signals
 
         result.control_unit_to_4mux_path.do_highlight = (
-            p_reg.control_unit_signals.wb_src
+            p_reg.control_unit_signals.wb_src_int is not None
         )
         result.alu_control_to_alu_path.do_highlight = (
             p_reg.control_unit_signals.alu_control
@@ -592,7 +592,7 @@ class RiscvSimulation(Simulation):
             result.add_instr_len_text.text
         )
         result.pc_to_add_imm_path.do_highlight = bool(result.add_imm_text.text)
-        result.pc_to_2mux_path.do_highlight = p_reg.control_unit_signals.alu_src_1
+        result.pc_to_2mux_path.do_highlight = bool(p_reg.control_unit_signals.alu_src_1)
         result.pc_to_instr_mem_path.do_highlight = bool(result.pc_text.text)
         result.pc_out_path.do_highlight = bool(result.pc_text.text)
 
@@ -632,8 +632,8 @@ class RiscvSimulation(Simulation):
         result.read_data_1_to_2mux_path.do_highlight = bool(
             bool(result.reg_file_read_data_1_text.text)
         )
-        result.read_data_2_2mux_to_alu_path.do_highlight = (
-            not p_reg.control_unit_signals.alu_src_2_is_none
+        result.read_data_2_2mux_to_alu_path.do_highlight = not (
+            p_reg.control_unit_signals.alu_src_2 is None
         )
         result.read_data_2_to_2mux_path.do_highlight = bool(
             result.reg_file_read_data_2_text.text
@@ -682,7 +682,7 @@ class RiscvSimulation(Simulation):
         result.instr_len_to_add_path.do_highlight = bool(result.instr_len_text.text)
 
         result.four_mux_to_write_data_path.do_highlight = (
-            p_reg.control_unit_signals.wb_src
+            p_reg.control_unit_signals.wb_src_int is not None
         )
 
         result.data_mem_read_data_to_4mux_path.do_highlight = bool(
