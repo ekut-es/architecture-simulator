@@ -48,6 +48,7 @@ function updateVisualization(updateValues) {
                 set_svg_text_complex_right_align(id, value);
                 break;
             case "highlight-plain":
+                set_svg_colour_plain(id, value);
                 break;
             case "write":
                 set_svg_text_plain(id, value);
@@ -60,7 +61,20 @@ function set_svg_text_plain(id, str){
     try {
     svg.value.getElementById(id).textContent = str;
     } catch {
-        console.log("Fail")
+        console.log("Fail on Text: " + id)
+    }
+}
+
+function set_svg_colour_plain(id, color) {
+    try {
+        svg.value.getElementById(id).style.stroke = color;
+        try {
+            set_svg_marker_color(id, color);
+        } catch {
+            console.log("Fail on marker: " + id)
+        }
+    } catch {
+        console.log("Fail on path: " + id)
     }
 }
 

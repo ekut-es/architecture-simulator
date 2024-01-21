@@ -58,7 +58,7 @@ class RiscvSingleStageSvgDirectives:
         self.pc_out_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
 
         self.instr_mem_to_read_addr1_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
-        self.instr_mem_read_addr2_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.instr_mem_to_read_addr2_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
         self.instr_mem_to_write_reg_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
         self.instr_mem_to_imm_gen_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
         self.instr_mem_to_control_unit_path: SvgFillDirectiveBlue = (
