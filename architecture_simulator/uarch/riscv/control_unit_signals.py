@@ -34,6 +34,7 @@ class SingleStageControlUnitSignals:
     alu_control: bool = False  # False if alu is not used
 
     wb_src: bool = False  # False if no data written to register file
+    wb_src_int: Optional[int] = None  # Needed for 4mux input highlighting
 
     branch: bool = False  # False if no branch instruction is selected
     pc_from_alu_res: bool = False  # True if the alu result is used as new pc -> needs inversion for highlighting of control unit path

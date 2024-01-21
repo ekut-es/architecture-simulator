@@ -586,4 +586,40 @@ class RiscvSimulation(Simulation):
             p_reg.control_unit_signals.alu_control
         )
 
+        # Other paths
+
+        result.pc_to_add_instr_len_path.do_highlight = bool(
+            result.add_instr_len_text.text
+        )
+        result.pc_to_add_imm_path.do_highlight = bool(result.add_imm_text.text)
+        result.pc_to_2mux_path.do_highlight = p_reg.control_unit_signals.alu_src_1
+        result.pc_to_instr_mem_path.do_highlight = bool(result.pc_text.text)
+        result.pc_out_path.do_highlight = bool(result.pc_text.text)
+
+        result.instr_mem_to_read_addr1_path.do_highlight = bool(
+            result.reg_file_read_addr1_text.text
+        )
+        result.instr_mem_to_read_addr2_path.do_highlight = bool(
+            result.reg_file_read_addr2_text.text
+        )
+        result.instr_mem_to_write_reg_path.do_highlight = bool(
+            result.reg_file_write_reg_text.text
+        )
+        result.instr_mem_to_imm_gen_path.do_highlight = bool(
+            result.imm_gen_value_text.text
+        )
+        result.instr_mem_to_control_unit_path.do_highlight = bool(
+            result.instr_mem_instr_text.text
+        )
+
+        result.imm_gen_out_path.do_highlight = bool(result.imm_gen_value_text.text)
+        result.imm_gen_to_add_path.do_highlight = bool(result.add_imm_text.text)
+        result.imm_gen_to_4mux_path.do_highlight = (
+            p_reg.control_unit_signals.wb_src_int == 3
+        )
+        result.imm_gen_to_2mux_path.do_highlight = (
+            p_reg.control_unit_signals.alu_src_2
+            or result.pc_to_add_imm_path.do_highlight
+        )
+
         return result.export()

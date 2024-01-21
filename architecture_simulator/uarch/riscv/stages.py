@@ -439,6 +439,9 @@ class SingleStage(Stage):
             result_pr.control_unit_signals.wb_src = (
                 five_stage_control_unit_signals.wb_src is not None
             )
+            result_pr.control_unit_signals.wb_src_int = (
+                five_stage_control_unit_signals.wb_src
+            )
             result_pr.control_unit_signals.branch = bool(
                 five_stage_control_unit_signals.branch
             )
