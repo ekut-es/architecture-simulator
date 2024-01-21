@@ -11,7 +11,8 @@ import RiscvVisualization from './RiscvVisualization.vue';
 // import SvgVisualization from '../SvgVisualization.vue';
 
 import { useRiscvSimulationStore } from '@/js/riscv_simulation_store';
-import svgPath from "/src/img/riscv_five_stage_pipeline.svg";
+import fiveStageVisualizationPath from "/src/img/riscv_five_stage_pipeline.svg";
+import singleStageVisualizationPath from "/src/img/riscv_single_stage_pipeline.svg";
 import { riscvSettings } from '@/js/riscv_settings';
 import { onMounted, watch } from 'vue';
 import { ArchsimSplit } from '@/js/archsim-split';
@@ -26,13 +27,7 @@ let split = null;
 
 onMounted(() => {
     split = new ArchsimSplit(mainContentContainer.value, textContentContainer.value, visualizationsContainer.value);
-    watch(riscvSettings.pipelineMode, (newPipelineMode) => {
-        if (newPipelineMode === 'five_stage_pipeline') {
-            split.createSplit();
-        } else {
-            split.destroySplit();
-        }
-    }, { immediate: true });
+    split.createSplit();
 });
 
 onUnmounted(() => {
@@ -53,7 +48,9 @@ onUnmounted(() => {
             <RiscvOutputField />
         </div>
         <div ref="visualizationsContainer" id="riscv-visualizations-container">
-            <RiscvVisualization v-if="riscvSettings.pipelineMode.value === 'five_stage_pipeline'" :path="svgPath"
+            <RiscvVisualization v-if="riscvSettings.pipelineMode.value === 'five_stage_pipeline'" :path="fiveStageVisualizationPath"
+                :simulation-store="simulationStore" />
+            <RiscvVisualization v-if="riscvSettings.pipelineMode.value === 'single_stage_pipeline'" :path="singleStageVisualizationPath"
                 :simulation-store="simulationStore" />
         </div>
     </div>

@@ -3,7 +3,7 @@
  * This is almost the same as the normal Visualization.Vue component,
  * but it has the riscv functions.
  */
-import { watch } from "vue";
+import { ref, watchEffect } from "vue";
 
 const props = defineProps(["path", "simulationStore"]);
 
@@ -16,12 +16,17 @@ const simulationStore = props.simulationStore;
  * modifications to the svg can be made. Will be undefined before
  * the svg has finished loading.
  */
-let svg;
+let svg = ref(null);
 
 function svgLoaded(event) {
-    svg = event.target.contentDocument;
-    watch(() => simulationStore.svgDirectives, (updateValues) => { updateVisualization(updateValues); }, { immediate: true });
+    svg.value = event.target.contentDocument;
 }
+
+watchEffect(() => {
+    if (svg.value !== null) {
+        updateVisualization(simulationStore.svgDirectives);
+    }
+});
 
 function updateVisualization(updateValues) {
     for (let i = 0; i < updateValues.length; i++) {
@@ -52,12 +57,11 @@ function updateVisualization(updateValues) {
  * @param {string} str -- The text the element given by id should have, the text is right aligned
  */
 function set_svg_text_complex_right_align(id, str) {
-    svg.getElementById(id).firstChild.nextSibling.style.fontSize =
+    svg.value.getElementById(id).firstChild.nextSibling.style.fontSize =
         "15px";
-    svg.getElementById(id).firstChild.nextSibling.textContent =
+    svg.value.getElementById(id).firstChild.nextSibling.textContent =
         str;
-    svg
-        .getElementById(id)
+    svg.value.getElementById(id)
         .firstChild.nextSibling.setAttribute("text-anchor", "end");
 }
 
@@ -67,12 +71,11 @@ function set_svg_text_complex_right_align(id, str) {
  * @param {string} str -- The text the element given by id should have, the text is left aligned
  */
 function set_svg_text_complex_left_align(id, str) {
-    svg.getElementById(id).firstChild.nextSibling.style.fontSize =
+    svg.value.getElementById(id).firstChild.nextSibling.style.fontSize =
         "15px";
-    svg.getElementById(id).firstChild.nextSibling.textContent =
+    svg.value.getElementById(id).firstChild.nextSibling.textContent =
         str;
-    svg
-        .getElementById(id)
+    svg.value.getElementById(id)
         .firstChild.nextSibling.setAttribute("text-anchor", "start");
 }
 
@@ -82,12 +85,11 @@ function set_svg_text_complex_left_align(id, str) {
  * @param {string} str -- The text the element given by id should have, the text is middle aligned
  */
 function set_svg_text_complex_middle_align(id, str) {
-    svg.getElementById(id).firstChild.nextSibling.style.fontSize =
+    svg.value.getElementById(id).firstChild.nextSibling.style.fontSize =
         "15px";
-    svg.getElementById(id).firstChild.nextSibling.textContent =
+    svg.value.getElementById(id).firstChild.nextSibling.textContent =
         str;
-    svg
-        .getElementById(id)
+    svg.value.getElementById(id)
         .firstChild.nextSibling.setAttribute("text-anchor", "middle");
 }
 
@@ -97,13 +99,13 @@ function set_svg_text_complex_middle_align(id, str) {
  * @param {string} str -- The colour the element and all its childnodes should have
  */
 function set_svg_colour(id, colour) {
-    const Child_Nodes = svg.getElementById(id).childNodes;
+    const Child_Nodes = svg.value.getElementById(id).childNodes;
     if (Child_Nodes.length > 0) {
         for (let i = 0; i < Child_Nodes.length; i++) {
             set_svg_colour(Child_Nodes[i].id, colour);
         }
     } else {
-        svg.getElementById(id).style.stroke = colour;
+        svg.value.getElementById(id).style.stroke = colour;
         set_svg_marker_color(id, colour);
     }
 }
@@ -115,7 +117,7 @@ function set_svg_colour(id, colour) {
  */
 function set_svg_marker_color(id, color) {
     // the marker is part of the style attribute
-    var styleAttribute = svg
+    var styleAttribute = svg.value
         .getElementById(id)
         .getAttribute("style");
     // marker must contain 'XXXXXX_ArchsimMarker' where X is a hexnum. Can be followed or prepended by other characters.
@@ -125,13 +127,7 @@ function set_svg_marker_color(id, color) {
         marker_regex,
         color.substring(1)
     );
-    if (styleAttribute !== newStyleAttribute) {
-        console.log("");
-    }
-
-    svg
-        .getElementById(id)
-        .setAttribute("style", newStyleAttribute);
+    svg.value.getElementById(id).setAttribute("style", newStyleAttribute);
 }
 
 </script>

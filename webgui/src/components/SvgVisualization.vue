@@ -1,5 +1,5 @@
 <script setup>
-import { watch } from "vue";
+import { ref, watchEffect } from "vue";
 
 const props = defineProps(["path", "simulationStore"]);
 
@@ -12,12 +12,17 @@ const simulationStore = props.simulationStore;
  * modifications to the svg can be made. Will be undefined before
  * the svg has finished loading.
  */
-let svg;
+let svg = ref(null);
 
 function svgLoaded(event) {
-    svg = event.target.contentDocument;
-    watch(() => simulationStore.svgDirectives, (updateValues) => { updateVisualization(updateValues); }, { immediate: true });
+    svg.value = event.target.contentDocument;
 }
+
+watchEffect(() => {
+    if (svg.value !== null) {
+        updateVisualization(simulationStore.svgDirectives);
+    }
+});
 
 function updateVisualization(updateValues) {
     for (let i = 0; i < updateValues.length; i++) {
@@ -45,7 +50,7 @@ function updateVisualization(updateValues) {
  * @param {string} color hex color string.
  */
 function toySvgHighlight(id, color) {
-    svg.querySelector("#" + id).setAttribute("style", "fill: " + color);
+    svg.value.querySelector("#" + id).setAttribute("style", "fill: " + color);
 }
 
 /**
@@ -54,7 +59,7 @@ function toySvgHighlight(id, color) {
  * @param {string} text text to set as the content of the element.
  */
 function toySvgSetText(id, text) {
-    svg.querySelector("#" + id).textContent = text;
+    svg.value.querySelector("#" + id).textContent = text;
 }
 
 /**
@@ -64,7 +69,7 @@ function toySvgSetText(id, text) {
  */
 function toySvgShow(id, doShow) {
     const display = doShow ? "block" : "none";
-    svg.querySelector("#" + id).style.display = display;
+    svg.value.querySelector("#" + id).style.display = display;
 }
 
 </script>
