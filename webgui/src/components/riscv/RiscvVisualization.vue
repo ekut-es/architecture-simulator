@@ -111,29 +111,23 @@ function set_svg_colour(id, colour) {
 /**
  * Sets the color of the marker on the given path if it has one (multiple markers will probably not work).
  * @param {string} id id of the path that might have marker-start or marker-end
- * @param {string} str color name (either black, blue or green)
+ * @param {string} str hex color code, starting with '#'
  */
-function set_svg_marker_color(id, colour) {
+function set_svg_marker_color(id, color) {
     // the marker is part of the style attribute
     var styleAttribute = svg
         .getElementById(id)
         .getAttribute("style");
-    // marker must contain 'Triangle_XXXXXX' where X is a hexnum. Can be followed or prepended by other characters.
-    var marker_regex = /Triangle_[0-9a-fA-F]{6}/;
-    var result = marker_regex.exec(styleAttribute);
-    if (result != null) {
-        // get the hex value for that color
-        var hexColor = colour;
-        var newMarker = "Triangle_" + hexColor.substring(1);
-        // create the new style string where the new color is used
-        var newStyleAttribute = styleAttribute.replace(
-            marker_regex,
-            newMarker
-        );
-        svg
-            .getElementById(id)
-            .setAttribute("style", newStyleAttribute);
-    }
+    // marker must contain 'XXXXXX_ArchsimMarker' where X is a hexnum. Can be followed or prepended by other characters.
+    var marker_regex = /\d{6}(?=_ArchsimMarker)/;
+    // create the new style string where the new color is used
+    var newStyleAttribute = styleAttribute.replace(
+        marker_regex,
+        color.substring(1)
+    );
+    svg
+        .getElementById(id)
+        .setAttribute("style", newStyleAttribute);
 }
 
 </script>

@@ -66,7 +66,7 @@
         transform="scale(0.5)"
         style="fill:#000000;fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
         d="M 5.77,0 -2.88,5 V -5 Z"
-        id="Triangle_000000_Path" /></marker><marker
+        id="000000_ArchsimMarker_Triangle_Reversed_Path" /></marker><marker
     style="overflow:visible"
     id="008000_ArchsimMarker_Triangle_Reversed"
     refX="0"
@@ -82,7 +82,7 @@
         transform="scale(0.5)"
         style="fill:#008000;fill-rule:evenodd;stroke:#008000;stroke-width:1pt"
         d="M 5.77,0 -2.88,5 V -5 Z"
-        id="Triangle_008000_Path" /></marker><marker
+        id="008000_ArchsimMarker_Triangle_Reversed_Path" /></marker><marker
     style="overflow:visible"
     id="0000FF_ArchsimMarker_Triangle_Reversed"
     refX="0"
@@ -98,7 +98,7 @@
         transform="scale(0.5)"
         style="fill:#0000FF;fill-rule:evenodd;stroke:#0000FF;stroke-width:1pt"
         d="M 5.77,0 -2.88,5 V -5 Z"
-        id="Triangle_0000FF_Path" /></marker><marker
+        id="0000FF_ArchsimMarker_Triangle_Reversed_Path" /></marker><marker
     style="overflow:visible"
     id="000000_ArchsimMarker_Triangle"
     refX="0"
@@ -112,11 +112,11 @@
     inkscape:collect="always"
     preserveAspectRatio="xMidYMid"><g
         transform="rotate(180,0,0)"
-        id="g45523"><path
+        id="000000_ArchsimMarker_Triangle_Group"><path
         transform="scale(0.5)"
         style="fill:#000000;fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
         d="M 5.77,0 -2.88,5 V -5 Z"
-        id="Triangle_000000_reversed_Path" /></g></marker><marker
+        id="000000_ArchsimMarker_Triangle_Path" /></g></marker><marker
         style="overflow:visible"
     id="008000_ArchsimMarker_Triangle"
     refX="0"
@@ -130,11 +130,11 @@
     inkscape:collect="always"
     preserveAspectRatio="xMidYMid"><g
         transform="rotate(180,0,0)"
-        id="g45523"><path
+        id="008000_ArchsimMarker_Triangle_Group"><path
         transform="scale(0.5)"
         style="fill:#008000;fill-rule:evenodd;stroke:#008000;stroke-width:1pt"
         d="M 5.77,0 -2.88,5 V -5 Z"
-        id="Triangle_008000_reversed_Path" /></g></marker><marker
+        id="008000_ArchsimMarker_Triangle_Path" /></g></marker><marker
     style="overflow:visible"
     id="0000FF_ArchsimMarker_Triangle"
     refX="0"
@@ -148,11 +148,11 @@
     inkscape:collect="always"
     preserveAspectRatio="xMidYMid"><g
         transform="rotate(180,0,0)"
-        id="g45523"><path
+        id="0000FF_ArchsimMarker_Triangle_Group"><path
         transform="scale(0.5)"
         style="fill:#0000FF;fill-rule:evenodd;stroke:#0000FF;stroke-width:1pt"
         d="M 5.77,0 -2.88,5 V -5 Z"
-        id="Triangle_0000FF_reversed_Path" /></g></marker>
+        id="0000FF_ArchsimMarker_Triangle_Path" /></g></marker>
 <!--CUSTOM MARKERS END--><rect
        x="1741.604"
        y="2720.9469"

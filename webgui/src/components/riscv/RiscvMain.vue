@@ -11,7 +11,7 @@ import RiscvVisualization from './RiscvVisualization.vue';
 // import SvgVisualization from '../SvgVisualization.vue';
 
 import { useRiscvSimulationStore } from '@/js/riscv_simulation_store';
-import svgPath from "/src/img/riscv_pipeline.svg";
+import svgPath from "/src/img/riscv_five_stage_pipeline.svg";
 import { riscvSettings } from '@/js/riscv_settings';
 import { onMounted, watch } from 'vue';
 import { ArchsimSplit } from '@/js/archsim-split';
@@ -38,6 +38,7 @@ onMounted(() => {
 onUnmounted(() => {
     split.destroyObject();
 })
+
 </script>
 
 <template>
