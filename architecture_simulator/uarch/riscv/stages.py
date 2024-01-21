@@ -505,6 +505,7 @@ class SingleStage(Stage):
             result_pr.register_write_data = defaultdict(
                 lambda: None,
                 {
+                    None: None,  # to stop mypy complaining
                     0: result_pr.pc_plus_instruction_length,
                     1: result_pr.memory_read_data,
                     2: result_pr.alu_result,

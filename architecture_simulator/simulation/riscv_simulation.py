@@ -522,3 +522,4 @@ class RiscvSimulation(Simulation):
         """
         assert self.mode == "single_stage_pipeline"
         self.state.pipeline.pipeline_registers[0]
+        return [("", "", "")]
