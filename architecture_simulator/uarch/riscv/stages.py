@@ -433,6 +433,9 @@ class SingleStage(Stage):
             result_pr.control_unit_signals.alu_src_2 = bool(
                 five_stage_control_unit_signals.alu_src_2
             )
+            result_pr.control_unit_signals.alu_src_2_is_none = (
+                five_stage_control_unit_signals.alu_src_2 is None
+            )
             result_pr.control_unit_signals.alu_control = (
                 five_stage_control_unit_signals.alu_op is not None
             )

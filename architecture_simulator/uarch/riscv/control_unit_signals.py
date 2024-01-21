@@ -31,6 +31,7 @@ class SingleStageControlUnitSignals:
     alu_src_2: bool = (
         False  # False if read data 2 -> no inversion for path highlighting
     )
+    alu_src_2_is_none: bool = False
     alu_control: bool = False  # False if alu is not used
 
     wb_src: bool = False  # False if no data written to register file

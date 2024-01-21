@@ -622,4 +622,67 @@ class RiscvSimulation(Simulation):
             or result.pc_to_add_imm_path.do_highlight
         )
 
+        result.read_data2_to_mem_write_data_path.do_highlight = bool(
+            result.data_memory_write_data_value_text.text
+        )
+        result.read_data_1_mux_to_alu_path.do_highlight = (
+            bool(result.reg_file_read_data_1_text)
+            or result.pc_to_2mux_path.do_highlight
+        )
+        result.read_data_2_2mux_to_alu_path.do_highlight = (
+            not p_reg.control_unit_signals.alu_src_2_is_none
+        )
+        result.read_data_2_to_2mux_path.do_highlight = bool(
+            result.reg_file_read_data_2_text.text
+        )
+
+        result.alu_out_path = bool(result.alu_result_text.text)
+        result.alu_to_data_memory_address_path.do_highlight = bool(
+            result.data_memory_address_text.text
+        )
+        result.alu_out_to_4mux_path.do_highlight = (
+            p_reg.control_unit_signals.wb_src_int == 2
+        )
+        result.alu_out_to_2mux_path.do_highlight = (
+            not result.alu_to_data_memory_address_path.do_highlight
+        ) and (not result.alu_out_to_4mux_path.do_highlight)
+        result.alu_comparison_to_and_path.do_highlight = p_reg.alu_comparison
+
+        result.and_to_mux_path.do_highlight = (
+            result.control_unit_to_and_path.do_highlight
+            and result.alu_comparison_to_and_path.do_highlight
+        )
+
+        result.add_imm_to_mux_path.do_highlight = (
+            result.control_unit_to_and_path.do_highlight
+        )
+        result.add_instr_len_out_path.do_highlight = bool(
+            result.add_instr_len_text.text
+        )
+        result.add_instr_len_to_4mux_path.do_highlight = (
+            p_reg.control_unit_signals.wb_src_int == 0
+        )
+        result.add_instr_len_to_2mux_path.do_highlight = (
+            result.add_instr_len_out_path.do_highlight
+            and (not result.add_instr_len_to_4mux_path.do_highlight)
+        )
+
+        result.two_mux_2mux_path.do_highlight = (
+            result.add_imm_to_mux_path.do_highlight
+            or result.add_instr_len_to_2mux_path.do_highlight
+        )
+        result.two_mux_to_pc_path.do_highlight = (
+            result.two_mux_2mux_path.do_highlight
+            or result.alu_out_to_2mux_path.do_highlight
+        )
+
+        result.instr_len_to_add_path.do_highlight = bool(result.instr_len_text.text)
+
+        result.four_mux_to_write_data_path.do_highlight = (
+            p_reg.control_unit_signals.wb_src
+        )
+
+        result.data_mem_read_data_to_4mux_path.do_highlight = bool(
+            result.data_memory_read_data_text.text
+        )
         return result.export()
