@@ -532,6 +532,7 @@ class RiscvSimulation(Simulation):
 
         if not isinstance(p_reg, SingleStagePipelineRegister):
             return result.export()
+        # Text Fields
 
         result.add_imm_text.text = save_to_str(p_reg.pc_plus_imm)
         result.add_instr_len_text.text = save_to_str(p_reg.pc_plus_instruction_length)
@@ -557,6 +558,32 @@ class RiscvSimulation(Simulation):
         result.data_memory_read_data_text.text = save_to_str(p_reg.memory_read_data)
         result.data_memory_write_data_value_text.text = save_to_str(
             p_reg.memory_write_data
+        )
+
+        # Paths
+
+        # Control Unit paths
+
+        # Binary signals
+
+        result.control_unit_2mux_pc_path.do_highlight = (
+            not p_reg.control_unit_signals.pc_from_alu_res
+        )
+        result.control_unit_to_and_path.do_highlight = p_reg.control_unit_signals.branch
+        result.alu_control_to_read_data_2mux_path.do_highlight = (
+            p_reg.control_unit_signals.alu_src_2
+        )
+        result.alu_control_to_read_data_1_mux_path.do_highlight = (
+            not p_reg.control_unit_signals.alu_src_1
+        )
+
+        # Non Binary signals
+
+        result.control_unit_to_4mux_path.do_highlight = (
+            p_reg.control_unit_signals.wb_src
+        )
+        result.alu_control_to_alu_path.do_highlight = (
+            p_reg.control_unit_signals.alu_control
         )
 
         return result.export()
