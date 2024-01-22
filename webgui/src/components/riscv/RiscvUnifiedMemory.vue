@@ -55,7 +55,7 @@ const isFiveStage = computed(() => riscvSettings.pipelineMode.value == 'five_sta
                 <tr v-for="entry of dataMemoryEntries">
                     <td> {{ entry.hexAdress }} </td>
                     <td :class="[{ highlight: entry.doHighlight }, 'text-end']"> {{ entry.value }} </td>
-                    <td></td>
+                    <td v-if="isFiveStage"></td>
                 </tr>
 
             </tbody>

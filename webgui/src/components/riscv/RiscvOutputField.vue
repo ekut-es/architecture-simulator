@@ -9,6 +9,7 @@ let output = computed(() => {
     if (simulationStore.error) {
         switch (simulationStore.error[0]) {
             case "ParserException":
+                break; // Will be shown in the editor
             case "InstructionExecutionException":
                 return [simulationStore.error[1]];
             default:
