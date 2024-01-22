@@ -1,5 +1,5 @@
 <script setup>
-import { computed, watchEffect } from 'vue';
+import { computed, watch } from 'vue';
 
 import RiscvElementToggle from './RiscvElementToggle.vue';
 
@@ -37,8 +37,8 @@ function resetButton() {
 /**
  * Hide the input field when the simulation starts.
  */
-watchEffect(() => {
-    riscvSettings.showInput.value = !simulationStore.hasStarted;
+watch(() => simulationStore.hasStarted, (hasStarted) => {
+    riscvSettings.showInput.value = !hasStarted;
 });
 
 </script>

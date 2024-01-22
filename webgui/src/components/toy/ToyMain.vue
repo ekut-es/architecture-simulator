@@ -36,8 +36,10 @@ watch(enableSplit, (enable) => {
 });
 
 onMounted(() => {
-  split = new ArchsimSplit(mainContentContainer.value, textContentContainer.value, visualizationsContainer.value);
-  split.createSplit();
+    split = new ArchsimSplit(mainContentContainer.value, textContentContainer.value, visualizationsContainer.value);
+    if (enableSplit.value) {
+        split.createSplit();
+    }
 });
 
 onUnmounted(() => {
@@ -50,12 +52,14 @@ onUnmounted(() => {
     <ToyControlBar />
 
     <div ref="mainContentContainer" id="toy-main-content-container" class="d-flex">
-        <div ref="textContentContainer" id="toy-text-content-container" :class="textContainerPopulated ? 'd-flex flex-grow-1' : 'd-none'">
-            <CodeEditor class="flex-grow-1 code-editor" :simulation-store="simulationStore" isa-name="toy" v-show="toySettings.showInput.value"/>
-            <ToyMainTextContainer v-show="toySettings.showMainColumn.value"/>
+        <div ref="textContentContainer" id="toy-text-content-container"
+            :class="textContainerPopulated ? 'd-flex flex-grow-1' : 'd-none'">
+            <CodeEditor class="flex-grow-1 code-editor" :simulation-store="simulationStore" isa-name="toy"
+                v-show="toySettings.showInput.value" />
+            <ToyMainTextContainer v-show="toySettings.showMainColumn.value" />
         </div>
         <div v-show="toySettings.showVisualization.value" ref="visualizationsContainer" id="toy-visualizations-container">
-            <SvgVisualization :simulation-store="simulationStore" :path="svgPath"/>
+            <SvgVisualization :simulation-store="simulationStore" :path="svgPath" />
         </div>
     </div>
 </template>
@@ -71,7 +75,7 @@ onUnmounted(() => {
     padding: 1em;
     height: 100%;
 }
+
 .code-editor {
     min-width: 20em;
-}
-</style>
+}</style>

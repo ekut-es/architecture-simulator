@@ -1,5 +1,5 @@
 <script setup>
-import { computed, watchEffect } from 'vue';
+import { computed, watch } from 'vue';
 
 import ToyElementToggle from './ToyElementToggle.vue';
 
@@ -46,8 +46,8 @@ function resetButton() {
 /**
  * Hide the input field when the simulation starts.
  */
-watchEffect(() => {
-    toySettings.showInput.value = !simulationStore.hasStarted;
+watch(() => simulationStore.hasStarted, (hasStarted) => {
+    toySettings.showInput.value = !hasStarted;
 });
 
 </script>

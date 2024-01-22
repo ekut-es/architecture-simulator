@@ -43,7 +43,9 @@ watch(enableSplit, (enable) => {
 
 onMounted(() => {
     split = new ArchsimSplit(mainContentContainer.value, textContentContainer.value, visualizationsContainer.value);
-    split.createSplit();
+    if (enableSplit.value) {
+        split.createSplit();
+    }
 });
 
 onUnmounted(() => {
@@ -56,7 +58,8 @@ onUnmounted(() => {
     <RiscvControlBar />
 
     <div ref="mainContentContainer" id="riscv-main-content-container" class="d-flex">
-        <div ref="textContentContainer" :class="textContainerPopulated ? 'd-flex flex-grow-1' : 'd-none'" id="riscv-text-content-container">
+        <div ref="textContentContainer" :class="textContainerPopulated ? 'd-flex flex-grow-1' : 'd-none'"
+            id="riscv-text-content-container">
             <CodeEditor class="flex-grow-1 code-editor" :simulation-store="simulationStore" isa-name="riscv"
                 v-show="riscvSettings.showInput.value" />
             <RiscvUnifiedMemory class="flex-shrink-0" v-show="riscvSettings.showMemory.value" />
