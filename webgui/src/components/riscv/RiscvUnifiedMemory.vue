@@ -40,8 +40,8 @@ const isFiveStage = computed(() => riscvSettings.pipelineMode.value == 'five_sta
             <tbody id="riscv-uni-memory-table-body">
                 <template v-for="entry in simulationStore.instructionMemoryEntries">
                     <tr :class="{ 'archsim-tr-runtime-error': simulationStore.instructionErrored(entry[0]) }">
-                        <td class="nowrap">
-                            <RiscvCurrentInstructionArrow v-if="isSingleStage" :class="{hidden: entry[2] !== 'Single' }"/>
+                        <td class="text-nowrap">
+                            <RiscvCurrentInstructionArrow v-if="isSingleStage" :class="{invisible: entry[2] !== 'Single' }"/>
                             {{ entry[0] }}
                         </td>
                         <td> {{ entry[1] }}</td>
@@ -54,7 +54,7 @@ const isFiveStage = computed(() => riscvSettings.pipelineMode.value == 'five_sta
                 </template>
                 <tr v-for="entry of dataMemoryEntries">
                     <td> {{ entry.hexAdress }} </td>
-                    <td :class="{ highlight: entry.doHighlight }"> {{ entry.value }} </td>
+                    <td :class="[{ highlight: entry.doHighlight }, 'text-end']"> {{ entry.value }} </td>
                     <td></td>
                 </tr>
 
@@ -64,16 +64,15 @@ const isFiveStage = computed(() => riscvSettings.pipelineMode.value == 'five_sta
 </template>
 
 <style>
-.hidden {
-    visibility: hidden;
+.highlight {
+    background-color: var(--highlight-color) !important;
 }
 
 .nowrap {
     white-space: nowrap;
 }
 
-#riscv-uni-memory-table-body>tr>td:nth-child(1),
-#riscv-uni-memory-table-body>tr>td:nth-child(2) {
+#riscv-uni-memory-table-body>tr>td:nth-child(1) {
     text-align: right;
 }
 

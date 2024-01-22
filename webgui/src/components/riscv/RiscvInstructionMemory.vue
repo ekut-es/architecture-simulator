@@ -27,8 +27,8 @@ const isFiveStage = computed(() => riscvSettings.pipelineMode.value == 'five_sta
             <tbody id="riscv-instruction-table-body">
                 <template v-for="entry in simulationStore.instructionMemoryEntries">
                     <tr :class="{ 'archsim-tr-runtime-error': simulationStore.instructionErrored(entry[0]) }">
-                        <td class="nowrap">
-                            <RiscvCurrentInstructionArrow v-if="isSingleStage" :class="{hidden: entry[2] !== 'Single' }"/>
+                        <td class="text-nowrap">
+                            <RiscvCurrentInstructionArrow v-if="isSingleStage" :class="{invisible: entry[2] !== 'Single' }"/>
                             {{ entry[0] }}
                         </td>
                         <td> {{ entry[1] }}</td>
@@ -44,13 +44,6 @@ const isFiveStage = computed(() => riscvSettings.pipelineMode.value == 'five_sta
 </template>
 
 <style>
-.hidden {
-    visibility: hidden;
-}
-
-.nowrap {
-    white-space: nowrap;
-}
 
 #riscv-instruction-table-body>tr>td:nth-child(1) {
     text-align: right;
