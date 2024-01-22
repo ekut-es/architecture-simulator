@@ -1,5 +1,5 @@
 <script setup>
-import { onUnmounted, ref } from 'vue';
+import { onUnmounted, ref, watch, computed } from 'vue';
 
 import RiscvControlBar from './RiscvControlBar.vue';
 import RiscvDataMemory from './RiscvDataMemory.vue';
@@ -26,6 +26,21 @@ const visualizationsContainer = ref(null);
 
 let split = null;
 
+const textContainerPopulated = computed(() => (riscvSettings.showInput.value || riscvSettings.showMemory.value || riscvSettings.showRegisters.value || riscvSettings.showOutput.value));
+const enableSplit = computed(() => textContainerPopulated.value && riscvSettings.showVisualization.value);
+
+watch(enableSplit, (enable) => {
+    if (split === null) {
+        return;
+    }
+
+    if (enable) {
+        split.createSplit();
+    } else {
+        split.destroySplit();
+    }
+});
+
 onMounted(() => {
     split = new ArchsimSplit(mainContentContainer.value, textContentContainer.value, visualizationsContainer.value);
     split.createSplit();
@@ -40,16 +55,18 @@ onUnmounted(() => {
 <template>
     <RiscvControlBar />
 
-    <div ref="mainContentContainer" id="riscv-main-content-container">
-        <div ref="textContentContainer" class="d-flex" id="riscv-text-content-container">
-            <CodeEditor class="flex-grow-1 code-editor" :simulation-store="simulationStore" isa-name="riscv" v-show="riscvSettings.showInput.value"/>
+    <div ref="mainContentContainer" id="riscv-main-content-container" class="d-flex">
+        <div ref="textContentContainer" :class="textContainerPopulated ? 'd-flex flex-grow-1' : 'd-none'" id="riscv-text-content-container">
+            <CodeEditor class="flex-grow-1 code-editor" :simulation-store="simulationStore" isa-name="riscv"
+                v-show="riscvSettings.showInput.value" />
             <RiscvUnifiedMemory class="flex-shrink-0" v-show="riscvSettings.showMemory.value" />
             <!-- <RiscvInstructionMemory /> -->
-            <RiscvRegisterTable class="flex-shrink-0" v-show="riscvSettings.showRegisters.value"/>
+            <RiscvRegisterTable class="flex-shrink-0" v-show="riscvSettings.showRegisters.value" />
             <!-- <RiscvDataMemory /> -->
-            <RiscvOutputField class="flex-shrink-0" v-show="riscvSettings.showOutput.value"/>
+            <RiscvOutputField class="flex-shrink-0" v-show="riscvSettings.showOutput.value" />
         </div>
-        <div v-show="riscvSettings.showVisualization.value" ref="visualizationsContainer" id="riscv-visualizations-container">
+        <div v-show="riscvSettings.showVisualization.value" ref="visualizationsContainer"
+            id="riscv-visualizations-container">
             <RiscvVisualization v-if="riscvSettings.pipelineMode.value === 'five_stage_pipeline'"
                 :path="fiveStageVisualizationPath" :simulation-store="simulationStore" />
             <RiscvVisualization v-if="riscvSettings.pipelineMode.value === 'single_stage_pipeline'"
