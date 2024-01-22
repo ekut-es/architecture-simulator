@@ -45,7 +45,6 @@ export class ArchsimSplit {
                 {
                     direction: "vertical",
                     minSize: 200,
-                    sizes: [60, 40],
                     snapOffset: 0,
                 }
             );
@@ -56,7 +55,6 @@ export class ArchsimSplit {
                 ["#" + this.firstElement.id, "#" + this.secondElement.id],
                 {
                     minSize: 200,
-                    sizes: [35, 65],
                     snapOffset: 0,
                 }
             );

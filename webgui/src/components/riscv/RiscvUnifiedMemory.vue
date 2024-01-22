@@ -32,8 +32,8 @@ const isFiveStage = computed(() => riscvSettings.pipelineMode.value == 'five_sta
         <table class="table table-sm table-hover table-bordered archsim-mono-table mb-0">
             <thead>
                 <tr>
-                    <th>Address</th>
-                    <th>Value</th>
+                    <th style="min-width: 8.25em">Address</th>
+                    <th style="min-width: 10em">Value</th>
                     <th v-if="isFiveStage">Stage</th>
                 </tr>
             </thead>
@@ -41,7 +41,7 @@ const isFiveStage = computed(() => riscvSettings.pipelineMode.value == 'five_sta
                 <template v-for="entry in simulationStore.instructionMemoryEntries">
                     <tr :class="{ 'archsim-tr-runtime-error': simulationStore.instructionErrored(entry[0]) }">
                         <td class="text-nowrap">
-                            <RiscvCurrentInstructionArrow v-if="isSingleStage" :class="{invisible: entry[2] !== 'Single' }"/>
+                            <RiscvCurrentInstructionArrow v-if="entry[2] === 'Single'"/>
                             {{ entry[0] }}
                         </td>
                         <td> {{ entry[1] }}</td>
@@ -63,7 +63,7 @@ const isFiveStage = computed(() => riscvSettings.pipelineMode.value == 'five_sta
     </div>
 </template>
 
-<style>
+<style scoped>
 .highlight {
     background-color: var(--highlight-color) !important;
 }
@@ -82,7 +82,9 @@ const isFiveStage = computed(() => riscvSettings.pipelineMode.value == 'five_sta
     padding: 0 0.2em;
     border-radius: 0.25em;
 }
+</style>
 
+<style>
 .riscv-stage-if {
     background-color: #ffbe0b;
     color: black;

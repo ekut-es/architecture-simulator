@@ -1,6 +1,8 @@
 <script setup>
 import { computed } from 'vue';
 
+import RiscvElementToggle from './RiscvElementToggle.vue';
+
 import { useRiscvSimulationStore } from '@/js/riscv_simulation_store';
 import { useEditorStore } from "@/js/editor_store";
 
@@ -34,8 +36,7 @@ function resetButton() {
 </script>
 
 <template>
-    <nav id="nav-bar" class="container-fluid">
-        <div class="row pt-1 pb-1">
+    <nav id="nav-bar" class="d-flex px-2 py-1 justify-content-between">
             <!--Buttons on the left side-->
             <div class="col-auto">
                 <button @click="simulationStore.runSimulation();" :disabled="disableRun" id="button-run-simulation"
@@ -63,13 +64,13 @@ function resetButton() {
                     <i class="bi bi-file-earmark-arrow-down"></i>
                 </button>
             </div>
+            <RiscvElementToggle />
             <!--Buttons on the right side-->
-            <div class="col-auto ms-auto">
+            <div>
                 <button class="btn" title="settings" data-bs-toggle="modal" data-bs-target="#settings-modal">
                     <i class="bi bi-gear-fill"></i>
                 </button>
             </div>
-        </div>
     </nav>
 </template>
 

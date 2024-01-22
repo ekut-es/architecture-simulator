@@ -41,15 +41,15 @@ onUnmounted(() => {
     <RiscvControlBar />
 
     <div ref="mainContentContainer" id="riscv-main-content-container">
-        <div ref="textContentContainer" class="d-flex justify-content-between" id="riscv-text-content-container">
-            <CodeEditor :simulation-store="simulationStore" isa-name="riscv" />
-            <RiscvUnifiedMemory />
+        <div ref="textContentContainer" class="d-flex" id="riscv-text-content-container">
+            <CodeEditor class="flex-grow-1 code-editor" :simulation-store="simulationStore" isa-name="riscv" v-show="riscvSettings.showInput.value"/>
+            <RiscvUnifiedMemory class="flex-shrink-0" v-show="riscvSettings.showMemory.value" />
             <!-- <RiscvInstructionMemory /> -->
-            <RiscvRegisterTable />
+            <RiscvRegisterTable class="flex-shrink-0" v-show="riscvSettings.showRegisters.value"/>
             <!-- <RiscvDataMemory /> -->
-            <RiscvOutputField />
+            <RiscvOutputField class="flex-shrink-0" v-show="riscvSettings.showOutput.value"/>
         </div>
-        <div ref="visualizationsContainer" id="riscv-visualizations-container">
+        <div v-show="riscvSettings.showVisualization.value" ref="visualizationsContainer" id="riscv-visualizations-container">
             <RiscvVisualization v-if="riscvSettings.pipelineMode.value === 'five_stage_pipeline'"
                 :path="fiveStageVisualizationPath" :simulation-store="simulationStore" />
             <RiscvVisualization v-if="riscvSettings.pipelineMode.value === 'single_stage_pipeline'"
@@ -58,7 +58,7 @@ onUnmounted(() => {
     </div>
 </template>
 
-<style>
+<style scoped>
 #riscv-main-content-container {
     flex: 1;
     min-height: 0;
@@ -74,5 +74,9 @@ onUnmounted(() => {
 #riscv-text-content-container>*:not(:last-child) {
     margin: 0 1em 0 0;
     overflow: auto;
+}
+
+.code-editor {
+    min-width: 20em;
 }
 </style>
