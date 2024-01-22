@@ -2,9 +2,10 @@
 import { onUnmounted, ref } from 'vue';
 
 import RiscvControlBar from './RiscvControlBar.vue';
-import RiscvMemoryTable from './RiscvMemoryTable.vue';
+import RiscvDataMemory from './RiscvDataMemory.vue';
+import RiscvInstructionMemory from './RiscvInstructionMemory.vue';
+import RiscvUnifiedMemory from './RiscvUnifiedMemory.vue';
 import RiscvRegisterTable from './RiscvRegisterTable.vue';
-import RiscvInstructionTable from './RiscvInstructionTable.vue';
 import CodeEditor from '../CodeEditor.vue';
 import RiscvOutputField from './RiscvOutputField.vue';
 import RiscvVisualization from './RiscvVisualization.vue';
@@ -14,7 +15,7 @@ import { useRiscvSimulationStore } from '@/js/riscv_simulation_store';
 import fiveStageVisualizationPath from "/src/img/riscv_five_stage_pipeline.svg";
 import singleStageVisualizationPath from "/src/img/riscv_single_stage_pipeline.svg";
 import { riscvSettings } from '@/js/riscv_settings';
-import { onMounted, watch } from 'vue';
+import { onMounted } from 'vue';
 import { ArchsimSplit } from '@/js/archsim-split';
 
 const simulationStore = useRiscvSimulationStore();
@@ -42,16 +43,17 @@ onUnmounted(() => {
     <div ref="mainContentContainer" id="riscv-main-content-container">
         <div ref="textContentContainer" class="d-flex justify-content-between" id="riscv-text-content-container">
             <CodeEditor :simulation-store="simulationStore" isa-name="riscv" />
-            <RiscvInstructionTable />
+            <RiscvUnifiedMemory />
+            <!-- <RiscvInstructionMemory /> -->
             <RiscvRegisterTable />
-            <RiscvMemoryTable />
+            <!-- <RiscvDataMemory /> -->
             <RiscvOutputField />
         </div>
         <div ref="visualizationsContainer" id="riscv-visualizations-container">
-            <RiscvVisualization v-if="riscvSettings.pipelineMode.value === 'five_stage_pipeline'" :path="fiveStageVisualizationPath"
-                :simulation-store="simulationStore" />
-            <RiscvVisualization v-if="riscvSettings.pipelineMode.value === 'single_stage_pipeline'" :path="singleStageVisualizationPath"
-                :simulation-store="simulationStore" />
+            <RiscvVisualization v-if="riscvSettings.pipelineMode.value === 'five_stage_pipeline'"
+                :path="fiveStageVisualizationPath" :simulation-store="simulationStore" />
+            <RiscvVisualization v-if="riscvSettings.pipelineMode.value === 'single_stage_pipeline'"
+                :path="singleStageVisualizationPath" :simulation-store="simulationStore" />
         </div>
     </div>
 </template>

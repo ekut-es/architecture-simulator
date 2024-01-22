@@ -128,7 +128,7 @@ class RiscvSimulation(Simulation):
 
         return [
             (
-                "0x" + "{:03X}".format(address),
+                "0x" + "{:08X}".format(address),
                 instruction,
                 pipeline_stages_addresses[address]
                 if address in pipeline_stages_addresses
