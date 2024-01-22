@@ -46,7 +46,7 @@ watchEffect(() => {
 <template>
     <nav id="nav-bar" class="d-flex px-2 py-1 justify-content-between">
             <!--Buttons on the left side-->
-            <div class="col-auto">
+            <div>
                 <button @click="simulationStore.runSimulation();" :disabled="disableRun" id="button-run-simulation"
                     class="btn btn-success me-1" title="run">
                     <i class="bi bi-play-fill"></i>
