@@ -1,10 +1,11 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, watchEffect } from 'vue';
 
 import RiscvElementToggle from './RiscvElementToggle.vue';
 
 import { useRiscvSimulationStore } from '@/js/riscv_simulation_store';
 import { useEditorStore } from "@/js/editor_store";
+import { riscvSettings } from '@/js/riscv_settings';
 
 const simulationStore = useRiscvSimulationStore();
 const editorStore = useEditorStore(simulationStore, "riscv");
@@ -32,6 +33,13 @@ function resetButton() {
     simulationStore.resetSimulation();
     editorStore.loadProgram();
 }
+
+/**
+ * Hide the input field when the simulation starts.
+ */
+watchEffect(() => {
+    riscvSettings.showInput.value = !simulationStore.hasStarted;
+});
 
 </script>
 
