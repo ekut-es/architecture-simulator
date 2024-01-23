@@ -9,19 +9,41 @@ from .pipeline_registers import (
     ExecutePipelineRegister,
     MemoryAccessPipelineRegister,
     RegisterWritebackPipelineRegister,
+    SingleStagePipelineRegister,
 )
 
 from architecture_simulator.isa.riscv.instruction_types import (
     BTypeInstruction,
     EmptyInstruction,
 )
-from architecture_simulator.isa.riscv.rv32i_instructions import JAL
+from architecture_simulator.isa.riscv.rv32i_instructions import (
+    JAL,
+    SB,
+    SH,
+    SW,
+    LB,
+    LBU,
+    LH,
+    LHU,
+    LW,
+    CSRRW,
+    CSRRS,
+    CSRRC,
+    CSRRWI,
+    CSRRSI,
+    CSRRCI,
+    ECALL,
+    EBREAK,
+    FENCE,
+)
 from .pipeline import InstructionExecutionException
 
 if TYPE_CHECKING:
     from architecture_simulator.uarch.riscv.riscv_architectural_state import (
         RiscvArchitecturalState,
     )
+
+from collections import defaultdict
 
 
 class Stage:
@@ -383,6 +405,22 @@ class RegisterWritebackStage(Stage):
 # Single stage Pipeline:
 #
 class SingleStage(Stage):
+    TYPE_MEMORY_INSTRUCTION = {SB, SH, SW, LB, LBU, LH, LHU, LW}
+    TYPE_STORE_INSTRUCTION = {SB, SH, SW}
+    TYPE_LOAD_INSTRUCTION = {LB, LBU, LH, LHU, LW}
+
+    TYPE_NO_VISUALISATION_AVIVABLE = {
+        CSRRW,
+        CSRRS,
+        CSRRC,
+        CSRRWI,
+        CSRRSI,
+        CSRRCI,
+        ECALL,
+        EBREAK,
+        FENCE,
+    }
+
     def behavior(
         self,
         pipeline_registers: list[PipelineRegister],
@@ -396,23 +434,123 @@ class SingleStage(Stage):
             state (ArchitecturalState): gets the current architectural state as argument
 
         Returns:
-            PipelineRegister: returns an PipelineRegister with default values
+            PipelineRegister: returns a SingleStagePipelineRegister or a default PipelineRegister
         """
         if state.instruction_at_pc():
-            pc_before_increment = state.program_counter
-            instr = state.instruction_memory.read_instruction(state.program_counter)
-
             state.performance_metrics.instruction_count += 1
+            result_pr = SingleStagePipelineRegister()
+
+            result_pr.instruction = state.instruction_memory.read_instruction(
+                state.program_counter
+            )
+            result_pr.address_of_instruction = state.program_counter
+
+            five_stage_control_unit_signals = (
+                result_pr.instruction.control_unit_signals()
+            )
+            result_pr.control_unit_signals.alu_src_1 = (
+                None
+                if five_stage_control_unit_signals.alu_src_1 is None
+                else not five_stage_control_unit_signals.alu_src_1
+            )
+            result_pr.control_unit_signals.alu_src_2 = (
+                five_stage_control_unit_signals.alu_src_2
+            )
+            result_pr.control_unit_signals.alu_control = (
+                five_stage_control_unit_signals.alu_op is not None
+            )
+            result_pr.control_unit_signals.wb_src_int = (
+                five_stage_control_unit_signals.wb_src
+            )
+            result_pr.control_unit_signals.jump = bool(
+                five_stage_control_unit_signals.jump
+            )
+            result_pr.control_unit_signals.pc_from_alu_res = (
+                result_pr.instruction.mnemonic == "jalr"
+            )
+
+            (
+                result_pr.register_read_addr_1,
+                result_pr.register_read_addr_2,
+                result_pr.register_read_data_1,
+                result_pr.register_read_data_2,
+                result_pr.imm,
+            ) = result_pr.instruction.access_register_file(state)
+            result_pr.register_write_register = (
+                result_pr.instruction.get_write_register()
+            )
+
+            result_pr.instruction_length = result_pr.instruction.length
+            result_pr.pc_plus_instruction_length = (
+                state.program_counter + result_pr.instruction_length
+            )
+            if result_pr.imm is not None and (
+                five_stage_control_unit_signals.branch
+                or result_pr.control_unit_signals.jump
+            ):
+                result_pr.pc_plus_imm = state.program_counter + result_pr.imm
+
+            a_comparison, a_result = result_pr.instruction.alu_compute(
+                state.program_counter
+                if result_pr.control_unit_signals.alu_src_1
+                else result_pr.register_read_data_1,
+                result_pr.imm
+                if result_pr.control_unit_signals.alu_src_2
+                else result_pr.register_read_data_2,
+            )
+
+            result_pr.alu_comparison = bool(a_comparison)
+            result_pr.alu_result = a_result
+
+            result_pr.memory_address = (
+                result_pr.alu_result
+                if type(result_pr.instruction) in SingleStage.TYPE_MEMORY_INSTRUCTION
+                else None
+            )
+
             try:
-                instr.behavior(state)
-                state.program_counter += instr.length
-                return PipelineRegister(
-                    address_of_instruction=pc_before_increment,
+                result_pr.memory_write_data = (
+                    result_pr.register_read_data_2
+                    if type(result_pr.instruction) in SingleStage.TYPE_STORE_INSTRUCTION
+                    else None
+                )
+                result_pr.memory_read_data = (
+                    result_pr.instruction.memory_access(
+                        result_pr.memory_address, None, state
+                    )
+                    if type(result_pr.instruction) in SingleStage.TYPE_LOAD_INSTRUCTION
+                    else None
                 )
             except Exception as e:
                 raise InstructionExecutionException(
-                    address=pc_before_increment,
-                    instruction_repr=instr.__repr__(),
+                    address=result_pr.address_of_instruction,
+                    instruction_repr=result_pr.instruction.__repr__(),
+                    error_message=e.__repr__(),
+                )
+
+            result_pr.register_write_data = defaultdict(
+                lambda: None,
+                {
+                    None: None,  # to stop mypy complaining
+                    0: result_pr.pc_plus_instruction_length,
+                    1: result_pr.memory_read_data,
+                    2: result_pr.alu_result,
+                    3: result_pr.imm,
+                },
+            )[five_stage_control_unit_signals.wb_src]
+
+            try:
+                result_pr.instruction.behavior(state)
+                state.program_counter += result_pr.instruction.length
+                if (
+                    not type(result_pr.instruction)
+                    in SingleStage.TYPE_NO_VISUALISATION_AVIVABLE
+                ):
+                    return result_pr
+            except Exception as e:
+                raise InstructionExecutionException(
+                    address=result_pr.address_of_instruction,
+                    instruction_repr=result_pr.instruction.__repr__(),
                     error_message=e.__repr__(),
                 )
         return PipelineRegister()

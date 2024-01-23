@@ -13,6 +13,7 @@ from architecture_simulator.uarch.riscv.pipeline_registers import (
     ExecutePipelineRegister,
     MemoryAccessPipelineRegister,
     RegisterWritebackPipelineRegister,
+    SingleStagePipelineRegister,
 )
 
 if TYPE_CHECKING:
@@ -26,6 +27,10 @@ from architecture_simulator.gui.riscv_fiveStage_svg_directives import (
     RiscvFiveStageMEMSvgDirectives,
     RiscvFiveStageWBSvgDirectives,
     RiscvFiveStageOTHERSvgDirectives,
+)
+
+from architecture_simulator.gui.riscv_single_stage_svg_directives import (
+    RiscvSingleStageSvgDirectives,
 )
 
 
@@ -148,6 +153,7 @@ class RiscvSimulation(Simulation):
             list[tuple[str, str, Any]]: each tuple is [svg-id, what update function to use, argument for update function (Any)].
             They can be one of ("<id>","highlight", <#hexcolor>), ("<id>", "write-center", <content>), ("<id>", "write-left", <content>), ("<id>", "write-right", <content>)
         """
+        assert self.mode == "five_stage_pipeline"
         return (
             self._get_riscv_five_stage_IF_svg_update_values()
             + self._get_riscv_five_stage_ID_svg_update_values()
@@ -510,4 +516,175 @@ class RiscvSimulation(Simulation):
             result.FetchLeftMuxOutText.text
         )
 
+        return result.export()
+
+    def get_riscv_single_stage_svg_update_values(self) -> list[tuple[str, str, Any]]:
+        """Returns all information needed to update the svg.
+
+        Returns:
+            list[tuple[str, str, Any]]: each tuple is [svg-id, what update function to use, argument for update function (Any)].
+            They can be one of ("<id>","highlight", <#hexcolor>), ("<id>", "write", <content>)
+        """
+        assert self.mode == "single_stage_pipeline"
+
+        p_reg = self.state.pipeline.pipeline_registers[0]
+        result = RiscvSingleStageSvgDirectives()
+
+        if not isinstance(p_reg, SingleStagePipelineRegister):
+            return result.export()
+        # Text Fields
+
+        result.add_imm_text.text = save_to_str(p_reg.pc_plus_imm)
+        result.add_instr_len_text.text = save_to_str(p_reg.pc_plus_instruction_length)
+        result.instr_len_text.text = save_to_str(p_reg.instruction.length)
+
+        result.pc_text.text = save_to_str(p_reg.address_of_instruction)
+
+        result.instr_mem_instr_text.text = save_to_str(p_reg.instruction.__repr__())
+        result.instr_mem_read_addr_text.text = result.pc_text.text
+
+        result.reg_file_read_addr1_text.text = save_to_str(p_reg.register_read_addr_1)
+        result.reg_file_read_addr2_text.text = save_to_str(p_reg.register_read_addr_2)
+        result.reg_file_read_data_1_text.text = save_to_str(p_reg.register_read_data_1)
+        result.reg_file_read_data_2_text.text = save_to_str(p_reg.register_read_data_2)
+        result.reg_file_write_reg_text.text = save_to_str(p_reg.register_write_register)
+        result.reg_file_write_data_text.text = save_to_str(p_reg.register_write_data)
+
+        result.imm_gen_value_text.text = save_to_str(p_reg.imm)
+
+        result.alu_result_text.text = save_to_str(p_reg.alu_result)
+
+        result.data_memory_address_text.text = save_to_str(p_reg.memory_address)
+        result.data_memory_read_data_text.text = save_to_str(p_reg.memory_read_data)
+        result.data_memory_write_data_value_text.text = save_to_str(
+            p_reg.memory_write_data
+        )
+
+        # Paths
+
+        # Control Unit paths
+
+        # Binary signals
+
+        result.control_unit_2mux_pc_path.do_highlight = (
+            not p_reg.control_unit_signals.pc_from_alu_res
+        )
+        result.control_unit_to_and_path.do_highlight = p_reg.control_unit_signals.jump
+        result.alu_control_to_read_data_2mux_path.do_highlight = bool(
+            p_reg.control_unit_signals.alu_src_2
+        )
+        result.alu_control_to_read_data_1_mux_path.do_highlight = (
+            p_reg.control_unit_signals.alu_src_1 is not None
+        ) and (not p_reg.control_unit_signals.alu_src_1)
+
+        # Non Binary signals
+
+        result.control_unit_to_4mux_path.do_highlight = (
+            p_reg.control_unit_signals.wb_src_int is not None
+        )
+        result.alu_control_to_alu_path.do_highlight = (
+            p_reg.control_unit_signals.alu_control
+        )
+
+        # Other paths
+
+        result.pc_to_add_instr_len_path.do_highlight = bool(
+            result.add_instr_len_text.text
+        )
+        result.pc_to_add_imm_path.do_highlight = bool(result.add_imm_text.text)
+        result.pc_to_2mux_path.do_highlight = bool(p_reg.control_unit_signals.alu_src_1)
+        result.pc_to_instr_mem_path.do_highlight = bool(result.pc_text.text)
+        result.pc_out_path.do_highlight = bool(result.pc_text.text)
+
+        result.instr_mem_to_read_addr1_path.do_highlight = bool(
+            result.reg_file_read_addr1_text.text
+        )
+        result.instr_mem_to_read_addr2_path.do_highlight = bool(
+            result.reg_file_read_addr2_text.text
+        )
+        result.instr_mem_to_write_reg_path.do_highlight = bool(
+            result.reg_file_write_reg_text.text
+        )
+        result.instr_mem_to_imm_gen_path.do_highlight = bool(
+            result.imm_gen_value_text.text
+        )
+        result.instr_mem_to_control_unit_path.do_highlight = bool(
+            result.instr_mem_instr_text.text
+        )
+
+        result.imm_gen_out_path.do_highlight = bool(result.imm_gen_value_text.text)
+        result.imm_gen_to_add_path.do_highlight = bool(result.add_imm_text.text)
+        result.imm_gen_to_4mux_path.do_highlight = (
+            p_reg.control_unit_signals.wb_src_int == 3
+        )
+        result.imm_gen_to_2mux_path.do_highlight = (
+            p_reg.control_unit_signals.alu_src_2
+            or result.pc_to_add_imm_path.do_highlight
+        )
+
+        result.read_data2_to_mem_write_data_path.do_highlight = bool(
+            result.data_memory_write_data_value_text.text
+        )
+        result.read_data_1_mux_to_alu_path.do_highlight = (
+            p_reg.control_unit_signals.alu_src_1 is not None
+        )
+        result.read_data_1_to_2mux_path.do_highlight = bool(
+            bool(result.reg_file_read_data_1_text.text)
+        )
+        result.read_data_2_2mux_to_alu_path.do_highlight = not (
+            p_reg.control_unit_signals.alu_src_2 is None
+        )
+        result.read_data_2_to_2mux_path.do_highlight = bool(
+            result.reg_file_read_data_2_text.text
+        )
+
+        result.alu_out_path.do_highlight = bool(result.alu_result_text.text)
+        result.alu_to_data_memory_address_path.do_highlight = bool(
+            result.data_memory_address_text.text
+        )
+        result.alu_out_to_4mux_path.do_highlight = (
+            p_reg.control_unit_signals.wb_src_int == 2
+        )
+        result.alu_out_to_2mux_path.do_highlight = (
+            result.alu_out_path.do_highlight
+            and (not result.alu_to_data_memory_address_path.do_highlight)
+            and (not result.alu_out_to_4mux_path.do_highlight)
+        )
+        result.alu_comparison_to_and_path.do_highlight = p_reg.alu_comparison
+
+        result.and_to_mux_path.do_highlight = (
+            result.control_unit_to_and_path.do_highlight
+            or result.alu_comparison_to_and_path.do_highlight
+        )
+
+        result.add_imm_to_mux_path.do_highlight = bool(result.add_imm_text.text)
+        result.add_instr_len_out_path.do_highlight = bool(
+            result.add_instr_len_text.text
+        )
+        result.add_instr_len_to_4mux_path.do_highlight = (
+            p_reg.control_unit_signals.wb_src_int == 0
+        )
+        result.add_instr_len_to_2mux_path.do_highlight = (
+            result.add_instr_len_out_path.do_highlight
+            and (not result.add_instr_len_to_4mux_path.do_highlight)
+        )
+
+        result.two_mux_2mux_path.do_highlight = (
+            result.add_imm_to_mux_path.do_highlight
+            or result.add_instr_len_to_2mux_path.do_highlight
+        )
+        result.two_mux_to_pc_path.do_highlight = (
+            result.two_mux_2mux_path.do_highlight
+            or result.alu_out_to_2mux_path.do_highlight
+        )
+
+        result.instr_len_to_add_path.do_highlight = bool(result.instr_len_text.text)
+
+        result.four_mux_to_write_data_path.do_highlight = (
+            p_reg.control_unit_signals.wb_src_int is not None
+        )
+
+        result.data_mem_read_data_to_4mux_path.do_highlight = bool(
+            result.data_memory_read_data_text.text
+        )
         return result.export()

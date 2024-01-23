@@ -87,17 +87,23 @@ export class RiscvSimulationStore extends BaseSimulationStore {
      * Syncs the svg directives.
      */
     syncSvgDirectives() {
-        this.svgDirectives = this.toJsSafe(
-            this.simulation.get_riscv_five_stage_svg_update_values()
-        );
+        if (riscvSettings.pipelineMode.value === "five_stage_pipeline") {
+            this.svgDirectives = this.toJsSafe(
+                this.simulation.get_riscv_five_stage_svg_update_values()
+            );
+        } else if (
+            riscvSettings.pipelineMode.value == "single_stage_pipeline"
+        ) {
+            this.svgDirectives = this.toJsSafe(
+                this.simulation.get_riscv_single_stage_svg_update_values()
+            );
+        }
     }
     syncAll() {
         this.syncRegisterEntries();
         this.syncDataMemoryEntries();
         this.syncInstructionMemoryEntries();
-        if (riscvSettings.pipelineMode.value === "five_stage_pipeline") {
-            this.syncSvgDirectives();
-        }
+        this.syncSvgDirectives();
         super.syncAll();
     }
 }

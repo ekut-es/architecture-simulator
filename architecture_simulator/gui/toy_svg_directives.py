@@ -1,5 +1,5 @@
 from typing import Any
-from .svg_directives import SvgDirective, SvgFillDirective
+from .svg_directives import SvgDirective, SvgFillDirective, SvgWriteDirective
 
 
 class ToySvgDirectives:
@@ -80,24 +80,6 @@ class ToySvgDirectives:
             if isinstance(value, SvgDirective):
                 result.append(value.export(key.replace("_", "-")))
         return result
-
-
-class SvgWriteDirective(SvgDirective):
-    """SVG Directive for changing text."""
-
-    def __init__(self):
-        self.text = ""
-
-    def export(self, id: str) -> tuple[str, str, str]:
-        """Creates a tuple of the directive that the front end can understand.
-
-        Args:
-            id (str): The id to target.
-
-        Returns:
-            tuple[str, str, str]: Tuple of (<id>, write, <value>)
-        """
-        return (id, "write", self.text)
 
 
 class SvgShowDirective(SvgDirective):
