@@ -31,7 +31,7 @@ const tableValues = computed(() => {
             <thead>
                 <tr>
                     <th colspan="2">Register</th>
-                    <th>Value</th>
+                    <th style="min-width: 5em;">Value</th>
                 </tr>
             </thead>
             <tbody id="riscv-register-table-body">

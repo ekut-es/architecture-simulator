@@ -50,14 +50,13 @@ class EditorStore {
                 StreamLanguage.define(gasArm),
                 syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
                 EditorView.editorAttributes.of({
-                    class: "archsim-default-border",
+                    class: "archsim-default-border archsim-editor",
                 }),
                 keymap.of(defaultKeymap), // new lines at end of doc don't work without this
                 lintGutter(),
                 this.linterCompartment.of([]),
             ],
         });
-        this.editorView.dom.id = "codemirror-input";
 
         // tell the editor to auto parse on modification
         this.editorView.dispatch({

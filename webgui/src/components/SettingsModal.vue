@@ -1,6 +1,6 @@
 <script setup>
-import ToySettings from './toy/ToySettings.vue';
-import RiscvSettings from './riscv/RiscvSettings.vue';
+import ToySettingsPage from './toy/ToySettingsPage.vue';
+import RiscvSettingsPage from './riscv/RiscvSettingsPage.vue';
 import RadioSettingsRow from './RadioSettingsRow.vue';
 
 import { globalSettings } from '@/js/global_settings';
@@ -32,8 +32,8 @@ watch(selectedIsa, (selection) => {
                         </RadioSettingsRow>
                     </div>
                     <div id="isa-specific-settings-container">
-                        <ToySettings v-if="globalSettings.selectedIsa === 'toy'"/>
-                        <RiscvSettings v-if="globalSettings.selectedIsa === 'riscv'"/>
+                        <ToySettingsPage v-if="globalSettings.selectedIsa === 'toy'"/>
+                        <RiscvSettingsPage v-if="globalSettings.selectedIsa === 'riscv'"/>
                     </div>
                 </div>
                 <div class="modal-footer">

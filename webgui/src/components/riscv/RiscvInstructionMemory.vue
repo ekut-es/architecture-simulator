@@ -1,4 +1,5 @@
 <script setup>
+import { computed } from 'vue';
 
 import RiscvCurrentInstructionArrow from './RiscvCurrentInstructionArrow.vue';
 
@@ -6,6 +7,9 @@ import { useRiscvSimulationStore } from '@/js/riscv_simulation_store';
 import { riscvSettings } from '@/js/riscv_settings';
 
 const simulationStore = useRiscvSimulationStore();
+
+const isSingleStage = computed(() => riscvSettings.pipelineMode.value == 'single_stage_pipeline');
+const isFiveStage = computed(() => riscvSettings.pipelineMode.value == 'five_stage_pipeline');
 
 </script>
 
@@ -23,11 +27,12 @@ const simulationStore = useRiscvSimulationStore();
             <tbody id="riscv-instruction-table-body">
                 <template v-for="entry in simulationStore.instructionMemoryEntries">
                     <tr :class="{ 'archsim-tr-runtime-error': simulationStore.instructionErrored(entry[0]) }">
-                        <td>
-                            <RiscvCurrentInstructionArrow v-if="entry[2] === 'Single'" />{{ entry[0] }}
+                        <td class="text-nowrap">
+                            <RiscvCurrentInstructionArrow v-if="isSingleStage" :class="{invisible: entry[2] !== 'Single' }"/>
+                            {{ entry[0] }}
                         </td>
                         <td> {{ entry[1] }}</td>
-                        <td v-if="riscvSettings.pipelineMode.value === 'five_stage_pipeline'"> <span
+                        <td v-if="isFiveStage"> <span
                                 :class="['riscv-stage-indicator', 'riscv-stage-' + entry[2].toLowerCase()]"> {{ entry[2] }}
                             </span> </td>
                     </tr>
@@ -39,6 +44,7 @@ const simulationStore = useRiscvSimulationStore();
 </template>
 
 <style>
+
 #riscv-instruction-table-body>tr>td:nth-child(1) {
     text-align: right;
 }

@@ -2,7 +2,7 @@ import Split from "split.js";
 
 export class ArchsimSplit {
     /**
-     * @param {Node} container Container of the split
+     * @param {Node} container Container of the split. Must already be a flex container.
      * @param {Node} firstElement First element that should be resizable
      * @param {Node} secondElement Second element that should be resizable
      */
@@ -31,32 +31,27 @@ export class ArchsimSplit {
      * Creates a SplitJS split between the given elements.
      * Will be horizontal or vertical depending on the window size.
      *
-     * @throws {Error} Throws an error if there already is a split.
      */
     createSplit() {
         if (this.isActive) {
-            throw Error("You can only create one split.");
+            return;
         }
+
         if (window.innerWidth < window.innerHeight) {
             // Vertical split
-            this.container.classList.add("vertical-split");
+            this.container.classList.add("flex-column");
             this.splitInstance = Split(
                 ["#" + this.firstElement.id, "#" + this.secondElement.id],
                 {
                     direction: "vertical",
-                    minSize: 200,
-                    sizes: [60, 40],
                     snapOffset: 0,
                 }
             );
         } else {
             // Horizontal split
-            this.container.classList.add("horizontal-split");
             this.splitInstance = Split(
                 ["#" + this.firstElement.id, "#" + this.secondElement.id],
                 {
-                    minSize: 200,
-                    sizes: [35, 65],
                     snapOffset: 0,
                 }
             );
@@ -72,10 +67,7 @@ export class ArchsimSplit {
         if (this.isActive) {
             this.splitInstance.destroy();
             this.splitInstance = null;
-            this.container.classList.remove(
-                "horizontal-split",
-                "vertical-split"
-            );
+            this.container.classList.remove("flex-column");
             this.isActive = false;
         }
     }
@@ -89,9 +81,9 @@ export class ArchsimSplit {
             return;
         }
         if (
-            (this.container.classList.contains("vertical-split") &&
+            (this.container.classList.contains("flex-column") &&
                 window.innerWidth >= window.innerHeight) ||
-            (this.container.classList.contains("horizontal-split") &&
+            (!this.container.classList.contains("flex-column") &&
                 window.innerWidth < window.innerHeight)
         ) {
             this.destroySplit();

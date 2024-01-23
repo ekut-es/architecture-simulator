@@ -9,6 +9,7 @@ let output = computed(() => {
     if (simulationStore.error) {
         switch (simulationStore.error[0]) {
             case "ParserException":
+                break; // Will be shown in the editor
             case "InstructionExecutionException":
                 return [simulationStore.error[1]];
             default:
@@ -25,7 +26,7 @@ let output = computed(() => {
 </script>
 
 <template>
-    <div id="riscv-output-wrapper archsim-default-border">
+    <div id="riscv-output-wrapper">
         <span class="archsim-text-element-heading">Output</span>
         <div class="flex-shrink-0 archsim-default-border output-field">
             <template v-for="line in output">
@@ -41,11 +42,13 @@ let output = computed(() => {
 .output-field {
     background-color: #ffffff;
     padding: 1em;
-    min-width: 12em;
+    min-width: 18em;
+    max-width: 20em;
+    min-height: 17em;
 }
 
 #riscv-output-wrapper {
     height: 100%;
-    flex-shrink: 0;
+    overflow: auto;
 }
 </style>
