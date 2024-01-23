@@ -1,3 +1,4 @@
+<!-- The riscv help page content. -->
 <template>
     <div class="container-fluid">
         <h2 id="instructions">Instructions</h2>

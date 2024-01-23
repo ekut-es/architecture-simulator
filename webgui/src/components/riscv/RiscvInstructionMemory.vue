@@ -1,3 +1,4 @@
+<!-- The riscv instruction memory table. Will probably be replaced by RiscvUnifiedMemory.vue -->
 <script setup>
 import { computed } from 'vue';
 

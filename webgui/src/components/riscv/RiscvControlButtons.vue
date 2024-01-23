@@ -1,3 +1,4 @@
+<!-- The buttons for controling the riscv simulation (step, run, ...) -->
 <script setup>
 import { computed, watch } from 'vue';
 
@@ -8,7 +9,12 @@ import { riscvSettings } from '@/js/riscv_settings';
 const simulationStore = useRiscvSimulationStore();
 const editorStore = useEditorStore(simulationStore, "riscv");
 
+/**
+ * Whether the simulation can not be started in the current state.
+ */
 const cantStep = computed(() => simulationStore.isRunning || !simulationStore.hasInstructions || simulationStore.isDone || editorStore.hasUnparsedChanges.value);
+
+// Variables for controlling the button states.
 
 const disableRun = cantStep;
 
@@ -19,6 +25,8 @@ const disableStep = cantStep;
 const disableReset = computed(() => simulationStore.isRunning);
 
 const disableUpload = computed(() => simulationStore.hasStarted);
+
+// functions for the buttons to execute.
 
 function stepButton() {
     simulationStore.resumePerformanceTimer();

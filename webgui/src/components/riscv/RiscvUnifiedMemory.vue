@@ -1,3 +1,4 @@
+<!-- A table that holds both instructions and data for RISC-V -->
 <script setup>
 
 import { computed } from 'vue';
@@ -9,6 +10,7 @@ import { riscvSettings } from '@/js/riscv_settings';
 
 const simulationStore = useRiscvSimulationStore();
 
+// An array that we can nicely iterate over in the template
 const dataMemoryEntries = computed(() => {
     const result = [];
     for (const entry of simulationStore.dataMemoryEntries) {
@@ -21,7 +23,9 @@ const dataMemoryEntries = computed(() => {
     return result;
 });
 
-const isSingleStage = computed(() => riscvSettings.pipelineMode.value == 'single_stage_pipeline');
+/**
+ * Whether the five stage pipeline is currently enabled.
+ */
 const isFiveStage = computed(() => riscvSettings.pipelineMode.value == 'five_stage_pipeline');
 
 </script>
@@ -34,17 +38,21 @@ const isFiveStage = computed(() => riscvSettings.pipelineMode.value == 'five_sta
                 <tr>
                     <th style="min-width: 8.25em">Address</th>
                     <th style="min-width: 10em">Value</th>
+                    <!-- An extra column to indicate the stage, but only in case of five stage pipeline -->
                     <th v-if="isFiveStage">Stage</th>
                 </tr>
             </thead>
             <tbody id="riscv-uni-memory-table-body">
+                <!-- Instruction memory entries -->
                 <template v-for="entry in simulationStore.instructionMemoryEntries">
                     <tr :class="{ 'archsim-tr-runtime-error': simulationStore.instructionErrored(entry[0]) }">
                         <td class="text-nowrap">
+                            <!-- Mark the current instruction in case of single stage -->
                             <RiscvCurrentInstructionArrow v-if="entry[2] === 'Single'"/>
                             {{ entry[0] }}
                         </td>
                         <td> {{ entry[1] }}</td>
+                        <!-- Stage indicator in case of five stage pipeline -->
                         <td v-if="isFiveStage">
                             <span :class="['riscv-stage-indicator', 'riscv-stage-' + entry[2].toLowerCase()]">
                                 {{ entry[2] }}
@@ -52,6 +60,7 @@ const isFiveStage = computed(() => riscvSettings.pipelineMode.value == 'five_sta
                         </td>
                     </tr>
                 </template>
+                <!-- Data memory entries -->
                 <tr v-for="entry of dataMemoryEntries">
                     <td> {{ entry.hexAdress }} </td>
                     <td :class="[{ highlight: entry.doHighlight }, 'text-end']"> {{ entry.value }} </td>

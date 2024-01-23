@@ -1,3 +1,4 @@
+<!-- The control bar for RISC-V -->
 <script setup>
 import RiscvElementToggle from './RiscvElementToggle.vue';
 import RiscvControlButtons from './RiscvControlButtons.vue';
