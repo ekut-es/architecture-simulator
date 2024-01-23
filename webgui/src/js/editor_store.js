@@ -15,8 +15,20 @@ import { defaultKeymap } from "@codemirror/commands";
 import { linter, lintGutter } from "@codemirror/lint";
 import { ref, watch } from "vue";
 
+/**
+ * Associative array that holds the editor store for each ISA.
+ * Use `useEditorStore` to access.
+ */
 const editorStores = [];
 
+/**
+ * Get the editor store for the given ISA.
+ *
+ * @param {BaseSimulationStore} simulationStore The simulation store the editor shall access.
+ * Will only be used if no editor store was created for that ISA yet.
+ * @param {String} isaName The name of the ISA.
+ * @returns {EditorStore}
+ */
 export function useEditorStore(simulationStore, isaName) {
     if (!(isaName in editorStores)) {
         editorStores[isaName] = new EditorStore(simulationStore);
@@ -24,18 +36,41 @@ export function useEditorStore(simulationStore, isaName) {
     return editorStores[isaName];
 }
 
+/**
+ * Holds the state of the editor, provides functions for interacting with the editor
+ * and does editor related interactions with the simulation store.
+ *
+ * Each ISA needs their own editor store.
+ */
 class EditorStore {
+    /**
+     * @param {BaseSimulationStore} simulationStore The simulation store that this editor store
+     * shall interact with.
+     */
     constructor(simulationStore) {
+        /**
+         * The simulation store that this editor store shall interact with.
+         */
         this.simulationStore = simulationStore;
-        // Compartments for modifying the state later
+        /**
+         * Compartment for dynamically making the editor read only.
+         */
         let readOnlyCompartment = new Compartment();
+        /**
+         * Compartment that is used for auto parsing.
+         */
         let onViewChangeCompartment = new Compartment();
+        /**
+         * Compartment for the linter.
+         */
         this.linterCompartment = new Compartment();
-
-        // Whether the editor content has changed since the last parsing
+        /**
+         * Whether the editor contents have changed since the last parsing.
+         */
         this.hasUnparsedChanges = ref(false);
-
-        // Timer that will parse the input
+        /**
+         * Timer for auto parsing.
+         */
         this.timer = null;
 
         // Create the editor itself
@@ -99,7 +134,8 @@ class EditorStore {
     }
 
     /**
-     * Replaces the existing linter in the linterCompartment with one that lints the specified line (lineNumber) and displays the provided errorMessage.
+     * Replaces the existing linter in the linterCompartment with one that lints
+     * the specified line (lineNumber) and displays the provided errorMessage.
      */
     showLinterError(lineNumber, errorMessage) {
         this.editorView.dispatch({
@@ -151,10 +187,13 @@ class EditorStore {
      * and syncs the simulationStore.
      */
     loadProgram() {
+        // parse
         clearTimeout(this.timer);
         const input = this.editorView.state.doc.toString();
         this.clearLinterError();
         this.simulationStore.loadProgram(input);
+
+        // show new error
         if (
             this.simulationStore.error &&
             this.simulationStore.error[0] === "ParserException"
@@ -164,6 +203,7 @@ class EditorStore {
                 this.simulationStore.error[1]
             );
         }
+
         this.hasUnparsedChanges.value = false;
         this.simulationStore.syncAll();
     }

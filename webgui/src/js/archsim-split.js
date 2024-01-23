@@ -1,12 +1,26 @@
 import Split from "split.js";
 
+/**
+ * Manages a split between two HTML elements that the user can resize.
+ *
+ * Utilises split.js.
+ *
+ * The split will be horizontal or vertical, depending on the device aspect ratio.
+ * There is also a resize listener that changes the direction if needed.
+ *
+ * Because of this listener, you have to explicitly destroy objects of this class
+ * (otherwise js cant garbage collect it).
+ */
 export class ArchsimSplit {
     /**
-     * @param {Node} container Container of the split. Must already be a flex container.
+     * @param {Node} container Container of the split. Must already be a flex container, otherwise the split won't work.
      * @param {Node} firstElement First element that should be resizable
      * @param {Node} secondElement Second element that should be resizable
      */
     constructor(container, firstElement, secondElement) {
+        /**
+         * Whether the split is currently activated.
+         */
         this.isActive = false;
         this.splitInstance = null;
         this.container = container;
@@ -31,6 +45,7 @@ export class ArchsimSplit {
      * Creates a SplitJS split between the given elements.
      * Will be horizontal or vertical depending on the window size.
      *
+     * Calling this function while the split is active won't do anything.
      */
     createSplit() {
         if (this.isActive) {
