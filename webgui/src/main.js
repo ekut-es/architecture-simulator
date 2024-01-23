@@ -15,6 +15,12 @@ import { globalSettings } from "./js/global_settings";
 import { setPyodide as setRiscvPyodide } from "@/js/riscv_simulation_store";
 import { setPyodide as setToyPyodide } from "@/js/toy_simulation_store";
 
+/**
+ * Loads the pyodide runtime. Installs micropip and archsim.
+ * Does the necessary python imports. Returns the pyodide Interface.
+ *
+ * @returns {PyodideInterface} The loaded pyodide interface.
+ */
 async function initializePyodide() {
     const pyodide = await loadPyodide({
         indexURL: "https://cdn.jsdelivr.net/pyodide/v0.22.1/full/",
@@ -52,16 +58,19 @@ function getDefaultIsa() {
 }
 
 async function main() {
+    // display a loading screen
     let loadingScreen = createApp(LoadingScreen);
     loadingScreen.mount("#app");
     globalSettings.loadingStatus = "Loading pyodide...";
     try {
+        // load pyodide
         const pyodide = await initializePyodide();
+        // initialize stuff
         globalSettings.loadingStatus = "Initializing...";
         setToyPyodide(pyodide);
         setRiscvPyodide(pyodide);
-        // set the initial ISA here
         globalSettings.setSelectedIsa(getDefaultIsa());
+        // unmount the loading screen and mount the actual app
         globalSettings.loadingStatus = "Mounting the app...";
         let app = createApp(App);
         loadingScreen.unmount();

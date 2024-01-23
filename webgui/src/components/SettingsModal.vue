@@ -1,3 +1,4 @@
+<!-- The settings modal. ISAs need to insert their custom settings here. -->
 <script setup>
 import ToySettingsPage from './toy/ToySettingsPage.vue';
 import RiscvSettingsPage from './riscv/RiscvSettingsPage.vue';
@@ -32,6 +33,7 @@ watch(selectedIsa, (selection) => {
                         </RadioSettingsRow>
                     </div>
                     <div id="isa-specific-settings-container">
+                        <!--Insert custom settings pages here-->
                         <ToySettingsPage v-if="globalSettings.selectedIsa === 'toy'"/>
                         <RiscvSettingsPage v-if="globalSettings.selectedIsa === 'riscv'"/>
                     </div>
