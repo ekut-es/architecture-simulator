@@ -328,6 +328,22 @@ class ToySimulation(Simulation):
             for name, value in zip(control_unit_names, control_unit_values):
                 control_unit_path = getattr(result, "path_control_unit_" + name)
                 control_unit_text = getattr(result, "text_" + name)
+                try:
+                    control_unit_path_2 = getattr(
+                        result, "path_control_unit_" + name + "_2"
+                    )
+                except AttributeError:
+                    pass
+                else:
+                    control_unit_path_2.do_highlight = value
+
+                try:
+                    control_unit_text_2 = getattr(result, "text_" + name + "_2")
+                except AttributeError:
+                    pass
+                else:
+                    control_unit_text_2.do_highlight = value
+
                 assert isinstance(control_unit_path, SvgFillDirectiveControlUnit)
                 assert isinstance(control_unit_text, SvgFillDirectiveControlUnit)
                 control_unit_path.do_highlight = value
