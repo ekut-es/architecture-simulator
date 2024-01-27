@@ -3,8 +3,6 @@
 import { onUnmounted, ref, watch, computed } from 'vue';
 
 import RiscvControlBar from './RiscvControlBar.vue';
-// import RiscvDataMemory from './RiscvDataMemory.vue';
-// import RiscvInstructionMemory from './RiscvInstructionMemory.vue';
 import RiscvUnifiedMemory from './RiscvUnifiedMemory.vue';
 import RiscvRegisterTable from './RiscvRegisterTable.vue';
 import CodeEditor from '../CodeEditor.vue';
@@ -70,9 +68,7 @@ onUnmounted(() => {
             <CodeEditor class="flex-grow-1 code-editor" :simulation-store="simulationStore" isa-name="riscv"
                 v-show="riscvSettings.showInput.value" />
             <RiscvUnifiedMemory class="flex-shrink-0" v-show="riscvSettings.showMemory.value" />
-            <!-- <RiscvInstructionMemory /> -->
             <RiscvRegisterTable class="flex-shrink-0" v-show="riscvSettings.showRegisters.value" />
-            <!-- <RiscvDataMemory /> -->
             <RiscvOutputField class="flex-shrink-0" v-show="riscvSettings.showOutput.value" />
         </div>
         <div v-show="riscvSettings.showVisualization.value" ref="visualizationsContainer"

@@ -1,3 +1,4 @@
+<!-- The Main App component -->
 <script setup>
 import PageHeader from "@/components/PageHeader.vue"
 import HelpModal from "./components/HelpModal.vue";

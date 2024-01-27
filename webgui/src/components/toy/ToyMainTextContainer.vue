@@ -1,3 +1,4 @@
+<!-- The column containing registers, memory and output  -->
 <script setup>
 import ToyMemoryTable from './ToyMemoryTable.vue';
 import ToyRegisterTable from './ToyRegisterTable.vue';

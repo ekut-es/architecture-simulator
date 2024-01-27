@@ -1,3 +1,4 @@
+<!-- The settings page for TOY -->
 <script setup>
 import RepresentationSettingsRow from '../RepresentationSettingsRow.vue';
 

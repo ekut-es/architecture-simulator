@@ -1,3 +1,4 @@
+<!-- The main component for TOY. -->
 <script setup>
 
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
@@ -14,15 +15,19 @@ import { toySettings } from '@/js/toy_settings';
 
 const simulationStore = useToySimulationStore();
 
+// component refs
 const mainContentContainer = ref(null);
 const textContentContainer = ref(null);
 const visualizationsContainer = ref(null);
 
+// Holds the ArchsimSplit
 let split = null;
 
+// Values that are needed for controlling the split
 const textContainerPopulated = computed(() => (toySettings.showInput.value || toySettings.showMainColumn.value));
 const enableSplit = computed(() => textContainerPopulated.value && toySettings.showVisualization.value);
 
+// Creates or disables the split when enableSplit changes.
 watch(enableSplit, (enable) => {
     if (split === null) {
         return;
@@ -35,6 +40,7 @@ watch(enableSplit, (enable) => {
     }
 });
 
+// Create an ArchsimSplit and activate it if desired.
 onMounted(() => {
     split = new ArchsimSplit(mainContentContainer.value, textContentContainer.value, visualizationsContainer.value);
     if (enableSplit.value) {
@@ -42,6 +48,7 @@ onMounted(() => {
     }
 });
 
+// destroy the split when unmounting
 onUnmounted(() => {
     split.destroyObject();
 });
