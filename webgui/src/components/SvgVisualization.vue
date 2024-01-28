@@ -1,6 +1,4 @@
-<!-- Shows a visualization and updates it according to the values of the simulation store.
-TODO: This is currently only used for toy, but we should replace the kindred riscv component
-with this (and modify the functions here so that this actually works).-->
+<!-- Shows a visualization and updates it according to the values of the simulation store. -->
 <script setup>
 import { ref, watchEffect } from "vue";
 
@@ -59,13 +57,13 @@ function updateVisualization(updateValues) {
         const value = update[2];
         switch (action) {
             case "highlight":
-                toySvgHighlight(id, value);
+                svgHighlight(id, value);
                 break;
             case "write":
-                toySvgSetText(id, value);
+                svgSetText(id, value);
                 break;
             case "show":
-                toySvgShow(id, value);
+                svgShow(id, value);
                 break;
         }
     }
@@ -76,7 +74,7 @@ function updateVisualization(updateValues) {
  * @param {string} id target id.
  * @param {string} color hex color string.
  */
-function toySvgHighlight(id, color) {
+function svgHighlight(id, color) {
     svg.value.querySelector("#" + id).setAttribute("style", "fill: " + color);
 }
 
@@ -85,7 +83,7 @@ function toySvgHighlight(id, color) {
  * @param {string} id target id.
  * @param {string} text text to set as the content of the element.
  */
-function toySvgSetText(id, text) {
+function svgSetText(id, text) {
     svg.value.querySelector("#" + id).textContent = text;
 }
 
@@ -94,7 +92,7 @@ function toySvgSetText(id, text) {
  * @param {string} id target id.
  * @param {boolean} doShow Whether to show the element (display: block). Else it will be hidden (display: none)
  */
-function toySvgShow(id, doShow) {
+function svgShow(id, doShow) {
     const display = doShow ? "block" : "none";
     svg.value.querySelector("#" + id).style.display = display;
 }

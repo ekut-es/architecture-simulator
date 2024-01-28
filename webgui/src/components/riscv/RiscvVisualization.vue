@@ -1,4 +1,5 @@
-<!-- Component for the riscv visualization. Should be merged with the normal visualization component. -->
+<!-- Component for the riscv visualization.
+This differs from the normal SvgVisualization.vue component because the five stage svg is a bit quirky -->
 <script setup>
 /**
  * This is almost the same as the normal Visualization.Vue component,
