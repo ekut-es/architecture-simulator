@@ -1,5 +1,8 @@
 import { ref } from "vue";
 
+/**
+ * RISC-V specific settings.
+ */
 export const riscvSettings = {
     registerRepresentation: ref("3"),
     memoryRepresentation: ref("3"),

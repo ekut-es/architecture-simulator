@@ -5,6 +5,10 @@ import { riscvSettings } from "./riscv_settings";
 
 let pyodide = null;
 
+/**
+ * Sets the local pyodide variable. Needed for creating RiscvSimulationStores.
+ * @param {PyodideInterface} newPyodide The pyodide interface to use.
+ */
 export function setPyodide(newPyodide) {
     pyodide = newPyodide;
 }
@@ -23,7 +27,13 @@ export function useRiscvSimulationStore() {
     return reactive(riscvSimulationStore);
 }
 
+/**
+ * The RISC-V simulation store for interacting with the riscv python simulation.
+ */
 export class RiscvSimulationStore extends BaseSimulationStore {
+    /**
+     * @param {PyodideInterface} pyodide The pyodide interface for interacting with python.
+     */
     constructor(pyodide) {
         const getRiscvSimulation = pyodide.globals.get("get_riscv_simulation");
         super(pyodide, () =>
@@ -34,6 +44,10 @@ export class RiscvSimulationStore extends BaseSimulationStore {
         );
         this.registerEntries = [];
         this.dataMemoryEntries = [];
+        /**
+         * The data memory entries from the last synchronization. Used for determining and highlighting
+         * changed entries.
+         */
         this.previousDataMemoryEntries = [];
         this.instructionMemoryEntries = [];
         this.svgDirectives = [];
@@ -43,6 +57,7 @@ export class RiscvSimulationStore extends BaseSimulationStore {
      * Also keeps track of which entries have changed.
      */
     syncDataMemoryEntries() {
+        // get the new entries
         let newDataMemoryEntries = this.toJsSafe(
             this.simulation.get_data_memory_entries()
         );
@@ -50,14 +65,17 @@ export class RiscvSimulationStore extends BaseSimulationStore {
         for (const entry of newDataMemoryEntries) {
             const intAddress = entry[0][0];
             const newValue = entry[1][1];
+            // find out if the entry has changed or if it is new and add that to the entry
             const hasChanged =
                 newValue !== this.previousDataMemoryEntries[intAddress];
             entry.push(hasChanged);
+            // update the previous entries.
             newPreviousDataMemoryEntries[intAddress] = newValue;
         }
         this.previousDataMemoryEntries = newPreviousDataMemoryEntries;
         this.dataMemoryEntries = newDataMemoryEntries;
     }
+
     /**
      * Syncs the registers.
      * Also keeps track of which entries have changed.
@@ -75,6 +93,7 @@ export class RiscvSimulationStore extends BaseSimulationStore {
         }
         this.registerEntries = newRegisterEntries;
     }
+
     /**
      * Syncs the instruction memory entries.
      */
@@ -83,6 +102,7 @@ export class RiscvSimulationStore extends BaseSimulationStore {
             this.simulation.get_instruction_memory_entries()
         );
     }
+
     /**
      * Syncs the svg directives.
      */
@@ -99,6 +119,7 @@ export class RiscvSimulationStore extends BaseSimulationStore {
             );
         }
     }
+
     syncAll() {
         this.syncRegisterEntries();
         this.syncDataMemoryEntries();

@@ -1,3 +1,4 @@
+<!-- The toggle button group for toggling the riscv elements. -->
 <script setup>
 import ToggleButton from '../ToggleButton.vue';
 

@@ -1,3 +1,4 @@
+<!-- The control buttons (step, run, ...) for TOY -->
 <script setup>
 import { computed, watch } from 'vue';
 

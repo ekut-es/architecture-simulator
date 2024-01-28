@@ -18,6 +18,7 @@ import { globalSettings } from '@/js/global_settings';
                     </h1>
                 </div>
                 <div id="help-modal-body" class="modal-body">
+                    <!--Insert custom help pages here-->
                     <ToyHelp v-if="globalSettings.selectedIsa === 'toy'" />
                     <RiscvHelp v-if="globalSettings.selectedIsa === 'riscv'" />
                 </div>

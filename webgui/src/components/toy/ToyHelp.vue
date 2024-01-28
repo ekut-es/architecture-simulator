@@ -1,3 +1,4 @@
+<!-- The TOY help page -->
 <template>
     <div class="container-fluid">
         <h2>Instructions</h2>

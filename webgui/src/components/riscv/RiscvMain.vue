@@ -1,9 +1,8 @@
+<!-- The main component for riscv. -->
 <script setup>
 import { onUnmounted, ref, watch, computed } from 'vue';
 
 import RiscvControlBar from './RiscvControlBar.vue';
-import RiscvDataMemory from './RiscvDataMemory.vue';
-import RiscvInstructionMemory from './RiscvInstructionMemory.vue';
 import RiscvUnifiedMemory from './RiscvUnifiedMemory.vue';
 import RiscvRegisterTable from './RiscvRegisterTable.vue';
 import CodeEditor from '../CodeEditor.vue';
@@ -20,15 +19,19 @@ import { ArchsimSplit } from '@/js/archsim-split';
 
 const simulationStore = useRiscvSimulationStore();
 
+// component refs
 const mainContentContainer = ref(null);
 const textContentContainer = ref(null);
 const visualizationsContainer = ref(null);
 
+// Holds the ArchsimSplit
 let split = null;
 
+// Values that are needed for controlling the split
 const textContainerPopulated = computed(() => (riscvSettings.showInput.value || riscvSettings.showMemory.value || riscvSettings.showRegisters.value || riscvSettings.showOutput.value));
 const enableSplit = computed(() => textContainerPopulated.value && riscvSettings.showVisualization.value);
 
+// Creates or disables the split when enableSplit changes.
 watch(enableSplit, (enable) => {
     if (split === null) {
         return;
@@ -41,6 +44,7 @@ watch(enableSplit, (enable) => {
     }
 });
 
+// Create an ArchsimSplit and activate it if desired.
 onMounted(() => {
     split = new ArchsimSplit(mainContentContainer.value, textContentContainer.value, visualizationsContainer.value);
     if (enableSplit.value) {
@@ -48,6 +52,7 @@ onMounted(() => {
     }
 });
 
+// destroy the split when unmounting
 onUnmounted(() => {
     split.destroyObject();
 })
@@ -63,9 +68,7 @@ onUnmounted(() => {
             <CodeEditor class="flex-grow-1 code-editor" :simulation-store="simulationStore" isa-name="riscv"
                 v-show="riscvSettings.showInput.value" />
             <RiscvUnifiedMemory class="flex-shrink-0" v-show="riscvSettings.showMemory.value" />
-            <!-- <RiscvInstructionMemory /> -->
             <RiscvRegisterTable class="flex-shrink-0" v-show="riscvSettings.showRegisters.value" />
-            <!-- <RiscvDataMemory /> -->
             <RiscvOutputField class="flex-shrink-0" v-show="riscvSettings.showOutput.value" />
         </div>
         <div v-show="riscvSettings.showVisualization.value" ref="visualizationsContainer"

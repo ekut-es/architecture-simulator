@@ -1,5 +1,8 @@
 import { ref } from "vue";
 
+/**
+ * TOY specific settings.
+ */
 export const toySettings = {
     registerRepresentation: ref("1"),
     memoryRepresentation: ref("1"),

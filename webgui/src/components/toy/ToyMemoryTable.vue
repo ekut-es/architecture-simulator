@@ -1,3 +1,4 @@
+<!-- The memory table for data and instructions -->
 <script setup>
 import { computed } from 'vue';
 
@@ -8,6 +9,7 @@ import { useToySimulationStore } from '@/js/toy_simulation_store';
 
 const simulationStore = useToySimulationStore();
 
+// An array that we can nicely iteratve over in the template
 const tableValues = computed(() => {
     let result = [];
     for (const entry of simulationStore.memoryEntries) {

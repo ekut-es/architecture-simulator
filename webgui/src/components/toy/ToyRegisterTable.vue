@@ -1,3 +1,4 @@
+<!-- The register table for TOY -->
 <script setup>
 import { useToySimulationStore } from '@/js/toy_simulation_store';
 import { toySettings } from '@/js/toy_settings';

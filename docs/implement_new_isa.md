@@ -8,13 +8,4 @@ This document will show you how you can add a new instruction set architecture (
 - Add a simulation class to `/architecture_simulator/simulation/` which is a subclass of the abstract base class (ABC) `architecture_simulator.simulation.simulation.Simulation`. This is an ABC so that you have to implement some basic interface methods, like `step()` and `load_program()`. The simulation should hold an architectural state and act as a common interface for all ISAs (which should also make it easier to add your ISA to the web interface).
 - For (basically) all of the points above, you can add tests to `/architecture_simulator/tests/`.
 - You can also add your ISA to the command line interface defined in `/architecture_simulator/cli/`, but at the time of writing, it is WIP, so I have no idea how to do that.
-- If you want to add your ISA to the web UI, there are a couple of things you need to do:
-    - In the `webgui/index.html`, add a button next to the other ones for switching the ISA (in the settings menu).
-    - `webgui/js/scripts.js` contains event listeners and the functions they should trigger. In there do the following:
-        - Create an event listener which listens for clicks on the button you just created and which changes the `selected_isa` variable (not sure if this is the best way to do it).
-    - Also create any other html elements inside the index.html that you need. Note that we already have a field for the instruction memory, data memory and registers. If you need something else, you've got to make sure that you hide/display the elements when your ISA is selected.
-    - `webgui/js/archsim.js` contains a variable `archsim_js` which has all the functions which you want to be able to call from python. In there, do the following:
-        - Add functions that you want to call from python to manipulate the HTML elements if you added any additional elements. There are already functions for the existing elements like the memory table.
-    - `architecture_simulator/gui/webgui.py` contains all the python functions that you want to be able to call from javascript. In there, do the following:
-        - adapt the function `reset_sim()` to create the simulation from your ISA if it is selected.
-        - adapt the function `update_tables()` so that it updates all the UI elements to reflect the current state of the simulation and the architectural state.
+- If you want to add your ISA to the web UI, read `add_isa_to_webgui.md`

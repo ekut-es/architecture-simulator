@@ -1,3 +1,4 @@
+<!-- RISCV settings page -->
 <script setup>
 import { ref, watch } from 'vue';
 import RadioSettingsRow from '../RadioSettingsRow.vue';
@@ -10,9 +11,11 @@ import { riscvSettings } from '@/js/riscv_settings';
 const simulationStore = useRiscvSimulationStore();
 const editorStore = useEditorStore(simulationStore, "riscv");
 
+// Changes to these values must be watched to perform side effects
 const pipelineMode = ref(riscvSettings.pipelineMode.value);
 const dataHazardDetection = ref(riscvSettings.dataHazardDetection.value);
 
+// Reset the sim and parse the input if the pipeline or data hazard detection changes
 watch([pipelineMode, dataHazardDetection], ([newPipelineMode, newDataHazardDetection]) => {
     riscvSettings.pipelineMode.value = newPipelineMode;
     riscvSettings.dataHazardDetection.value = newDataHazardDetection;

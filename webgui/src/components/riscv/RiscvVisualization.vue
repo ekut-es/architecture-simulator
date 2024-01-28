@@ -1,3 +1,4 @@
+<!-- Component for the riscv visualization. Should be merged with the normal visualization component. -->
 <script setup>
 /**
  * This is almost the same as the normal Visualization.Vue component,

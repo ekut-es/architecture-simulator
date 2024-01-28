@@ -1,3 +1,4 @@
+<!-- The output field for RISC-V -->
 <script setup>
 import { computed } from 'vue';
 
@@ -5,6 +6,13 @@ import { useRiscvSimulationStore } from '@/js/riscv_simulation_store';
 
 const simulationStore = useRiscvSimulationStore();
 
+/**
+ * An array that holds one string for each line to display
+ * in the output field.
+ *
+ * Contains unknown errors and runtime errors, or shows the
+ * performance metrics in case there are no errors.
+ */
 let output = computed(() => {
     if (simulationStore.error) {
         switch (simulationStore.error[0]) {

@@ -1,3 +1,4 @@
+<!-- The arrow for marking the current instruction in TOY -->
 <template>
     <span class="toy-current-cycle text-light bg-dark">
         <slot></slot>

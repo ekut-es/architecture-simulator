@@ -1,3 +1,4 @@
+<!-- The register table for riscv -->
 <script setup>
 import { computed } from 'vue';
 
@@ -6,8 +7,12 @@ import { riscvSettings } from '@/js/riscv_settings';
 
 const simulationStore = useRiscvSimulationStore();
 
+// The ABI names for each register
 const abiNames = ["zero", "ra", "sp", "gp", "tp", "t0", "t1", "t2", "s0/fp", "s1", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"];
 
+/**
+ * An array of objects for the register entries that we can nicely iterate over in the template.
+ */
 const tableValues = computed(() => {
     const result = [];
     for (let i = 0; i < 32; i++) {
