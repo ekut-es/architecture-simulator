@@ -112,7 +112,7 @@ const isFiveStage = computed(
 <style>
 .riscv-stage-if {
     background-color: #ffbe0b;
-    color: black;
+    color: black !important;
 }
 
 .riscv-stage-id {
