@@ -2,7 +2,7 @@
 <script setup>
 import { computed } from "vue";
 
-import RiscvCurrentInstructionArrow from "./RiscvCurrentInstructionArrow.vue";
+import CurrentInstructionArrow from "../CurrentInstructionArrow.vue";
 
 import { useRiscvSimulationStore } from "@/js/riscv_simulation_store";
 import { riscvSettings } from "@/js/riscv_settings";
@@ -21,13 +21,6 @@ const dataMemoryEntries = computed(() => {
     }
     return result;
 });
-
-/**
- * Whether the five stage pipeline is currently enabled.
- */
-const isFiveStage = computed(
-    () => riscvSettings.pipelineMode.value == "five_stage_pipeline"
-);
 </script>
 
 <template>
@@ -54,9 +47,9 @@ const isFiveStage = computed(
                         }"
                     >
                         <td class="text-nowrap">
-                            <!-- Mark the current instruction/current stage -->
+                            <!-- Mark the current instruction/stage -->
                             <template v-if="entry[2] === 'Single'">
-                                <RiscvCurrentInstructionArrow />
+                                <CurrentInstructionArrow />
                             </template>
                             <template v-else>
                                 <span
@@ -106,10 +99,9 @@ const isFiveStage = computed(
     font-weight: 500;
     padding: 0 0.2em;
     border-radius: 0.25em;
+    float: left;
 }
-</style>
 
-<style>
 .riscv-stage-if {
     background-color: #ffbe0b;
     color: black !important;

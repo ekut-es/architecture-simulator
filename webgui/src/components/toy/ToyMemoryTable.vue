@@ -2,7 +2,7 @@
 <script setup>
 import { computed } from "vue";
 
-import ToyCurrentInstructionArrow from "./ToyCurrentInstructionArrow.vue";
+import CurrentInstructionArrow from "../CurrentInstructionArrow.vue";
 
 import { toySettings } from "@/js/toy_settings";
 import { useToySimulationStore } from "@/js/toy_simulation_store";
@@ -42,9 +42,9 @@ const tableValues = computed(() => {
             <tbody id="toy-memory-table-body">
                 <tr v-for="entry in tableValues">
                     <td>
-                        <ToyCurrentInstructionArrow v-if="entry.cycle">
+                        <CurrentInstructionArrow v-if="entry.cycle">
                             {{ entry.cycle }}
-                        </ToyCurrentInstructionArrow>
+                        </CurrentInstructionArrow>
                         {{ entry.hexAddress }}
                     </td>
                     <td :class="{ highlight: entry.doHighlight }">
