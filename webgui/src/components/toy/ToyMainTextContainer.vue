@@ -1,8 +1,8 @@
 <!-- The column containing registers, memory and output  -->
 <script setup>
-import ToyMemoryTable from './ToyMemoryTable.vue';
-import ToyRegisterTable from './ToyRegisterTable.vue';
-import ToyOutputField from './ToyOutputField.vue';
+import ToyMemoryTable from "./ToyMemoryTable.vue";
+import ToyRegisterTable from "./ToyRegisterTable.vue";
+import ToyOutputField from "./ToyOutputField.vue";
 </script>
 
 <template>
@@ -19,7 +19,7 @@ import ToyOutputField from './ToyOutputField.vue';
     overflow: auto;
 }
 
-#toy-main-text-container>* {
+#toy-main-text-container > * {
     overflow: auto;
 }
 </style>

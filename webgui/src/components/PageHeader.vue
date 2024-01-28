@@ -1,5 +1,5 @@
 <script setup>
-import { globalSettings } from '@/js/global_settings';
+import { globalSettings } from "@/js/global_settings";
 </script>
 
 <template>
@@ -10,8 +10,12 @@ import { globalSettings } from '@/js/global_settings';
             </div>
             <div class="col-auto ms-auto">
                 <button id="help-button" class="btn">
-                    <i class="bi bi-question-circle-fill" title="help" data-bs-toggle="modal"
-                        data-bs-target="#help-modal"></i>
+                    <i
+                        class="bi bi-question-circle-fill"
+                        title="help"
+                        data-bs-toggle="modal"
+                        data-bs-target="#help-modal"
+                    ></i>
                 </button>
             </div>
         </div>
@@ -19,7 +23,6 @@ import { globalSettings } from '@/js/global_settings';
 </template>
 
 <style scoped>
-
 header {
     background-color: var(--main-accent-color);
     color: white;
@@ -30,5 +33,4 @@ header {
     font-size: 2rem;
     padding: 0px 8px;
 }
-
 </style>

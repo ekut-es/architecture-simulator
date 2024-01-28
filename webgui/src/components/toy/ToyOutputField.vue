@@ -1,8 +1,8 @@
 <!-- The output field for TOY -->
 <script setup>
-import { computed } from 'vue';
+import { computed } from "vue";
 
-import { useToySimulationStore } from '@/js/toy_simulation_store';
+import { useToySimulationStore } from "@/js/toy_simulation_store";
 
 const simulationStore = useToySimulationStore();
 
@@ -21,7 +21,9 @@ let output = computed(() => {
             case "InstructionExecutionException":
                 return [simulationStore.error[1]];
             default:
-                return [`An unknown error occured: ${simulationStore.error[1]}`];
+                return [
+                    `An unknown error occured: ${simulationStore.error[1]}`,
+                ];
         }
     }
 
@@ -38,9 +40,7 @@ let output = computed(() => {
         <span class="archsim-text-element-heading">Output</span>
         <div class="flex-shrink-0 archsim-default-border output-field">
             <template v-for="line in output">
-                <template v-if="line">
-                    {{ line }} <br>
-                </template>
+                <template v-if="line"> {{ line }} <br /> </template>
             </template>
         </div>
     </div>

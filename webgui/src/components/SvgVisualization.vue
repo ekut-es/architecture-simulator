@@ -98,11 +98,15 @@ function toySvgShow(id, doShow) {
     const display = doShow ? "block" : "none";
     svg.value.querySelector("#" + id).style.display = display;
 }
-
 </script>
 
 <template>
-    <object @load.once="svgLoaded" :data="path" type="image/svg+xml" class="visualization"></object>
+    <object
+        @load.once="svgLoaded"
+        :data="path"
+        type="image/svg+xml"
+        class="visualization"
+    ></object>
 </template>
 
 <style scoped>

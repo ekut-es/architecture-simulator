@@ -1,12 +1,11 @@
 <!-- A table that holds both instructions and data for RISC-V -->
 <script setup>
+import { computed } from "vue";
 
-import { computed } from 'vue';
+import RiscvCurrentInstructionArrow from "./RiscvCurrentInstructionArrow.vue";
 
-import RiscvCurrentInstructionArrow from './RiscvCurrentInstructionArrow.vue';
-
-import { useRiscvSimulationStore } from '@/js/riscv_simulation_store';
-import { riscvSettings } from '@/js/riscv_settings';
+import { useRiscvSimulationStore } from "@/js/riscv_simulation_store";
+import { riscvSettings } from "@/js/riscv_settings";
 
 const simulationStore = useRiscvSimulationStore();
 
@@ -17,7 +16,7 @@ const dataMemoryEntries = computed(() => {
         result.push({
             hexAdress: entry[0][1],
             value: entry[1][riscvSettings.memoryRepresentation.value],
-            doHighlight: simulationStore.hasStarted && entry[2]
+            doHighlight: simulationStore.hasStarted && entry[2],
         });
     }
     return result;
@@ -26,14 +25,17 @@ const dataMemoryEntries = computed(() => {
 /**
  * Whether the five stage pipeline is currently enabled.
  */
-const isFiveStage = computed(() => riscvSettings.pipelineMode.value == 'five_stage_pipeline');
-
+const isFiveStage = computed(
+    () => riscvSettings.pipelineMode.value == "five_stage_pipeline"
+);
 </script>
 
 <template>
     <div>
         <span class="archsim-text-element-heading">Memory</span>
-        <table class="table table-sm table-hover table-bordered archsim-mono-table mb-0">
+        <table
+            class="table table-sm table-hover table-bordered archsim-mono-table mb-0"
+        >
             <thead>
                 <tr>
                     <th style="min-width: 9.5em">Address</th>
@@ -42,32 +44,45 @@ const isFiveStage = computed(() => riscvSettings.pipelineMode.value == 'five_sta
             </thead>
             <tbody id="riscv-uni-memory-table-body">
                 <!-- Instruction memory entries -->
-                <template v-for="entry in simulationStore.instructionMemoryEntries">
-                    <tr :class="{ 'archsim-tr-runtime-error': simulationStore.instructionErrored(entry[0]) }">
+                <template
+                    v-for="entry in simulationStore.instructionMemoryEntries"
+                >
+                    <tr
+                        :class="{
+                            'archsim-tr-runtime-error':
+                                simulationStore.instructionErrored(entry[0]),
+                        }"
+                    >
                         <td class="text-nowrap">
                             <!-- Mark the current instruction/current stage -->
                             <template v-if="entry[2] === 'Single'">
                                 <RiscvCurrentInstructionArrow />
                             </template>
                             <template v-else>
-                                <span :class="['riscv-stage-indicator', 'riscv-stage-' + entry[2].toLowerCase()]"
-                                    v-if="entry[2]">
+                                <span
+                                    :class="[
+                                        'riscv-stage-indicator',
+                                        'riscv-stage-' + entry[2].toLowerCase(),
+                                    ]"
+                                    v-if="entry[2]"
+                                >
                                     {{ entry[2] }}
                                 </span>
                             </template>
                             <!-- The actual address -->
                             {{ entry[0] }}
                         </td>
-                        <td> {{ entry[1] }}</td>
+                        <td>{{ entry[1] }}</td>
                         <!-- Stage indicator in case of five stage pipeline -->
                     </tr>
                 </template>
                 <!-- Data memory entries -->
                 <tr v-for="entry of dataMemoryEntries">
-                    <td> {{ entry.hexAdress }} </td>
-                    <td :class="[{ highlight: entry.doHighlight }, 'text-end']"> {{ entry.value }} </td>
+                    <td>{{ entry.hexAdress }}</td>
+                    <td :class="[{ highlight: entry.doHighlight }, 'text-end']">
+                        {{ entry.value }}
+                    </td>
                 </tr>
-
             </tbody>
         </table>
     </div>
@@ -82,7 +97,7 @@ const isFiveStage = computed(() => riscvSettings.pipelineMode.value == 'five_sta
     white-space: nowrap;
 }
 
-#riscv-uni-memory-table-body>tr>td:nth-child(1) {
+#riscv-uni-memory-table-body > tr > td:nth-child(1) {
     text-align: right;
 }
 

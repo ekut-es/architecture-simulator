@@ -14,7 +14,14 @@ const checked = setting.value;
 </script>
 
 <template>
-    <input type="checkbox" class="btn-check" :id="baseId" autocomplete="off" :checked="checked" v-model="setting">
+    <input
+        type="checkbox"
+        class="btn-check"
+        :id="baseId"
+        autocomplete="off"
+        :checked="checked"
+        v-model="setting"
+    />
     <label class="btn btn-outline-primary" :for="baseId">
         <slot></slot>
     </label>

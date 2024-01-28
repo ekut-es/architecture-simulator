@@ -110,10 +110,10 @@
         </div>
         <p>
             Note that the address
-            <code>addr</code> of an instruction is a 12 bit value that can either be
-            given as decimal or hexadecimal number, or it can be the name of a label
-            or a variable. Hexadecimal numbers have to be prepended by '0x' like
-            this: <code>0x400</code>.
+            <code>addr</code> of an instruction is a 12 bit value that can
+            either be given as decimal or hexadecimal number, or it can be the
+            name of a label or a variable. Hexadecimal numbers have to be
+            prepended by '0x' like this: <code>0x400</code>.
         </p>
 
         <h2>Comments</h2>
@@ -123,10 +123,11 @@
         <h2>Labels</h2>
         <p>
             Labels are names that can be used instead of addresses.<br />
-            Labels reference a position in the program and are used as destination
-            addresses for branch instructions or to reference an instruction. They
-            are declared by typing the name of the label, followed by a colon. Note
-            that indenting the following code section is optional.<br />
+            Labels reference a position in the program and are used as
+            destination addresses for branch instructions or to reference an
+            instruction. They are declared by typing the name of the label,
+            followed by a colon. Note that indenting the following code section
+            is optional.<br />
         </p>
         <pre class="bg-light">
 loop:
@@ -137,15 +138,17 @@ loop:
     ZRO
     BRZ loop
 end:
-</pre>
+</pre
+        >
 
         <h2>Segments and variables</h2>
-        In addition to the program code, the simulator supports a data segment. It
-        can be used to store variables and arrays in the processor's memory.<br />
+        In addition to the program code, the simulator supports a data segment.
+        It can be used to store variables and arrays in the processor's
+        memory.<br />
 
         In order to define a data segment, the
-        <code>.data</code> directive is used, while the <code>.text</code> directive
-        designates the code segment. <br />
+        <code>.data</code> directive is used, while the
+        <code>.text</code> directive designates the code segment. <br />
         The following example demonstrates how to declare and use variables and
         arrays: <br />
         <br />
@@ -164,28 +167,32 @@ end:
     true:
         INC
         STO my_result
-    end:</pre>
+    end:</pre
+        >
         <p>
             Note that similarly to labels, indentation is optional. <br />
-            If no directives are given, the entire input is interpreted as code.<br />
-            Similarly, if a <code>.data</code> but no <code>.text</code> directive
-            is given, every line before the data segment is interpreted as code.
+            If no directives are given, the entire input is interpreted as
+            code.<br />
+            Similarly, if a <code>.data</code> but no
+            <code>.text</code> directive is given, every line before the data
+            segment is interpreted as code.
             <br />
             There is no fixed segmentation order. However, declaring multiple
             segments of the same type will throw an error.
         </p>
         <h2>Memory</h2>
         <p>
-            The simulator uses one memory of 4096 16 bit words for instructions and
-            data.<br />
-            Instructions get written to the beginning of the memory space. They can
-            be modified "at runtime" (see Examples).<br />
-            Any value in the memory can be interpreted as an instruction. To still
-            know when to stop, we use the last instruction written in the code
-            editor. If the program counter gets higher, the simulation will stop.<br />
+            The simulator uses one memory of 4096 16 bit words for instructions
+            and data.<br />
+            Instructions get written to the beginning of the memory space. They
+            can be modified "at runtime" (see Examples).<br />
+            Any value in the memory can be interpreted as an instruction. To
+            still know when to stop, we use the last instruction written in the
+            code editor. If the program counter gets higher, the simulation will
+            stop.<br />
             Variables and arrays get written to the end of the memory (the first
-            variable declared will have the highest memory address). Note that the
-            elements of an array still get written in ascending order.
+            variable declared will have the highest memory address). Note that
+            the elements of an array still get written in ascending order.
         </p>
 
         <h2>Examples</h2>
@@ -212,7 +219,8 @@ end:
         ZRO
         BRZ loop
     end:
-</pre>
+</pre
+        >
         <h4>Example 2:</h4>
         <pre class="bg-light">
 # store second value of my_tuple in my_value
@@ -228,6 +236,7 @@ end:
     my_load_instruction:        # this label points to the memory location of LDA instruction
     LDA my_tuple                # actually load data at my_tuple + 1 (=0xFFF)
     STO my_value                # store value of second tuple entry at my_value (0xFFD)
-</pre>
+</pre
+        >
     </div>
 </template>

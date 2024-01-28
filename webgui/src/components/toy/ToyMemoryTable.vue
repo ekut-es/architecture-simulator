@@ -1,11 +1,11 @@
 <!-- The memory table for data and instructions -->
 <script setup>
-import { computed } from 'vue';
+import { computed } from "vue";
 
-import ToyCurrentInstructionArrow from './ToyCurrentInstructionArrow.vue';
+import ToyCurrentInstructionArrow from "./ToyCurrentInstructionArrow.vue";
 
-import { toySettings } from '@/js/toy_settings';
-import { useToySimulationStore } from '@/js/toy_simulation_store';
+import { toySettings } from "@/js/toy_settings";
+import { useToySimulationStore } from "@/js/toy_simulation_store";
 
 const simulationStore = useToySimulationStore();
 
@@ -18,18 +18,20 @@ const tableValues = computed(() => {
             value: entry[1][toySettings.memoryRepresentation.value],
             instruction: entry[2],
             cycle: entry[3],
-            doHighlight: simulationStore.hasStarted && entry[4]
+            doHighlight: simulationStore.hasStarted && entry[4],
         });
     }
     return result;
 });
-
 </script>
 
 <template>
     <div class="mb-3" id="toy-memory-wrapper">
         <span class="archsim-text-element-heading">Memory</span>
-        <table id="toy-memory-table" class="table table-sm table-hover table-bordered archsim-mono-table mb-0">
+        <table
+            id="toy-memory-table"
+            class="table table-sm table-hover table-bordered archsim-mono-table mb-0"
+        >
             <thead>
                 <tr>
                     <th>Address</th>
@@ -40,11 +42,15 @@ const tableValues = computed(() => {
             <tbody id="toy-memory-table-body">
                 <tr v-for="entry in tableValues">
                     <td>
-                        <ToyCurrentInstructionArrow v-if="entry.cycle"> {{ entry.cycle }} </ToyCurrentInstructionArrow>
+                        <ToyCurrentInstructionArrow v-if="entry.cycle">
+                            {{ entry.cycle }}
+                        </ToyCurrentInstructionArrow>
                         {{ entry.hexAddress }}
                     </td>
-                    <td :class="{ highlight: entry.doHighlight }"> {{ entry.value }} </td>
-                    <td> {{ entry.instruction }} </td>
+                    <td :class="{ highlight: entry.doHighlight }">
+                        {{ entry.value }}
+                    </td>
+                    <td>{{ entry.instruction }}</td>
                 </tr>
             </tbody>
         </table>
@@ -67,8 +73,8 @@ const tableValues = computed(() => {
     flex: 1 0 min(auto, 1em);
 }
 
-#toy-memory-table-body>tr>td:nth-child(1),
-#toy-memory-table-body>tr>td:nth-child(2) {
+#toy-memory-table-body > tr > td:nth-child(1),
+#toy-memory-table-body > tr > td:nth-child(2) {
     text-align: right;
 }
 

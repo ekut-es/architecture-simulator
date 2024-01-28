@@ -63,7 +63,7 @@ function updateVisualization(updateValues) {
  * @param {string} id id of text field
  * @param {string} str text to insert
  */
-function set_svg_text_plain(id, str){
+function set_svg_text_plain(id, str) {
     svg.value.getElementById(id).textContent = str;
 }
 
@@ -83,11 +83,10 @@ function set_svg_colour_plain(id, color) {
  * @param {string} str -- The text the element given by id should have, the text is right aligned
  */
 function set_svg_text_complex_right_align(id, str) {
-    svg.value.getElementById(id).firstChild.nextSibling.style.fontSize =
-        "15px";
-    svg.value.getElementById(id).firstChild.nextSibling.textContent =
-        str;
-    svg.value.getElementById(id)
+    svg.value.getElementById(id).firstChild.nextSibling.style.fontSize = "15px";
+    svg.value.getElementById(id).firstChild.nextSibling.textContent = str;
+    svg.value
+        .getElementById(id)
         .firstChild.nextSibling.setAttribute("text-anchor", "end");
 }
 
@@ -97,11 +96,10 @@ function set_svg_text_complex_right_align(id, str) {
  * @param {string} str -- The text the element given by id should have, the text is left aligned
  */
 function set_svg_text_complex_left_align(id, str) {
-    svg.value.getElementById(id).firstChild.nextSibling.style.fontSize =
-        "15px";
-    svg.value.getElementById(id).firstChild.nextSibling.textContent =
-        str;
-    svg.value.getElementById(id)
+    svg.value.getElementById(id).firstChild.nextSibling.style.fontSize = "15px";
+    svg.value.getElementById(id).firstChild.nextSibling.textContent = str;
+    svg.value
+        .getElementById(id)
         .firstChild.nextSibling.setAttribute("text-anchor", "start");
 }
 
@@ -111,11 +109,10 @@ function set_svg_text_complex_left_align(id, str) {
  * @param {string} str -- The text the element given by id should have, the text is middle aligned
  */
 function set_svg_text_complex_middle_align(id, str) {
-    svg.value.getElementById(id).firstChild.nextSibling.style.fontSize =
-        "15px";
-    svg.value.getElementById(id).firstChild.nextSibling.textContent =
-        str;
-    svg.value.getElementById(id)
+    svg.value.getElementById(id).firstChild.nextSibling.style.fontSize = "15px";
+    svg.value.getElementById(id).firstChild.nextSibling.textContent = str;
+    svg.value
+        .getElementById(id)
         .firstChild.nextSibling.setAttribute("text-anchor", "middle");
 }
 
@@ -143,9 +140,7 @@ function set_svg_colour(id, colour) {
  */
 function set_svg_marker_color(id, color) {
     // the marker is part of the style attribute
-    var styleAttribute = svg.value
-        .getElementById(id)
-        .getAttribute("style");
+    var styleAttribute = svg.value.getElementById(id).getAttribute("style");
     // marker must contain 'XXXXXX_ArchsimMarker' where X is a hexnum. Can be followed or prepended by other characters.
     var marker_regex = /[\da-fA-F]{6}(?=_ArchsimMarker)/g; // the global flag g makes the regex apply to all matches
     // create the new style string where the new color is used
@@ -155,11 +150,15 @@ function set_svg_marker_color(id, color) {
     );
     svg.value.getElementById(id).setAttribute("style", newStyleAttribute);
 }
-
 </script>
 
 <template>
-    <object @load.once="svgLoaded" :data="path" type="image/svg+xml" class="visualization"></object>
+    <object
+        @load.once="svgLoaded"
+        :data="path"
+        type="image/svg+xml"
+        class="visualization"
+    ></object>
 </template>
 
 <style scoped>

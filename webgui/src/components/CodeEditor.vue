@@ -17,7 +17,6 @@ onMounted(() => {
     // Insert the editor into the DOM once Vue has mounted this component
     inputWrapper.value.appendChild(editorStore.editorView.dom);
 });
-
 </script>
 
 <template>
@@ -31,6 +30,6 @@ onMounted(() => {
 }
 
 .archsim-editor {
-    height: 100%
+    height: 100%;
 }
 </style>

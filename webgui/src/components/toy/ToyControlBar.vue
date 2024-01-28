@@ -1,7 +1,7 @@
 <!-- The control bar for TOY -->
 <script setup>
-import ToyElementToggle from './ToyElementToggle.vue';
-import ToyControlButtons from './ToyControlButtons.vue';
+import ToyElementToggle from "./ToyElementToggle.vue";
+import ToyControlButtons from "./ToyControlButtons.vue";
 </script>
 
 <template>
@@ -10,7 +10,12 @@ import ToyControlButtons from './ToyControlButtons.vue';
             <ToyControlButtons class="col" />
             <ToyElementToggle class="col" />
             <div class="d-flex justify-content-end col">
-                <button class="btn" title="settings" data-bs-toggle="modal" data-bs-target="#settings-modal">
+                <button
+                    class="btn"
+                    title="settings"
+                    data-bs-toggle="modal"
+                    data-bs-target="#settings-modal"
+                >
                     <i class="bi bi-gear-fill"></i>
                 </button>
             </div>
