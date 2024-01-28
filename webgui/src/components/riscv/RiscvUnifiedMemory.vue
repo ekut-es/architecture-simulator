@@ -38,8 +38,6 @@ const isFiveStage = computed(() => riscvSettings.pipelineMode.value == 'five_sta
                 <tr>
                     <th style="min-width: 8.25em">Address</th>
                     <th style="min-width: 10em">Value</th>
-                    <!-- An extra column to indicate the stage, but only in case of five stage pipeline -->
-                    <th v-if="isFiveStage">Stage</th>
                 </tr>
             </thead>
             <tbody id="riscv-uni-memory-table-body">
@@ -47,24 +45,27 @@ const isFiveStage = computed(() => riscvSettings.pipelineMode.value == 'five_sta
                 <template v-for="entry in simulationStore.instructionMemoryEntries">
                     <tr :class="{ 'archsim-tr-runtime-error': simulationStore.instructionErrored(entry[0]) }">
                         <td class="text-nowrap">
-                            <!-- Mark the current instruction in case of single stage -->
-                            <RiscvCurrentInstructionArrow v-if="entry[2] === 'Single'"/>
+                            <!-- Mark the current instruction/current stage -->
+                            <template v-if="entry[2] === 'Single'">
+                                <RiscvCurrentInstructionArrow />
+                            </template>
+                            <template v-else>
+                                <span :class="['riscv-stage-indicator', 'riscv-stage-' + entry[2].toLowerCase()]"
+                                    v-if="entry[2]">
+                                    {{ entry[2] }}
+                                </span>
+                            </template>
+                            <!-- The actual address -->
                             {{ entry[0] }}
                         </td>
                         <td> {{ entry[1] }}</td>
                         <!-- Stage indicator in case of five stage pipeline -->
-                        <td v-if="isFiveStage">
-                            <span :class="['riscv-stage-indicator', 'riscv-stage-' + entry[2].toLowerCase()]">
-                                {{ entry[2] }}
-                            </span>
-                        </td>
                     </tr>
                 </template>
                 <!-- Data memory entries -->
                 <tr v-for="entry of dataMemoryEntries">
                     <td> {{ entry.hexAdress }} </td>
                     <td :class="[{ highlight: entry.doHighlight }, 'text-end']"> {{ entry.value }} </td>
-                    <td v-if="isFiveStage"></td>
                 </tr>
 
             </tbody>
