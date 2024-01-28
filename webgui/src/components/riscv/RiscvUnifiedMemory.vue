@@ -36,7 +36,7 @@ const isFiveStage = computed(() => riscvSettings.pipelineMode.value == 'five_sta
         <table class="table table-sm table-hover table-bordered archsim-mono-table mb-0">
             <thead>
                 <tr>
-                    <th style="min-width: 8.25em">Address</th>
+                    <th style="min-width: 9.5em">Address</th>
                     <th style="min-width: 10em">Value</th>
                 </tr>
             </thead>
