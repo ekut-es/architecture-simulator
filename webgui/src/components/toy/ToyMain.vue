@@ -3,7 +3,6 @@
 import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 
 import ToyControlBar from "./ToyControlBar.vue";
-import ToyMainTextContainer from "./ToyMainTextContainer.vue";
 import CodeEditor from "../CodeEditor.vue";
 import SvgVisualization from "../SvgVisualization.vue";
 
@@ -11,6 +10,8 @@ import { ArchsimSplit } from "@/js/archsim-split";
 import { useToySimulationStore } from "@/js/toy_simulation_store";
 import svgPath from "/src/img/toy_structure.svg";
 import { toySettings } from "@/js/toy_settings";
+import ToyMemoryTable from "./ToyMemoryTable.vue";
+import ToyRegistersOutput from "./ToyRegistersOutput.vue";
 
 const simulationStore = useToySimulationStore();
 
@@ -24,8 +25,12 @@ let split = null;
 
 // Values that are needed for controlling the split
 const textContainerPopulated = computed(
-    () => toySettings.showInput.value || toySettings.showMainColumn.value
+    () =>
+        toySettings.showInput.value ||
+        toySettings.showMemory.value ||
+        toySettings.showRegistersOutput.value
 );
+
 const enableSplit = computed(
     () => textContainerPopulated.value && toySettings.showVisualization.value
 );
@@ -80,7 +85,14 @@ onUnmounted(() => {
                 isa-name="toy"
                 v-show="toySettings.showInput.value"
             />
-            <ToyMainTextContainer v-show="toySettings.showMainColumn.value" />
+            <ToyMemoryTable
+                class="flex-shrink-0"
+                v-show="toySettings.showMemory.value"
+            />
+            <ToyRegistersOutput
+                class="flex-shrink-0"
+                v-show="toySettings.showRegistersOutput.value"
+            />
         </div>
         <div
             v-show="toySettings.showVisualization.value"
@@ -105,6 +117,15 @@ onUnmounted(() => {
 #toy-visualizations-container {
     padding: 1em;
     height: 100%;
+}
+
+#toy-text-content-container {
+    overflow: hidden;
+}
+
+#toy-text-content-container > *:not(:last-child) {
+    margin: 0 1em 0 0;
+    overflow-y: auto;
 }
 
 .code-editor {

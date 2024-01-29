@@ -26,7 +26,7 @@ const tableValues = computed(() => {
 </script>
 
 <template>
-    <div class="mb-3" id="toy-memory-wrapper">
+    <div id="toy-memory-wrapper">
         <span class="archsim-text-element-heading">Memory</span>
         <table
             id="toy-memory-table"
@@ -58,19 +58,9 @@ const tableValues = computed(() => {
 </template>
 
 <style scoped>
-.toy-current-cycle {
-    padding: 0em 0.2em;
-    border-radius: 0.3em;
-    float: left;
-}
-
 #toy-memory-table th:first-child {
     width: 7em;
     min-width: 7em;
-}
-
-#toy-memory-wrapper {
-    flex: 1 0 min(auto, 1em);
 }
 
 #toy-memory-table-body > tr > td:nth-child(1),

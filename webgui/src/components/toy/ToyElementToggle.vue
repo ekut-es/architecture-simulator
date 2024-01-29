@@ -18,10 +18,16 @@ import { toySettings } from "@/js/toy_settings";
                 >Input</ToggleButton
             >
             <ToggleButton
-                v-model="toySettings.showMainColumn.value"
-                base-id="toy-toggle-main-column"
+                v-model="toySettings.showMemory.value"
+                base-id="toy-toggle-memory"
             >
-                Registers/Memory/Output</ToggleButton
+                Memory</ToggleButton
+            >
+            <ToggleButton
+                v-model="toySettings.showRegistersOutput.value"
+                base-id="toy-toggle-registers-output"
+            >
+                Registers/Output</ToggleButton
             >
             <ToggleButton
                 v-model="toySettings.showVisualization.value"

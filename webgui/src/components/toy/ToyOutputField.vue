@@ -50,11 +50,13 @@ let output = computed(() => {
 .output-field {
     background-color: #ffffff;
     padding: 1em;
-    min-width: 12em;
+    min-width: 18em;
+    max-width: 20em;
+    min-height: 10em;
 }
 
-#toy-output-wrapper,
-#toy-registers-wrapper {
-    flex: 0 0 auto;
+#toy-output-wrapper {
+    flex: 0 1 auto;
+    overflow: auto;
 }
 </style>

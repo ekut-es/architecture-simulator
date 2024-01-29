@@ -61,5 +61,6 @@ const simulationStore = useToySimulationStore();
 
 #toy-registers-wrapper {
     flex: 0 0 auto;
+    overflow: auto;
 }
 </style>

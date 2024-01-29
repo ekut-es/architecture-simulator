@@ -135,12 +135,15 @@ onUnmounted(() => {
 #riscv-visualizations-container {
     padding: 1em;
     height: 100%;
-    overflow-y: hidden;
+}
+
+#riscv-text-content-container {
+    overflow-x: hidden;
 }
 
 #riscv-text-content-container > *:not(:last-child) {
     margin: 0 1em 0 0;
-    overflow: auto;
+    overflow-y: auto;
 }
 
 .code-editor {
