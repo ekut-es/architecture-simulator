@@ -83,16 +83,16 @@ onUnmounted(() => {
             id="riscv-text-content-container"
         >
             <CodeEditor
-                class="flex-grow-1 code-editor"
+                class="editor"
                 :simulation-store="simulationStore"
                 isa-name="riscv"
                 v-show="riscvSettings.showInput.value"
             />
             <RiscvUnifiedMemory
-                class="flex-shrink-0"
+                class="memory"
                 v-show="riscvSettings.showMemory.value"
             />
-            <RiscvRegistersOutput />
+            <RiscvRegistersOutput class="reg-output" />
         </div>
         <div
             v-show="riscvSettings.showVisualization.value"
@@ -131,14 +131,15 @@ onUnmounted(() => {
 
 #riscv-text-content-container {
     overflow-x: hidden;
+    gap: 1em;
 }
 
-#riscv-text-content-container > *:not(:last-child) {
-    margin: 0 1em 0 0;
-    overflow-y: auto;
-}
-
-.code-editor {
+.editor {
     min-width: 20em;
+}
+
+.memory,
+.reg-output {
+    flex: 0 0 auto;
 }
 </style>
