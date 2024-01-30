@@ -15,7 +15,7 @@ import { globalSettings } from "@/js/global_settings";
     >
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="archsim-modal-header">
                     <h1
                         class="modal-title fs-2 text-light"
                         id="help-modal-label"
@@ -38,7 +38,7 @@ import { globalSettings } from "@/js/global_settings";
                         ESC+Tab.
                     </p>
                 </div>
-                <div class="modal-footer">
+                <div class="archsim-modal-footer">
                     <a
                         href="https://github.com/ekut-es/architecture-simulator"
                         class="me-auto link-light"

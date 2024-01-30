@@ -25,7 +25,7 @@ watch(selectedIsa, (selection) => {
     >
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="archsim-modal-header">
                     <h1
                         class="modal-title fs-2 text-light"
                         id="settingsModalLabel"
@@ -58,7 +58,7 @@ watch(selectedIsa, (selection) => {
                         />
                     </div>
                 </div>
-                <div class="modal-footer">
+                <div class="archsim-modal-footer">
                     <button class="btn btn-secondary" data-bs-dismiss="modal">
                         Close
                     </button>

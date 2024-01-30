@@ -11,7 +11,7 @@ import ToyControlButtons from "./ToyControlButtons.vue";
             <ToyElementToggle class="col" />
             <div class="d-flex justify-content-end col">
                 <button
-                    class="btn"
+                    class="archsim-icon-button settings-button"
                     title="settings"
                     data-bs-toggle="modal"
                     data-bs-target="#settings-modal"
@@ -24,9 +24,8 @@ import ToyControlButtons from "./ToyControlButtons.vue";
 </template>
 
 <style scoped>
-button {
+.settings-button {
     font-size: 1.5rem;
-    padding: 0px 6px;
 }
 
 nav {

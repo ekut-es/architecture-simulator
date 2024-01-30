@@ -33,15 +33,21 @@ body {
     font-size: 1.5em;
 }
 
-.modal-header,
-.modal-footer {
-    background-color: var(--main-accent-color) !important;
+.archsim-icon-button {
+    background-color: transparent;
+    border: none;
+    padding: 0px 0px;
 }
 
-.cm-focused {
-    outline: none !important;
+.archsim-modal-header,
+.archsim-modal-footer {
+    background-color: var(--main-accent-color) !important;
 }
 
 .archsim-tr-runtime-error > td {
     background: var(--highlight-color);
+}
+
+.cm-focused {
+    outline: none !important;
 }
