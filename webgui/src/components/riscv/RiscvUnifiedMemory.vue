@@ -24,64 +24,83 @@ const dataMemoryEntries = computed(() => {
 </script>
 
 <template>
-    <div>
+    <div class="wrapper">
         <span class="archsim-text-element-heading">Memory</span>
-        <table
-            class="table table-sm table-hover table-bordered archsim-mono-table mb-0"
-        >
-            <thead>
-                <tr>
-                    <th style="min-width: 9.5em">Address</th>
-                    <th style="min-width: 10em">Value</th>
-                </tr>
-            </thead>
-            <tbody id="riscv-uni-memory-table-body">
-                <!-- Instruction memory entries -->
-                <template
-                    v-for="entry in simulationStore.instructionMemoryEntries"
-                >
-                    <tr
-                        :class="{
-                            'archsim-tr-runtime-error':
-                                simulationStore.instructionErrored(entry[0]),
-                        }"
-                    >
-                        <td class="text-nowrap">
-                            <!-- Mark the current instruction/stage -->
-                            <template v-if="entry[2] === 'Single'">
-                                <CurrentInstructionArrow />
-                            </template>
-                            <template v-else>
-                                <span
-                                    :class="[
-                                        'riscv-stage-indicator',
-                                        'riscv-stage-' + entry[2].toLowerCase(),
-                                    ]"
-                                    v-if="entry[2]"
-                                >
-                                    {{ entry[2] }}
-                                </span>
-                            </template>
-                            <!-- The actual address -->
-                            {{ entry[0] }}
-                        </td>
-                        <td>{{ entry[1] }}</td>
-                        <!-- Stage indicator in case of five stage pipeline -->
+
+        <div class="table-wrapper">
+            <table
+                class="table table-sm table-hover table-bordered archsim-mono-table mb-0"
+            >
+                <thead>
+                    <tr>
+                        <th style="min-width: 9.5em">Address</th>
+                        <th style="min-width: 10em">Value</th>
                     </tr>
-                </template>
-                <!-- Data memory entries -->
-                <tr v-for="entry of dataMemoryEntries">
-                    <td>{{ entry.hexAdress }}</td>
-                    <td :class="[{ highlight: entry.doHighlight }, 'text-end']">
-                        {{ entry.value }}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                </thead>
+                <tbody id="riscv-uni-memory-table-body">
+                    <!-- Instruction memory entries -->
+                    <template
+                        v-for="entry in simulationStore.instructionMemoryEntries"
+                    >
+                        <tr
+                            :class="{
+                                'archsim-tr-runtime-error':
+                                    simulationStore.instructionErrored(
+                                        entry[0]
+                                    ),
+                            }"
+                        >
+                            <td class="text-nowrap">
+                                <!-- Mark the current instruction/stage -->
+                                <template v-if="entry[2] === 'Single'">
+                                    <CurrentInstructionArrow />
+                                </template>
+                                <template v-else>
+                                    <span
+                                        :class="[
+                                            'riscv-stage-indicator',
+                                            'riscv-stage-' +
+                                                entry[2].toLowerCase(),
+                                        ]"
+                                        v-if="entry[2]"
+                                    >
+                                        {{ entry[2] }}
+                                    </span>
+                                </template>
+                                <!-- The actual address -->
+                                {{ entry[0] }}
+                            </td>
+                            <td>{{ entry[1] }}</td>
+                            <!-- Stage indicator in case of five stage pipeline -->
+                        </tr>
+                    </template>
+                    <!-- Data memory entries -->
+                    <tr v-for="entry of dataMemoryEntries">
+                        <td>{{ entry.hexAdress }}</td>
+                        <td
+                            :class="[
+                                { highlight: entry.doHighlight },
+                                'text-end',
+                            ]"
+                        >
+                            {{ entry.value }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </template>
 
 <style scoped>
+.wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.table-wrapper {
+    overflow-y: auto;
+}
 .highlight {
     background-color: var(--highlight-color) !important;
 }

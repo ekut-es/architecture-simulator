@@ -62,31 +62,42 @@ const tableValues = computed(() => {
 </script>
 
 <template>
-    <div>
+    <div class="wrapper">
         <span class="archsim-text-element-heading">Registers</span>
-        <table
-            class="table table-sm table-hover table-bordered archsim-mono-table mb-0"
-        >
-            <thead>
-                <tr>
-                    <th colspan="2">Register</th>
-                    <th style="min-width: 5em">Value</th>
-                </tr>
-            </thead>
-            <tbody id="riscv-register-table-body">
-                <tr v-for="entry of tableValues">
-                    <td>{{ entry.abiName }}</td>
-                    <td>{{ entry.index }}</td>
-                    <td :class="{ highlight: entry.doHighlight }">
-                        {{ entry.value }}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="table-wrapper">
+            <table
+                class="table table-sm table-hover table-bordered archsim-mono-table mb-0"
+            >
+                <thead>
+                    <tr>
+                        <th colspan="2">Register</th>
+                        <th style="min-width: 5em">Value</th>
+                    </tr>
+                </thead>
+                <tbody id="riscv-register-table-body">
+                    <tr v-for="entry of tableValues">
+                        <td>{{ entry.abiName }}</td>
+                        <td>{{ entry.index }}</td>
+                        <td :class="{ highlight: entry.doHighlight }">
+                            {{ entry.value }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </template>
 
 <style scoped>
+.wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.table-wrapper {
+    overflow-y: auto;
+}
+
 .highlight {
     background-color: var(--highlight-color) !important;
 }
