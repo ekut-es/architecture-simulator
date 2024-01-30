@@ -1,6 +1,7 @@
 <!-- The riscv help page content. -->
 <template>
     <div class="container-fluid">
+        <h1>RISC-V</h1>
         <h2 id="instructions">Instructions</h2>
         <p>
             This simulator supports a subset of the RISC-V32 ISA. The supported
@@ -72,8 +73,8 @@
                         <td>
                             Set <code>rd</code> to 1 if the value in
                             <code>rs1</code> is less than the value in
-                            <code>rs2</code>, otherwise 0 (both values are treated
-                            as signed)
+                            <code>rs2</code>, otherwise 0 (both values are
+                            treated as signed)
                         </td>
                     </tr>
                     <tr>
@@ -86,8 +87,8 @@
                         <td>
                             Set <code>rd</code> to 1 if the value in
                             <code>rs1</code> is less than the value in
-                            <code>rs2</code>, otherwise 0 (both values are treated
-                            as unsigned)
+                            <code>rs2</code>, otherwise 0 (both values are
+                            treated as unsigned)
                         </td>
                     </tr>
                     <tr>
@@ -126,8 +127,8 @@
             Unless otherwise specified, the immediate (<code>imm</code>) has a
             length of 12 bits and is sign extended to 32 bits.
             <br />
-            <code>var</code> is a variable name, <code>index</code> is an optional
-            array index.
+            <code>var</code> is a variable name, <code>index</code> is an
+            optional array index.
         </p>
         <div class="table-responsive">
             <table class="table table-bordered table-hover table-instr-op">
@@ -158,8 +159,8 @@
                         <td>
                             Set <code>rd</code> to 1 if the value in
                             <code>rs1</code> is less than the value in
-                            <code>imm</code>, otherwise 0 (both values are treated
-                            as signed)
+                            <code>imm</code>, otherwise 0 (both values are
+                            treated as signed)
                         </td>
                     </tr>
                     <tr>
@@ -172,8 +173,8 @@
                         <td>
                             Set <code>rd</code> to 1 if the value in
                             <code>rs1</code> is less than the value in
-                            <code>imm</code>, otherwise 0 (both values are treated
-                            as unsigned)
+                            <code>imm</code>, otherwise 0 (both values are
+                            treated as unsigned)
                         </td>
                     </tr>
                     <tr>
@@ -211,7 +212,8 @@
                             <code>rd = rs1 &lt;&lt; imm</code>
                         </td>
                         <td>
-                            <code>imm</code> is unsigned, with a length of 5 bits
+                            <code>imm</code> is unsigned, with a length of 5
+                            bits
                         </td>
                     </tr>
                     <tr>
@@ -240,13 +242,17 @@
                     </tr>
                     <tr>
                         <td>
-                            <code>LB rd, rs1, imm<br />
+                            <code
+                                >LB rd, rs1, imm<br />
                                 LB rd, imm(rs1)<br />
-                                LB rd, var[index]</code>
+                                LB rd, var[index]</code
+                            >
                         </td>
                         <td>
-                            <code>rd = M[rs1 + imm]<br />
-                                rd = var[index]</code>
+                            <code
+                                >rd = M[rs1 + imm]<br />
+                                rd = var[index]</code
+                            >
                         </td>
                         <td>
                             Load byte.<br /><code>rd</code>
@@ -255,13 +261,17 @@
                     </tr>
                     <tr>
                         <td>
-                            <code>LH rd, rs1, imm<br />
+                            <code
+                                >LH rd, rs1, imm<br />
                                 LH rd, imm(rs1)<br />
-                                LH rd, var[index]</code>
+                                LH rd, var[index]</code
+                            >
                         </td>
                         <td>
-                            <code>rd = M[rs1 + imm]<br />
-                                rd = var[index]</code>
+                            <code
+                                >rd = M[rs1 + imm]<br />
+                                rd = var[index]</code
+                            >
                         </td>
                         <td>
                             Load two bytes.<br /><code>rd</code>
@@ -270,13 +280,17 @@
                     </tr>
                     <tr>
                         <td>
-                            <code>LW rd, rs1, imm<br />
+                            <code
+                                >LW rd, rs1, imm<br />
                                 LW rd, imm(rs1)<br />
-                                LW rd, var[index]</code>
+                                LW rd, var[index]</code
+                            >
                         </td>
                         <td>
-                            <code>rd = M[rs1 + imm]<br />
-                                rd = var[index]</code>
+                            <code
+                                >rd = M[rs1 + imm]<br />
+                                rd = var[index]</code
+                            >
                         </td>
                         <td>
                             Load four bytes.<br /><code>rd</code>
@@ -285,25 +299,33 @@
                     </tr>
                     <tr>
                         <td>
-                            <code>LBU rd, rs1, imm<br />
+                            <code
+                                >LBU rd, rs1, imm<br />
                                 LBU rd, imm(rs1)<br />
-                                LBU rd, var[index]</code>
+                                LBU rd, var[index]</code
+                            >
                         </td>
                         <td>
-                            <code>rd = M[rs1 + imm]<br />
-                                rd = var[index]</code>
+                            <code
+                                >rd = M[rs1 + imm]<br />
+                                rd = var[index]</code
+                            >
                         </td>
                         <td>Load byte</td>
                     </tr>
                     <tr>
                         <td>
-                            <code>LHU rd, rs1, imm<br />
+                            <code
+                                >LHU rd, rs1, imm<br />
                                 LHU rd, imm(rs1)<br />
-                                LHU rd, var[index]</code>
+                                LHU rd, var[index]</code
+                            >
                         </td>
                         <td>
-                            <code>rd = M[rs1 + imm]<br />
-                                rd = var[index]</code>
+                            <code
+                                >rd = M[rs1 + imm]<br />
+                                rd = var[index]</code
+                            >
                         </td>
                         <td>Load two bytes</td>
                     </tr>
@@ -316,8 +338,8 @@
                         </td>
                         <td>
                             Jump and link register.
-                            <code>rd</code> is set to the address of the instruction
-                            following the jump. The jump target is
+                            <code>rd</code> is set to the address of the
+                            instruction following the jump. The jump target is
                             <code>rs1 + imm</code>
                             with the least significant bit cleared.
                         </td>
@@ -330,8 +352,8 @@
         <p>
             The immediate (<code>imm</code>) has a length of 12 bits and is sign
             extended to 32 bits. <br />
-            <code>var</code> is a variable name, <code>index</code> is an optional
-            array index.
+            <code>var</code> is a variable name, <code>index</code> is an
+            optional array index.
         </p>
         <div class="table-responsive">
             <table class="table table-bordered table-hover table-instr-op">
@@ -345,50 +367,62 @@
                 <tbody>
                     <tr>
                         <td>
-                            <code>SB rs1, rs2, imm<br />
+                            <code
+                                >SB rs1, rs2, imm<br />
                                 SB rs1, imm(rs2)<br />
-                                SB rs1, var[index], rs2</code>
+                                SB rs1, var[index], rs2</code
+                            >
                         </td>
                         <td>
-                            <code>M[rs2 + imm] = rs1<br />
-                                var[index] = rs1</code>
+                            <code
+                                >M[rs2 + imm] = rs1<br />
+                                var[index] = rs1</code
+                            >
                         </td>
                         <td>
                             Store byte.<br />If a variable is modified,
-                            <code>rs2</code> is used as a temporary register, that
-                            will be overwritten.
+                            <code>rs2</code> is used as a temporary register,
+                            that will be overwritten.
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <code>SH rs1, rs2, imm<br />
+                            <code
+                                >SH rs1, rs2, imm<br />
                                 SH rs1, imm(rs2)<br />
-                                SH rs1, var[index], rs2</code>
+                                SH rs1, var[index], rs2</code
+                            >
                         </td>
                         <td>
-                            <code>M[rs2 + imm] = rs1<br />
-                                var[index] = rs1</code>
+                            <code
+                                >M[rs2 + imm] = rs1<br />
+                                var[index] = rs1</code
+                            >
                         </td>
                         <td>
                             Store two bytes.<br />If a variable is modified,
-                            <code>rs2</code> is used as a temporary register, that
-                            will be overwritten.
+                            <code>rs2</code> is used as a temporary register,
+                            that will be overwritten.
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <code>SW rs1, rs2, imm<br />
+                            <code
+                                >SW rs1, rs2, imm<br />
                                 SW rs1, imm(rs2)<br />
-                                SW rs1, var[index], rs2</code>
+                                SW rs1, var[index], rs2</code
+                            >
                         </td>
                         <td>
-                            <code>M[rs2 + imm] = rs1<br />
-                                var[index] = rs1</code>
+                            <code
+                                >M[rs2 + imm] = rs1<br />
+                                var[index] = rs1</code
+                            >
                         </td>
                         <td>
                             Store four bytes.<br />If a variable is modified,
-                            <code>rs2</code> is used as a temporary register, that
-                            will be overwritten.
+                            <code>rs2</code> is used as a temporary register,
+                            that will be overwritten.
                         </td>
                     </tr>
                 </tbody>
@@ -412,8 +446,10 @@
                 <tbody>
                     <tr>
                         <td>
-                            <code>BEQ rs1, rs2, imm<br />
-                                BEQ rs1, rs2, label+offset</code>
+                            <code
+                                >BEQ rs1, rs2, imm<br />
+                                BEQ rs1, rs2, label+offset</code
+                            >
                         </td>
                         <td>
                             <code>if (rs1 == rs2) PC = PC + imm</code>
@@ -422,8 +458,10 @@
                     </tr>
                     <tr>
                         <td>
-                            <code>BNE rs1, rs2, imm<br />
-                                BNE rs1, rs2, label+offset</code>
+                            <code
+                                >BNE rs1, rs2, imm<br />
+                                BNE rs1, rs2, label+offset</code
+                            >
                         </td>
                         <td>
                             <code>if (rs1 != rs2) PC = PC + imm</code>
@@ -432,8 +470,10 @@
                     </tr>
                     <tr>
                         <td>
-                            <code>BLT rs1, rs2, imm<br />
-                                BLT rs1, rs2, label+offset</code>
+                            <code
+                                >BLT rs1, rs2, imm<br />
+                                BLT rs1, rs2, label+offset</code
+                            >
                         </td>
                         <td>
                             <code>if (rs1 &lt;s rs2) PC = PC + imm</code>
@@ -442,8 +482,10 @@
                     </tr>
                     <tr>
                         <td>
-                            <code>BGE rs1, rs2, imm<br />
-                                BGE rs1, rs2, label+offset</code>
+                            <code
+                                >BGE rs1, rs2, imm<br />
+                                BGE rs1, rs2, label+offset</code
+                            >
                         </td>
                         <td>
                             <code>if (rs1 &gt;=s rs2) PC = PC + imm</code>
@@ -452,8 +494,10 @@
                     </tr>
                     <tr>
                         <td>
-                            <code>BLTU rs1, rs2, imm<br />
-                                BLTU rs1, rs2, label+offset</code>
+                            <code
+                                >BLTU rs1, rs2, imm<br />
+                                BLTU rs1, rs2, label+offset</code
+                            >
                         </td>
                         <td>
                             <code>if (rs1 &lt;u rs2) PC = PC + imm</code>
@@ -462,8 +506,10 @@
                     </tr>
                     <tr>
                         <td>
-                            <code>BGEU rs1, rs2, imm<br />
-                                BGEU rs1, rs2, label+offset</code>
+                            <code
+                                >BGEU rs1, rs2, imm<br />
+                                BGEU rs1, rs2, label+offset</code
+                            >
                         </td>
                         <td>
                             <code>if (rs1 &gt;=u rs2) PC = PC + imm</code>
@@ -529,16 +575,18 @@
                 <tbody>
                     <tr>
                         <td>
-                            <code>JAL rd, imm<br />
-                                JAL rd, label+offset</code>
+                            <code
+                                >JAL rd, imm<br />
+                                JAL rd, label+offset</code
+                            >
                         </td>
                         <td>
                             <code>rd = PC + 4; PC = PC + imm</code>
                         </td>
                         <td>
                             Jump and link.
-                            <code>rd</code> is set to the address of the instruction
-                            following the jump.
+                            <code>rd</code> is set to the address of the
+                            instruction following the jump.
                         </td>
                     </tr>
                 </tbody>
@@ -546,8 +594,10 @@
 
             <h3 id="csr-type">CSR-Type</h3>
             <p>
-                <i>Currently not implemented in 5-stage pipeline mode.</i> <br />
-                The unsigned immediate (<code>uimm</code>) has a length of 5 bits.
+                <i>Currently not implemented in 5-stage pipeline mode.</i>
+                <br />
+                The unsigned immediate (<code>uimm</code>) has a length of 5
+                bits.
             </p>
             <div class="table-responsive">
                 <table class="table table-bordered table-hover table-instr-op">
@@ -735,12 +785,14 @@
 my_label:
 addi x1, x1, 1
 jal x2, my_label
-addi x3, x3, 1 # This line is never reached</pre>
+addi x3, x3, 1 # This line is never reached</pre
+        >
 
         <h2 id="variables">Segments and variables</h2>
         <p>
-            In addition to the program code, the simulator supports a data segment.
-            It can be used to store variables and arrays in the simulator's memory.
+            In addition to the program code, the simulator supports a data
+            segment. It can be used to store variables and arrays in the
+            simulator's memory.
         </p>
         <p>
             In order to define a data segment, the
@@ -748,8 +800,8 @@ addi x3, x3, 1 # This line is never reached</pre>
             <code>.text</code> directive designates the code segment.
         </p>
         <p>
-            The following example demonstrates how to declare and use variables and
-            arrays, employing all currently supported data types:
+            The following example demonstrates how to declare and use variables
+            and arrays, employing all currently supported data types:
         </p>
         <pre class="bg-light">
 .data
@@ -763,11 +815,14 @@ addi x3, x3, 1 # This line is never reached</pre>
     lh x3, my_var2[0]  # same effect as above
     lh x4, my_var2[2]  # x4 = 999
     lw x5, my_var3[1]  # x5 = 0b111
-    lb x6, text1[11]   # x6 = '!'</pre>
+    lb x6, text1[11]   # x6 = '!'</pre
+        >
         <p>
-            If no directives are given, the entire input is interpreted as code.<br />
-            Similarly, if a <code>.data</code> but no <code>.text</code> directive
-            is given, every line before the data segment is interpreted as code.
+            If no directives are given, the entire input is interpreted as
+            code.<br />
+            Similarly, if a <code>.data</code> but no
+            <code>.text</code> directive is given, every line before the data
+            segment is interpreted as code.
             <br />
             There is no fixed segmentation order. However, declaring multiple
             segments of the same type will throw an error.

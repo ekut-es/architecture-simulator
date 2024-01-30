@@ -1,10 +1,8 @@
-<!-- The output field for RISC-V -->
+<!-- An output field that works with any simulation store -->
 <script setup>
-import { computed } from 'vue';
-
-import { useRiscvSimulationStore } from '@/js/riscv_simulation_store';
-
-const simulationStore = useRiscvSimulationStore();
+import { computed } from "vue";
+const props = defineProps(["simulationStore"]);
+const simulationStore = props.simulationStore;
 
 /**
  * An array that holds one string for each line to display
@@ -21,7 +19,9 @@ let output = computed(() => {
             case "InstructionExecutionException":
                 return [simulationStore.error[1]];
             default:
-                return [`An unknown error occured: ${simulationStore.error[1]}`];
+                return [
+                    `An unknown error occured: ${simulationStore.error[1]}`,
+                ];
         }
     }
 
@@ -34,29 +34,18 @@ let output = computed(() => {
 </script>
 
 <template>
-    <div id="riscv-output-wrapper">
-        <span class="archsim-text-element-heading">Output</span>
-        <div class="flex-shrink-0 archsim-default-border output-field">
-            <template v-for="line in output">
-                <template v-if="line">
-                    {{ line }} <br>
-                </template>
-            </template>
-        </div>
+    <div class="archsim-default-border output-field">
+        <template v-for="line in output">
+            <template v-if="line"> {{ line }} <br /> </template>
+        </template>
     </div>
 </template>
 
 <style scoped>
 .output-field {
     background-color: #ffffff;
-    padding: 1em;
+    padding: 0.5em;
     min-width: 18em;
     max-width: 20em;
-    min-height: 17em;
-}
-
-#riscv-output-wrapper {
-    height: 100%;
-    overflow: auto;
 }
 </style>
