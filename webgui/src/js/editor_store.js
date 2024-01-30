@@ -11,7 +11,7 @@ import {
     syntaxHighlighting,
 } from "@codemirror/language";
 import { gasArm } from "@codemirror/legacy-modes/mode/gas";
-import { defaultKeymap } from "@codemirror/commands";
+import { defaultKeymap, indentWithTab } from "@codemirror/commands";
 import { linter, lintGutter } from "@codemirror/lint";
 import { ref, watch } from "vue";
 
@@ -87,7 +87,7 @@ class EditorStore {
                 EditorView.editorAttributes.of({
                     class: "archsim-default-border archsim-editor",
                 }),
-                keymap.of(defaultKeymap), // new lines at end of doc don't work without this
+                keymap.of([...defaultKeymap, indentWithTab]), // new lines at end of doc don't work without this
                 lintGutter(),
                 this.linterCompartment.of([]),
             ],

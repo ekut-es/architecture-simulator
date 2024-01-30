@@ -1,6 +1,7 @@
 <!-- The riscv help page content. -->
 <template>
     <div class="container-fluid">
+        <h1>RISC-V</h1>
         <h2 id="instructions">Instructions</h2>
         <p>
             This simulator supports a subset of the RISC-V32 ISA. The supported

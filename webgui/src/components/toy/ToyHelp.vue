@@ -1,6 +1,7 @@
 <!-- The TOY help page -->
 <template>
     <div class="container-fluid">
+        <h1>TOY</h1>
         <h2>Instructions</h2>
         <div class="table-responsive">
             <table class="table table-bordered table-hover">

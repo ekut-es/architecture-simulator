@@ -25,15 +25,18 @@ import { globalSettings } from "@/js/global_settings";
                             width="35px"
                             height="35px"
                         ></i>
-                        <span id="help-modal-heading">
-                            {{ globalSettings.selectedIsaName }}
-                        </span>
+                        <span> Help </span>
                     </h1>
                 </div>
                 <div id="help-modal-body" class="modal-body">
                     <!--Insert custom help pages here-->
                     <ToyHelp v-if="globalSettings.selectedIsa === 'toy'" />
                     <RiscvHelp v-if="globalSettings.selectedIsa === 'riscv'" />
+                    <h1>Accessibility</h1>
+                    <p>
+                        To exit the editor without a mouse, you can press
+                        ESC+Tab.
+                    </p>
                 </div>
                 <div class="modal-footer">
                     <a
