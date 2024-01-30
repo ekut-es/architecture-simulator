@@ -120,7 +120,7 @@ onUnmounted(() => {
 }
 
 #toy-text-content-container {
-    overflow: hidden;
+    overflow-x: auto;
     gap: 1em;
 }
 

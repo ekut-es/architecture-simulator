@@ -39,15 +39,17 @@ body {
     padding: 0px 0px;
 }
 
-.archsim-modal-header,
-.archsim-modal-footer {
-    background-color: var(--main-accent-color) !important;
-}
-
 .archsim-tr-runtime-error > td {
     background: var(--highlight-color);
 }
 
+/* Overwrites */
+
 .cm-focused {
     outline: none !important;
+}
+
+.modal-header,
+.modal-footer {
+    background-color: var(--main-accent-color) !important;
 }

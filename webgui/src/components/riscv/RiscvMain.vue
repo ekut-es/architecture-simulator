@@ -132,7 +132,7 @@ onUnmounted(() => {
 }
 
 #riscv-text-content-container {
-    overflow-x: hidden;
+    overflow-x: auto;
     gap: 1em;
 }
 
