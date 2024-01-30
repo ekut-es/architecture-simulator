@@ -23,15 +23,10 @@ import { riscvSettings } from "@/js/riscv_settings";
                 >Memory</ToggleButton
             >
             <ToggleButton
-                v-model="riscvSettings.showRegisters.value"
-                base-id="riscv-toggle-registers"
-                >Registers
+                v-model="riscvSettings.showRegistersOutput.value"
+                base-id="riscv-toggle-registers-output"
+                >Registers/Output
             </ToggleButton>
-            <ToggleButton
-                v-model="riscvSettings.showOutput.value"
-                base-id="riscv-toggle-output"
-                >Output</ToggleButton
-            >
             <ToggleButton
                 v-model="riscvSettings.showVisualization.value"
                 base-id="riscv-toggle-visualization"

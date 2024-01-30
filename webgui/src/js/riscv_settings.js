@@ -10,7 +10,6 @@ export const riscvSettings = {
     dataHazardDetection: ref(true),
     showInput: ref(true),
     showMemory: ref(true),
-    showRegisters: ref(true),
-    showOutput: ref(true),
+    showRegistersOutput: ref(true),
     showVisualization: ref(true),
 };

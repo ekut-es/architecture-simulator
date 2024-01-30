@@ -31,8 +31,7 @@ const textContainerPopulated = computed(
     () =>
         riscvSettings.showInput.value ||
         riscvSettings.showMemory.value ||
-        riscvSettings.showRegisters.value ||
-        riscvSettings.showOutput.value
+        riscvSettings.showRegistersOutput.value
 );
 const enableSplit = computed(
     () => textContainerPopulated.value && riscvSettings.showVisualization.value
@@ -92,7 +91,10 @@ onUnmounted(() => {
                 class="memory"
                 v-show="riscvSettings.showMemory.value"
             />
-            <RiscvRegistersOutput class="reg-output" />
+            <RiscvRegistersOutput
+                class="reg-output"
+                v-show="riscvSettings.showRegistersOutput.value"
+            />
         </div>
         <div
             v-show="riscvSettings.showVisualization.value"
