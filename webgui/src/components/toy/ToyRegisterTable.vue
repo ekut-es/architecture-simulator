@@ -7,8 +7,7 @@ const simulationStore = useToySimulationStore();
 </script>
 
 <template>
-    <div class="mb-3" id="toy-registers-wrapper">
-        <span class="archsim-text-element-heading">Registers</span>
+    <div>
         <table
             class="table table-sm table-hover table-bordered archsim-mono-table mb-0"
             id="toy-register-table"
@@ -57,10 +56,5 @@ const simulationStore = useToySimulationStore();
 #toy-register-table td:last-child {
     text-align: right;
     width: 100%;
-}
-
-#toy-registers-wrapper {
-    flex: 0 0 auto;
-    overflow: auto;
 }
 </style>

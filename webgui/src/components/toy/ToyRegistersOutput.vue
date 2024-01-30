@@ -5,15 +5,26 @@ import ToyRegisterTable from "./ToyRegisterTable.vue";
 </script>
 
 <template>
-    <div class="registers-output-wrapper">
-        <ToyRegisterTable />
-        <ToyOutputField />
+    <div class="wrapper">
+        <span class="archsim-text-element-heading">Registers</span>
+        <ToyRegisterTable class="registers" />
+        <span class="archsim-text-element-heading">Output</span>
+        <ToyOutputField class="output" />
     </div>
 </template>
 
 <style scoped>
-.registers-output-wrapper {
+.wrapper {
     display: flex;
     flex-direction: column;
+}
+
+.registers,
+.output {
+    overflow-y: auto;
+}
+
+.registers {
+    margin-bottom: 0.5em;
 }
 </style>

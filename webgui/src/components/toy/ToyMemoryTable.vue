@@ -26,49 +26,54 @@ const tableValues = computed(() => {
 </script>
 
 <template>
-    <div id="toy-memory-wrapper">
+    <div class="wrapper">
         <span class="archsim-text-element-heading">Memory</span>
-        <table
-            id="toy-memory-table"
-            class="table table-sm table-hover table-bordered archsim-mono-table mb-0"
-        >
-            <thead>
-                <tr>
-                    <th>Address</th>
-                    <th>Value</th>
-                    <th>Instruction</th>
-                </tr>
-            </thead>
-            <tbody id="toy-memory-table-body">
-                <tr v-for="entry in tableValues">
-                    <td>
-                        <CurrentInstructionArrow v-if="entry.cycle">
-                            {{ entry.cycle }}
-                        </CurrentInstructionArrow>
-                        {{ entry.hexAddress }}
-                    </td>
-                    <td :class="{ highlight: entry.doHighlight }">
-                        {{ entry.value }}
-                    </td>
-                    <td>{{ entry.instruction }}</td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="table-wrapper">
+            <table
+                class="table table-sm table-hover table-bordered archsim-mono-table mb-0"
+            >
+                <thead>
+                    <tr>
+                        <th style="min-width: 7em">Address</th>
+                        <th>Value</th>
+                        <th>Instruction</th>
+                    </tr>
+                </thead>
+                <tbody id="toy-memory-table-body">
+                    <tr v-for="entry in tableValues">
+                        <td>
+                            <CurrentInstructionArrow v-if="entry.cycle">
+                                {{ entry.cycle }}
+                            </CurrentInstructionArrow>
+                            {{ entry.hexAddress }}
+                        </td>
+                        <td :class="{ highlight: entry.doHighlight }">
+                            {{ entry.value }}
+                        </td>
+                        <td>{{ entry.instruction }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </template>
 
 <style scoped>
-#toy-memory-table th:first-child {
-    width: 7em;
-    min-width: 7em;
+.wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.table-wrapper {
+    overflow-y: auto;
+}
+
+.highlight {
+    background-color: var(--highlight-color) !important;
 }
 
 #toy-memory-table-body > tr > td:nth-child(1),
 #toy-memory-table-body > tr > td:nth-child(2) {
     text-align: right;
-}
-
-.highlight {
-    background-color: var(--highlight-color) !important;
 }
 </style>

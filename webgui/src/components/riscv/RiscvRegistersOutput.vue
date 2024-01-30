@@ -16,7 +16,6 @@ import RiscvRegisterTable from "./RiscvRegisterTable.vue";
 .wrapper {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
 }
 
 .registers,

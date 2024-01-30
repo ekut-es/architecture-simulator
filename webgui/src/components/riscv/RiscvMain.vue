@@ -141,5 +141,6 @@ onUnmounted(() => {
 .memory,
 .reg-output {
     flex: 0 0 auto;
+    overflow: hidden;
 }
 </style>

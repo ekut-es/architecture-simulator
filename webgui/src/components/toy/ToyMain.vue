@@ -80,17 +80,17 @@ onUnmounted(() => {
             :class="textContainerPopulated ? 'd-flex flex-grow-1' : 'd-none'"
         >
             <CodeEditor
-                class="flex-grow-1 code-editor"
+                class="editor"
                 :simulation-store="simulationStore"
                 isa-name="toy"
                 v-show="toySettings.showInput.value"
             />
             <ToyMemoryTable
-                class="flex-shrink-0"
+                class="memory"
                 v-show="toySettings.showMemory.value"
             />
             <ToyRegistersOutput
-                class="flex-shrink-0"
+                class="reg-output"
                 v-show="toySettings.showRegistersOutput.value"
             />
         </div>
@@ -121,14 +121,16 @@ onUnmounted(() => {
 
 #toy-text-content-container {
     overflow: hidden;
+    gap: 1em;
 }
 
-#toy-text-content-container > *:not(:last-child) {
-    margin: 0 1em 0 0;
-    overflow-y: auto;
-}
-
-.code-editor {
+.editor {
     min-width: 20em;
+}
+
+.memory,
+.reg-output {
+    flex: 0 0 auto;
+    overflow: hidden;
 }
 </style>
