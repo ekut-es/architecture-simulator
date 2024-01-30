@@ -26,7 +26,7 @@
      showgrid="true"
      inkscape:zoom="0.16"
      inkscape:cx="2031.25"
-     inkscape:cy="1681.25"
+     inkscape:cy="1668.75"
      inkscape:window-width="1920"
      inkscape:window-height="1007"
      inkscape:window-x="0"
@@ -53,110 +53,44 @@
      id="defs2">
      <!--CUSTOM MARKERS START-->
     <marker
-    style="overflow:visible"
-    id="000000_ArchsimMarker_Dot"
-    refX="0"
-    refY="0"
-    orient="auto"
-    inkscape:stockid="Dot"
-    markerWidth="0.40000001"
-    markerHeight="0.40000001"
-    viewBox="0 0 1 1"
-    inkscape:isstock="true"
-    inkscape:collect="always"
-    preserveAspectRatio="xMidYMid"><path
-        transform="scale(0.5)"
-        style="fill:#000000;fill-rule:evenodd;stroke:none"
-        d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
-        sodipodi:nodetypes="sssss"
-        id="path78" /></marker>
-    <marker
-    style="overflow:visible"
-    id="008000_ArchsimMarker_Dot"
-    refX="0"
-    refY="0"
-    orient="auto"
-    inkscape:stockid="Dot"
-    markerWidth="0.40000001"
-    markerHeight="0.40000001"
-    viewBox="0 0 1 1"
-    inkscape:isstock="true"
-    inkscape:collect="always"
-    preserveAspectRatio="xMidYMid"><path
-        transform="scale(0.5)"
-        style="fill:#008000;fill-rule:evenodd;stroke:none"
-        d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
-        sodipodi:nodetypes="sssss"
-        id="path78" /></marker>
-    <marker
-    style="overflow:visible"
-    id="0000FF_ArchsimMarker_Dot"
-    refX="0"
-    refY="0"
-    orient="auto"
-    inkscape:stockid="Dot"
-    markerWidth="0.40000001"
-    markerHeight="0.40000001"
-    viewBox="0 0 1 1"
-    inkscape:isstock="true"
-    inkscape:collect="always"
-    preserveAspectRatio="xMidYMid"><path
-        transform="scale(0.5)"
-        style="fill:#0000FF;fill-rule:evenodd;stroke:none"
-        d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
-        sodipodi:nodetypes="sssss"
-        id="path78" /></marker>
+   style="overflow:visible"
+   id="000000_ArchsimMarker_Dot"
+   refX="0"
+   refY="0"
+   orient="auto"
+   inkscape:stockid="Dot"
+   markerWidth="0.40000001"
+   markerHeight="0.40000001"
+   viewBox="0 0 1 1"
+   inkscape:isstock="true"
+   inkscape:collect="always"
+   preserveAspectRatio="xMidYMid"><path
+     transform="scale(0.5)"
+     style="fill:#000000;fill-rule:evenodd;stroke:none"
+     d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
+     sodipodi:nodetypes="sssss"
+     id="path78" /></marker>
+
+
         <marker
-    style="overflow:visible"
-    id="000000_ArchsimMarker_Triangle_Reversed"
-    refX="0"
-    refY="0"
-    orient="auto-start-reverse"
-    inkscape:stockid="Triangle arrow"
-    markerWidth="1"
-    markerHeight="1"
-    viewBox="0 0 1 1"
-    inkscape:isstock="true"
-    inkscape:collect="always"
-    preserveAspectRatio="xMidYMid"><path
-        transform="scale(0.5)"
-        style="fill:#000000;fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
-        d="M 5.77,0 -2.88,5 V -5 Z"
-        id="path135" /></marker>
-        <marker
-    style="overflow:visible"
-    id="008000_ArchsimMarker_Triangle_Reversed"
-    refX="0"
-    refY="0"
-    orient="auto-start-reverse"
-    inkscape:stockid="Triangle arrow"
-    markerWidth="1"
-    markerHeight="1"
-    viewBox="0 0 1 1"
-    inkscape:isstock="true"
-    inkscape:collect="always"
-    preserveAspectRatio="xMidYMid"><path
-        transform="scale(0.5)"
-        style="fill:#008000;fill-rule:evenodd;stroke:#008000;stroke-width:1pt"
-        d="M 5.77,0 -2.88,5 V -5 Z"
-        id="path135" /></marker>
-        <marker
-    style="overflow:visible"
-    id="0000FF_ArchsimMarker_Triangle_Reversed"
-    refX="0"
-    refY="0"
-    orient="auto-start-reverse"
-    inkscape:stockid="Triangle arrow"
-    markerWidth="1"
-    markerHeight="1"
-    viewBox="0 0 1 1"
-    inkscape:isstock="true"
-    inkscape:collect="always"
-    preserveAspectRatio="xMidYMid"><path
-        transform="scale(0.5)"
-        style="fill:#0000FF;fill-rule:evenodd;stroke:#0000FF;stroke-width:1pt"
-        d="M 5.77,0 -2.88,5 V -5 Z"
-        id="path135" /></marker>
+   style="overflow:visible"
+   id="000000_ArchsimMarker_Triangle_Reversed"
+   refX="0"
+   refY="0"
+   orient="auto-start-reverse"
+   inkscape:stockid="Triangle arrow"
+   markerWidth="1"
+   markerHeight="1"
+   viewBox="0 0 1 1"
+   inkscape:isstock="true"
+   inkscape:collect="always"
+   preserveAspectRatio="xMidYMid"><path
+     transform="scale(0.5)"
+     style="fill:#000000;fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+     d="M 5.77,0 -2.88,5 V -5 Z"
+     id="path135" /></marker>
+
+
          <!--CUSTOM MARKERS END-->
          <rect
    x="1741.604"
@@ -394,8 +328,7 @@
        x="408.51486"
        y="702.11664"
        id="IM"
-       inkscape:label="IM"><title
-         id="title5932">IM</title><tspan
+       inkscape:label="IM"><tspan
          sodipodi:role="line"
          id="tspan15178"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.6944px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke-width:0.70575"
@@ -412,8 +345,7 @@
        x="323.44971"
        y="799.7597"
        id="IMReadAddress"
-       inkscape:label="IMReadAddress"><title
-         id="title5916">IMReadAddress</title><tspan
+       inkscape:label="IMReadAddress"><tspan
          sodipodi:role="line"
          id="tspan15178-3"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15.875px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0.70575"
@@ -424,8 +356,7 @@
        x="401.03903"
        y="757.18188"
        id="IMInstr"
-       inkscape:label="IMInstr"><title
-         id="title5914">IMInstr</title><tspan
+       inkscape:label="IMInstr"><tspan
          sodipodi:role="line"
          id="tspan15178-6"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15.875px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0.70575"
@@ -445,8 +376,7 @@
        x="148.20949"
        y="745.37134"
        id="PCT"
-       inkscape:label="PCT"><title
-         id="title5900">PCT</title><tspan
+       inkscape:label="PCT"><tspan
          sodipodi:role="line"
          id="tspan15178-6-0"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.6944px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0.70575"
@@ -519,8 +449,7 @@
        x="672.03668"
        y="647.79382"
        id="RF"
-       inkscape:label="RF"><title
-         id="title5934">RF</title><tspan
+       inkscape:label="RF"><tspan
          sodipodi:role="line"
          id="tspan15178-8"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.6944px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0.70575"
@@ -531,8 +460,7 @@
        x="659.28253"
        y="811.69025"
        id="RFWriteData"
-       inkscape:label="RFWriteData"><title
-         id="title5924">RFWriteData</title><tspan
+       inkscape:label="RFWriteData"><tspan
          sodipodi:role="line"
          id="tspan15178-3-8"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15.875px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0.70575"
@@ -543,8 +471,7 @@
        x="659.28687"
        y="776.61945"
        id="RFWriteFile"
-       inkscape:label="RFWriteFile"><title
-         id="title5922">RFWriteFile</title><tspan
+       inkscape:label="RFWriteFile"><tspan
          sodipodi:role="line"
          id="tspan15178-3-8-8"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15.875px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0.70575"
@@ -555,8 +482,7 @@
        x="788.44025"
        y="662.13483"
        id="RFReadData1"
-       inkscape:label="RFReadData1"><title
-         id="title5926">RFReadData1</title><tspan
+       inkscape:label="RFReadData1"><tspan
          sodipodi:role="line"
          id="tspan15178-6-3"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15.9718px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0.70575"
@@ -573,8 +499,7 @@
        x="788.44025"
        y="718.13483"
        id="RFReadData2"
-       inkscape:label="RFReadData2"><title
-         id="title5928">RFReadData2</title><tspan
+       inkscape:label="RFReadData2"><tspan
          sodipodi:role="line"
          id="tspan15178-6-3-4"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15.9718px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0.70575"
@@ -591,8 +516,7 @@
        x="658.4342"
        y="737.06128"
        id="RFReadAddress2"
-       inkscape:label="RFReadAddress2"><title
-         id="title5920">RFReadAddress2</title><tspan
+       inkscape:label="RFReadAddress2"><tspan
          sodipodi:role="line"
          id="tspan15178-3-8-1"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15.875px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0.70575"
@@ -622,8 +546,7 @@
        x="1333.2701"
        y="699.83276"
        id="DM"
-       inkscape:label="DM"><title
-         id="title5944">DM</title><tspan
+       inkscape:label="DM"><tspan
          sodipodi:role="line"
          id="tspan15178-7"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.6944px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#020100;fill-opacity:1;stroke-width:0.70575"
@@ -634,8 +557,7 @@
        x="1334.2825"
        y="791.69025"
        id="DMWriteData"
-       inkscape:label="DMWriteData"><title
-         id="title6002">DMWriteData</title><tspan
+       inkscape:label="DMWriteData"><tspan
          sodipodi:role="line"
          id="tspan15178-3-4"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15.875px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#020100;fill-opacity:1;stroke-width:0.70575"
@@ -646,8 +568,7 @@
        x="1418.7026"
        y="757.06128"
        id="DMReadData"
-       inkscape:label="DMReadData"><title
-         id="title5948">DMReadData</title><tspan
+       inkscape:label="DMReadData"><tspan
          sodipodi:role="line"
          id="tspan15178-3-4-5"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15.875px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#020100;fill-opacity:1;stroke-width:0.70575"
@@ -658,8 +579,7 @@
        x="1334.7972"
        y="722.13483"
        id="DMAddress"
-       inkscape:label="DMAddress"><title
-         id="title5946">DMAddress</title><tspan
+       inkscape:label="DMAddress"><tspan
          sodipodi:role="line"
          id="tspan15178-6-38"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15.875px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#020100;fill-opacity:1;stroke-width:0.70575"
@@ -681,8 +601,7 @@
        y="487.79349"
        id="ControlUnit"
        inkscape:highlight-color="#e33b3b"
-       inkscape:label="ControlUnit"><title
-         id="title5898">ControlUnit</title><tspan
+       inkscape:label="ControlUnit"><tspan
          sodipodi:role="line"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28.2222px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke-width:0.70575"
          x="753.44507"
@@ -705,8 +624,7 @@
        y="896.9231"
        id="IG"
        inkscape:highlight-color="#e33b3b"
-       inkscape:label="IG"><title
-         id="title5930">IG</title><tspan
+       inkscape:label="IG"><tspan
          sodipodi:role="line"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15.875px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke-width:0.415;stroke-dasharray:none"
          x="750.15503"
@@ -727,8 +645,7 @@
        y="849.58606"
        id="ALUControl"
        inkscape:highlight-color="#e33b3b"
-       inkscape:label="ALUControl"><title
-         id="title5942">ALUControl</title><tspan
+       inkscape:label="ALUControl"><tspan
          sodipodi:role="line"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15.875px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke-width:0.70575"
          x="1083.4803"
@@ -748,8 +665,7 @@
        x="1094.8232"
        y="446.44226"
        id="Add-3-7"
-       inkscape:label="Add"><title
-         id="title5896-6-4">Add</title><tspan
+       inkscape:label="Add"><tspan
          sodipodi:role="line"
          id="tspan15178-1-2-3-5"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28.2222px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0.70575"
@@ -764,8 +680,7 @@
        x="1121.4589"
        y="694.13983"
        id="ALUBranchTaken-4-6-6"
-       inkscape:label="ALUBranchTaken"><title
-         id="title5936-3-6-6">ALUBranchTaken</title><tspan
+       inkscape:label="ALUBranchTaken"><tspan
          sodipodi:role="line"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.3472px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0.70575"
          x="1121.4589"
@@ -776,8 +691,7 @@
        x="1146.7939"
        y="730.51898"
        id="ALU-6-6-3"
-       inkscape:label="ALU"><title
-         id="title5940-8-5-2">ALU</title><tspan
+       inkscape:label="ALU"><tspan
          sodipodi:role="line"
          id="tspan15178-8-1-6-4-0"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28.2222px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0.70575"
@@ -793,8 +707,7 @@
        x="1120.9464"
        y="769.38098"
        id="ALUResult-8-3-0"
-       inkscape:label="ALUResult"><title
-         id="title5938-9-2-9">ALUResult</title><tspan
+       inkscape:label="ALUResult"><tspan
          sodipodi:role="line"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.3472px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0.70575"
          x="1120.9464"
@@ -1114,8 +1027,7 @@
          y="-950.32037"
          id="TopMostLeftMux0-8-6"
          inkscape:label="TopMostLeftMux0"
-         transform="rotate(90)"><title
-           id="title5886-8-8">TopMostLeftMux0</title><tspan
+         transform="rotate(90)"><tspan
            sodipodi:role="line"
            id="tspan15178-1-6-8-9-9-8"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:21.1667px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0;stroke-dasharray:none"
@@ -1127,8 +1039,7 @@
          y="-950"
          id="TopMostLeftMux1-9-6"
          inkscape:label="TopMostLeftMux1"
-         transform="rotate(90)"><title
-           id="title5884-0-1">TopMostLeftMux1</title><tspan
+         transform="rotate(90)"><tspan
            sodipodi:role="line"
            id="tspan15178-1-6-84-8-1"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:21.1667px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0;stroke-dasharray:none"
@@ -1140,8 +1051,7 @@
          y="-973.29352"
          id="TopMostLeftMux-5"
          inkscape:label="TopMostLeftMux"
-         transform="rotate(90)"><title
-           id="title5892-0">TopMostLeftMux</title><tspan
+         transform="rotate(90)"><tspan
            sodipodi:role="line"
            id="tspan15178-1-7-8"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15.875px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0.70575"
@@ -1160,8 +1070,7 @@
          y="-950.32037"
          id="TopMostLeftMux0-8-6-5"
          inkscape:label="TopMostLeftMux0"
-         transform="rotate(90)"><title
-           id="title5886-8-8-6">TopMostLeftMux0</title><tspan
+         transform="rotate(90)"><tspan
            sodipodi:role="line"
            id="tspan15178-1-6-8-9-9-8-1"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:21.1667px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0;stroke-dasharray:none"
@@ -1173,8 +1082,7 @@
          y="-950"
          id="TopMostLeftMux1-9-6-7"
          inkscape:label="TopMostLeftMux1"
-         transform="rotate(90)"><title
-           id="title5884-0-1-3">TopMostLeftMux1</title><tspan
+         transform="rotate(90)"><tspan
            sodipodi:role="line"
            id="tspan15178-1-6-84-8-1-4"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:21.1667px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0;stroke-dasharray:none"
@@ -1186,8 +1094,7 @@
          y="-973.29352"
          id="TopMostLeftMux-5-1"
          inkscape:label="TopMostLeftMux"
-         transform="rotate(90)"><title
-           id="title5892-0-0">TopMostLeftMux</title><tspan
+         transform="rotate(90)"><tspan
            sodipodi:role="line"
            id="tspan15178-1-7-8-0"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15.875px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0.70575"
@@ -1205,8 +1112,7 @@
          x="378.86554"
          y="361.44226"
          id="Add-3-7-1"
-         inkscape:label="Add"><title
-           id="title5896-6-4-4">Add</title><tspan
+         inkscape:label="Add"><tspan
            sodipodi:role="line"
            id="tspan15178-1-2-3-5-9"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28.2222px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0.70575"
@@ -1227,8 +1133,7 @@
          y="-950.32037"
          id="TopMostLeftMux0-8-6-5-7"
          inkscape:label="TopMostLeftMux0"
-         transform="rotate(90)"><title
-           id="title5886-8-8-6-3">TopMostLeftMux0</title><tspan
+         transform="rotate(90)"><tspan
            sodipodi:role="line"
            id="tspan15178-1-6-8-9-9-8-1-9"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:21.1667px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0;stroke-dasharray:none"
@@ -1240,8 +1145,7 @@
          y="-950"
          id="TopMostLeftMux1-9-6-7-7"
          inkscape:label="TopMostLeftMux1"
-         transform="rotate(90)"><title
-           id="title5884-0-1-3-8">TopMostLeftMux1</title><tspan
+         transform="rotate(90)"><tspan
            sodipodi:role="line"
            id="tspan15178-1-6-84-8-1-4-8"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:21.1667px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0;stroke-dasharray:none"
@@ -1253,8 +1157,7 @@
          y="-973.29352"
          id="TopMostLeftMux-5-1-7"
          inkscape:label="TopMostLeftMux"
-         transform="rotate(90)"><title
-           id="title5892-0-0-7">TopMostLeftMux</title><tspan
+         transform="rotate(90)"><tspan
            sodipodi:role="line"
            id="tspan15178-1-7-8-0-2"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15.875px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0.70575"
@@ -1275,8 +1178,7 @@
          y="-950.32037"
          id="TopMostLeftMux0-8-6-5-7-1"
          inkscape:label="TopMostLeftMux0"
-         transform="rotate(90)"><title
-           id="title5886-8-8-6-3-0">TopMostLeftMux0</title><tspan
+         transform="rotate(90)"><tspan
            sodipodi:role="line"
            id="tspan15178-1-6-8-9-9-8-1-9-9"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:21.1667px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0;stroke-dasharray:none"
@@ -1288,8 +1190,7 @@
          y="-950"
          id="TopMostLeftMux1-9-6-7-7-9"
          inkscape:label="TopMostLeftMux1"
-         transform="rotate(90)"><title
-           id="title5884-0-1-3-8-5">TopMostLeftMux1</title><tspan
+         transform="rotate(90)"><tspan
            sodipodi:role="line"
            id="tspan15178-1-6-84-8-1-4-8-2"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:21.1667px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0;stroke-dasharray:none"
@@ -1301,8 +1202,7 @@
          y="-973.29352"
          id="TopMostLeftMux-5-1-7-3"
          inkscape:label="TopMostLeftMux"
-         transform="rotate(90)"><title
-           id="title5892-0-0-7-8">TopMostLeftMux</title><tspan
+         transform="rotate(90)"><tspan
            sodipodi:role="line"
            id="tspan15178-1-7-8-0-2-3"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15.875px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0.70575"
@@ -1320,8 +1220,7 @@
          y="-1434.4003"
          id="TopMostLeftMux0-8-6-5-7-1-6"
          inkscape:label="TopMostLeftMux0"
-         transform="rotate(89.644326)"><title
-           id="title5886-8-8-6-3-0-4">TopMostLeftMux0</title><tspan
+         transform="rotate(89.644326)"><tspan
            sodipodi:role="line"
            id="tspan15178-1-6-8-9-9-8-1-9-9-7"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:21.1667px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0;stroke-dasharray:none"
@@ -1333,8 +1232,7 @@
          y="-1433.9094"
          id="TopMostLeftMux1-9-6-7-7-9-0"
          inkscape:label="TopMostLeftMux1"
-         transform="rotate(89.644326)"><title
-           id="title5884-0-1-3-8-5-2">TopMostLeftMux1</title><tspan
+         transform="rotate(89.644326)"><tspan
            sodipodi:role="line"
            id="tspan15178-1-6-84-8-1-4-8-2-4"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:21.1667px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0;stroke-dasharray:none"
@@ -1346,8 +1244,7 @@
          y="-1452.0337"
          id="TopMostLeftMux-5-1-7-3-7"
          inkscape:label="TopMostLeftMux"
-         transform="rotate(89.644326)"><title
-           id="title5892-0-0-7-8-4">TopMostLeftMux</title><tspan
+         transform="rotate(89.644326)"><tspan
            sodipodi:role="line"
            id="tspan15178-1-7-8-0-2-3-5"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15.875px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:0.70575"
