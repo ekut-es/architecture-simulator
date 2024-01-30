@@ -4,10 +4,9 @@ import { onUnmounted, ref, watch, computed } from "vue";
 
 import RiscvControlBar from "./RiscvControlBar.vue";
 import RiscvUnifiedMemory from "./RiscvUnifiedMemory.vue";
-import RiscvRegisterTable from "./RiscvRegisterTable.vue";
 import CodeEditor from "../CodeEditor.vue";
-import RiscvOutputField from "./RiscvOutputField.vue";
 import RiscvVisualization from "./RiscvVisualization.vue";
+import RiscvRegistersOutput from "./RiscvRegistersOutput.vue";
 // import SvgVisualization from '../SvgVisualization.vue';
 
 import { useRiscvSimulationStore } from "@/js/riscv_simulation_store";
@@ -93,14 +92,7 @@ onUnmounted(() => {
                 class="flex-shrink-0"
                 v-show="riscvSettings.showMemory.value"
             />
-            <RiscvRegisterTable
-                class="flex-shrink-0"
-                v-show="riscvSettings.showRegisters.value"
-            />
-            <RiscvOutputField
-                class="flex-shrink-0"
-                v-show="riscvSettings.showOutput.value"
-            />
+            <RiscvRegistersOutput />
         </div>
         <div
             v-show="riscvSettings.showVisualization.value"

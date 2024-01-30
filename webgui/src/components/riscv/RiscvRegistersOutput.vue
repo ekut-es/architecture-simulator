@@ -1,0 +1,34 @@
+<script setup>
+import RiscvOutputField from "./RiscvOutputField.vue";
+import RiscvRegisterTable from "./RiscvRegisterTable.vue";
+</script>
+
+<template>
+    <div class="wrapper">
+        <span class="archsim-text-element-heading">Registers</span>
+        <RiscvRegisterTable class="registers" />
+        <span class="archsim-text-element-heading">Output</span>
+        <RiscvOutputField class="output" />
+    </div>
+</template>
+
+<style scoped>
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.registers,
+.output {
+    overflow-y: auto;
+}
+
+.registers {
+    flex: 0 1 auto;
+}
+
+.output {
+    flex: 1 0 8em;
+}
+</style>

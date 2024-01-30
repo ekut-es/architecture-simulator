@@ -36,27 +36,18 @@ let output = computed(() => {
 </script>
 
 <template>
-    <div id="riscv-output-wrapper">
-        <span class="archsim-text-element-heading">Output</span>
-        <div class="flex-shrink-0 archsim-default-border output-field">
-            <template v-for="line in output">
-                <template v-if="line"> {{ line }} <br /> </template>
-            </template>
-        </div>
+    <div class="archsim-default-border output-field">
+        <template v-for="line in output">
+            <template v-if="line"> {{ line }} <br /> </template>
+        </template>
     </div>
 </template>
 
 <style scoped>
 .output-field {
     background-color: #ffffff;
-    padding: 1em;
+    padding: 0.5em;
     min-width: 18em;
     max-width: 20em;
-    min-height: 17em;
-}
-
-#riscv-output-wrapper {
-    height: 100%;
-    overflow: auto;
 }
 </style>
