@@ -1,6 +1,10 @@
 <script setup>
-import RiscvOutputField from "./RiscvOutputField.vue";
+import OutputField from "../OutputField.vue";
 import RiscvRegisterTable from "./RiscvRegisterTable.vue";
+
+import { useRiscvSimulationStore } from "@/js/riscv_simulation_store";
+
+const simulationStore = useRiscvSimulationStore();
 </script>
 
 <template>
@@ -8,7 +12,7 @@ import RiscvRegisterTable from "./RiscvRegisterTable.vue";
         <span class="archsim-text-element-heading">Registers</span>
         <RiscvRegisterTable class="registers" />
         <span class="archsim-text-element-heading">Output</span>
-        <RiscvOutputField class="output" />
+        <OutputField class="output" :simulation-store="simulationStore" />
     </div>
 </template>
 

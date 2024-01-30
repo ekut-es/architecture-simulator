@@ -1,10 +1,8 @@
-<!-- The output field for TOY -->
+<!-- An output field that works with any simulation store -->
 <script setup>
 import { computed } from "vue";
-
-import { useToySimulationStore } from "@/js/toy_simulation_store";
-
-const simulationStore = useToySimulationStore();
+const props = defineProps(["simulationStore"]);
+const simulationStore = props.simulationStore;
 
 /**
  * An array that holds one string for each line to display

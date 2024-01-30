@@ -1,7 +1,11 @@
 <!-- Contains the register table and output field -->
 <script setup>
-import ToyOutputField from "./ToyOutputField.vue";
+import OutputField from "../OutputField.vue";
 import ToyRegisterTable from "./ToyRegisterTable.vue";
+
+import { useToySimulationStore } from "@/js/toy_simulation_store";
+
+const simulationStore = useToySimulationStore();
 </script>
 
 <template>
@@ -9,7 +13,7 @@ import ToyRegisterTable from "./ToyRegisterTable.vue";
         <span class="archsim-text-element-heading">Registers</span>
         <ToyRegisterTable class="registers" />
         <span class="archsim-text-element-heading">Output</span>
-        <ToyOutputField class="output" />
+        <OutputField class="output" :simulation-store="simulationStore" />
     </div>
 </template>
 
