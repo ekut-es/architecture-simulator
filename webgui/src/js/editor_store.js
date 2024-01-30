@@ -100,6 +100,7 @@ class EditorStore {
                     if (v.docChanged) {
                         this.hasUnparsedChanges.value = true;
                         this.debounceAutoParsing();
+                        this.clearLinterError(); // remove error linting immediately
                     }
                 })
             ),
@@ -152,7 +153,7 @@ class EditorStore {
                             },
                         ];
                     },
-                    { delay: 0 }
+                    { delay: 10 } // small delay so we can disable the linter on change
                 )
             ),
         });
