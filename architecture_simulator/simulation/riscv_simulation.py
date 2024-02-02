@@ -71,11 +71,11 @@ class RiscvSimulation(Simulation):
 
     def step(self) -> bool:
         if not self.is_done():
+            self.has_started = True
             self.state.previous_program_counter = (
                 self.state.program_counter
             )  # maybe this should not go here
             self.state.pipeline.step()
-            self.has_started = True
         return not self.is_done()
 
     def run(self):
