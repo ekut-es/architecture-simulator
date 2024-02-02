@@ -209,8 +209,7 @@ export class BaseSimulationStore {
     /**
      * Return true if there was a runtime error caused by the instruction at the given address.
      *
-     * @param {String} address Address of the instruction. Will be casted to a number using Number(address),
-     * so it may be a hex string starting with 0x.
+     * @param {Number} address Address of the instruction.
      *
      * @returns {bool}
      */
@@ -218,7 +217,7 @@ export class BaseSimulationStore {
         return (
             this.error &&
             this.error[0] === "InstructionExecutionException" &&
-            Number(address) === this.error[2]
+            address === this.error[2]
         );
     }
 }

@@ -113,11 +113,12 @@ class RiscvSimulation(Simulation):
         """
         return self.state.register_file.reg_repr()
 
-    def get_instruction_memory_entries(self) -> list[tuple[str, str, str]]:
-        """Returns a list of the address (in hex), instruction and pipeline stage of the instruction for all instructions in the instruction memory.
+    def get_instruction_memory_entries(self) -> list[tuple[tuple[int, str], str, str]]:
+        """Returns a list of the address (as int and as hex string),
+        instruction and pipeline stage of the instruction for all instructions in the instruction memory.
 
         Returns:
-            list[tuple[str, str, str]]: List of (address, instruction, stage).
+            list[tuple[str, str, str]]: List of ((int_address, hex_address), instruction, stage).
         """
         pipeline_stages_addresses: dict[int, str] = {}
         for pipeline_register in self.state.pipeline.pipeline_registers:
@@ -128,7 +129,7 @@ class RiscvSimulation(Simulation):
 
         return [
             (
-                "0x" + "{:08X}".format(address),
+                (address, "0x" + "{:08X}".format(address)),
                 instruction,
                 pipeline_stages_addresses[address]
                 if address in pipeline_stages_addresses
@@ -151,7 +152,8 @@ class RiscvSimulation(Simulation):
 
         Returns:
             list[tuple[str, str, Any]]: each tuple is [svg-id, what update function to use, argument for update function (Any)].
-            They can be one of ("<id>","highlight", <#hexcolor>), ("<id>", "write-center", <content>), ("<id>", "write-left", <content>), ("<id>", "write-right", <content>)
+            They can be one of ("<id>","highlight", <#hexcolor>), ("<id>", "write-center", <content>),
+            ("<id>", "write-left", <content>), ("<id>", "write-right", <content>)
         """
         assert self.mode == "five_stage_pipeline"
         return (

@@ -46,7 +46,7 @@ const dataMemoryEntries = computed(() => {
                             :class="{
                                 'archsim-tr-runtime-error':
                                     simulationStore.instructionErrored(
-                                        entry[0]
+                                        entry[0][0]
                                     ),
                             }"
                         >
@@ -68,7 +68,7 @@ const dataMemoryEntries = computed(() => {
                                     </span>
                                 </template>
                                 <!-- The actual address -->
-                                {{ entry[0] }}
+                                {{ entry[0][1] }}
                             </td>
                             <td>{{ entry[1] }}</td>
                             <!-- Stage indicator in case of five stage pipeline -->
