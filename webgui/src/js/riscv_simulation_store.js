@@ -63,14 +63,14 @@ export class RiscvSimulationStore extends BaseSimulationStore {
         );
         let newPreviousDataMemoryEntries = [];
         for (const entry of newDataMemoryEntries) {
-            const intAddress = entry[0][0];
+            const hexAddress = entry[0][1];
             const newValue = entry[1][1];
             // find out if the entry has changed or if it is new and add that to the entry
             const hasChanged =
-                newValue !== this.previousDataMemoryEntries[intAddress];
+                newValue !== this.previousDataMemoryEntries[hexAddress];
             entry.push(hasChanged);
             // update the previous entries.
-            newPreviousDataMemoryEntries[intAddress] = newValue;
+            newPreviousDataMemoryEntries[hexAddress] = newValue;
         }
         this.previousDataMemoryEntries = newPreviousDataMemoryEntries;
         this.dataMemoryEntries = newDataMemoryEntries;

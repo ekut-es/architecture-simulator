@@ -54,12 +54,12 @@ export class ToySimulationStore extends BaseSimulationStore {
         );
         let newPreviousMemoryEntries = [];
         for (const entry of newMemoryEntries) {
-            const intAddress = entry[0][0];
+            const hexAddress = entry[0][1];
             const newValue = entry[1][1];
             const hasChanged =
-                newValue !== this.previousMemoryEntries[intAddress];
+                newValue !== this.previousMemoryEntries[hexAddress];
             entry.push(hasChanged);
-            newPreviousMemoryEntries[intAddress] = newValue;
+            newPreviousMemoryEntries[hexAddress] = newValue;
         }
         this.previousMemoryEntries = newPreviousMemoryEntries;
         this.memoryEntries = newMemoryEntries;
