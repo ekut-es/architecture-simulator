@@ -21,6 +21,19 @@ const dataMemoryEntries = computed(() => {
     }
     return result;
 });
+
+const instructionMemoryEntries = computed(() => {
+    const result = [];
+    for (const entry of simulationStore.instructionMemoryEntries) {
+        result.push({
+            hexAddress: entry[0][1],
+            value: entry[1],
+            stage: entry[2],
+            error: simulationStore.instructionErrored(entry[0][0]),
+        });
+    }
+    return result;
+});
 </script>
 
 <template>
@@ -39,20 +52,15 @@ const dataMemoryEntries = computed(() => {
                 </thead>
                 <tbody id="riscv-uni-memory-table-body">
                     <!-- Instruction memory entries -->
-                    <template
-                        v-for="entry in simulationStore.instructionMemoryEntries"
-                    >
+                    <template v-for="entry in instructionMemoryEntries">
                         <tr
                             :class="{
-                                'archsim-tr-runtime-error':
-                                    simulationStore.instructionErrored(
-                                        entry[0][0]
-                                    ),
+                                'archsim-tr-runtime-error': entry.error,
                             }"
                         >
                             <td class="text-nowrap">
                                 <!-- Mark the current instruction/stage -->
-                                <template v-if="entry[2] === 'Single'">
+                                <template v-if="entry.stage === 'Single'">
                                     <CurrentInstructionArrow />
                                 </template>
                                 <template v-else>
@@ -60,18 +68,17 @@ const dataMemoryEntries = computed(() => {
                                         :class="[
                                             'riscv-stage-indicator',
                                             'riscv-stage-' +
-                                                entry[2].toLowerCase(),
+                                                entry.stage.toLowerCase(),
                                         ]"
-                                        v-if="entry[2]"
+                                        v-if="entry.stage"
                                     >
-                                        {{ entry[2] }}
+                                        {{ entry.stage }}
                                     </span>
                                 </template>
                                 <!-- The actual address -->
-                                {{ entry[0][1] }}
+                                {{ entry.hexAddress }}
                             </td>
-                            <td>{{ entry[1] }}</td>
-                            <!-- Stage indicator in case of five stage pipeline -->
+                            <td>{{ entry.value }}</td>
                         </tr>
                     </template>
                     <!-- Data memory entries -->
