@@ -15,7 +15,10 @@ class MemoryAddressError(ValueError):
     memory_type: str
 
     def __repr__(self):
-        return f"MemoryAddressError: Cannot access {self.memory_type} at address {self.address}: Addresses go from {self.min_address_incl} to {self.max_address_incl}"
+        hex_address = "0x" + "{:X}".format(self.address)
+        min_address_hex = "0x" + "{:X}".format(self.min_address_incl)
+        max_address_hex = "0x" + "{:X}".format(self.max_address_incl)
+        return f"MemoryAddressError: Cannot access {self.memory_type} at address {hex_address}: Addresses go from {min_address_hex} to {max_address_hex}"
 
 
 @dataclass
