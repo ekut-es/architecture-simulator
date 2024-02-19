@@ -15,7 +15,10 @@ class MemoryAddressError(ValueError):
     memory_type: str
 
     def __repr__(self):
-        return f"MemoryAddressError: Cannot access {self.memory_type} at address {self.address}: Addresses go from {self.min_address_incl} to {self.max_address_incl}"
+        hex_address = "0x" + "{:X}".format(self.address)
+        min_address_hex = "0x" + "{:X}".format(self.min_address_incl)
+        max_address_hex = "0x" + "{:X}".format(self.max_address_incl)
+        return f"MemoryAddressError: Cannot access {self.memory_type} at address {hex_address}: Addresses go from {min_address_hex} to {max_address_hex}"
 
 
 @dataclass
@@ -68,6 +71,10 @@ class Memory(Generic[T]):
             range(2**self.address_length) if address_range is None else address_range
         )
         self.memory_file: dict[int, T] = dict()
+
+    def reset(self):
+        """Clears the memory."""
+        self.memory_file = {}
 
     def assert_address_in_range(self, address: int):
         """
@@ -337,7 +344,7 @@ class Memory(Generic[T]):
         Parameters:
             bits_of_one_block (int): Specifies how many bits long the value at an address should be considered.
 
-        Returns:
+         Returns:
             dict[int, tuple[str, str, str, str]]:
                 Keys: Memory addresses.
                 Values: Tuples of (binary, unsigned decimal, hexadecimal, signed decimal) strings.
@@ -371,7 +378,7 @@ class Memory(Generic[T]):
         Raises:
             UnsupportedFunctionError: If no byte-wise addressing is used.
 
-        Returns:
+         Returns:
             dict[int, tuple[str, str, str, str]]:
                 Keys: Memory addresses.
                 Values: Tuples of (binary, unsigned decimal, hexadecimal, signed decimal) strings.
@@ -389,7 +396,7 @@ class Memory(Generic[T]):
         Raises:
             UnsupportedFunctionError: If no halfword-wise addressing or smaller is used.
 
-        Returns:
+         Returns:
             dict[int, tuple[str, str, str, str]]:
                 Keys: Memory addresses.
                 Values: Tuples of (binary, unsigned decimal, hexadecimal, signed decimal) strings.
@@ -407,7 +414,7 @@ class Memory(Generic[T]):
         Raises:
             UnsupportedFunctionError: If no word-wise addressing or smaller is used.
 
-        Returns:
+         Returns:
             dict[int, tuple[str, str, str, str]]:
                 Keys: Memory addresses.
                 Values: Tuples of (binary, unsigned decimal, hexadecimal, signed decimal) strings.
@@ -425,7 +432,7 @@ class Memory(Generic[T]):
         Raises:
             UnsupportedFunctionError: If no doubleword-wise addressing or smaller is used.
 
-        Returns:
+         Returns:
             dict[int, tuple[str, str, str, str]]:
                 Keys: Memory addresses.
                 Values: Tuples of (binary, unsigned decimal, hexadecimal, signed decimal) strings.

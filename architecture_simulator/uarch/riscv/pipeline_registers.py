@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
 from dataclasses import dataclass, field
 
-from .control_unit_signals import ControlUnitSignals
+from .control_unit_signals import ControlUnitSignals, SingleStageControlUnitSignals
 from architecture_simulator.isa.riscv.instruction_types import EmptyInstruction
 
 if TYPE_CHECKING:
@@ -19,12 +19,14 @@ class PipelineRegister:
     instruction: RiscvInstruction = field(default_factory=EmptyInstruction)
     address_of_instruction: Optional[int] = None
     flush_signal: Optional[FlushSignal] = None
+    abbreviation = "Single"
 
 
 @dataclass
 class InstructionFetchPipelineRegister(PipelineRegister):
     branch_prediction: Optional[bool] = None
     pc_plus_instruction_length: Optional[int] = None
+    abbreviation = "IF"
 
 
 @dataclass
@@ -38,6 +40,7 @@ class InstructionDecodePipelineRegister(PipelineRegister):
     write_register: Optional[int] = None
     branch_prediction: Optional[bool] = None
     pc_plus_instruction_length: Optional[int] = None
+    abbreviation = "ID"
 
 
 @dataclass
@@ -56,6 +59,7 @@ class ExecutePipelineRegister(PipelineRegister):
     pc_plus_imm: Optional[int] = None
     branch_prediction: Optional[bool] = None
     pc_plus_instruction_length: Optional[int] = None
+    abbreviation = "EX"
 
 
 @dataclass
@@ -72,6 +76,7 @@ class MemoryAccessPipelineRegister(PipelineRegister):
     pc_plus_imm: Optional[int] = None
     pc_plus_instruction_length: Optional[int] = None
     imm: Optional[int] = None
+    abbreviation = "MEM"
 
 
 @dataclass
@@ -83,3 +88,33 @@ class RegisterWritebackPipelineRegister(PipelineRegister):
     alu_result: Optional[int] = None
     pc_plus_instruction_length: Optional[int] = None
     imm: Optional[int] = None
+    abbreviation = "WB"
+
+
+@dataclass
+class SingleStagePipelineRegister(PipelineRegister):
+    # instruction
+    # address_of_instruction
+    control_unit_signals: SingleStageControlUnitSignals = field(
+        default_factory=SingleStageControlUnitSignals
+    )
+
+    register_read_addr_1: Optional[int] = None
+    register_read_addr_2: Optional[int] = None
+    register_read_data_1: Optional[int] = None
+    register_read_data_2: Optional[int] = None
+    imm: Optional[int] = None
+    register_write_register: Optional[int] = None
+
+    instruction_length: Optional[int] = None
+    pc_plus_instruction_length: Optional[int] = None
+    pc_plus_imm: Optional[int] = None
+
+    alu_comparison: bool = False
+    alu_result: Optional[int] = None
+
+    memory_address: Optional[int] = None
+    memory_write_data: Optional[int] = None
+    memory_read_data: Optional[int] = None
+
+    register_write_data: Optional[int] = None

@@ -8,7 +8,8 @@ class InstructionExecutionException(RuntimeError):
     error_message: str
 
     def __repr__(self):
-        return f"There was an error executing the instruction at address '{self.address}': '{self.instruction_repr}':\n{self.error_message}"
+        hex_address = "0x" + "{:X}".format(self.address)
+        return f"There was an error executing '{self.instruction_repr}' at address {hex_address}:\n{self.error_message}"
 
 
 @dataclass

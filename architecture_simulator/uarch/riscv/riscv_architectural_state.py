@@ -60,6 +60,7 @@ class RiscvArchitecturalState:
         self.register_file = RegisterFile() if register_file is None else register_file
         self.csr_registers = CsrRegisterFile()
         self.program_counter = self.instruction_memory.address_range.start  # 0
+        self.previous_program_counter = self.program_counter
         self.performance_metrics = RiscvPerformanceMetrics()
 
     def change_privilege_level(self, level: int):
