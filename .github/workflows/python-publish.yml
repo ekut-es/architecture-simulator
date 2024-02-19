@@ -52,9 +52,15 @@ jobs:
         run: python -m build
       - name: Copy package to 'webgui'
         run: |
-          mkdir webgui/dist
-          cp dist/*.whl webgui/dist/
-
+          cp dist/*.whl webgui/public/
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.0
+      - name: Build web UI
+        run: |
+          npm install
+          npm run build-main-github
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v3.1.3
         with:
@@ -70,8 +76,8 @@ jobs:
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          # Upload entire repository
-          path: 'webgui'
+          # Upload webgui dist
+          path: 'webgui/dist/'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
