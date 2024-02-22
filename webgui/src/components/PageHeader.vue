@@ -9,13 +9,14 @@ import { globalSettings } from "@/js/global_settings";
                 {{ globalSettings.selectedIsaName }} Simulator
             </div>
             <div class="col-auto ms-auto">
-                <button id="help-button" class="archsim-icon-button">
-                    <i
-                        class="bi bi-question-circle-fill"
-                        title="help"
-                        data-bs-toggle="modal"
-                        data-bs-target="#help-modal"
-                    ></i>
+                <button
+                    id="help-button"
+                    class="archsim-icon-button"
+                    title="help"
+                    data-bs-toggle="modal"
+                    data-bs-target="#help-modal"
+                >
+                    <i class="bi bi-question-circle-fill"></i>
                 </button>
             </div>
         </div>
