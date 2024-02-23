@@ -118,8 +118,6 @@ class RiscvFiveStageMEMSvgDirectives(RiscvSvgDirectivesBase):
         self.MemoryFetchAddOut = SvgFillDirectiveBlue()
         self.MemoryImmGenText = SvgWriteCenterDirective()
         self.MemoryImmGen = SvgFillDirectiveBlue()
-        self.ControlUnitLeftRight = SvgFillDirectiveGreen()
-        self.ControlUnitLeft = SvgFillDirectiveGreen()
         self.ControlUnitLeftRight1_3 = SvgFillDirectiveGreen()
         self.ControlUnitLeftRight2_3 = SvgFillDirectiveGreen()
         self.ControlUnitLeft_3 = SvgFillDirectiveGreen()

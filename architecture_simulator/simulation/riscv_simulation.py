@@ -131,9 +131,11 @@ class RiscvSimulation(Simulation):
             (
                 (address, "0x" + "{:08X}".format(address)),
                 instruction,
-                pipeline_stages_addresses[address]
-                if address in pipeline_stages_addresses
-                else "",
+                (
+                    pipeline_stages_addresses[address]
+                    if address in pipeline_stages_addresses
+                    else ""
+                ),
             )
             for address, instruction in self.state.instruction_memory.get_representation()
         ]
@@ -268,7 +270,21 @@ class RiscvSimulation(Simulation):
             result.DecodeInstructionMemory.do_highlight = bool(
                 result.DecodeLowerFetchPCOutText.text
             )
-
+            result.ControlUnitLeftRight1_1.do_highlight = bool(
+                pipeline_register.control_unit_signals.jump
+            )
+            result.ControlUnitLeftRight2_1.do_highlight = bool(
+                pipeline_register.control_unit_signals.wb_src
+            )
+            result.ControlUnitLeftRight3_1.do_highlight = bool(
+                pipeline_register.control_unit_signals.alu_src_1
+            )
+            result.ControlUnitLeftRight4_1.do_highlight = bool(
+                pipeline_register.control_unit_signals.alu_src_2
+            )
+            result.ControlUnitLeft_1.do_highlight = bool(
+                pipeline_register.control_unit_signals.alu_to_pc
+            )
         return result.export()
 
     def _get_riscv_five_stage_EX_svg_update_values(self) -> list[tuple[str, str, Any]]:
@@ -336,11 +352,20 @@ class RiscvSimulation(Simulation):
 
             result.ALUComparison.do_highlight = bool(pipeline_register.comparison)
 
-            result.ControlUnitLeftRight3.do_highlight = bool(
+            result.ControlUnitLeftRight1_2.do_highlight = bool(
+                pipeline_register.control_unit_signals.jump
+            )
+            result.ControlUnitLeftRight2_2.do_highlight = bool(
+                pipeline_register.control_unit_signals.wb_src
+            )
+            result.ControlUnitLeftRight3_2.do_highlight = bool(
                 pipeline_register.control_unit_signals.alu_src_1
             )
-            result.ControlUnitLeftRight4.do_highlight = bool(
+            result.ControlUnitLeftRight4_2.do_highlight = bool(
                 pipeline_register.control_unit_signals.alu_src_2
+            )
+            result.ControlUnitLeft_2.do_highlight = bool(
+                pipeline_register.control_unit_signals.alu_to_pc
             )
 
             result.AluControl.do_highlight = bool(
@@ -416,11 +441,13 @@ class RiscvSimulation(Simulation):
             result.MemoryImmGenText.text = save_to_str(pipeline_register.imm)
             result.MemoryImmGen.do_highlight = bool(result.MemoryImmGenText.text)
 
-            result.ControlUnitLeftRight.do_highlight = bool(
+            result.ControlUnitLeftRight1_3.do_highlight = bool(
                 pipeline_register.control_unit_signals.jump
             )
-
-            result.ControlUnitLeft.do_highlight = bool(
+            result.ControlUnitLeftRight2_3.do_highlight = bool(
+                pipeline_register.control_unit_signals.wb_src
+            )
+            result.ControlUnitLeft_3.do_highlight = bool(
                 pipeline_register.control_unit_signals.alu_to_pc
             )
 
@@ -475,7 +502,9 @@ class RiscvSimulation(Simulation):
             result.wbsrc.text = save_to_str(
                 pipeline_register.control_unit_signals.wb_src
             )
-            result.ControlUnitLeftRight2.do_highlight = bool(result.wbsrc.text)
+            result.ControlUnitLeftRight2_4.do_highlight = bool(
+                pipeline_register.control_unit_signals.wb_src
+            )
         return result.export()
 
     def _get_riscv_five_stage_OTHER_svg_update_values(

@@ -123,14 +123,18 @@ function set_svg_text_complex_middle_align(id, str) {
  * @param {string} str -- The colour the element and all its childnodes should have
  */
 function set_svg_colour(id, colour) {
-    const Child_Nodes = svg.value.getElementById(id).childNodes;
-    if (Child_Nodes.length > 0) {
-        for (let i = 0; i < Child_Nodes.length; i++) {
-            set_svg_colour(Child_Nodes[i].id, colour);
+    try {
+        const Child_Nodes = svg.value.getElementById(id).childNodes;
+        if (Child_Nodes.length > 0) {
+            for (let i = 0; i < Child_Nodes.length; i++) {
+                set_svg_colour(Child_Nodes[i].id, colour);
+            }
+        } else {
+            svg.value.getElementById(id).style.stroke = colour;
+            set_svg_marker_color(id, colour);
         }
-    } else {
-        svg.value.getElementById(id).style.stroke = colour;
-        set_svg_marker_color(id, colour);
+    } catch {
+        console.log("id not found (?)");
     }
 }
 
