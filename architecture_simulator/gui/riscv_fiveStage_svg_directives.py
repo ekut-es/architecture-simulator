@@ -58,7 +58,7 @@ class RiscvFiveStageIDSvgDirectives(RiscvSvgDirectivesBase):
         self.DecodeLowerFetchPCOut = SvgFillDirectiveBlue()
         self.DecodeInstructionMemory = SvgFillDirectiveBlue()
         self.ControlUnitLeftRight1_1 = SvgFillDirectiveGreen()
-        self.ControlUnitLeftRight2_1 = SvgFillDirectiveGreen()
+        self.ControlUnitLeftRight2_1 = SvgFillDirectiveBlue()
         self.ControlUnitLeftRight3_1 = SvgFillDirectiveGreen()
         self.ControlUnitLeftRight4_1 = SvgFillDirectiveGreen()
         self.ControlUnitLeft_1 = SvgFillDirectiveGreen()
@@ -90,7 +90,7 @@ class RiscvFiveStageEXSvgDirectives(RiscvSvgDirectivesBase):
         self.ExecuteLowerFetchPCOut = SvgFillDirectiveBlue()
         self.ALUComparison = SvgFillDirectiveGreen()
         self.ControlUnitLeftRight1_2 = SvgFillDirectiveGreen()
-        self.ControlUnitLeftRight2_2 = SvgFillDirectiveGreen()
+        self.ControlUnitLeftRight2_2 = SvgFillDirectiveBlue()
         self.ControlUnitLeftRight3_2 = SvgFillDirectiveGreen()
         self.ControlUnitLeftRight4_2 = SvgFillDirectiveGreen()
         self.ControlUnitLeft_2 = SvgFillDirectiveGreen()
@@ -119,7 +119,7 @@ class RiscvFiveStageMEMSvgDirectives(RiscvSvgDirectivesBase):
         self.MemoryImmGenText = SvgWriteCenterDirective()
         self.MemoryImmGen = SvgFillDirectiveBlue()
         self.ControlUnitLeftRight1_3 = SvgFillDirectiveGreen()
-        self.ControlUnitLeftRight2_3 = SvgFillDirectiveGreen()
+        self.ControlUnitLeftRight2_3 = SvgFillDirectiveBlue()
         self.ControlUnitLeft_3 = SvgFillDirectiveGreen()
 
 
