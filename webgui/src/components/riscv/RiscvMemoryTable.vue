@@ -1,6 +1,6 @@
 <!-- A table that holds both instructions and data for RISC-V -->
 <script setup>
-import { computed, watchEffect, ref, watch } from "vue";
+import { computed, watchEffect, ref, watch, onMounted } from "vue";
 
 import CurrentInstructionArrow from "../CurrentInstructionArrow.vue";
 
@@ -8,6 +8,7 @@ import { useRiscvSimulationStore } from "@/js/riscv_simulation_store";
 import { riscvSettings } from "@/js/riscv_settings";
 
 const table = ref(null);
+const followCheckbox = ref(null);
 
 const simulationStore = useRiscvSimulationStore();
 
@@ -60,20 +61,38 @@ watchEffect(() => {
 });
 
 // auto scroll to the current instruction
-watch(currentInstructionRow, (rowIndex) => {
-    const rows = table.value.rows;
-    if (rows.length > rowIndex) {
-        rows[rowIndex].scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-        });
+watch(
+    [currentInstructionRow, riscvSettings.followCurrentInstruction],
+    ([rowIndex, doFollow]) => {
+        if (!doFollow) {
+            return;
+        }
+        const rows = table.value.rows;
+        if (rows.length > rowIndex) {
+            rows[rowIndex].scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+            });
+        }
     }
-});
+);
 </script>
 
 <template>
     <div class="wrapper">
-        <span class="archsim-text-element-heading">Memory</span>
+        <div class="header">
+            <span class="archsim-text-element-heading">Memory </span>
+            <label class="ms-auto" for="riscv-follow-current-instruction">
+                <input
+                    ref="followCheckbox"
+                    type="checkbox"
+                    id="riscv-follow-current-instruction"
+                    v-model="riscvSettings.followCurrentInstruction.value"
+                    :checked="riscvSettings.followCurrentInstruction.value"
+                />
+                Follow
+            </label>
+        </div>
 
         <div class="table-wrapper">
             <table
@@ -183,5 +202,10 @@ watch(currentInstructionRow, (rowIndex) => {
 
 .riscv-stage-wb {
     background-color: #3a86ff;
+}
+
+.header {
+    display: flex;
+    align-items: end;
 }
 </style>
