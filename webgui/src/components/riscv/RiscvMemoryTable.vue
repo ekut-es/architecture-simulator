@@ -26,9 +26,9 @@ const dataMemoryEntries = computed(() => {
 });
 
 const instructionMemoryEntries = ref(null);
-
+// The row index of the current instruction
 const currentInstructionRow = ref(0);
-
+// Keep the table values and current instruction row index updated
 watchEffect(() => {
     const tableEntries = [];
     // to find out in which row the current instruction is
