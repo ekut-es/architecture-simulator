@@ -1,11 +1,13 @@
 <!-- A table that holds both instructions and data for RISC-V -->
 <script setup>
-import { computed } from "vue";
+import { computed, watchEffect, ref, watch } from "vue";
 
 import CurrentInstructionArrow from "../CurrentInstructionArrow.vue";
 
 import { useRiscvSimulationStore } from "@/js/riscv_simulation_store";
 import { riscvSettings } from "@/js/riscv_settings";
+
+const table = ref(null);
 
 const simulationStore = useRiscvSimulationStore();
 
@@ -22,17 +24,44 @@ const dataMemoryEntries = computed(() => {
     return result;
 });
 
-const instructionMemoryEntries = computed(() => {
-    const result = [];
-    for (const entry of simulationStore.instructionMemoryEntries) {
-        result.push({
+const instructionMemoryEntries = ref(null);
+
+const currentInstructionRow = ref(0);
+
+watchEffect(() => {
+    const tableEntries = [];
+    // to find out in which row the current instruction is
+    let currentInstructionIndicator = "";
+    if (riscvSettings.pipelineMode.value === "single_stage_pipeline") {
+        currentInstructionIndicator = "Single";
+    } else {
+        currentInstructionIndicator = "IF";
+    }
+
+    for (const [
+        index,
+        entry,
+    ] of simulationStore.instructionMemoryEntries.entries()) {
+        let row = {
             hexAddress: entry[0][1],
             value: entry[1],
             stage: entry[2],
             error: simulationStore.instructionErrored(entry[0][0]),
-        });
+        };
+        if (row.stage === currentInstructionIndicator) {
+            currentInstructionRow.value = index;
+            console.log(index);
+        }
+        tableEntries.push(row);
     }
-    return result;
+    instructionMemoryEntries.value = tableEntries;
+});
+
+watch(currentInstructionRow, (rowIndex) => {
+    table.value.rows[rowIndex].scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+    });
 });
 </script>
 
@@ -42,6 +71,7 @@ const instructionMemoryEntries = computed(() => {
 
         <div class="table-wrapper">
             <table
+                ref="table"
                 class="table table-sm table-hover table-bordered archsim-mono-table mb-0"
             >
                 <thead>
