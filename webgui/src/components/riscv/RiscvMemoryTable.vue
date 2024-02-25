@@ -37,6 +37,8 @@ watchEffect(() => {
     } else {
         currentInstructionIndicator = "IF";
     }
+    // reset scroll (just in case of simulation reset, where there is no current instruction)
+    currentInstructionRow.value = 0;
 
     for (const [
         index,
@@ -57,11 +59,15 @@ watchEffect(() => {
     instructionMemoryEntries.value = tableEntries;
 });
 
+// auto scroll to the current instruction
 watch(currentInstructionRow, (rowIndex) => {
-    table.value.rows[rowIndex].scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-    });
+    const rows = table.value.rows;
+    if (rows.length > rowIndex) {
+        rows[rowIndex].scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+        });
+    }
 });
 </script>
 
