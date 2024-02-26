@@ -185,9 +185,10 @@ def display(sim: Union[ToySimulation, RiscvSimulation], display_mode: str) -> st
         res += toy_memory_repr(sim.state.memory, display_mode)
         res += hline
         # TODO: Fix me
-        # res += f"PC: {sim.state.program_counter} | Instruction at PC: {'#####' if not sim.state.instruction_at_pc() else str(sim.state.instruction_memory.read_instruction(int(sim.state.program_counter)))}\n"
-        res += hline
+        # toy instr form integer repr
         res += f"Accu: {sim.state.accu}\n"
+        res += f"PC: {sim.state.program_counter}\n"
+        res += f"IR: {'#####' if sim.is_done() else sim.state.memory.read}\n"
         res += hline
         res += "Performance Metrics:\n"
         res += sim.state.performance_metrics.__repr__()
