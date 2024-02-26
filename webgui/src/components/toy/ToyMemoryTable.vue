@@ -18,8 +18,11 @@ const currentInstructionRow = ref(0);
 // Keep the table values and current instruction row index updated
 watchEffect(() => {
     let result = [];
-    // reset scroll (just in case of simulation reset, where there is no current instruction)
-    currentInstructionRow.value = 0;
+    // In case of a reset or when the user enters new instructions, the memory values change
+    // but we don't want to scroll
+    if (!simulationStore.hasStarted) {
+        currentInstructionRow.value = -1;
+    }
 
     for (const [index, entry] of simulationStore.memoryEntries.entries()) {
         const row = {
@@ -29,6 +32,8 @@ watchEffect(() => {
             cycle: entry[3],
             doHighlight: simulationStore.hasStarted && entry[4],
         };
+        // update the current instruction row if a current instruction can be found
+        // else just keep the old row
         if (row.cycle !== "") {
             currentInstructionRow.value = index;
         }
@@ -41,7 +46,7 @@ watchEffect(() => {
 watch(
     [currentInstructionRow, toySettings.followCurrentInstruction],
     ([rowIndex, doFollow]) => {
-        if (!doFollow) {
+        if (!doFollow || rowIndex < 0) {
             return;
         }
         const rows = table.value.rows;

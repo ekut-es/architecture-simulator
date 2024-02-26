@@ -38,8 +38,11 @@ watchEffect(() => {
     } else {
         currentInstructionIndicator = "IF";
     }
-    // reset scroll (just in case of simulation reset, where there is no current instruction)
-    currentInstructionRow.value = 0;
+    // In case of a reset or when the user enters new instructions, the memory values change
+    // but we don't want to scroll
+    if (!simulationStore.hasStarted) {
+        currentInstructionRow.value = -1;
+    }
 
     for (const [
         index,
@@ -51,9 +54,10 @@ watchEffect(() => {
             stage: entry[2],
             error: simulationStore.instructionErrored(entry[0][0]),
         };
+        // update the current instruction row if the matching indicator is in the list
+        // else just keep the old row
         if (row.stage === currentInstructionIndicator) {
             currentInstructionRow.value = index;
-            console.log(index);
         }
         tableEntries.push(row);
     }
@@ -64,7 +68,7 @@ watchEffect(() => {
 watch(
     [currentInstructionRow, riscvSettings.followCurrentInstruction],
     ([rowIndex, doFollow]) => {
-        if (!doFollow) {
+        if (!doFollow || rowIndex < 0) {
             return;
         }
         const rows = table.value.rows;
