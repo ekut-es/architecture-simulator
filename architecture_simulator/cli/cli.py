@@ -3,7 +3,7 @@ from architecture_simulator.simulation.toy_simulation import ToySimulation
 from typing import Optional, Union
 from architecture_simulator.uarch.memory import Memory
 from architecture_simulator.uarch.riscv.register_file import RegisterFile
-
+from architecture_simulator.isa.toy.toy_instructions import ToyInstruction
 from architecture_simulator.uarch.riscv.pipeline import (
     PipelineRegister,
     InstructionExecutionException,
@@ -188,7 +188,11 @@ def display(sim: Union[ToySimulation, RiscvSimulation], display_mode: str) -> st
         # toy instr form integer repr
         res += f"Accu: {sim.state.accu}\n"
         res += f"PC: {sim.state.program_counter}\n"
-        res += f"IR: {'#####' if sim.is_done() else sim.state.memory.read}\n"
+        loaded_instr = sim.state.loaded_instruction
+        if loaded_instr is None:
+            res += f"IR: {'#####'}\n"
+        else:
+            res += f"IR: {loaded_instr.to_integer()} | {str(loaded_instr)}\n"
         res += hline
         res += "Performance Metrics:\n"
         res += sim.state.performance_metrics.__repr__()
