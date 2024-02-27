@@ -179,13 +179,11 @@ def display(sim: Union[ToySimulation, RiscvSimulation], display_mode: str) -> st
         res += hline
         return res
     else:
-        hline = "=" * 35 + "\n"
+        hline = "=" * 39 + "\n"
         res = "Architectural state:\n"
         res += hline
-        res += toy_memory_repr(sim.state.memory, display_mode)
+        res += toy_memory_repr(sim.state.memory, display_mode, sim)
         res += hline
-        # TODO: Fix me
-        # toy instr form integer repr
         res += f"Accu: {sim.state.accu}\n"
         res += f"PC: {sim.state.program_counter}\n"
         loaded_instr = sim.state.loaded_instruction
@@ -359,7 +357,7 @@ def five_stage_pipeline_repr(registers: list[PipelineRegister]) -> str:
     return res
 
 
-def toy_memory_repr(mem: Memory, display_mode: str) -> str:
+def toy_memory_repr(mem: Memory, display_mode: str, sim: ToySimulation) -> str:
     """
     Produces a representation of the toy processor memory
 
@@ -376,23 +374,23 @@ def toy_memory_repr(mem: Memory, display_mode: str) -> str:
     if display_mode not in display_modes:
         return ""
     if display_mode == "sdec" or display_mode == "udec":
-        res = "Memory:\nAddress   HalfWord\n" + "=" * 18 + "\n"
+        res = "Memory:\nAddress   HalfWord      Instr\n" + "=" * 29 + "\n"
     elif display_mode == "hex":
-        res = "Memory:\nAddress HalfWord\n" + "=" * 16 + "\n"
+        res = "Memory:\nAddress HalfWord      Instr\n" + "=" * 27 + "\n"
     else:
-        res = "Memory:\nAddress             HalfWord\n" + "=" * 28 + "\n"
+        res = "Memory:\nAddress             HalfWord      Instr\n" + "=" * 39 + "\n"
 
     for key, values in sorted(list(repr_list.items())):
         key_hex = (str(hex(key))[2:]).upper()
         key_repr = "0" * (8 - len(key_hex)) + key_hex
         if display_mode == "sdec":
-            res += f"{key_repr}    {pad_num(values[3], 6)}\n"
+            res += f"{key_repr}    {pad_num(values[3], 6)}  {sim._get_instruction_representation(key, int(values[1])):9}\n"
         elif display_mode == "udec":
-            res += f"{key_repr}    {pad_num(values[1], 6)}\n"
+            res += f"{key_repr}    {pad_num(values[1], 6)}  {sim._get_instruction_representation(key, int(values[1])):9}\n"
         elif display_mode == "hex":
-            res += f"{key_repr} | {values[2]}\n"
+            res += f"{key_repr} | {values[2]}  {sim._get_instruction_representation(key, int(values[1])):9}\n"
         else:  # "bin" case
-            res += f"{key_repr} | {values[0]}\n"
+            res += f"{key_repr} | {values[0]}  {sim._get_instruction_representation(key, int(values[1])):9}\n"
 
     return res
 
