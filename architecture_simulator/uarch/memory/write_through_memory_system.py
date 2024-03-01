@@ -33,25 +33,28 @@ class WriteThroughMemorySystem(MemorySystem):
         self.accesses = 0
         super().__init__(memory)
 
-    def read_byte(self, address: int) -> UInt8:
+    def read_byte(self, address: int, update_statistics: bool = True) -> UInt8:
         decoded_address = self._decode_address(address)
         block_values, hit = self._read_block(decoded_address)
-        self.accesses += 1
-        self.hits += int(hit)
+        if update_statistics:
+            self.accesses += 1
+            self.hits += int(hit)
         return byte_from_block(decoded_address, block_values)
 
-    def read_halfword(self, address: int) -> UInt16:
+    def read_halfword(self, address: int, update_statistics: bool = True) -> UInt16:
         decoded_address = self._decode_address(address)
         block_values, hit = self._read_block(decoded_address)
-        self.accesses += 1
-        self.hits += int(hit)
+        if update_statistics:
+            self.accesses += 1
+            self.hits += int(hit)
         return halfword_from_block(decoded_address, block_values)
 
-    def read_word(self, address: int) -> UInt32:
+    def read_word(self, address: int, update_statistics: bool = True) -> UInt32:
         decoded_address = self._decode_address(address)
         block_values, hit = self._read_block(decoded_address)
-        self.accesses += 1
-        self.hits += int(hit)
+        if update_statistics:
+            self.accesses += 1
+            self.hits += int(hit)
         return word_from_block(decoded_address, block_values)
 
     def write_byte(self, address: int, value: UInt8) -> None:

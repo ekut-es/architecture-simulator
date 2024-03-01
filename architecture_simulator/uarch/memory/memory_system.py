@@ -13,15 +13,15 @@ class MemorySystem(ABC):
         self.memory = memory
 
     @abstractmethod
-    def read_byte(self, address: int) -> UInt8:
+    def read_byte(self, address: int, update_statistics: bool = True) -> UInt8:
         raise NotImplementedError
 
     @abstractmethod
-    def read_halfword(self, address: int) -> UInt16:
+    def read_halfword(self, address: int, update_statistics: bool = True) -> UInt16:
         raise NotImplementedError
 
     @abstractmethod
-    def read_word(self, address: int) -> UInt32:
+    def read_word(self, address: int, update_statistics: bool = True) -> UInt32:
         raise NotImplementedError
 
     @abstractmethod

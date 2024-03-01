@@ -2,7 +2,10 @@ from abc import ABC, abstractmethod
 
 
 class ReplacementStrategy(ABC):
-    """A class that stores and updates the state of the replacement strategy for a set of the cache."""
+    """A class that stores and updates the state of the replacement strategy for a set of the cache.
+    NOTE: All replacement strategies must be idempotent - after the first call to access(), further calls should not change the state
+    of the strategy. This is because we may call the read methods of the cache in order to generate values for the visualization in the webui.
+    """
 
     def __init__(self, associativity: int) -> None:
         self.associativity = associativity
@@ -10,6 +13,7 @@ class ReplacementStrategy(ABC):
     @abstractmethod
     def access(self, index: int) -> None:
         """Informs the replacement strategy that an element has been accessed.
+        Needs to be idempotent.
 
         Args:
             index (int): The index of the block inside the set that was accessed.
