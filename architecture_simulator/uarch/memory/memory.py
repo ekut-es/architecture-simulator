@@ -357,7 +357,7 @@ class Memory(Generic[T]):
                 continue
             word = read_fkt(aligned_address)
             repr_map[aligned_address] = get_n_bit_representations(
-                int(word), bits_of_one_block
+                int(word), bits_of_one_block  # type: ignore[call-overload]
             )
         return repr_map
 
