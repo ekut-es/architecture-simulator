@@ -24,7 +24,7 @@ class WriteThroughMemorySystem(MemorySystem):
         associativity: int,
     ) -> None:
         # TODO: check that num_index_bits, num_block_bits, associativity have legal values
-        self.cache = Cache(
+        self.cache = Cache[UInt32](
             num_index_bits=num_index_bits,
             num_block_bits=num_block_bits,
             associativity=associativity,
