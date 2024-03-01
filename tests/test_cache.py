@@ -1,5 +1,5 @@
 from unittest import TestCase
-from fixedint import MutableUInt8, MutableUInt16, MutableUInt32, MutableUInt64
+from fixedint import MutableUInt8, MutableUInt16, MutableUInt32, UInt8, UInt16, UInt32
 
 from architecture_simulator.uarch.memory.decoded_address import DecodedAddress
 from architecture_simulator.uarch.memory.memory import Memory, AddressingType
@@ -34,7 +34,7 @@ class TestCache(TestCase):
         )
         self.assertEqual(addr2.block_offset, 0b0)
 
-    def test_cache_1(self) -> None:
+    def test_write_through_cache_1(self) -> None:
         memory = Memory(AddressingType.BYTE, 32, True)
         for i in range(32):
             memory.write_word(i * 4, MutableUInt32(i))
@@ -57,7 +57,7 @@ class TestCache(TestCase):
         self.assertEqual(memory_system.hits, 4)
         self.assertEqual(memory_system.accesses, 8)
 
-    def test_cache_2(self) -> None:
+    def test_write_through_cache_2(self) -> None:
         memory = Memory(AddressingType.BYTE, 32, True)
         for i in range(32):
             memory.write_word(i * 4, MutableUInt32(i))
@@ -79,7 +79,7 @@ class TestCache(TestCase):
         self.assertEqual(memory_system.hits, 0)
         self.assertEqual(memory_system.accesses, 8)
 
-    def test_cache_3(self) -> None:
+    def test_write_through_cache_3(self) -> None:
         memory = Memory(AddressingType.BYTE, 32, True)
         for i in range(32):
             memory.write_word(i * 4, MutableUInt32(i))
@@ -101,7 +101,7 @@ class TestCache(TestCase):
         self.assertEqual(memory_system.hits, 6)
         self.assertEqual(memory_system.accesses, 8)
 
-    def test_cache_4(self) -> None:
+    def test_write_through_cache_4(self) -> None:
         memory = Memory(AddressingType.BYTE, 32, True)
         for i in range(32):
             memory.write_word(i * 4, MutableUInt32(i))
@@ -128,7 +128,7 @@ class TestCache(TestCase):
         self.assertEqual(memory_system.hits, 0)
         self.assertEqual(memory_system.accesses, 10)
 
-    def test_cache_5(self) -> None:
+    def test_write_through_cache_5(self) -> None:
         memory = Memory(AddressingType.BYTE, 32, True)
         for i in range(32):
             memory.write_word(i * 4, MutableUInt32(i))
@@ -152,3 +152,43 @@ class TestCache(TestCase):
 
         self.assertEqual(memory_system.hits, 2)
         self.assertEqual(memory_system.accesses, 8)
+
+    def test_write_through_cache_6(self) -> None:
+        memory = Memory(AddressingType.BYTE, 32, True)
+        memory_system = WriteThroughMemorySystem(
+            num_index_bits=5,
+            num_block_bits=2,
+            associativity=4,
+            memory=memory,
+        )
+        memory_system.write_byte(1, UInt8(72))
+        memory_system.write_halfword(5, UInt16(500))
+        memory_system.write_halfword(5, UInt16(600))
+        memory_system.write_word(8, UInt32(131072))
+        memory_system.write_word(8, UInt32(131073))
+        memory_system.write_word(8, UInt32(131074))
+
+        self.assertEqual(memory_system.hits, 0)
+        self.assertEqual(memory_system.accesses, 6)
+        self.assertEqual(memory_system.memory.read_byte(1), 72)
+        self.assertEqual(memory_system.memory.read_halfword(5), 600)
+        self.assertEqual(memory_system.memory.read_word(8), 131074)
+
+    def test_write_through_cache_7(self) -> None:
+        memory = Memory(AddressingType.BYTE, 32, True)
+        memory_system = WriteThroughMemorySystem(
+            num_index_bits=5,
+            num_block_bits=2,
+            associativity=4,
+            memory=memory,
+        )
+        memory_system.write_byte(1, UInt8(72))
+        memory_system.read_byte(1)
+        memory_system.write_byte(2, UInt8(73))
+        memory_system.write_byte(3, UInt8(74))
+        memory_system.write_byte(0, UInt8(75))
+        memory_system.write_word(0, UInt32(8))
+
+        self.assertEqual(memory_system.hits, 4)
+        self.assertEqual(memory_system.accesses, 6)
+        self.assertEqual(memory_system.memory.read_word(0), 8)
