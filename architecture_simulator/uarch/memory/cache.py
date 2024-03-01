@@ -22,18 +22,20 @@ class CacheBlock(Generic[T]):
         self.block_size = block_size
         self.values: list[T] = []
         self.valid_bit: bool = False
-        self.tag: int = 0
+        self.dirty_bit: bool = False
+        self.decoded_address: DecodedAddress = DecodedAddress(0, 0, 0)
 
-    def write(self, values: list[T], tag: int) -> None:
+    def write(self, values: list[T], decoded_address: DecodedAddress) -> None:
         """Writes the given values to the block and marks the block as valid
 
         Args:
             values (list[T]): A list of words that will be written to the block. Must have the correct length (self.block_size).
+            decoded_address (DecodedAddress): The full address to write to.
         """
         assert len(values) == self.block_size
         self.values = values
         self.valid_bit = True
-        self.tag = tag
+        self.decoded_address = decoded_address
 
 
 class CacheSet(Generic[T]):
@@ -41,9 +43,6 @@ class CacheSet(Generic[T]):
     Provides methods for reading and writing whole blocks of words (block size can be configured).
     """
 
-    # is_in_set
-    # read (addresse zu lesen, wert an den der HS glaubt zum allocate wenn nicht im Cache) -> wert, hit? Optional[(addresse, wert) (verängt)]
-    # write (addresse zu beschreiben, wert zu beschreiben) -> hit?, Optional[list[(adresse, wert) zum in HS schreiben] (entweder verängtes oder write no allocate)
     def __init__(
         self,
         associativity: int,
@@ -54,7 +53,6 @@ class CacheSet(Generic[T]):
         self.blocks = [CacheBlock[T](2**block_bits) for _ in range(associativity)]
         self.replacement_strategy = replacement_strategy
 
-    #                       was i memory steht falls du es nicht hast und reinschreiben musst
     def read(self, address: DecodedAddress) -> Optional[list[T]]:
         """Tries to read the value from the given address.
 
@@ -62,7 +60,7 @@ class CacheSet(Generic[T]):
             address (DecodedAddress): Full memory address.
 
         Returns:
-            Optional[T]: Returns the full block in case of a read-hit, or None in case of a read-miss.
+            Optional[list[T]]: Returns all block values in case of a read-hit, or None in case of a read-miss.
         """
         block_index = self.get_block_index(address)
         if block_index is not None:
@@ -70,7 +68,9 @@ class CacheSet(Generic[T]):
             return self.blocks[block_index].values
         return None
 
-    def write(self, address: DecodedAddress, block_values: list[T]) -> bool:
+    def write(
+        self, address: DecodedAddress, block_values: list[T]
+    ) -> tuple[bool, Optional[tuple[DecodedAddress, list[T]]]]:
         """Writes the given block to the set.
 
         Args:
@@ -78,15 +78,26 @@ class CacheSet(Generic[T]):
             block_values (list[T]): The block values to write.
 
         Returns:
-            bool: Whether it was a write-hit.
+            tuple[bool, Optional[tuple[DecodedAddress, list[T]]]]: First element is whether it was a cache hit.
+            The second value is None if nothing dirty was replaced.
+            If a dirty entry was replaced, it is a tuple of the address and the values that were stored there.
         """
         block_index = self.get_block_index(address)
-        is_hit = block_index is not None
-        if block_index is None:
+        if block_index is None:  # Not in Cache Case
             block_index = self.replacement_strategy.get_next_to_replace()
-        self.blocks[block_index].write(block_values, address.tag)
-        self.replacement_strategy.access(block_index)
-        return is_hit
+            block = self.blocks[block_index]
+            replaced = None
+            if block.dirty_bit:
+                replaced = (block.decoded_address, block.values)
+                block.dirty_bit = False
+            block.write(block_values, address)
+            self.replacement_strategy.access(block_index)
+            return False, replaced
+        else:  # Already in Cache Case
+            self.blocks[block_index].write(block_values, address)
+            self.blocks[block_index].dirty_bit = True
+            self.replacement_strategy.access(block_index)
+            return True, None
 
     def is_block_in_set(self, address: DecodedAddress) -> bool:
         """Returns whether the address is stored in the set.
@@ -109,7 +120,7 @@ class CacheSet(Generic[T]):
             Optional[int]: Returns the index of the block, if it is stored in the set, or None if it is not.
         """
         for block_index, block in enumerate(self.blocks):
-            if (block.tag == address.tag) and block.valid_bit:
+            if block.valid_bit and (block.decoded_address.tag == address.tag):
                 return block_index
         return None
 
@@ -137,7 +148,7 @@ class Cache(Generic[T]):
 
     def write_block(
         self, decoded_address: DecodedAddress, block_values: list[T]
-    ) -> bool:
+    ) -> tuple[bool, Optional[tuple[DecodedAddress, list[T]]]]:
         return self.sets[decoded_address.cache_set_index].write(
             decoded_address, block_values
         )
