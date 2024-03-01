@@ -5,15 +5,6 @@ from abc import ABC, abstractmethod
 from architecture_simulator.uarch.memory import Memory
 
 
-def select_bits(number: int, start: int, stop: int) -> int:
-    return (number >> start) & ((2 ** (stop - start)) - 1)
-
-
-def is_power_of_two(n: int) -> bool:
-    return (n > 0) and ((n & (n - 1)) == 0)
-    # TODO: Use everywhere instead of % 2 == 0
-
-
 class DecodedAddress:
     """A class that contains a lot of information about an address that is relevant for caches,
     like the tag, the index and offsets.
@@ -100,7 +91,6 @@ class CacheBlock:
         Args:
             block_size (int): The number of bytes that live inside the cache block. Must be a power of 2.
         """
-        # TODO: Fix that ? assert is_power_of_two(block_size)
         self.block_size = block_size
         self.values: list[UInt32] = [UInt32(0) for _ in range(block_size)]
         self.valid_bit: bool = False
@@ -132,8 +122,6 @@ class CacheSet:
         block_bits: int,
         replacement_strategy: ReplacementStrategy,
     ) -> None:
-        # TODO: Fix ? assert block_size % 2 == 0
-        # TODO: Fix ? assert associativity % 2 == 0
         self.block_bits = block_bits
         self.blocks = [CacheBlock(2**block_bits) for _ in range(associativity)]
         self.replacement_strategy = replacement_strategy
@@ -204,10 +192,7 @@ class Cache:
         num_index_bits: int,
         num_block_bits: int,
         associativity: int,
-        main_memory: Memory,
     ) -> None:
-
-        # TODO: Check for legality of input
 
         self.num_index_bits = num_index_bits
         self.num_sets = 2**num_index_bits
@@ -219,87 +204,17 @@ class Cache:
             for _ in range(2**num_index_bits)
         ]
 
-        self.main_memory = main_memory
+    def read_block(self, decoded_address: DecodedAddress) -> Optional[list[UInt32]]:
+        return self.sets[decoded_address.cache_set_index].read(decoded_address)
 
-    def write_byte(self, address: int, value: UInt8) -> bool:
-        decoded_address = DecodedAddress(
-            self.num_index_bits, self.num_block_bits, address
+    def write_block(
+        self, decoded_address: DecodedAddress, block_values: list[UInt32]
+    ) -> bool:
+        return self.sets[decoded_address.cache_set_index].write(
+            decoded_address, block_values
         )
-        target_set = self.sets[decoded_address.cache_set_index]
-        hit = target_set.is_block_in_set(decoded_address)
-        self.main_memory.write_byte(address, MutableUInt8(value))
-        if hit:
-            block = self._read_block_data_from_main_memory(decoded_address)
-            target_set.write(decoded_address, block)
-        return hit
 
-    def write_halfword(self, address: int, value: UInt16) -> bool:
-        decoded_address = DecodedAddress(
-            self.num_index_bits, self.num_block_bits, address
+    def contains(self, decoded_address: DecodedAddress) -> bool:
+        return self.sets[decoded_address.cache_set_index].is_block_in_set(
+            decoded_address
         )
-        target_set = self.sets[decoded_address.cache_set_index]
-        hit = target_set.is_block_in_set(decoded_address)
-        self.main_memory.write_halfword(address, MutableUInt16(value))
-        if hit:
-            block = self._read_block_data_from_main_memory(decoded_address)
-            target_set.write(decoded_address, block)
-        return hit
-
-    def write_word(self, address: int, value: UInt32) -> bool:
-        decoded_address = DecodedAddress(
-            self.num_index_bits, self.num_block_bits, address
-        )
-        target_set = self.sets[decoded_address.cache_set_index]
-        hit = target_set.is_block_in_set(decoded_address)
-        self.main_memory.write_word(address, MutableUInt32(value))
-        if hit:
-            block = self._read_block_data_from_main_memory(decoded_address)
-            target_set.write(decoded_address, block)
-        return hit
-
-    def read_byte(self, address: int) -> tuple[UInt8, bool]:
-        decoded_address = DecodedAddress(
-            self.num_index_bits, self.num_block_bits, address
-        )
-        word, hit = self._read_word_from_anywhere(decoded_address)
-        read_b = (int(word) >> (8 * decoded_address.byte_offset)) & 0xFF
-        return (UInt8(read_b), hit)
-
-    def read_halfword(self, address: int) -> tuple[UInt16, bool]:
-        assert not address & 0x1  # TODO: Custom Error!
-        decoded_address = DecodedAddress(
-            self.num_index_bits, self.num_block_bits, address
-        )
-        word, hit = self._read_word_from_anywhere(decoded_address)
-        read_hw = (int(word) >> (16 * decoded_address.byte_offset)) & 0xFFFF
-        return (UInt16(read_hw), hit)
-
-    def read_word(self, address: int) -> tuple[UInt32, bool]:
-        assert not address & 0x3  # TODO: Cutom Error!
-        decoded_address = DecodedAddress(
-            self.num_index_bits, self.num_block_bits, address
-        )
-        return self._read_word_from_anywhere(decoded_address)
-
-    def _read_word_from_anywhere(
-        self, decoded_address: DecodedAddress
-    ) -> tuple[UInt32, bool]:
-        block_content = self.sets[decoded_address.cache_set_index].read(decoded_address)
-        hit = block_content is not None
-        if block_content is None:
-            block_content = self._read_block_data_from_main_memory(decoded_address)
-            self.sets[decoded_address.cache_set_index].write(
-                decoded_address, block_content
-            )
-        word = block_content[decoded_address.block_offset]
-        return (word, hit)
-
-    def _read_block_data_from_main_memory(
-        self, address: DecodedAddress
-    ) -> list[UInt32]:
-        return [
-            UInt32(
-                int(self.main_memory.read_word(address.block_alinged_address + 4 * i))
-            )
-            for i in range(self.num_words_in_block)
-        ]

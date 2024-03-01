@@ -1,18 +1,12 @@
 from unittest import TestCase
 from fixedint import MutableUInt8, MutableUInt16, MutableUInt32, MutableUInt64
 
-from architecture_simulator.uarch.cache import select_bits, DecodedAddress, Cache
+from architecture_simulator.uarch.cache import DecodedAddress, Cache
 from architecture_simulator.uarch.memory import Memory, AddressingType
+from architecture_simulator.uarch.write_back_memory_system import WriteBackMemorySystem
 
 
 class TestCache(TestCase):
-    def test_select_bits(self) -> None:
-        self.assertEqual(select_bits(0xFF0, 4, 8), 0xF)
-        self.assertEqual(select_bits(0xFFFF, 0, 0), 0)
-        self.assertEqual(select_bits(0xE, 0, 1), 0)
-        self.assertEqual(select_bits(0xABCDABCD, 0, 32), 0xABCDABCD)
-        self.assertEqual(select_bits(0xDCBAABCD, 12, 20), 0xAA)
-
     def test_decoded_address(self) -> None:
         addr1 = DecodedAddress(8, 2, 0b1101_0100_1010_1101_0101_1101_0010_0111)
         self.assertEqual(addr1.tag, 0b1101_0100_1010_1101_0101)
@@ -42,116 +36,117 @@ class TestCache(TestCase):
         memory = Memory(AddressingType.BYTE, 32, True)
         for i in range(32):
             memory.write_word(i * 4, MutableUInt32(i))
-        cache = Cache(
+        memory_system = WriteBackMemorySystem(
             num_index_bits=1,
             num_block_bits=1,
             associativity=1,
-            main_memory=memory,
+            memory=memory,
         )
-        c = 0
-        c += int(cache.read_word(0)[1])
-        c += int(cache.read_word(4)[1])
-        c += int(cache.read_word(8)[1])
-        c += int(cache.read_word(12)[1])
-        c += int(cache.read_word(16)[1])
-        c += int(cache.read_word(12)[1])
-        c += int(cache.read_word(16)[1])
-        c += int(cache.read_word(60)[1])
 
-        self.assertEqual(c, 4)
+        memory_system.read_word(0)
+        memory_system.read_word(4)
+        memory_system.read_word(8)
+        memory_system.read_word(12)
+        memory_system.read_word(16)
+        memory_system.read_word(12)
+        memory_system.read_word(16)
+        memory_system.read_word(60)
+
+        self.assertEqual(memory_system.hits, 4)
+        self.assertEqual(memory_system.accesses, 8)
 
     def test_cache_2(self) -> None:
         memory = Memory(AddressingType.BYTE, 32, True)
         for i in range(32):
             memory.write_word(i * 4, MutableUInt32(i))
-        cache = Cache(
+        memory_system = WriteBackMemorySystem(
             num_index_bits=2,
             num_block_bits=0,
             associativity=1,
-            main_memory=memory,
+            memory=memory,
         )
-        c = 0
-        c += int(cache.read_word(0)[1])
-        c += int(cache.read_word(16)[1])
-        c += int(cache.read_word(0)[1])
-        c += int(cache.read_word(16)[1])
-        c += int(cache.read_word(0)[1])
-        c += int(cache.read_word(16)[1])
-        c += int(cache.read_word(0)[1])
-        c += int(cache.read_word(16)[1])
+        memory_system.read_word(0)
+        memory_system.read_word(16)
+        memory_system.read_word(0)
+        memory_system.read_word(16)
+        memory_system.read_word(0)
+        memory_system.read_word(16)
+        memory_system.read_word(0)
+        memory_system.read_word(16)
 
-        self.assertEqual(c, 0)
+        self.assertEqual(memory_system.hits, 0)
+        self.assertEqual(memory_system.accesses, 8)
 
     def test_cache_3(self) -> None:
         memory = Memory(AddressingType.BYTE, 32, True)
         for i in range(32):
             memory.write_word(i * 4, MutableUInt32(i))
-        cache = Cache(
+        memory_system = WriteBackMemorySystem(
             num_index_bits=1,
             num_block_bits=0,
             associativity=2,
-            main_memory=memory,
+            memory=memory,
         )
-        c = 0
-        c += int(cache.read_word(0)[1])
-        c += int(cache.read_word(16)[1])
-        c += int(cache.read_word(0)[1])
-        c += int(cache.read_word(16)[1])
-        c += int(cache.read_word(0)[1])
-        c += int(cache.read_word(16)[1])
-        c += int(cache.read_word(0)[1])
-        c += int(cache.read_word(16)[1])
+        memory_system.read_word(0)
+        memory_system.read_word(16)
+        memory_system.read_word(0)
+        memory_system.read_word(16)
+        memory_system.read_word(0)
+        memory_system.read_word(16)
+        memory_system.read_word(0)
+        memory_system.read_word(16)
 
-        self.assertEqual(c, 6)
+        self.assertEqual(memory_system.hits, 6)
+        self.assertEqual(memory_system.accesses, 8)
 
     def test_cache_4(self) -> None:
         memory = Memory(AddressingType.BYTE, 32, True)
         for i in range(32):
             memory.write_word(i * 4, MutableUInt32(i))
-        cache = Cache(
+        memory_system = WriteBackMemorySystem(
             num_index_bits=1,
             num_block_bits=0,
             associativity=4,
-            main_memory=memory,
+            memory=memory,
         )
         # 0 [ , , , ]
         # 1 [ , , , ]
         # 0, 8, 16, 24, 32, 0, 8, 16, 24, 32
-        c = 0
-        c += int(cache.read_word(0)[1])
-        c += int(cache.read_word(8)[1])
-        c += int(cache.read_word(16)[1])
-        c += int(cache.read_word(24)[1])
-        c += int(cache.read_word(32)[1])
-        c += int(cache.read_word(0)[1])
-        c += int(cache.read_word(8)[1])
-        c += int(cache.read_word(16)[1])
-        c += int(cache.read_word(24)[1])
-        c += int(cache.read_word(32)[1])
+        memory_system.read_word(0)
+        memory_system.read_word(8)
+        memory_system.read_word(16)
+        memory_system.read_word(24)
+        memory_system.read_word(32)
+        memory_system.read_word(0)
+        memory_system.read_word(8)
+        memory_system.read_word(16)
+        memory_system.read_word(24)
+        memory_system.read_word(32)
 
-        self.assertEqual(c, 0)
+        self.assertEqual(memory_system.hits, 0)
+        self.assertEqual(memory_system.accesses, 10)
 
     def test_cache_5(self) -> None:
         memory = Memory(AddressingType.BYTE, 32, True)
         for i in range(32):
             memory.write_word(i * 4, MutableUInt32(i))
-        cache = Cache(
+        memory_system = WriteBackMemorySystem(
             num_index_bits=1,
             num_block_bits=0,
             associativity=4,
-            main_memory=memory,
+            memory=memory,
         )
         # 0 [ , , , ]
         # 1 [ , , , ]
         # 0, 8, 16, 24, 32, 8, 16, 0
-        c = 0
-        c += int(cache.read_word(0)[1])
-        c += int(cache.read_word(8)[1])
-        c += int(cache.read_word(16)[1])
-        c += int(cache.read_word(24)[1])
-        c += int(cache.read_word(32)[1])
-        c += int(cache.read_word(8)[1])
-        c += int(cache.read_word(16)[1])
-        c += int(cache.read_word(0)[1])
+        memory_system.read_word(0)
+        memory_system.read_word(8)
+        memory_system.read_word(16)
+        memory_system.read_word(24)
+        memory_system.read_word(32)
+        memory_system.read_word(8)
+        memory_system.read_word(16)
+        memory_system.read_word(0)
 
-        self.assertEqual(c, 2)
+        self.assertEqual(memory_system.hits, 2)
+        self.assertEqual(memory_system.accesses, 8)
