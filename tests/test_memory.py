@@ -5,17 +5,17 @@ from architecture_simulator.uarch.memory.memory import (
     UnsupportedFunctionError,
     MemoryAddressError,
 )
-from fixedint import MutableUInt8, MutableUInt16, MutableUInt32, MutableUInt64
+from fixedint import UInt8, UInt16, UInt32, UInt64
 
 
 class TestMemory(TestCase):
     def test_mixed(self) -> None:
         mem01 = Memory(AddressingType.BYTE, 32)
 
-        mem01.write_word(0, MutableUInt32(0xFABCFABC))
+        mem01.write_word(0, UInt32(0xFABCFABC))
         self.assertEqual(mem01.read_word(0), 0xFABCFABC)
 
-        mem01.write_doubleword(4, MutableUInt64(0xAAAABBBBCCCCDDDD))
+        mem01.write_doubleword(4, UInt64(0xAAAABBBBCCCCDDDD))
         self.assertEqual(mem01.read_doubleword(4), 0xAAAABBBBCCCCDDDD)
         self.assertEqual(mem01.read_byte(7), 0xCC)
         self.assertEqual(mem01.read_byte(8), 0xBB)
@@ -25,18 +25,18 @@ class TestMemory(TestCase):
         mem02 = Memory(AddressingType.WORD, 8, True)
 
         with self.assertRaises(RuntimeError):
-            mem02.write_halfword(0, MutableUInt16(0xFFAA))
+            mem02.write_halfword(0, UInt16(0xFFAA))
 
-        mem02.write_word(7 + 2**8, MutableUInt32(0x1234))
+        mem02.write_word(7 + 2**8, UInt32(0x1234))
         self.assertEqual(mem02.read_word(7), 0x1234)
 
     def test_byte_addressing(self) -> None:
         mem = Memory(AddressingType.BYTE, 32, False)
 
-        mem.write_byte(0, MutableUInt8(0x01))
-        mem.write_halfword(1, MutableUInt16(0x2345))
-        mem.write_word(3, MutableUInt32(0x6789ABCD))
-        mem.write_doubleword(7, MutableUInt64(0xEF0123456789ABCF))
+        mem.write_byte(0, UInt8(0x01))
+        mem.write_halfword(1, UInt16(0x2345))
+        mem.write_word(3, UInt32(0x6789ABCD))
+        mem.write_doubleword(7, UInt64(0xEF0123456789ABCF))
 
         self.assertEqual(mem.read_word(0), 0xCD234501)
         self.assertEqual(mem.read_word(4), 0xCF6789AB)
@@ -54,14 +54,14 @@ class TestMemory(TestCase):
         with self.assertRaises(MemoryAddressError):
             mem.read_byte(2**10)
 
-        mem.write_byte(2**15, MutableUInt8(0xAB))
-        mem.write_halfword(2**15 - 1, MutableUInt16(0))
+        mem.write_byte(2**15, UInt8(0xAB))
+        mem.write_halfword(2**15 - 1, UInt16(0))
 
         self.assertEqual(mem.read_byte(2**15), 0)
 
-        a = MutableUInt8(0xFA)
+        a = UInt8(0xFA)
         mem.write_byte(2**16, a)
-        a += MutableUInt8(1)
+        a += UInt8(1)
 
         self.assertEqual(mem.read_byte(2**16), 0xFA)
 
@@ -71,7 +71,7 @@ class TestMemory(TestCase):
             mem.read_byte(0)
 
         with self.assertRaises(UnsupportedFunctionError):
-            mem.write_byte(0, MutableUInt8(1))
+            mem.write_byte(0, UInt8(1))
 
         with self.assertRaises(UnsupportedFunctionError):
             mem.bytewise_repr()
@@ -84,12 +84,12 @@ class TestMemory(TestCase):
                 "This function requires byte-wise addressing, but this memory uses HALF_WORD-wise addressing.",
             )
 
-        mem.write_halfword(0, MutableUInt16(0x3210))
-        mem.write_word(1, MutableUInt32(0xBA987654))
-        mem.write_doubleword(3, MutableUInt32(0x000000000000FEDC))
+        mem.write_halfword(0, UInt16(0x3210))
+        mem.write_word(1, UInt32(0xBA987654))
+        mem.write_doubleword(3, UInt32(0x000000000000FEDC))
 
         self.assertEqual(mem.read_halfword(1234), 0)
-        self.assertEqual(mem.read_word(1), MutableUInt32(0xBA987654))
+        self.assertEqual(mem.read_word(1), UInt32(0xBA987654))
         self.assertEqual(mem.read_doubleword(0), 0xFEDCBA9876543210)
 
     def test_word_addressing(self):
@@ -98,7 +98,7 @@ class TestMemory(TestCase):
             mem.read_byte(0)
 
         with self.assertRaises(UnsupportedFunctionError):
-            mem.write_byte(0, MutableUInt8(1))
+            mem.write_byte(0, UInt8(1))
 
         with self.assertRaises(UnsupportedFunctionError):
             mem.bytewise_repr()
@@ -107,16 +107,16 @@ class TestMemory(TestCase):
             mem.read_halfword(0)
 
         with self.assertRaises(UnsupportedFunctionError):
-            mem.write_halfword(0, MutableUInt16(1))
+            mem.write_halfword(0, UInt16(1))
 
         with self.assertRaises(UnsupportedFunctionError):
             mem.half_wordwise_repr()
 
-        mem.write_word(0, MutableUInt32(1234))
-        mem.write_word(2**8 - 1, MutableUInt32(0xABCDABCD))
+        mem.write_word(0, UInt32(1234))
+        mem.write_word(2**8 - 1, UInt32(0xABCDABCD))
 
         with self.assertRaises(MemoryAddressError):
-            mem.write_word(2**8, MutableUInt32(0xABCDABCD))
+            mem.write_word(2**8, UInt32(0xABCDABCD))
 
         with self.assertRaises(MemoryAddressError):
             mem.read_doubleword(2**8 - 1)
@@ -140,7 +140,7 @@ class TestMemory(TestCase):
             mem.read_byte(0)
 
         with self.assertRaises(UnsupportedFunctionError):
-            mem.write_byte(0, MutableUInt8(1))
+            mem.write_byte(0, UInt8(1))
 
         with self.assertRaises(UnsupportedFunctionError):
             mem.bytewise_repr()
@@ -149,7 +149,7 @@ class TestMemory(TestCase):
             mem.read_halfword(0)
 
         with self.assertRaises(UnsupportedFunctionError):
-            mem.write_halfword(0, MutableUInt16(1))
+            mem.write_halfword(0, UInt16(1))
 
         with self.assertRaises(UnsupportedFunctionError):
             mem.half_wordwise_repr()
@@ -158,11 +158,11 @@ class TestMemory(TestCase):
             mem.read_word(0)
 
         with self.assertRaises(UnsupportedFunctionError):
-            mem.write_word(0, MutableUInt32(1))
+            mem.write_word(0, UInt32(1))
 
         with self.assertRaises(UnsupportedFunctionError):
             mem.wordwise_repr()
 
-        mem.write_doubleword(2**9 + 7, MutableUInt64(122342354563))
+        mem.write_doubleword(2**9 + 7, UInt64(122342354563))
 
         self.assertEqual(mem.read_doubleword(7), 122342354563)

@@ -1,9 +1,9 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Type
-from fixedint import MutableUInt16
+from fixedint import UInt16
 from ..instruction import Instruction
 from architecture_simulator.uarch.toy.SvgVisValues import SvgVisValues
-from architecture_simulator.util.fixedint_12 import MutableUInt12
+from architecture_simulator.util.fixedint_12 import UInt12
 
 if TYPE_CHECKING:
     from architecture_simulator.uarch.toy.toy_architectural_state import (
@@ -168,7 +168,7 @@ class BRZ(AddressTypeInstruction):
         """PC = ADDRESS if (ACCU == 0)"""
         state.visualisation_values = SvgVisValues(jump=not state.accu)
         if not state.accu:
-            state.set_current_pc(MutableUInt12(self.address))
+            state.set_current_pc(UInt12(self.address))
             state.performance_metrics.branch_count += 1
 
 
@@ -180,7 +180,7 @@ class ADD(AddressTypeInstruction):
         """ACCU += MEM[address]"""
         read_value = state.memory.read_halfword(address=self.address)
         state.visualisation_values = SvgVisValues(
-            accu_old=MutableUInt16(int(state.accu)),
+            accu_old=state.accu,
             ram_out=read_value,
             alu_out=state.accu + read_value,
         )
@@ -195,7 +195,7 @@ class SUB(AddressTypeInstruction):
         """ACCU -= MEM[address]"""
         read_value = state.memory.read_halfword(address=self.address)
         state.visualisation_values = SvgVisValues(
-            accu_old=MutableUInt16(int(state.accu)),
+            accu_old=state.accu,
             ram_out=read_value,
             alu_out=state.accu - read_value,
         )
@@ -210,7 +210,7 @@ class OR(AddressTypeInstruction):
         """ACCU |= MEM[address]"""
         read_value = state.memory.read_halfword(address=self.address)
         state.visualisation_values = SvgVisValues(
-            accu_old=MutableUInt16(int(state.accu)),
+            accu_old=state.accu,
             ram_out=read_value,
             alu_out=state.accu | read_value,
         )
@@ -225,7 +225,7 @@ class AND(AddressTypeInstruction):
         """ACCU &= MEM[address]"""
         read_value = state.memory.read_halfword(address=self.address)
         state.visualisation_values = SvgVisValues(
-            accu_old=MutableUInt16(int(state.accu)),
+            accu_old=state.accu,
             ram_out=read_value,
             alu_out=state.accu & read_value,
         )
@@ -240,7 +240,7 @@ class XOR(AddressTypeInstruction):
         """ACCU ^= MEM[address]"""
         read_value = state.memory.read_halfword(address=self.address)
         state.visualisation_values = SvgVisValues(
-            accu_old=MutableUInt16(int(state.accu)),
+            accu_old=state.accu,
             ram_out=read_value,
             alu_out=state.accu ^ read_value,
         )
@@ -254,7 +254,7 @@ class NOT(ToyInstruction):
     def behavior(self, state: ToyArchitecturalState):
         """ACCU = ~ACCU"""
         state.visualisation_values = SvgVisValues(
-            accu_old=MutableUInt16(int(state.accu)), alu_out=~state.accu
+            accu_old=state.accu, alu_out=~state.accu
         )
         state.accu = ~state.accu
 
@@ -266,10 +266,10 @@ class INC(ToyInstruction):
     def behavior(self, state: ToyArchitecturalState):
         """ACCU += 1"""
         state.visualisation_values = SvgVisValues(
-            accu_old=MutableUInt16(int(state.accu)),
-            alu_out=state.accu + MutableUInt16(1),
+            accu_old=state.accu,
+            alu_out=state.accu + UInt16(1),
         )
-        state.accu += MutableUInt16(1)
+        state.accu += UInt16(1)
 
 
 class DEC(ToyInstruction):
@@ -279,10 +279,10 @@ class DEC(ToyInstruction):
     def behavior(self, state: ToyArchitecturalState):
         """ACCU -= 1"""
         state.visualisation_values = SvgVisValues(
-            accu_old=MutableUInt16(int(state.accu)),
-            alu_out=state.accu - MutableUInt16(1),
+            accu_old=state.accu,
+            alu_out=state.accu - UInt16(1),
         )
-        state.accu -= MutableUInt16(1)
+        state.accu -= UInt16(1)
 
 
 class ZRO(ToyInstruction):
@@ -291,8 +291,8 @@ class ZRO(ToyInstruction):
 
     def behavior(self, state: ToyArchitecturalState):
         """ACCU = 0"""
-        state.visualisation_values = SvgVisValues(alu_out=MutableUInt16(0))
-        state.accu = MutableUInt16(0)
+        state.visualisation_values = SvgVisValues(alu_out=UInt16(0))
+        state.accu = UInt16(0)
 
 
 class NOP(ToyInstruction):

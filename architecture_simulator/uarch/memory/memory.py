@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Generic, Optional, Type, TypeVar
 from enum import Enum
-from fixedint import MutableUInt8, MutableUInt16, MutableUInt32, MutableUInt64
+from fixedint import UInt8, UInt16, UInt32, UInt64
 from architecture_simulator.util.integer_representations import (
     get_n_bit_representations,
 )
@@ -32,16 +32,16 @@ class UnsupportedFunctionError(RuntimeError):
 
 class AddressingType(Enum):
     """
-    Enum that stores addressing types (byte, half_word, word, double_word) and the corresponding MutableUInt.
+    Enum that stores addressing types (byte, half_word, word, double_word) and the corresponding UInt.
     """
 
-    BYTE: Type[MutableUInt8] = MutableUInt8
-    HALF_WORD: Type[MutableUInt16] = MutableUInt16
-    WORD: Type[MutableUInt32] = MutableUInt32
-    DOUBLE_WORD: Type[MutableUInt64] = MutableUInt64
+    BYTE: Type[UInt8] = UInt8
+    HALF_WORD: Type[UInt16] = UInt16
+    WORD: Type[UInt32] = UInt32
+    DOUBLE_WORD: Type[UInt64] = UInt64
 
 
-T = TypeVar("T", MutableUInt8, MutableUInt16, MutableUInt32, MutableUInt64)
+T = TypeVar("T", UInt8, UInt16, UInt32, UInt64)
 
 
 class Memory(Generic[T]):
@@ -102,9 +102,7 @@ class Memory(Generic[T]):
             address = address % (2**self.address_length)
         self.assert_address_in_range(address)
         try:
-            value = self.class_of_memory_file_values(
-                int(self.memory_file[address])
-            )  # deep copy
+            value = self.memory_file[address]
         except KeyError:
             value = self.class_of_memory_file_values(0)
         return value
@@ -120,9 +118,7 @@ class Memory(Generic[T]):
         if self.address_overflow:
             address = address % (2**self.address_length)
         self.assert_address_in_range(address)
-        self.memory_file[address] = self.class_of_memory_file_values(
-            int(value)
-        )  # deep copy
+        self.memory_file[address] = value
 
     def _read_multiple(self, address: int, n: int) -> int:
         """
@@ -161,7 +157,7 @@ class Memory(Generic[T]):
             )
             value = value >> self.memory_file_values_width
 
-    def read_byte(self, address: int) -> MutableUInt8:
+    def read_byte(self, address: int) -> UInt8:
         """
         Reads the byte at the specified memory address.
 
@@ -175,15 +171,15 @@ class Memory(Generic[T]):
             MemoryAddressError: If the address is outside the valid memory range.
 
         Returns:
-            MutableUInt8: The value at the given address.
+            UInt8: The value at the given address.
         """
         if self.memory_file_values_width > 8:
             raise UnsupportedFunctionError(
                 "byte-wise addressing", self.addressing_type.name
             )
-        return MutableUInt8(self._read_multiple(address, 1))
+        return UInt8(self._read_multiple(address, 1))
 
-    def read_halfword(self, address: int) -> MutableUInt16:
+    def read_halfword(self, address: int) -> UInt16:
         """
         Reads the halfword at the specified memory address.
 
@@ -197,17 +193,15 @@ class Memory(Generic[T]):
             MemoryAddressError: If the address is outside the valid memory range.
 
         Returns:
-            MutableUInt16: The value at the given address.
+            UInt16: The value at the given address.
         """
         if self.memory_file_values_width > 16:
             raise UnsupportedFunctionError(
                 "halfword-wise addressing or smaller", self.addressing_type.name
             )
-        return MutableUInt16(
-            self._read_multiple(address, 16 // self.memory_file_values_width)
-        )
+        return UInt16(self._read_multiple(address, 16 // self.memory_file_values_width))
 
-    def read_word(self, address: int) -> MutableUInt32:
+    def read_word(self, address: int) -> UInt32:
         """
         Reads the word at the specified memory address.
 
@@ -221,17 +215,15 @@ class Memory(Generic[T]):
             MemoryAddressError: If the address is outside the valid memory range.
 
         Returns:
-            MutableUInt32: The value at the given address.
+            UInt32: The value at the given address.
         """
         if self.memory_file_values_width > 32:
             raise UnsupportedFunctionError(
                 "word-wise addressing or smaller", self.addressing_type.name
             )
-        return MutableUInt32(
-            self._read_multiple(address, 32 // self.memory_file_values_width)
-        )
+        return UInt32(self._read_multiple(address, 32 // self.memory_file_values_width))
 
-    def read_doubleword(self, address: int) -> MutableUInt64:
+    def read_doubleword(self, address: int) -> UInt64:
         """
         Reads the doubleword at the specified memory address.
 
@@ -245,17 +237,15 @@ class Memory(Generic[T]):
             MemoryAddressError: If the address is outside the valid memory range.
 
         Returns:
-            MutableUInt64: The value at the given address.
+            UInt64: The value at the given address.
         """
         if self.memory_file_values_width > 64:
             raise UnsupportedFunctionError(
                 "doubleword-wise addressing or smaller", self.addressing_type.name
             )
-        return MutableUInt64(
-            self._read_multiple(address, 64 // self.memory_file_values_width)
-        )
+        return UInt64(self._read_multiple(address, 64 // self.memory_file_values_width))
 
-    def write_byte(self, address: int, value: MutableUInt8) -> None:
+    def write_byte(self, address: int, value: UInt8) -> None:
         """
         Writes the byte to the specified memory address.
 
@@ -263,7 +253,7 @@ class Memory(Generic[T]):
 
         Parameters:
             address (int): The memory address to write to.
-            value (MutableUInt8): The value to write.
+            value (UInt8): The value to write.
 
         Raises:
             UnsupportedFunctionError: If no byte-wise addressing is used.
@@ -275,7 +265,7 @@ class Memory(Generic[T]):
             )
         self._write_multiple(address, 1, int(value))
 
-    def write_halfword(self, address: int, value: MutableUInt16) -> None:
+    def write_halfword(self, address: int, value: UInt16) -> None:
         """
         Writes the halfword to the specified memory address.
 
@@ -283,7 +273,7 @@ class Memory(Generic[T]):
 
         Parameters:
             address (int): The memory address to write to.
-            value (MutableUInt16): The value to write.
+            value (UInt16): The value to write.
 
         Raises:
             UnsupportedFunctionError: If no halfword-wise addressing or smaller is used.
@@ -295,7 +285,7 @@ class Memory(Generic[T]):
             )
         self._write_multiple(address, 16 // self.memory_file_values_width, int(value))
 
-    def write_word(self, address: int, value: MutableUInt32) -> None:
+    def write_word(self, address: int, value: UInt32) -> None:
         """
         Writes the word to the specified memory address.
 
@@ -303,7 +293,7 @@ class Memory(Generic[T]):
 
         Parameters:
             address (int): The memory address to write to.
-            value (MutableUInt32): The value to write.
+            value (UInt32): The value to write.
 
         Raises:
             UnsupportedFunctionError: If no word-wise addressing or smaller is used.
@@ -315,7 +305,7 @@ class Memory(Generic[T]):
             )
         self._write_multiple(address, 32 // self.memory_file_values_width, int(value))
 
-    def write_doubleword(self, address: int, value: MutableUInt64) -> None:
+    def write_doubleword(self, address: int, value: UInt64) -> None:
         """
         Writes the doubleword to the specified memory address.
 
@@ -323,7 +313,7 @@ class Memory(Generic[T]):
 
         Parameters:
             address (int): The memory address to write to.
-            value (MutableUInt64): The value to write.
+            value (UInt64): The value to write.
 
         Raises:
             UnsupportedFunctionError: If no doubleword-wise addressing or smaller is used.

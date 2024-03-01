@@ -1,4 +1,4 @@
-from fixedint import UInt8, UInt16, UInt32, MutableUInt8, MutableUInt16, MutableUInt32
+from fixedint import UInt8, UInt16, UInt32, UInt8, UInt16, UInt32
 
 from architecture_simulator.uarch.memory.memory_system import MemorySystem
 from architecture_simulator.util.integer_manipulation import (
@@ -66,7 +66,7 @@ class WriteThroughMemorySystem(MemorySystem):
         if block_values is not None:
             block_values = byte_into_block(decoded_address, block_values, value)
             self.cache.write_block(decoded_address, block_values)
-        self.memory.write_byte(address, MutableUInt8(value))
+        self.memory.write_byte(address, value)
 
     def write_halfword(self, address: int, value: UInt16) -> None:
         decoded_address = self._decode_address(address)
@@ -77,7 +77,7 @@ class WriteThroughMemorySystem(MemorySystem):
         if block_values is not None:
             block_values = halfword_into_block(decoded_address, block_values, value)
             self.cache.write_block(decoded_address, block_values)
-        self.memory.write_halfword(address, MutableUInt16(value))
+        self.memory.write_halfword(address, value)
 
     def write_word(self, address: int, value: UInt32) -> None:
         decoded_address = self._decode_address(address)
@@ -88,7 +88,7 @@ class WriteThroughMemorySystem(MemorySystem):
         if block_values is not None:
             block_values = word_into_block(decoded_address, block_values, value)
             self.cache.write_block(decoded_address, block_values)
-        self.memory.write_word(address, MutableUInt32(value))
+        self.memory.write_word(address, value)
 
     def _decode_address(self, address: int) -> DecodedAddress:
         return DecodedAddress(
@@ -105,10 +105,6 @@ class WriteThroughMemorySystem(MemorySystem):
 
     def _read_block_from_memory(self, decoded_address: DecodedAddress) -> list[UInt32]:
         return [
-            UInt32(
-                int(
-                    self.memory.read_word(decoded_address.block_alinged_address + 4 * i)
-                )
-            )
+            self.memory.read_word(decoded_address.block_alinged_address + 4 * i)
             for i in range(self.cache.num_words_in_block)
         ]

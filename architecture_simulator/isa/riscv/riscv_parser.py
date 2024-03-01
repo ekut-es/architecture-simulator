@@ -349,7 +349,7 @@ class RiscvParser(Parser):
                     )
                     for val in line_parsed.get("values"):
                         self.state.memory.write_byte(
-                            address_counter, fixedint.MutableUInt8(int(val, base=0))
+                            address_counter, fixedint.UInt8(int(val, base=0))
                         )
                         address_counter += 1
                 elif line_parsed.type.type == "half":
@@ -358,7 +358,7 @@ class RiscvParser(Parser):
                     )
                     for val in line_parsed.get("values"):
                         self.state.memory.write_halfword(
-                            address_counter, fixedint.MutableUInt16(int(val, base=0))
+                            address_counter, fixedint.UInt16(int(val, base=0))
                         )
                         address_counter += 2
                 elif line_parsed.type.type == "word":
@@ -367,7 +367,7 @@ class RiscvParser(Parser):
                     )
                     for val in line_parsed.get("values"):
                         self.state.memory.write_word(
-                            address_counter, fixedint.MutableUInt32(int(val, base=0))
+                            address_counter, fixedint.UInt32(int(val, base=0))
                         )
                         address_counter += 4
                 # strings are saved as byte arrays
@@ -377,13 +377,11 @@ class RiscvParser(Parser):
                     )
                     for char in line_parsed.string[1:-1]:
                         self.state.memory.write_byte(
-                            address_counter, fixedint.MutableUInt8(ord(char))
+                            address_counter, fixedint.UInt8(ord(char))
                         )
                         address_counter += 1
                     # write null terminator
-                    self.state.memory.write_byte(
-                        address_counter, fixedint.MutableUInt8(0)
-                    )
+                    self.state.memory.write_byte(address_counter, fixedint.UInt8(0))
                     address_counter += 1
 
     def _process_pseudo_instructions(self) -> None:
@@ -409,9 +407,9 @@ class RiscvParser(Parser):
                         else "x" + line_parsed.rd[0][1]
                     )
                     imm = int(line_parsed.imm, base=0)
-                    lui_imm = int(fixedint.MutableUInt32(imm)) >> 12
+                    lui_imm = int(fixedint.UInt32(imm)) >> 12
                     # get the 12 first bits
-                    addi_imm = int(fixedint.MutableUInt32(imm)) & 0xFFF
+                    addi_imm = int(fixedint.UInt32(imm)) & 0xFFF
                     # compensate addi sign extension
                     if addi_imm > 2047 or addi_imm < -2048:
                         lui_imm += 1
@@ -469,9 +467,9 @@ class RiscvParser(Parser):
                         address = (
                             self.variables[line_parsed.variable.name][0] + array_index
                         )
-                        lui_imm = int(fixedint.MutableUInt32(address)) >> 12
+                        lui_imm = int(fixedint.UInt32(address)) >> 12
                         # get the 12 first bits
-                        addi_imm = int(fixedint.MutableUInt32(address)) & 0xFFF
+                        addi_imm = int(fixedint.UInt32(address)) & 0xFFF
                         # compensate addi sign extension
                         if addi_imm > 2047 or addi_imm < -2048:
                             lui_imm += 1
@@ -531,9 +529,9 @@ class RiscvParser(Parser):
                     )
                     # address with array offset
                     address = self.variables[line_parsed.variable.name][0] + array_index
-                    lui_imm = int(fixedint.MutableUInt32(address)) >> 12
+                    lui_imm = int(fixedint.UInt32(address)) >> 12
                     # get the 12 first bits
-                    addi_imm = int(fixedint.MutableUInt32(address)) & 0xFFF
+                    addi_imm = int(fixedint.UInt32(address)) & 0xFFF
                     # compensate addi sign extension
                     if addi_imm > 2047 or addi_imm < -2048:
                         lui_imm += 1

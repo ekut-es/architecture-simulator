@@ -1,5 +1,5 @@
 from unittest import TestCase
-from fixedint import MutableUInt8, MutableUInt16, MutableUInt32, UInt8, UInt16, UInt32
+from fixedint import UInt8, UInt16, UInt32, UInt8, UInt16, UInt32
 
 from architecture_simulator.uarch.memory.decoded_address import DecodedAddress
 from architecture_simulator.uarch.memory.memory import Memory, AddressingType
@@ -37,7 +37,7 @@ class TestCache(TestCase):
     def test_write_through_cache_1(self) -> None:
         memory = Memory(AddressingType.BYTE, 32, True)
         for i in range(32):
-            memory.write_word(i * 4, MutableUInt32(i))
+            memory.write_word(i * 4, UInt32(i))
         memory_system = WriteThroughMemorySystem(
             num_index_bits=1,
             num_block_bits=1,
@@ -60,7 +60,7 @@ class TestCache(TestCase):
     def test_write_through_cache_2(self) -> None:
         memory = Memory(AddressingType.BYTE, 32, True)
         for i in range(32):
-            memory.write_word(i * 4, MutableUInt32(i))
+            memory.write_word(i * 4, UInt32(i))
         memory_system = WriteThroughMemorySystem(
             num_index_bits=2,
             num_block_bits=0,
@@ -82,7 +82,7 @@ class TestCache(TestCase):
     def test_write_through_cache_3(self) -> None:
         memory = Memory(AddressingType.BYTE, 32, True)
         for i in range(32):
-            memory.write_word(i * 4, MutableUInt32(i))
+            memory.write_word(i * 4, UInt32(i))
         memory_system = WriteThroughMemorySystem(
             num_index_bits=1,
             num_block_bits=0,
@@ -104,7 +104,7 @@ class TestCache(TestCase):
     def test_write_through_cache_4(self) -> None:
         memory = Memory(AddressingType.BYTE, 32, True)
         for i in range(32):
-            memory.write_word(i * 4, MutableUInt32(i))
+            memory.write_word(i * 4, UInt32(i))
         memory_system = WriteThroughMemorySystem(
             num_index_bits=1,
             num_block_bits=0,
@@ -131,7 +131,7 @@ class TestCache(TestCase):
     def test_write_through_cache_5(self) -> None:
         memory = Memory(AddressingType.BYTE, 32, True)
         for i in range(32):
-            memory.write_word(i * 4, MutableUInt32(i))
+            memory.write_word(i * 4, UInt32(i))
         memory_system = WriteThroughMemorySystem(
             num_index_bits=1,
             num_block_bits=0,

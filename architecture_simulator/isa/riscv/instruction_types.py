@@ -102,7 +102,7 @@ class RiscvInstruction(Instruction):
 
         Args:
             write_register (Optional[int]): register index to write the data to or None.
-            register_write_data (Optional[int]): Data to be written to the register. Needs to be casted to fixedint.MutableUInt32
+            register_write_data (Optional[int]): Data to be written to the register. Needs to be casted to fixedint.UInt32
             architectural_state (ArchitecturalState): architectural state
         """
 
@@ -172,9 +172,9 @@ class RTypeInstruction(RiscvInstruction):
     ):
         assert write_register is not None
         assert register_write_data is not None
-        architectural_state.register_file.registers[
-            write_register
-        ] = fixedint.MutableUInt32(register_write_data)
+        architectural_state.register_file.registers[write_register] = fixedint.UInt32(
+            register_write_data
+        )
 
 
 class ITypeInstruction(RiscvInstruction):
@@ -240,9 +240,9 @@ class ITypeInstruction(RiscvInstruction):
     ):
         assert write_register is not None
         assert register_write_data is not None
-        architectural_state.register_file.registers[
-            write_register
-        ] = fixedint.MutableUInt32(register_write_data)
+        architectural_state.register_file.registers[write_register] = fixedint.UInt32(
+            register_write_data
+        )
 
 
 class MemoryITypeInstruction(ITypeInstruction):
@@ -402,9 +402,9 @@ class UTypeInstruction(RiscvInstruction):
     ):
         assert write_register is not None
         assert register_write_data is not None
-        architectural_state.register_file.registers[
-            write_register
-        ] = fixedint.MutableUInt32(register_write_data)
+        architectural_state.register_file.registers[write_register] = fixedint.UInt32(
+            register_write_data
+        )
 
     def access_register_file(
         self, architectural_state: RiscvArchitecturalState
@@ -446,9 +446,9 @@ class JTypeInstruction(RiscvInstruction):
     ):
         assert write_register is not None
         assert register_write_data is not None
-        architectural_state.register_file.registers[
-            write_register
-        ] = fixedint.MutableUInt32(register_write_data)
+        architectural_state.register_file.registers[write_register] = fixedint.UInt32(
+            register_write_data
+        )
 
     def access_register_file(
         self, architectural_state: RiscvArchitecturalState

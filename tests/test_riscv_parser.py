@@ -879,23 +879,23 @@ fibonacci:
 
         self.assertEqual(
             state.register_file.registers[1],
-            fixedint.MutableUInt32(ord("H")),
+            fixedint.UInt32(ord("H")),
         )
         self.assertEqual(
             state.register_file.registers[2],
-            fixedint.MutableUInt32(ord("e")),
+            fixedint.UInt32(ord("e")),
         )
         self.assertEqual(
             state.register_file.registers[3],
-            fixedint.MutableUInt32(ord("!")),
+            fixedint.UInt32(ord("!")),
         )
         self.assertEqual(
             state.register_file.registers[4],
-            fixedint.MutableUInt32(0),
+            fixedint.UInt32(0),
         )
         self.assertEqual(
             state.register_file.registers[5],
-            fixedint.MutableUInt32(ord("a")),
+            fixedint.UInt32(ord("a")),
         )
 
     def test_pseudo_instructions_variables(self):
@@ -915,24 +915,24 @@ fibonacci:
 
         self.assertEqual(
             state.memory.read_byte(state.memory.address_range.start),
-            fixedint.MutableUInt8(42),
+            fixedint.UInt8(42),
         )
         self.assertEqual(
             state.memory.read_halfword(state.memory.address_range.start + 1),
-            fixedint.MutableUInt16(5),
+            fixedint.UInt16(5),
         )
         self.assertEqual(
             state.memory.read_word(state.memory.address_range.start + 3),
-            fixedint.MutableUInt32(0x2),
+            fixedint.UInt32(0x2),
         )
         self.assertEqual(
             state.memory.read_word(state.memory.address_range.start + 3 + 2 * 4),
-            fixedint.MutableUInt32(-99),
+            fixedint.UInt32(-99),
         )
         # out of bounds
         self.assertEqual(
             state.memory.read_word(state.memory.address_range.start + 3 + 2 * 4 + 4),
-            fixedint.MutableUInt32(0),
+            fixedint.UInt32(0),
         )
 
         program2 = """.data
@@ -958,31 +958,31 @@ fibonacci:
 
         self.assertEqual(
             state.memory.read_byte(state.memory.address_range.start),
-            fixedint.MutableUInt32(42),
+            fixedint.UInt32(42),
         )
         self.assertEqual(
             state.memory.read_halfword(state.memory.address_range.start + 1),
-            fixedint.MutableUInt32(10),
+            fixedint.UInt32(10),
         )
         self.assertEqual(
             state.memory.read_word(state.memory.address_range.start + 3),
-            fixedint.MutableUInt32(2),
+            fixedint.UInt32(2),
         )
         self.assertEqual(
             state.memory.read_word(state.memory.address_range.start + 7),
-            fixedint.MutableUInt32(11),
+            fixedint.UInt32(11),
         )
         self.assertEqual(
             state.memory.read_word(state.memory.address_range.start + 11),
-            fixedint.MutableUInt32(0),
+            fixedint.UInt32(0),
         )
         self.assertEqual(
             state.memory.read_word(state.memory.address_range.start + 15),
-            fixedint.MutableUInt32(-555),
+            fixedint.UInt32(-555),
         )
         self.assertEqual(
             state.memory.read_word(state.memory.address_range.start + 19),
-            fixedint.MutableUInt32(-1),
+            fixedint.UInt32(-1),
         )
 
         self.assertEqual(state.instruction_memory.read_instruction(0).mnemonic, "lui")
@@ -1065,10 +1065,8 @@ fibonacci:
 
         self.assertEqual(state.register_file.registers[6], 10)
         self.assertEqual(state.register_file.registers[8], 2)
-        self.assertEqual(state.register_file.registers[9], fixedint.MutableUInt32(-555))
-        self.assertEqual(
-            state.register_file.registers[11], fixedint.MutableUInt32(-555)
-        )
+        self.assertEqual(state.register_file.registers[9], fixedint.UInt32(-555))
+        self.assertEqual(state.register_file.registers[11], fixedint.UInt32(-555))
 
         program4 = """.data
         test1: .byte 42
@@ -1208,16 +1206,14 @@ fibonacci:
         self.assertEqual(state.instruction_memory.read_instruction(11 * length).rs1, 8)
         self.assertEqual(state.instruction_memory.read_instruction(11 * length).rd, 8)
 
-        self.assertEqual(state.register_file.registers[5], fixedint.MutableUInt32(42))
-        self.assertEqual(state.register_file.registers[6], fixedint.MutableUInt32(10))
-        self.assertEqual(state.register_file.registers[7], fixedint.MutableUInt32(2))
-        self.assertEqual(state.register_file.registers[8], fixedint.MutableUInt32(2))
-        self.assertEqual(state.register_file.registers[9], fixedint.MutableUInt32(11))
-        self.assertEqual(state.register_file.registers[10], fixedint.MutableUInt32(0))
-        self.assertEqual(
-            state.register_file.registers[11], fixedint.MutableUInt32(-555)
-        )
-        self.assertEqual(state.register_file.registers[12], fixedint.MutableUInt32(-1))
+        self.assertEqual(state.register_file.registers[5], fixedint.UInt32(42))
+        self.assertEqual(state.register_file.registers[6], fixedint.UInt32(10))
+        self.assertEqual(state.register_file.registers[7], fixedint.UInt32(2))
+        self.assertEqual(state.register_file.registers[8], fixedint.UInt32(2))
+        self.assertEqual(state.register_file.registers[9], fixedint.UInt32(11))
+        self.assertEqual(state.register_file.registers[10], fixedint.UInt32(0))
+        self.assertEqual(state.register_file.registers[11], fixedint.UInt32(-555))
+        self.assertEqual(state.register_file.registers[12], fixedint.UInt32(-1))
 
     def test_s_type_pseudos(self):
         program = """.data
@@ -1312,15 +1308,15 @@ fibonacci:
 
         self.assertEqual(
             state.memory.read_byte(state.memory.address_range.start),
-            fixedint.MutableUInt32(42),
+            fixedint.UInt32(42),
         )
         self.assertEqual(
             state.memory.read_halfword(state.memory.address_range.start + 1),
-            fixedint.MutableUInt32(10),
+            fixedint.UInt32(10),
         )
         self.assertEqual(
             state.memory.read_word(state.memory.address_range.start + 11),
-            fixedint.MutableUInt32(0),
+            fixedint.UInt32(0),
         )
 
         simulation = RiscvSimulation(state=state)
@@ -1328,15 +1324,15 @@ fibonacci:
 
         self.assertEqual(
             state.memory.read_byte(state.memory.address_range.start),
-            fixedint.MutableUInt32(47),
+            fixedint.UInt32(47),
         )
         self.assertEqual(
             state.memory.read_halfword(state.memory.address_range.start + 1),
-            fixedint.MutableUInt32(0xBB),
+            fixedint.UInt32(0xBB),
         )
         self.assertEqual(
             state.memory.read_word(state.memory.address_range.start + 11),
-            fixedint.MutableUInt32(0x7FF),
+            fixedint.UInt32(0x7FF),
         )
 
     def test_li(self):
@@ -1386,21 +1382,21 @@ fibonacci:
         self.assertEqual(state.instruction_memory.read_instruction(4 * length).rs1, 4)
         self.assertEqual(state.instruction_memory.read_instruction(4 * length).rd, 4)
 
-        self.assertEqual(state.register_file.registers[1], fixedint.MutableUInt32(0))
-        self.assertEqual(state.register_file.registers[2], fixedint.MutableUInt32(1))
-        self.assertEqual(state.register_file.registers[3], fixedint.MutableUInt32(-1))
+        self.assertEqual(state.register_file.registers[1], fixedint.UInt32(0))
+        self.assertEqual(state.register_file.registers[2], fixedint.UInt32(1))
+        self.assertEqual(state.register_file.registers[3], fixedint.UInt32(-1))
         self.assertEqual(
             state.register_file.registers[4],
-            fixedint.MutableUInt32(0xABCDEF),
+            fixedint.UInt32(0xABCDEF),
         )
         self.assertEqual(
             state.register_file.registers[5],
-            fixedint.MutableUInt32(0xFFFFFFFF),
+            fixedint.UInt32(0xFFFFFFFF),
         )
-        self.assertEqual(state.register_file.registers[5], fixedint.MutableUInt32(-1))
+        self.assertEqual(state.register_file.registers[5], fixedint.UInt32(-1))
         self.assertEqual(
             state.register_file.registers[6],
-            fixedint.MutableUInt32(-1234567),
+            fixedint.UInt32(-1234567),
         )
 
     def test_in_line_labels(self):

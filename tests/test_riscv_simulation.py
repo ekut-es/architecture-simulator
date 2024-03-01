@@ -140,7 +140,7 @@ class TestRiscvSimulation(unittest.TestCase):
             state=RiscvArchitecturalState(memory=Memory(AddressingType.BYTE, 32))
         )
 
-        simulation1.state.register_file.registers[5] = fixedint.MutableUInt32(12)
+        simulation1.state.register_file.registers[5] = fixedint.UInt32(12)
         self.assertEqual(int(simulation1.state.register_file.registers[5]), 12)
         self.assertEqual(int(simulation2.state.register_file.registers[5]), 0)
 
@@ -150,9 +150,7 @@ class TestRiscvSimulation(unittest.TestCase):
         self.assertEqual(len(simulation1.state.instruction_memory.instructions), 1)
         self.assertEqual(len(simulation2.state.instruction_memory.instructions), 0)
 
-        simulation1.state.csr_registers.write_byte(
-            address=5, value=fixedint.MutableUInt8(12)
-        )
+        simulation1.state.csr_registers.write_byte(address=5, value=fixedint.UInt8(12))
         self.assertEqual(
             (int(simulation1.state.csr_registers.read_byte(address=5))), 12
         )
@@ -162,7 +160,7 @@ class TestRiscvSimulation(unittest.TestCase):
         self.assertEqual(simulation1.state.performance_metrics.instruction_count, 12)
         self.assertEqual(simulation2.state.performance_metrics.instruction_count, 0)
 
-        simulation1.state.memory.write_byte(address=5, value=fixedint.MutableUInt8(12))
+        simulation1.state.memory.write_byte(address=5, value=fixedint.UInt8(12))
         self.assertEqual(int(simulation1.state.memory.read_byte(address=5)), 12)
         self.assertEqual(int(simulation2.state.memory.read_byte(address=5)), 0)
 

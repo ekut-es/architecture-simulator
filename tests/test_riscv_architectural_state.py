@@ -37,27 +37,27 @@ class TestRiscvArchitecture(unittest.TestCase):
             state.register_file.registers[32]
 
         # instructions still work as intended
-        state.register_file.registers[1] = fixedint.MutableUInt32(0x_80_00_00_00)
-        state.register_file.registers[2] = fixedint.MutableUInt32(0x_FF_FF_FF_FF)
+        state.register_file.registers[1] = fixedint.UInt32(0x_80_00_00_00)
+        state.register_file.registers[2] = fixedint.UInt32(0x_FF_FF_FF_FF)
         add = ADD(rd=3, rs1=1, rs2=2)
         state = add.behavior(state)
         self.assertEqual(
-            state.register_file.registers[3], fixedint.MutableUInt32(0x_7F_FF_FF_FF)
+            state.register_file.registers[3], fixedint.UInt32(0x_7F_FF_FF_FF)
         )
 
-        state.register_file.registers[4] = fixedint.MutableUInt32(31)
-        state.register_file.registers[5] = fixedint.MutableUInt32(7)
+        state.register_file.registers[4] = fixedint.UInt32(31)
+        state.register_file.registers[5] = fixedint.UInt32(7)
         sll = SLL(rd=4, rs1=5, rs2=4)
         state = sll.behavior(state)
         self.assertEqual(
-            state.register_file.registers[4], fixedint.MutableUInt32(0x_80_00_00_00)
+            state.register_file.registers[4], fixedint.UInt32(0x_80_00_00_00)
         )
 
         # reg_repr tests
         state = RiscvArchitecturalState()
-        state.register_file.registers[1] = fixedint.MutableUInt32(1)
-        state.register_file.registers[2] = fixedint.MutableUInt32(-1)
-        state.register_file.registers[3] = fixedint.MutableUInt32(3)
+        state.register_file.registers[1] = fixedint.UInt32(1)
+        state.register_file.registers[2] = fixedint.UInt32(-1)
+        state.register_file.registers[3] = fixedint.UInt32(3)
         self.assertEqual(
             state.register_file.reg_repr()[1][0],
             "00000000 00000000 00000000 00000001",
@@ -80,9 +80,9 @@ class TestRiscvArchitecture(unittest.TestCase):
     def test_mem(self):
         # test the wordwise repr method
         state = RiscvArchitecturalState(memory=Memory(AddressingType.BYTE, 32))
-        state.memory.write_word(0, fixedint.MutableUInt32(1))
-        state.memory.write_word(6, fixedint.MutableUInt32(6))
-        state.memory.write_byte(21, fixedint.MutableUInt32(20))
+        state.memory.write_word(0, fixedint.UInt32(1))
+        state.memory.write_word(6, fixedint.UInt32(6))
+        state.memory.write_byte(21, fixedint.UInt32(20))
 
         self.assertEqual(
             state.memory.wordwise_repr()[0][0],
@@ -117,40 +117,40 @@ class TestRiscvArchitecture(unittest.TestCase):
             memory=Memory(AddressingType.BYTE, 32),
         )
         # store_byte test
-        state.memory.write_byte(0, fixedint.MutableUInt8(1))
-        self.assertEqual(state.memory.read_byte(0), fixedint.MutableUInt8(1))
+        state.memory.write_byte(0, fixedint.UInt8(1))
+        self.assertEqual(state.memory.read_byte(0), fixedint.UInt8(1))
 
         # store_byte type test
-        state.memory.write_byte(0, fixedint.MutableUInt8(1))
-        self.assertIsInstance(state.memory.read_byte(0), fixedint.MutableUInt8)
+        state.memory.write_byte(0, fixedint.UInt8(1))
+        self.assertIsInstance(state.memory.read_byte(0), fixedint.UInt8)
 
         # store_halfword test
-        state.memory.write_halfword(0, fixedint.MutableUInt16(1))
-        self.assertEqual(state.memory.read_halfword(0), fixedint.MutableUInt16(1))
+        state.memory.write_halfword(0, fixedint.UInt16(1))
+        self.assertEqual(state.memory.read_halfword(0), fixedint.UInt16(1))
 
         # store_halfword type test
-        state.memory.write_halfword(0, fixedint.MutableUInt16(1))
-        self.assertIsInstance(state.memory.read_halfword(0), fixedint.MutableUInt16)
+        state.memory.write_halfword(0, fixedint.UInt16(1))
+        self.assertIsInstance(state.memory.read_halfword(0), fixedint.UInt16)
 
         # store_word test
-        state.memory.write_word(0, fixedint.MutableUInt32(1))
-        self.assertEqual(state.memory.read_word(0), fixedint.MutableUInt32(1))
+        state.memory.write_word(0, fixedint.UInt32(1))
+        self.assertEqual(state.memory.read_word(0), fixedint.UInt32(1))
 
         # store_word type test
-        state.memory.write_word(0, fixedint.MutableUInt32(1))
-        self.assertIsInstance(state.memory.read_word(0), fixedint.MutableUInt32)
+        state.memory.write_word(0, fixedint.UInt32(1))
+        self.assertIsInstance(state.memory.read_word(0), fixedint.UInt32)
 
         # store_byte negative value test
-        state.memory.write_byte(0, fixedint.MutableUInt8(-1))
-        self.assertEqual(state.memory.read_byte(0), fixedint.MutableUInt8(-1))
+        state.memory.write_byte(0, fixedint.UInt8(-1))
+        self.assertEqual(state.memory.read_byte(0), fixedint.UInt8(-1))
 
         # store_halfword negative value test
-        state.memory.write_halfword(0, fixedint.MutableUInt16(-1))
-        self.assertEqual(state.memory.read_halfword(0), fixedint.MutableUInt16(-1))
+        state.memory.write_halfword(0, fixedint.UInt16(-1))
+        self.assertEqual(state.memory.read_halfword(0), fixedint.UInt16(-1))
 
         # store_word test
-        state.memory.write_word(0, fixedint.MutableUInt32(-1))
-        self.assertEqual(state.memory.read_word(0), fixedint.MutableUInt32(-1))
+        state.memory.write_word(0, fixedint.UInt32(-1))
+        self.assertEqual(state.memory.read_word(0), fixedint.UInt32(-1))
 
         # tests are now with 16 bit length of memory
         state = RiscvArchitecturalState(
@@ -159,16 +159,16 @@ class TestRiscvArchitecture(unittest.TestCase):
         )
 
         # store_byte test
-        state.memory.write_byte(pow(2, 16), fixedint.MutableUInt8(2))
-        self.assertEqual(state.memory.read_word(0), fixedint.MutableUInt32(2))
+        state.memory.write_byte(pow(2, 16), fixedint.UInt8(2))
+        self.assertEqual(state.memory.read_word(0), fixedint.UInt32(2))
 
         # store_halfword test
-        state.memory.write_halfword(pow(2, 16), fixedint.MutableUInt16(3))
-        self.assertEqual(state.memory.read_halfword(0), fixedint.MutableUInt16(3))
+        state.memory.write_halfword(pow(2, 16), fixedint.UInt16(3))
+        self.assertEqual(state.memory.read_halfword(0), fixedint.UInt16(3))
 
         # store_word test
-        state.memory.write_word(pow(2, 16), fixedint.MutableUInt32(4))
-        self.assertEqual(state.memory.read_word(0), fixedint.MutableUInt32(4))
+        state.memory.write_word(pow(2, 16), fixedint.UInt32(4))
+        self.assertEqual(state.memory.read_word(0), fixedint.UInt32(4))
 
     def test_unified_memory(self):
         state = RiscvArchitecturalState()
@@ -231,12 +231,8 @@ class TestRiscvArchitecture(unittest.TestCase):
         with self.assertRaises(MemoryAddressError):
             state.instruction_memory.read_instruction(2**14)
 
-        self.assertEqual(
-            state.memory.read_byte(address=2**14), fixedint.MutableUInt8(0)
-        )
-        self.assertEqual(
-            state.memory.read_byte(address=2**32 - 1), fixedint.MutableUInt8(0)
-        )
+        self.assertEqual(state.memory.read_byte(address=2**14), fixedint.UInt8(0))
+        self.assertEqual(state.memory.read_byte(address=2**32 - 1), fixedint.UInt8(0))
 
         with self.assertRaises(MemoryAddressError) as cm:
             state.memory.read_byte(address=2**14 - 1)

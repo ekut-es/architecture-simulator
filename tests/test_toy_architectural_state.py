@@ -1,5 +1,5 @@
 import unittest
-from fixedint import MutableUInt16
+from fixedint import UInt16
 
 from architecture_simulator.uarch.toy.toy_architectural_state import (
     ToyArchitecturalState,
@@ -23,9 +23,9 @@ class TestToyArchitecture(unittest.TestCase):
         with self.assertRaises(MemoryAddressError):
             state.memory.read_halfword(4096)
 
-        state.memory.write_halfword(address=1024, value=MutableUInt16(1))
-        state.memory.write_halfword(address=2000, value=MutableUInt16(1000))
-        state.memory.write_halfword(address=4095, value=MutableUInt16(2**16 - 1))
+        state.memory.write_halfword(address=1024, value=UInt16(1))
+        state.memory.write_halfword(address=2000, value=UInt16(1000))
+        state.memory.write_halfword(address=4095, value=UInt16(2**16 - 1))
         self.assertEqual(state.memory.read_halfword(1024), 1)
         self.assertEqual(state.memory.read_halfword(2000), 1000)
         self.assertEqual(state.memory.read_halfword(4095), 2**16 - 1)
@@ -63,11 +63,11 @@ class TestToyArchitecture(unittest.TestCase):
 
     def test_memory_repr(self):
         state = ToyArchitecturalState()
-        state.memory.write_halfword(address=1024, value=MutableUInt16(0))
-        state.memory.write_halfword(address=1025, value=MutableUInt16(0xFFFF))
-        state.memory.write_halfword(address=2000, value=MutableUInt16(0x0F0F))
-        state.memory.write_halfword(address=4094, value=MutableUInt16(0xDEAD))
-        state.memory.write_halfword(address=4095, value=MutableUInt16(0x123A))
+        state.memory.write_halfword(address=1024, value=UInt16(0))
+        state.memory.write_halfword(address=1025, value=UInt16(0xFFFF))
+        state.memory.write_halfword(address=2000, value=UInt16(0x0F0F))
+        state.memory.write_halfword(address=4094, value=UInt16(0xDEAD))
+        state.memory.write_halfword(address=4095, value=UInt16(0x123A))
         entries = state.memory.half_wordwise_repr()
         self.assertEqual(entries[1024], ("00000000 00000000", "0", "00 00", "0"))
         self.assertEqual(entries[1025], ("11111111 11111111", "65535", "FF FF", "-1"))
