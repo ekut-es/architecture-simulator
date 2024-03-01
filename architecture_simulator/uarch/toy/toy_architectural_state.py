@@ -2,7 +2,7 @@ from fixedint import MutableUInt16
 from typing import Optional
 
 from architecture_simulator.settings.settings import Settings
-from architecture_simulator.uarch.memory import Memory, AddressingType
+from architecture_simulator.uarch.memory.memory import Memory, AddressingType
 from architecture_simulator.isa.toy.toy_instructions import ToyInstruction
 from .toy_performance_metrics import ToyPerformanceMetrics
 from .SvgVisValues import SvgVisValues

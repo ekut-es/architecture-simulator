@@ -1,9 +1,11 @@
 from unittest import TestCase
 from fixedint import MutableUInt8, MutableUInt16, MutableUInt32, MutableUInt64
 
-from architecture_simulator.uarch.cache import DecodedAddress, Cache
-from architecture_simulator.uarch.memory import Memory, AddressingType
-from architecture_simulator.uarch.write_back_memory_system import WriteBackMemorySystem
+from architecture_simulator.uarch.memory.decoded_address import DecodedAddress
+from architecture_simulator.uarch.memory.memory import Memory, AddressingType
+from architecture_simulator.uarch.memory.write_through_memory_system import (
+    WriteThroughMemorySystem,
+)
 
 
 class TestCache(TestCase):
@@ -36,7 +38,7 @@ class TestCache(TestCase):
         memory = Memory(AddressingType.BYTE, 32, True)
         for i in range(32):
             memory.write_word(i * 4, MutableUInt32(i))
-        memory_system = WriteBackMemorySystem(
+        memory_system = WriteThroughMemorySystem(
             num_index_bits=1,
             num_block_bits=1,
             associativity=1,
@@ -59,7 +61,7 @@ class TestCache(TestCase):
         memory = Memory(AddressingType.BYTE, 32, True)
         for i in range(32):
             memory.write_word(i * 4, MutableUInt32(i))
-        memory_system = WriteBackMemorySystem(
+        memory_system = WriteThroughMemorySystem(
             num_index_bits=2,
             num_block_bits=0,
             associativity=1,
@@ -81,7 +83,7 @@ class TestCache(TestCase):
         memory = Memory(AddressingType.BYTE, 32, True)
         for i in range(32):
             memory.write_word(i * 4, MutableUInt32(i))
-        memory_system = WriteBackMemorySystem(
+        memory_system = WriteThroughMemorySystem(
             num_index_bits=1,
             num_block_bits=0,
             associativity=2,
@@ -103,7 +105,7 @@ class TestCache(TestCase):
         memory = Memory(AddressingType.BYTE, 32, True)
         for i in range(32):
             memory.write_word(i * 4, MutableUInt32(i))
-        memory_system = WriteBackMemorySystem(
+        memory_system = WriteThroughMemorySystem(
             num_index_bits=1,
             num_block_bits=0,
             associativity=4,
@@ -130,7 +132,7 @@ class TestCache(TestCase):
         memory = Memory(AddressingType.BYTE, 32, True)
         for i in range(32):
             memory.write_word(i * 4, MutableUInt32(i))
-        memory_system = WriteBackMemorySystem(
+        memory_system = WriteThroughMemorySystem(
             num_index_bits=1,
             num_block_bits=0,
             associativity=4,

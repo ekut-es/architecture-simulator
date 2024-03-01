@@ -3,8 +3,8 @@ from typing import Optional
 from architecture_simulator.settings.settings import Settings
 from .riscv_performance_metrics import RiscvPerformanceMetrics
 from .register_file import RegisterFile
-from architecture_simulator.uarch.memory import Memory, AddressingType
-from ..instruction_memory import InstructionMemory
+from architecture_simulator.uarch.memory.memory import Memory, AddressingType
+from ..memory.instruction_memory import InstructionMemory
 from .csr_registers import CsrRegisterFile
 from architecture_simulator.isa.riscv.instruction_types import RiscvInstruction
 from .stages import (

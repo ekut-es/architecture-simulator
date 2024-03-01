@@ -1,5 +1,5 @@
 from unittest import TestCase
-from architecture_simulator.uarch.memory import (
+from architecture_simulator.uarch.memory.memory import (
     Memory,
     AddressingType,
     UnsupportedFunctionError,

@@ -1,6 +1,6 @@
 import unittest
 import fixedint
-from architecture_simulator.uarch.memory import Memory, AddressingType
+from architecture_simulator.uarch.memory.memory import Memory, AddressingType
 from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 
 

@@ -1,7 +1,7 @@
 import fixedint
 from dataclasses import dataclass
 
-from architecture_simulator.uarch.memory import Memory, AddressingType
+from architecture_simulator.uarch.memory.memory import Memory, AddressingType
 
 
 class CsrRegisterFile(Memory):

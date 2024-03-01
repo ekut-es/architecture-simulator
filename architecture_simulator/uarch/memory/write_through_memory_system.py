@@ -1,6 +1,6 @@
 from fixedint import UInt8, UInt16, UInt32, MutableUInt8, MutableUInt16, MutableUInt32
 
-from architecture_simulator.uarch.memory_system import MemorySystem
+from architecture_simulator.uarch.memory.memory_system import MemorySystem
 from architecture_simulator.util.integer_manipulation import (
     byte_from_block,
     halfword_from_block,
@@ -10,11 +10,12 @@ from architecture_simulator.util.integer_manipulation import (
     word_into_block,
 )
 
-from architecture_simulator.uarch.cache import Cache, DecodedAddress
-from architecture_simulator.uarch.memory import Memory
+from architecture_simulator.uarch.memory.cache import Cache
+from architecture_simulator.uarch.memory.decoded_address import DecodedAddress
+from architecture_simulator.uarch.memory.memory import Memory
 
 
-class WriteBackMemorySystem(MemorySystem):
+class WriteThroughMemorySystem(MemorySystem):
     def __init__(
         self,
         memory: Memory,

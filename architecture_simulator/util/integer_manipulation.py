@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from fixedint import UInt8, UInt16, UInt32
 
 if TYPE_CHECKING:
-    from architecture_simulator.uarch.cache import DecodedAddress
+    from architecture_simulator.uarch.memory.decoded_address import DecodedAddress
 
 
 def byte_from_block(decoded_address: DecodedAddress, block: list[UInt32]) -> UInt8:

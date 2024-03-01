@@ -4,7 +4,7 @@ from fixedint import MutableUInt16
 from architecture_simulator.uarch.toy.toy_architectural_state import (
     ToyArchitecturalState,
 )
-from architecture_simulator.uarch.memory import MemoryAddressError
+from architecture_simulator.uarch.memory.memory import MemoryAddressError
 from architecture_simulator.isa.toy.toy_instructions import (
     ADD,
     INC,

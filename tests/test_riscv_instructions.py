@@ -52,7 +52,7 @@ from architecture_simulator.uarch.riscv.register_file import RegisterFile
 from architecture_simulator.uarch.riscv.riscv_architectural_state import (
     RiscvArchitecturalState,
 )
-from architecture_simulator.uarch.memory import Memory, AddressingType
+from architecture_simulator.uarch.memory.memory import Memory, AddressingType
 from architecture_simulator.uarch.riscv.csr_registers import CSRError
 from architecture_simulator.isa.riscv.riscv_parser import RiscvParser
 

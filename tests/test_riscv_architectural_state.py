@@ -2,7 +2,7 @@ import unittest
 import fixedint
 
 from architecture_simulator.uarch.riscv.register_file import RegisterFile
-from architecture_simulator.uarch.memory import (
+from architecture_simulator.uarch.memory.memory import (
     Memory,
     MemoryAddressError,
     AddressingType,
@@ -11,7 +11,9 @@ from architecture_simulator.uarch.riscv.riscv_architectural_state import (
     RiscvArchitecturalState,
 )
 from architecture_simulator.isa.riscv.rv32i_instructions import ADD, SLL
-from architecture_simulator.uarch.instruction_memory import InstructionMemoryKeyError
+from architecture_simulator.uarch.memory.instruction_memory import (
+    InstructionMemoryKeyError,
+)
 
 
 class TestRiscvArchitecture(unittest.TestCase):

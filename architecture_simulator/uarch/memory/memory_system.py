@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from fixedint import UInt32, UInt16, UInt8
 
 if TYPE_CHECKING:
-    from architecture_simulator.uarch.memory import Memory
+    from architecture_simulator.uarch.memory.memory import Memory
 
 
 class MemorySystem(ABC):

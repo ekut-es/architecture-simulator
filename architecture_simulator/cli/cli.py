@@ -1,7 +1,7 @@
 from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 from architecture_simulator.simulation.toy_simulation import ToySimulation
 from typing import Optional, Union
-from architecture_simulator.uarch.memory import Memory
+from architecture_simulator.uarch.memory.memory import Memory
 from architecture_simulator.uarch.riscv.register_file import RegisterFile
 
 from architecture_simulator.uarch.riscv.pipeline import (

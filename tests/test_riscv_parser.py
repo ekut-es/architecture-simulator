@@ -20,7 +20,7 @@ from architecture_simulator.uarch.riscv.riscv_architectural_state import (
     RiscvArchitecturalState,
 )
 from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
-from architecture_simulator.uarch.memory import Memory, AddressingType
+from architecture_simulator.uarch.memory.memory import Memory, AddressingType
 from architecture_simulator.isa.riscv.riscv_parser import RiscvParser
 from architecture_simulator.isa.parser_exceptions import (
     ParserLabelException,
