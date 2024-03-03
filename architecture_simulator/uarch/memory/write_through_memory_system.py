@@ -31,7 +31,7 @@ class WriteThroughMemorySystem(MemorySystem):
         )
         self.hits = 0
         self.accesses = 0
-        super().__init__(memory)
+        self.memory = memory
 
     def read_byte(self, address: int, update_statistics: bool = True) -> UInt8:
         decoded_address = self._decode_address(address)

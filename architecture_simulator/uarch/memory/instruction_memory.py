@@ -1,16 +1,20 @@
+from __future__ import annotations
 from typing import TypeVar, Generic
 from dataclasses import dataclass, field
 
 from architecture_simulator.settings.settings import Settings
 from architecture_simulator.isa.instruction import Instruction
 from architecture_simulator.uarch.memory.memory import MemoryAddressError
+from architecture_simulator.uarch.memory.instruction_memory_system import (
+    InstructionMemorySystem,
+)
 
 
 T = TypeVar("T", bound=Instruction)
 
 
 @dataclass
-class InstructionMemory(Generic[T]):
+class InstructionMemory(InstructionMemorySystem, Generic[T]):
     """A Generic instruction memory class. Can store instructions from different ISAs,
     as long as their instructions are based on the 'Instruction' class.
 

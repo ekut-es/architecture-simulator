@@ -1,16 +1,12 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
 
 from fixedint import UInt32, UInt16, UInt8
 
-if TYPE_CHECKING:
-    from architecture_simulator.uarch.memory.memory import Memory
-
 
 class MemorySystem(ABC):
-    def __init__(self, memory: Memory) -> None:
-        self.memory = memory
+    def __init__(self) -> None:
+        pass
 
     @abstractmethod
     def read_byte(self, address: int, update_statistics: bool = True) -> UInt8:
