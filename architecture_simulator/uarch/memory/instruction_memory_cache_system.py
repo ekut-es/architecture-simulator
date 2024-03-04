@@ -56,7 +56,7 @@ class InstructionMemoryCacheSystem(InstructionMemorySystem):
         self.instruction_memory.write_instructions(instructions)
 
     def instruction_at_address(self, address: int) -> bool:
-        return self.instruction_at_address(address)
+        return self.instruction_memory.instruction_at_address(address)
 
     def _decode_address(self, address: int) -> DecodedAddress:
         return DecodedAddress(
