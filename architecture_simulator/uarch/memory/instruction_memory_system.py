@@ -1,10 +1,11 @@
 from __future__ import annotations
-from typing import TypeVar, Generic
+from typing import TypeVar, Generic, Optional, TYPE_CHECKING
 from abc import ABC, abstractmethod
 
-from architecture_simulator.settings.settings import Settings
-from architecture_simulator.uarch.memory.memory import MemoryAddressError
 from architecture_simulator.isa.instruction import Instruction
+
+if TYPE_CHECKING:
+    from architecture_simulator.uarch.memory.cache import CacheRepr
 
 
 T = TypeVar("T", bound=Instruction)
@@ -37,3 +38,9 @@ class InstructionMemorySystem(ABC, Generic[T]):
     @abstractmethod
     def instruction_at_address(self, address: int) -> bool:
         pass
+
+    def get_cache_stats(self) -> Optional[dict[str, str]]:
+        return None
+
+    def cache_repr(self) -> Optional[CacheRepr]:
+        return None

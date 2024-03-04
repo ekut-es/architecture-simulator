@@ -1,10 +1,9 @@
 from architecture_simulator.uarch.memory.instruction_memory_system import (
     InstructionMemorySystem,
 )
-from architecture_simulator.uarch.memory.cache import Cache
+from architecture_simulator.uarch.memory.cache import Cache, CacheRepr
 from architecture_simulator.uarch.memory.instruction_memory import InstructionMemory
 from architecture_simulator.isa.riscv.rv32i_instructions import RiscvInstruction
-from architecture_simulator.isa.instruction import Instruction
 from architecture_simulator.uarch.memory.decoded_address import DecodedAddress
 
 
@@ -57,6 +56,12 @@ class InstructionMemoryCacheSystem(InstructionMemorySystem):
 
     def instruction_at_address(self, address: int) -> bool:
         return self.instruction_memory.instruction_at_address(address)
+
+    def get_cache_stats(self) -> dict[str, str]:
+        return {"hits": str(self.hits), "accesses": str(self.accesses)}
+
+    def cache_repr(self) -> CacheRepr:
+        return self.cache.get_repr()
 
     def _decode_address(self, address: int) -> DecodedAddress:
         return DecodedAddress(
