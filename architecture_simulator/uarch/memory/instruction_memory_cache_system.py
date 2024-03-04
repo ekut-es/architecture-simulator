@@ -38,6 +38,12 @@ class InstructionMemoryCacheSystem(InstructionMemorySystem):
             associativity=self.associativity,
         )
 
+    def has_instructions(self) -> bool:
+        return bool(self.instruction_memory.has_instructions())
+
+    def get_address_range(self) -> range:
+        return self.instruction_memory.get_address_range()
+
     def get_representation(self) -> list[tuple[int, str]]:
         return self.instruction_memory.get_representation()
 

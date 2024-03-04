@@ -12,7 +12,9 @@ class CsrRegisterFile(Memory):
         self.privilege_level = privilege_level
         self.min_bytes = min_bytes
 
-    def read_byte(self, address: int) -> fixedint.UInt8:
+    def read_byte(
+        self, address: int, update_statistics: bool = False
+    ) -> fixedint.UInt8:
         self.check_for_legal_address(address)
         self.check_privilege_level(address)
         return super().read_byte(address)
@@ -23,7 +25,9 @@ class CsrRegisterFile(Memory):
         self.check_read_only(address)
         return super().write_byte(address, value)
 
-    def read_halfword(self, address: int) -> fixedint.UInt16:
+    def read_halfword(
+        self, address: int, update_statistics: bool = False
+    ) -> fixedint.UInt16:
         self.check_for_legal_address(address)
         self.check_privilege_level(address)
         return super().read_halfword(address)
@@ -34,7 +38,9 @@ class CsrRegisterFile(Memory):
         self.check_read_only(address)
         return super().write_halfword(address, value)
 
-    def read_word(self, address: int) -> fixedint.UInt32:
+    def read_word(
+        self, address: int, update_statistics: bool = False
+    ) -> fixedint.UInt32:
         self.check_for_legal_address(address)
         self.check_privilege_level(address)
         return super().read_word(address)

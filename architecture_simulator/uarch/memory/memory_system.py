@@ -12,6 +12,10 @@ class MemorySystem(ABC):
         pass
 
     @abstractmethod
+    def get_address_range(self) -> range:
+        raise NotImplementedError
+
+    @abstractmethod
     def read_byte(self, address: int, update_statistics: bool = True) -> UInt8:
         raise NotImplementedError
 

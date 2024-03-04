@@ -1,4 +1,5 @@
-from typing import Optional
+from __future__ import annotations
+from typing import Optional, TYPE_CHECKING
 
 from architecture_simulator.settings.settings import Settings
 from .riscv_performance_metrics import RiscvPerformanceMetrics
@@ -17,6 +18,12 @@ from .stages import (
 )
 from .pipeline import Pipeline
 
+if TYPE_CHECKING:
+    from architecture_simulator.uarch.memory.memory_system import MemorySystem
+    from architecture_simulator.uarch.memory.instruction_memory_system import (
+        InstructionMemorySystem,
+    )
+
 
 class RiscvArchitecturalState:
     """The Architectural State for the RISC-V architecture."""
@@ -25,8 +32,9 @@ class RiscvArchitecturalState:
         self,
         pipeline_mode: str = Settings().get()["default_pipeline_mode"],
         detect_data_hazards: bool = Settings().get()["hazard_detection"],
-        memory: Optional[Memory] = None,
+        memory: Optional[MemorySystem] = None,
         register_file: Optional[RegisterFile] = None,
+        instruction_memory: Optional[InstructionMemorySystem] = None,
     ):
         if pipeline_mode == "five_stage_pipeline":
             stages = [
@@ -43,7 +51,13 @@ class RiscvArchitecturalState:
         self.pipeline = Pipeline(
             stages=stages, execution_ordering=execution_ordering, state=self
         )
-        self.instruction_memory = InstructionMemory[RiscvInstruction]()
+        ###
+        self.instruction_memory = (
+            InstructionMemory[RiscvInstruction]()
+            if instruction_memory is None
+            else instruction_memory
+        )
+        ###
         address_length: int = Settings().get()["memory_address_length"]
         self.memory = (
             Memory(
@@ -59,7 +73,7 @@ class RiscvArchitecturalState:
         )
         self.register_file = RegisterFile() if register_file is None else register_file
         self.csr_registers = CsrRegisterFile()
-        self.program_counter = self.instruction_memory.address_range.start  # 0
+        self.program_counter = self.instruction_memory.get_address_range().start  # 0
         self.previous_program_counter = self.program_counter
         self.performance_metrics = RiscvPerformanceMetrics()
 

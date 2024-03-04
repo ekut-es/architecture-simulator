@@ -47,6 +47,12 @@ class InstructionMemory(InstructionMemorySystem, Generic[T]):
             )
         ]
 
+    def has_instructions(self) -> bool:
+        return bool(self.instructions)
+
+    def get_address_range(self) -> range:
+        return self.address_range
+
     def read_instruction(self, address: int) -> T:
         """Load instruction from given address.
 

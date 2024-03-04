@@ -100,7 +100,7 @@ class RiscvSimulation(Simulation):
         return self.state.pipeline.is_done()
 
     def has_instructions(self) -> bool:
-        return bool(self.state.instruction_memory.instructions)
+        return self.state.instruction_memory.has_instructions()
 
     def get_performance_metrics(self) -> RiscvPerformanceMetrics:
         return self.state.performance_metrics

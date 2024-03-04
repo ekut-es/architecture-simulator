@@ -12,7 +12,12 @@ T = TypeVar("T", bound=Instruction)
 
 
 class InstructionMemorySystem(ABC, Generic[T]):
-    def __init__(self) -> None:
+    @abstractmethod
+    def has_instructions(self) -> bool:
+        pass
+
+    @abstractmethod
+    def get_address_range(self) -> range:
         pass
 
     @abstractmethod

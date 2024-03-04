@@ -38,6 +38,9 @@ class WriteThroughMemorySystem(MemorySystem):
         self.accesses = 0
         self.memory = memory
 
+    def get_address_range(self) -> range:
+        return self.memory.get_address_range()
+
     def read_byte(self, address: int, update_statistics: bool = True) -> UInt8:
         decoded_address = self._decode_address(address)
         block_values, hit = self._read_block(decoded_address)

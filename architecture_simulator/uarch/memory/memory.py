@@ -5,6 +5,7 @@ from fixedint import UInt8, UInt16, UInt32, UInt64
 from architecture_simulator.util.integer_representations import (
     get_n_bit_representations,
 )
+from architecture_simulator.uarch.memory.memory_system import MemorySystem
 
 
 @dataclass
@@ -44,7 +45,7 @@ class AddressingType(Enum):
 T = TypeVar("T", UInt8, UInt16, UInt32, UInt64)
 
 
-class Memory(Generic[T]):
+class Memory(Generic[T], MemorySystem):
     """
     A class representing data memory (using Little-Endian byte-ordering).
 
@@ -75,6 +76,9 @@ class Memory(Generic[T]):
     def reset(self):
         """Clears the memory."""
         self.memory_file = {}
+
+    def get_address_range(self) -> range:
+        return self.address_range
 
     def assert_address_in_range(self, address: int):
         """
@@ -157,7 +161,7 @@ class Memory(Generic[T]):
             )
             value = value >> self.memory_file_values_width
 
-    def read_byte(self, address: int) -> UInt8:
+    def read_byte(self, address: int, update_statistics: bool = False) -> UInt8:
         """
         Reads the byte at the specified memory address.
 
@@ -179,7 +183,7 @@ class Memory(Generic[T]):
             )
         return UInt8(self._read_multiple(address, 1))
 
-    def read_halfword(self, address: int) -> UInt16:
+    def read_halfword(self, address: int, update_statistics: bool = False) -> UInt16:
         """
         Reads the halfword at the specified memory address.
 
@@ -201,7 +205,7 @@ class Memory(Generic[T]):
             )
         return UInt16(self._read_multiple(address, 16 // self.memory_file_values_width))
 
-    def read_word(self, address: int) -> UInt32:
+    def read_word(self, address: int, update_statistics: bool = False) -> UInt32:
         """
         Reads the word at the specified memory address.
 
@@ -223,7 +227,7 @@ class Memory(Generic[T]):
             )
         return UInt32(self._read_multiple(address, 32 // self.memory_file_values_width))
 
-    def read_doubleword(self, address: int) -> UInt64:
+    def read_doubleword(self, address: int, update_statistics: bool = False) -> UInt64:
         """
         Reads the doubleword at the specified memory address.
 
