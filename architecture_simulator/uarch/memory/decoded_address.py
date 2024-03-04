@@ -16,6 +16,12 @@ class DecodedAddress:
         self.full_address: int = address
         """The full address"""
 
+        self.num_index_bits = num_index_bits
+        """The number of bits for the index."""
+
+        self.num_block_bits = num_block_bits
+        """The number of bits for the block index."""
+
         self.tag: int = address >> (num_index_bits + num_block_bits + 2)
         """The tag"""
 

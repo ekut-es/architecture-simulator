@@ -1,7 +1,10 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-
+from typing import TYPE_CHECKING, Optional
 from fixedint import UInt32, UInt16, UInt8
+
+if TYPE_CHECKING:
+    from architecture_simulator.uarch.memory.cache import CacheRepr
 
 
 class MemorySystem(ABC):
@@ -32,6 +35,16 @@ class MemorySystem(ABC):
     def write_word(self, address: int, value: UInt32) -> None:
         raise NotImplementedError
 
-    # @abstractmethod
-    # def get_stats_repr(self)-> dict[str, str]:
-    #     raise NotImplementedError
+    @abstractmethod
+    def reset(self) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    def wordwise_repr(self) -> dict[int, tuple[str, str, str, str]]:
+        raise NotImplementedError
+
+    def get_cache_stats(self) -> Optional[dict[str, str]]:
+        return None
+
+    def cache_repr(self) -> Optional[CacheRepr]:
+        return None

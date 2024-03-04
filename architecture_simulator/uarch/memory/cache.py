@@ -1,13 +1,25 @@
 from typing import Optional
 from typing import TypeVar, Generic
-
 from architecture_simulator.uarch.memory.decoded_address import DecodedAddress
 from architecture_simulator.uarch.memory.replacement_strategies import (
     ReplacementStrategy,
     LRU,
 )
+from architecture_simulator.util.integer_representations import to_hex_str
 
 T = TypeVar("T")
+
+
+class CacheBlockRepr(Generic[T]):
+    def __init__(
+        self, valid_bit: bool, dirty_bit: bool, values: list[T], base_address: int
+    ) -> None:
+        self.valid_bit = str(int(valid_bit))
+        self.dirty_bit = str(int(dirty_bit))
+        self.address_value_list = [
+            (to_hex_str(base_address + i * 4, 32), str(entry))
+            for i, entry in enumerate(values)
+        ]
 
 
 class CacheBlock(Generic[T]):
@@ -35,7 +47,22 @@ class CacheBlock(Generic[T]):
         assert len(values) == self.block_size
         self.values = values
         self.valid_bit = True
+
         self.decoded_address = decoded_address
+
+    def get_repr(self) -> CacheBlockRepr:
+        return CacheBlockRepr(
+            self.valid_bit,
+            self.dirty_bit,
+            self.values,
+            self.decoded_address.block_alinged_address,
+        )
+
+
+class CacheSetRepr:
+    def __init__(self, index_str: str, blocks: list[CacheBlockRepr]) -> None:
+        self.index = index_str
+        self.blocks = blocks
 
 
 class CacheSet(Generic[T]):
@@ -48,10 +75,12 @@ class CacheSet(Generic[T]):
         associativity: int,
         block_bits: int,
         replacement_strategy: ReplacementStrategy,
+        index_str: str,
     ) -> None:
         self.block_bits = block_bits
         self.blocks = [CacheBlock[T](2**block_bits) for _ in range(associativity)]
         self.replacement_strategy = replacement_strategy
+        self.index_str = index_str
 
     def read(self, address: DecodedAddress) -> Optional[list[T]]:
         """Tries to read the value from the given address.
@@ -124,6 +153,14 @@ class CacheSet(Generic[T]):
                 return block_index
         return None
 
+    def get_repr(self) -> CacheSetRepr:
+        return CacheSetRepr(self.index_str, [block.get_repr() for block in self.blocks])
+
+
+class CacheRepr:
+    def __init__(self, sets: list[CacheSetRepr]) -> None:
+        self.sets = sets
+
 
 class Cache(Generic[T]):
     def __init__(
@@ -139,8 +176,13 @@ class Cache(Generic[T]):
         self.num_words_in_block = 2**num_block_bits
 
         self.sets: list[CacheSet[T]] = [
-            CacheSet[T](associativity, num_block_bits, LRU(associativity))
-            for _ in range(2**num_index_bits)
+            CacheSet[T](
+                associativity,
+                num_block_bits,
+                LRU(associativity),
+                to_hex_str(i, self.num_index_bits),
+            )
+            for i in range(2**num_index_bits)
         ]
 
     def read_block(self, decoded_address: DecodedAddress) -> Optional[list[T]]:
@@ -157,3 +199,6 @@ class Cache(Generic[T]):
         return self.sets[decoded_address.cache_set_index].is_block_in_set(
             decoded_address
         )
+
+    def get_repr(self) -> CacheRepr:
+        return CacheRepr([zet.get_repr() for zet in self.sets])

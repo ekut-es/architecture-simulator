@@ -10,7 +10,7 @@ from architecture_simulator.util.integer_manipulation import (
     word_into_block,
 )
 
-from architecture_simulator.uarch.memory.cache import Cache
+from architecture_simulator.uarch.memory.cache import Cache, CacheRepr
 from architecture_simulator.uarch.memory.decoded_address import DecodedAddress
 from architecture_simulator.uarch.memory.memory import Memory
 
@@ -29,6 +29,11 @@ class WriteThroughMemorySystem(MemorySystem):
             num_block_bits=num_block_bits,
             associativity=associativity,
         )
+
+        self.num_index_bits = num_index_bits
+        self.num_block_bits = num_block_bits
+        self.associativity = associativity
+
         self.hits = 0
         self.accesses = 0
         self.memory = memory
@@ -89,6 +94,23 @@ class WriteThroughMemorySystem(MemorySystem):
             block_values = word_into_block(decoded_address, block_values, value)
             self.cache.write_block(decoded_address, block_values)
         self.memory.write_word(address, value)
+
+    def wordwise_repr(self) -> dict[int, tuple[str, str, str, str]]:
+        return self.memory.wordwise_repr()
+
+    def reset(self) -> None:
+        self.cache = Cache[UInt32](
+            num_index_bits=self.num_index_bits,
+            num_block_bits=self.num_block_bits,
+            associativity=self.associativity,
+        )
+        self.memory.reset()
+
+    def cache_repr(self) -> CacheRepr:
+        return self.cache.get_repr()
+
+    def get_cache_stats(self) -> dict[str, str]:
+        return {"hits": str(self.hits), "accesses": str(self.accesses)}
 
     def _decode_address(self, address: int) -> DecodedAddress:
         return DecodedAddress(

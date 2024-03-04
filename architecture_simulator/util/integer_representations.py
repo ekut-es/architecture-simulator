@@ -33,14 +33,27 @@ def get_n_bit_representations(number: int, n: int) -> tuple[str, str, str, str]:
     )
     bin_format = "{:0" + str(n) + "b}"
     bin_string = bin_format.format(unsigned_number)
-    hex_format = "{:0" + str(math.ceil(n / 4)) + "X}"
-    hex_string = hex_format.format(unsigned_number)
+    hex_string = to_hex_str(unsigned_number, n)
     return (
         groupify_string(string=bin_string, group_size=8),
         str(unsigned_number),
         groupify_string(string=hex_string, group_size=2),
         str(signed_number),
     )
+
+
+def to_hex_str(number: int, n: int) -> str:
+    """Returns the number as hex string, padded to contain the given number of BITS (not hex chars).
+
+    Args:
+        number (int): number to convert.
+        n (int): number of bits the number should be padded to (4 per character).
+
+    Returns:
+        str: The padded string.
+    """
+    hex_format = "{:0" + str(math.ceil(n / 4)) + "X}"
+    return hex_format.format(number)
 
 
 def groupify_string(string: str, group_size: int, separator=" ") -> str:
