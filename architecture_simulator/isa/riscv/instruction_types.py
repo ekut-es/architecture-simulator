@@ -79,6 +79,7 @@ class RiscvInstruction(Instruction):
         memory_address: Optional[int],
         memory_write_data: Optional[int],
         architectural_state: RiscvArchitecturalState,
+        update_statistics: bool = True,
     ) -> Optional[int]:
         """Performs memory read and write operations and returns the read data if the instruction reads from the memory.
 
@@ -161,6 +162,7 @@ class RTypeInstruction(RiscvInstruction):
         memory_address: Optional[int],
         memory_write_data: Optional[int],
         architectural_state: RiscvArchitecturalState,
+        update_statistics: bool = True,
     ) -> Optional[int]:
         return None
 
@@ -229,6 +231,7 @@ class ITypeInstruction(RiscvInstruction):
         memory_address: Optional[int],
         memory_write_data: Optional[int],
         architectural_state: RiscvArchitecturalState,
+        update_statistics: bool = True,
     ) -> Optional[int]:
         return None
 
@@ -533,6 +536,7 @@ class EmptyInstruction(RiscvInstruction):
         memory_address: Optional[int],
         memory_write_data: Optional[int],
         architectural_state: RiscvArchitecturalState,
+        update_statistics: bool = True,
     ) -> Optional[int]:
         return None
 

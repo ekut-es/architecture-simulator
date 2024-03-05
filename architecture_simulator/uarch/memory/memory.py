@@ -249,7 +249,9 @@ class Memory(Generic[T], MemorySystem):
             )
         return UInt64(self._read_multiple(address, 64 // self.memory_file_values_width))
 
-    def write_byte(self, address: int, value: UInt8) -> None:
+    def write_byte(
+        self, address: int, value: UInt8, update_statistics: bool = False
+    ) -> None:
         """
         Writes the byte to the specified memory address.
 
@@ -269,7 +271,9 @@ class Memory(Generic[T], MemorySystem):
             )
         self._write_multiple(address, 1, int(value))
 
-    def write_halfword(self, address: int, value: UInt16) -> None:
+    def write_halfword(
+        self, address: int, value: UInt16, update_statistics: bool = False
+    ) -> None:
         """
         Writes the halfword to the specified memory address.
 
@@ -289,7 +293,9 @@ class Memory(Generic[T], MemorySystem):
             )
         self._write_multiple(address, 16 // self.memory_file_values_width, int(value))
 
-    def write_word(self, address: int, value: UInt32) -> None:
+    def write_word(
+        self, address: int, value: UInt32, update_statistics: bool = False
+    ) -> None:
         """
         Writes the word to the specified memory address.
 
@@ -309,7 +315,9 @@ class Memory(Generic[T], MemorySystem):
             )
         self._write_multiple(address, 32 // self.memory_file_values_width, int(value))
 
-    def write_doubleword(self, address: int, value: UInt64) -> None:
+    def write_doubleword(
+        self, address: int, value: UInt64, update_statistics: bool = False
+    ) -> None:
         """
         Writes the doubleword to the specified memory address.
 

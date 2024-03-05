@@ -65,34 +65,43 @@ class WriteThroughMemorySystem(MemorySystem):
             self.hits += int(hit)
         return word_from_block(decoded_address, block_values)
 
-    def write_byte(self, address: int, value: UInt8) -> None:
+    def write_byte(
+        self, address: int, value: UInt8, update_statistics: bool = True
+    ) -> None:
         decoded_address = self._decode_address(address)
         block_values = self.cache.read_block(decoded_address)
         hit = block_values is not None
-        self.hits += int(hit)
-        self.accesses += 1
+        if update_statistics:
+            self.hits += int(hit)
+            self.accesses += 1
         if block_values is not None:
             block_values = byte_into_block(decoded_address, block_values, value)
             self.cache.write_block(decoded_address, block_values)
         self.memory.write_byte(address, value)
 
-    def write_halfword(self, address: int, value: UInt16) -> None:
+    def write_halfword(
+        self, address: int, value: UInt16, update_statistics: bool = True
+    ) -> None:
         decoded_address = self._decode_address(address)
         block_values = self.cache.read_block(decoded_address)
         hit = block_values is not None
-        self.hits += int(hit)
-        self.accesses += 1
+        if update_statistics:
+            self.hits += int(hit)
+            self.accesses += 1
         if block_values is not None:
             block_values = halfword_into_block(decoded_address, block_values, value)
             self.cache.write_block(decoded_address, block_values)
         self.memory.write_halfword(address, value)
 
-    def write_word(self, address: int, value: UInt32) -> None:
+    def write_word(
+        self, address: int, value: UInt32, update_statistics: bool = True
+    ) -> None:
         decoded_address = self._decode_address(address)
         block_values = self.cache.read_block(decoded_address)
         hit = block_values is not None
-        self.hits += int(hit)
-        self.accesses += 1
+        if update_statistics:
+            self.hits += int(hit)
+            self.accesses += 1
         if block_values is not None:
             block_values = word_into_block(decoded_address, block_values, value)
             self.cache.write_block(decoded_address, block_values)

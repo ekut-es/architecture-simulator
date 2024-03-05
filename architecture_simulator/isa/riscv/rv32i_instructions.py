@@ -608,10 +608,17 @@ class LB(MemoryITypeInstruction):
         memory_address: Optional[int],
         memory_write_data: Optional[int],
         architectural_state: RiscvArchitecturalState,
+        update_statistics: bool = True,
     ) -> Optional[int]:
         assert memory_address is not None
         return int(
-            fixedint.Int8(int(architectural_state.memory.read_byte(memory_address)))
+            fixedint.Int8(
+                int(
+                    architectural_state.memory.read_byte(
+                        memory_address, update_statistics=update_statistics
+                    )
+                )
+            )
         )
 
 
@@ -644,11 +651,16 @@ class LH(MemoryITypeInstruction):
         memory_address: Optional[int],
         memory_write_data: Optional[int],
         architectural_state: RiscvArchitecturalState,
+        update_statistics: bool = True,
     ) -> Optional[int]:
         assert memory_address is not None
         return int(
             fixedint.Int16(
-                int(architectural_state.memory.read_halfword(memory_address))
+                int(
+                    architectural_state.memory.read_halfword(
+                        memory_address, update_statistics=update_statistics
+                    )
+                )
             )
         )
 
@@ -680,9 +692,14 @@ class LW(MemoryITypeInstruction):
         memory_address: Optional[int],
         memory_write_data: Optional[int],
         architectural_state: RiscvArchitecturalState,
+        update_statistics: bool = True,
     ) -> Optional[int]:
         assert memory_address is not None
-        return int(architectural_state.memory.read_word(memory_address))
+        return int(
+            architectural_state.memory.read_word(
+                memory_address, update_statistics=update_statistics
+            )
+        )
 
 
 class LBU(MemoryITypeInstruction):
@@ -713,9 +730,14 @@ class LBU(MemoryITypeInstruction):
         memory_address: Optional[int],
         memory_write_data: Optional[int],
         architectural_state: RiscvArchitecturalState,
+        update_statistics: bool = True,
     ) -> Optional[int]:
         assert memory_address is not None
-        return int(architectural_state.memory.read_byte(memory_address))
+        return int(
+            architectural_state.memory.read_byte(
+                memory_address, update_statistics=update_statistics
+            )
+        )
 
 
 class LHU(MemoryITypeInstruction):
@@ -745,9 +767,14 @@ class LHU(MemoryITypeInstruction):
         memory_address: Optional[int],
         memory_write_data: Optional[int],
         architectural_state: RiscvArchitecturalState,
+        update_statistics: bool = True,
     ) -> Optional[int]:
         assert memory_address is not None
-        return int(architectural_state.memory.read_halfword(memory_address))
+        return int(
+            architectural_state.memory.read_halfword(
+                memory_address, update_statistics=update_statistics
+            )
+        )
 
 
 class JALR(ITypeInstruction):
@@ -839,10 +866,13 @@ class SB(STypeInstruction):
         memory_address: Optional[int],
         memory_write_data: Optional[int],
         architectural_state: RiscvArchitecturalState,
+        update_statistics: bool = True,
     ) -> Optional[int]:
         if memory_address is not None and memory_write_data is not None:
             architectural_state.memory.write_byte(
-                memory_address, fixedint.UInt8(memory_write_data)
+                memory_address,
+                fixedint.UInt8(memory_write_data),
+                update_statistics=update_statistics,
             )
         return None
 
@@ -894,10 +924,13 @@ class SH(STypeInstruction):
         memory_address: Optional[int],
         memory_write_data: Optional[int],
         architectural_state: RiscvArchitecturalState,
+        update_statistics: bool = True,
     ) -> Optional[int]:
         if memory_address is not None and memory_write_data is not None:
             architectural_state.memory.write_halfword(
-                memory_address, fixedint.UInt16(memory_write_data)
+                memory_address,
+                fixedint.UInt16(memory_write_data),
+                update_statistics=update_statistics,
             )
         return None
 
@@ -933,10 +966,13 @@ class SW(STypeInstruction):
         memory_address: Optional[int],
         memory_write_data: Optional[int],
         architectural_state: RiscvArchitecturalState,
+        update_statistics: bool = True,
     ) -> Optional[int]:
         if memory_address is not None and memory_write_data is not None:
             architectural_state.memory.write_word(
-                memory_address, fixedint.UInt32(memory_write_data)
+                memory_address,
+                fixedint.UInt32(memory_write_data),
+                update_statistics=update_statistics,
             )
         return None
 
