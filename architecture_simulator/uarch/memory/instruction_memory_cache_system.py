@@ -5,6 +5,7 @@ from architecture_simulator.uarch.memory.cache import Cache, CacheRepr
 from architecture_simulator.uarch.memory.instruction_memory import InstructionMemory
 from architecture_simulator.isa.riscv.rv32i_instructions import RiscvInstruction
 from architecture_simulator.uarch.memory.decoded_address import DecodedAddress
+from architecture_simulator.isa.riscv.instruction_types import EmptyInstruction
 
 
 class InstructionMemoryCacheSystem(InstructionMemorySystem):
@@ -88,8 +89,12 @@ class InstructionMemoryCacheSystem(InstructionMemorySystem):
         self, decoded_address: DecodedAddress
     ) -> list[RiscvInstruction]:
         return [
-            self.instruction_memory.read_instruction(
-                decoded_address.block_alinged_address + 4 * i
+            (
+                self.instruction_memory.read_instruction(a)
+                if self.instruction_memory.instruction_at_address(
+                    a := decoded_address.block_alinged_address + 4 * i
+                )
+                else EmptyInstruction()
             )
             for i in range(self.cache.num_words_in_block)
         ]
