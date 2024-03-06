@@ -40,14 +40,8 @@ export class RiscvSimulationStore extends BaseSimulationStore {
             getRiscvSimulation(
                 riscvSettings.pipelineMode.value,
                 riscvSettings.dataHazardDetection.value,
-                riscvSettings.dataCache.value.enable,
-                riscvSettings.dataCache.value.num_index_bits,
-                riscvSettings.dataCache.value.num_block_bits,
-                riscvSettings.dataCache.value.associativity,
-                riscvSettings.instructionCache.value.enable,
-                riscvSettings.instructionCache.value.num_index_bits,
-                riscvSettings.instructionCache.value.num_block_bits,
-                riscvSettings.instructionCache.value.associativity
+                riscvSettings.dataCache.value,
+                riscvSettings.instructionCache.value
             )
         );
         this.registerEntries = [];

@@ -30,24 +30,49 @@ const instructionCacheAssociativity = ref(
 );
 
 // Reset the sim and parse the input if the pipeline or data hazard detection changes
-watchEffect(() => {
-    riscvSettings.pipelineMode.value = pipelineMode.value;
-    riscvSettings.dataHazardDetection.value = dataHazardDetection.value;
-    riscvSettings.dataCache.value.enable = enableDataCache.value;
-    riscvSettings.dataCache.value.num_index_bits = dataCacheIndexBits.value;
-    riscvSettings.dataCache.value.num_block_bits = dataCacheBlockBits.value;
-    riscvSettings.dataCache.value.associativity = dataCacheAssociativity.value;
-    riscvSettings.instructionCache.value.enable = enableInstructionCache.value;
-    riscvSettings.instructionCache.value.num_index_bits =
-        instructionCacheIndexBits.value;
-    riscvSettings.instructionCache.value.num_block_bits =
-        instructionCacheBlockBits.value;
-    riscvSettings.instructionCache.value.associativity =
-        instructionCacheAssociativity.value;
-    // FIXME: This is the same as the reset button does in RiscvControlBar.vue
-    simulationStore.resetSimulation();
-    editorStore.loadProgram();
-});
+watch(
+    () => [
+        pipelineMode.value,
+        dataHazardDetection.value,
+        enableDataCache.value,
+        dataCacheIndexBits.value,
+        dataCacheBlockBits.value,
+        dataCacheAssociativity.value,
+        enableInstructionCache.value,
+        instructionCacheIndexBits.value,
+        instructionCacheBlockBits.value,
+        instructionCacheAssociativity.value,
+    ],
+    ([
+        pipelineMode,
+        dataHazardDetection,
+        enableDataCache,
+        dataCacheIndexBits,
+        dataCacheBlockBits,
+        dataCacheAssociativity,
+        enableInstructionCache,
+        instructionCacheIndexBits,
+        instructionCacheBlockBits,
+        instructionCacheAssociativity,
+    ]) => {
+        riscvSettings.pipelineMode.value = pipelineMode;
+        riscvSettings.dataHazardDetection.value = dataHazardDetection;
+        riscvSettings.dataCache.value.enable = enableDataCache;
+        riscvSettings.dataCache.value.num_index_bits = dataCacheIndexBits;
+        riscvSettings.dataCache.value.num_block_bits = dataCacheBlockBits;
+        riscvSettings.dataCache.value.associativity = dataCacheAssociativity;
+        riscvSettings.instructionCache.value.enable = enableInstructionCache;
+        riscvSettings.instructionCache.value.num_index_bits =
+            instructionCacheIndexBits;
+        riscvSettings.instructionCache.value.num_block_bits =
+            instructionCacheBlockBits;
+        riscvSettings.instructionCache.value.associativity =
+            instructionCacheAssociativity;
+        // FIXME: This is the same as the reset button does in RiscvControlBar.vue
+        simulationStore.resetSimulation();
+        editorStore.loadProgram();
+    }
+);
 </script>
 
 <template>
