@@ -1,7 +1,6 @@
 from __future__ import annotations
 import sys
 
-from typing import TYPE_CHECKING
 
 from architecture_simulator.simulation.toy_simulation import ToySimulation
 from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
@@ -10,15 +9,23 @@ from architecture_simulator.simulation.runtime_errors import (
     InstructionExecutionException,
 )
 
-if TYPE_CHECKING:
-    from architecture_simulator.uarch.memory.cache import CacheOptions
+# if TYPE_CHECKING:
+# from architecture_simulator.uarch.memory.cache import CacheOptions
+
+from architecture_simulator.uarch.memory.cache import CacheOptions
 
 
 def get_riscv_simulation(
     pipeline_mode: str,
     data_hazard_detection: bool,
-    data_cache: CacheOptions,
-    instruction_cache: CacheOptions,
+    data_enable: bool,
+    data_num_index_bits: int,
+    data_num_block_bits: int,
+    data_associativity: int,
+    instruction_enable: bool,
+    instruction_num_index_bits: int,
+    instruction_num_block_bits: int,
+    instruction_associativity: int,
 ) -> RiscvSimulation:
     """Creates a new RiscvSimulation.
 
@@ -29,11 +36,20 @@ def get_riscv_simulation(
     Returns:
         RiscvSimulation: The Simulation object.
     """
+    data_cache_options = CacheOptions(
+        data_enable, data_num_index_bits, data_num_block_bits, data_associativity
+    )
+    instruction_cache_options = CacheOptions(
+        instruction_enable,
+        instruction_num_index_bits,
+        instruction_num_block_bits,
+        instruction_associativity,
+    )
     return RiscvSimulation(
         mode=pipeline_mode,
         detect_data_hazards=data_hazard_detection,
-        data_cache=data_cache,
-        instruction_cache=instruction_cache,
+        data_cache=data_cache_options,
+        instruction_cache=instruction_cache_options,
     )
 
 

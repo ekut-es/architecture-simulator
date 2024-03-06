@@ -7,6 +7,7 @@ import CodeEditor from "../CodeEditor.vue";
 import RiscvMemoryTable from "./RiscvMemoryTable.vue";
 import RiscvRegistersOutput from "./RiscvRegistersOutput.vue";
 import RiscvVisualization from "./RiscvVisualization.vue";
+import CacheView from "./CacheView.vue";
 // import SvgVisualization from '../SvgVisualization.vue';
 
 import { useRiscvSimulationStore } from "@/js/riscv_simulation_store";
@@ -32,6 +33,13 @@ const textContainerPopulated = computed(
         riscvSettings.showInput.value ||
         riscvSettings.showMemory.value ||
         riscvSettings.showRegistersOutput.value
+);
+
+const visualizationsContainerPopulated = computed(
+    () =>
+        riscvSettings.showVisualization ||
+        riscvSettings.showDataCache ||
+        riscvSettings.showInstructionCache
 );
 const enableSplit = computed(
     () => textContainerPopulated.value && riscvSettings.showVisualization.value
@@ -115,6 +123,10 @@ onUnmounted(() => {
                 :path="singleStageVisualizationPath"
                 :simulation-store="simulationStore"
             />
+            <CacheView
+                v-if="riscvSettings.showDataCache.value"
+                :cache="simulationStore.dataCacheEntries"
+            ></CacheView>
         </div>
     </div>
 </template>

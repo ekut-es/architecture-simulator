@@ -32,6 +32,16 @@ import { riscvSettings } from "@/js/riscv_settings";
                 base-id="riscv-toggle-visualization"
                 >Visualization
             </ToggleButton>
+            <ToggleButton
+                v-model="riscvSettings.showDataCache.value"
+                base-id="riscv-toggle-data-cache"
+                >Data Cache
+            </ToggleButton>
+            <ToggleButton
+                v-model="riscvSettings.showInstructionCache.value"
+                base-id="riscv-toggle-instruction-cache"
+                >Instruction Cache
+            </ToggleButton>
         </div>
     </div>
 </template>

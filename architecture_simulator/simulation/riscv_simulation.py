@@ -152,6 +152,18 @@ class RiscvSimulation(Simulation):
             result.append(((key, "0x" + "{:08X}".format(key)), values))
         return result
 
+    def get_data_cache_entries(self):
+        return self.state.memory.cache_repr()
+
+    def get_data_cache_stats(self):
+        return self.state.memory.get_cache_stats()
+
+    def get_instruction_cache_entries(self):
+        return self.state.instruction_memory.cache_repr()
+
+    def get_instruction_cache_stats(self):
+        return self.state.instruction_memory.get_cache_stats()
+
     def get_riscv_five_stage_svg_update_values(self) -> list[tuple[str, str, Any]]:
         """Returns all information needed to update the svg.
 

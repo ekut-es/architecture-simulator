@@ -39,7 +39,15 @@ export class RiscvSimulationStore extends BaseSimulationStore {
         super(pyodide, () =>
             getRiscvSimulation(
                 riscvSettings.pipelineMode.value,
-                riscvSettings.dataHazardDetection.value
+                riscvSettings.dataHazardDetection.value,
+                riscvSettings.dataCache.value.enable,
+                riscvSettings.dataCache.value.num_index_bits,
+                riscvSettings.dataCache.value.num_block_bits,
+                riscvSettings.dataCache.value.associativity,
+                riscvSettings.instructionCache.value.enable,
+                riscvSettings.instructionCache.value.num_index_bits,
+                riscvSettings.instructionCache.value.num_block_bits,
+                riscvSettings.instructionCache.value.associativity
             )
         );
         this.registerEntries = [];
@@ -51,7 +59,36 @@ export class RiscvSimulationStore extends BaseSimulationStore {
         this.previousDataMemoryEntries = [];
         this.instructionMemoryEntries = [];
         this.svgDirectives = [];
+        this.instructionCacheEntries = null;
+        this.instructionCacheStats = null;
+        this.dataCacheEntries = null;
+        this.dataCacheStats = null;
     }
+
+    /**
+     * Syncs the instruction cache entries and stats.
+     */
+    syncInstructionCache() {
+        this.instructionCacheEntries = this.toJsSafe(
+            this.simulation.get_instruction_cache_entries()
+        );
+        this.instructionCacheStats = this.toJsSafe(
+            this.simulation.get_instruction_cache_stats()
+        );
+    }
+
+    /**
+     * Syncs the data cache entries and stats.
+     */
+    syncDataCache() {
+        this.dataCacheEntries = this.toJsSafe(
+            this.simulation.get_data_cache_entries()
+        );
+        this.dataCacheStats = this.toJsSafe(
+            this.simulation.get_data_cache_stats()
+        );
+    }
+
     /**
      * Syncs the memory table entries.
      * Also keeps track of which entries have changed.
@@ -125,6 +162,8 @@ export class RiscvSimulationStore extends BaseSimulationStore {
         this.syncDataMemoryEntries();
         this.syncInstructionMemoryEntries();
         this.syncSvgDirectives();
+        this.syncInstructionCache();
+        this.syncDataCache();
         super.syncAll();
     }
 }

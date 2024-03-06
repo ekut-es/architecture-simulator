@@ -197,6 +197,9 @@ export class BaseSimulationStore {
      * @returns {any} The converted proxy.
      */
     toJsSafe(proxy) {
+        if (proxy === null || typeof proxy === "undefined") {
+            return null;
+        }
         let pyproxies = [];
         const convertedProxy = proxy.toJs({ pyproxies });
         for (let px of pyproxies) {

@@ -1,6 +1,6 @@
 <!-- RISCV settings page -->
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, watchEffect } from "vue";
 import RadioSettingsRow from "../RadioSettingsRow.vue";
 import RepresentationSettingsRow from "../RepresentationSettingsRow.vue";
 
@@ -14,18 +14,40 @@ const editorStore = useEditorStore(simulationStore, "riscv");
 // Changes to these values must be watched to perform side effects
 const pipelineMode = ref(riscvSettings.pipelineMode.value);
 const dataHazardDetection = ref(riscvSettings.dataHazardDetection.value);
+const enableDataCache = ref(riscvSettings.dataCache.value.enable);
+const dataCacheIndexBits = ref(riscvSettings.dataCache.value.num_index_bits);
+const dataCacheBlockBits = ref(riscvSettings.dataCache.value.num_block_bits);
+const dataCacheAssociativity = ref(riscvSettings.dataCache.value.associativity);
+const enableInstructionCache = ref(riscvSettings.instructionCache.value.enable);
+const instructionCacheIndexBits = ref(
+    riscvSettings.instructionCache.value.num_index_bits
+);
+const instructionCacheBlockBits = ref(
+    riscvSettings.instructionCache.value.num_block_bits
+);
+const instructionCacheAssociativity = ref(
+    riscvSettings.instructionCache.value.associativity
+);
 
 // Reset the sim and parse the input if the pipeline or data hazard detection changes
-watch(
-    [pipelineMode, dataHazardDetection],
-    ([newPipelineMode, newDataHazardDetection]) => {
-        riscvSettings.pipelineMode.value = newPipelineMode;
-        riscvSettings.dataHazardDetection.value = newDataHazardDetection;
-        // FIXME: This is the same as the reset button does in RiscvControlBar.vue
-        simulationStore.resetSimulation();
-        editorStore.loadProgram();
-    }
-);
+watchEffect(() => {
+    riscvSettings.pipelineMode.value = pipelineMode.value;
+    riscvSettings.dataHazardDetection.value = dataHazardDetection.value;
+    riscvSettings.dataCache.value.enable = enableDataCache.value;
+    riscvSettings.dataCache.value.num_index_bits = dataCacheIndexBits.value;
+    riscvSettings.dataCache.value.num_block_bits = dataCacheBlockBits.value;
+    riscvSettings.dataCache.value.associativity = dataCacheAssociativity.value;
+    riscvSettings.instructionCache.value.enable = enableInstructionCache.value;
+    riscvSettings.instructionCache.value.num_index_bits =
+        instructionCacheIndexBits.value;
+    riscvSettings.instructionCache.value.num_block_bits =
+        instructionCacheBlockBits.value;
+    riscvSettings.instructionCache.value.associativity =
+        instructionCacheAssociativity.value;
+    // FIXME: This is the same as the reset button does in RiscvControlBar.vue
+    simulationStore.resetSimulation();
+    editorStore.loadProgram();
+});
 </script>
 
 <template>
@@ -64,6 +86,31 @@ watch(
                 />
                 Data Hazard detection
             </label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4">Data Cache</div>
+        <div class="col-8">
+            <label for="riscv-data-cache-enable">
+                <input
+                    type="checkbox"
+                    id="riscv-data-cache-enable"
+                    :checked="enableDataCache"
+                    v-model="enableDataCache"
+                />
+                Enable
+            </label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4"></div>
+        <div class="col-8">
+            <p>2<sup>N</sup> sets:</p>
+            <input type="number" min="0" v-model="dataCacheIndexBits" />
+            <p>2<sup>N</sup> words per block:</p>
+            <input type="number" min="0" v-model="dataCacheBlockBits" />
+            <p>associativity:</p>
+            <input type="number" min="1" v-model="dataCacheAssociativity" />
         </div>
     </div>
 </template>

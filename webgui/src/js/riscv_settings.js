@@ -12,4 +12,18 @@ export const riscvSettings = {
     showMemory: ref(true),
     showRegistersOutput: ref(true),
     showVisualization: ref(true),
+    dataCache: ref({
+        enable: false,
+        num_index_bits: 2,
+        num_block_bits: 0,
+        associativity: 4,
+    }),
+    instructionCache: ref({
+        enable: false,
+        num_index_bits: 2,
+        num_block_bits: 0,
+        associativity: 4,
+    }),
+    showDataCache: ref(false),
+    showInstructionCache: ref(false),
 };
