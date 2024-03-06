@@ -1,5 +1,7 @@
 import json
 
+from architecture_simulator.uarch.memory.cache import CacheOptions
+
 
 class Settings:
     """Global settings to be imported by all modules in the architecture simulator."""
@@ -55,6 +57,12 @@ class Settings:
             "t6": 31,
         },
         "toy_memory_max_bytes": 4096,
+        "instruction_cache": CacheOptions(
+            enable=False, num_index_bits=0, num_block_bits=0, associativity=1
+        ),
+        "data_cache": CacheOptions(
+            enable=False, num_index_bits=0, num_block_bits=0, associativity=1
+        ),
     }
 
     def get_JSON(self) -> str:

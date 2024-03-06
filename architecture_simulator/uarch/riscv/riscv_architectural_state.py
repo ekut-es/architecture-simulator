@@ -17,12 +17,19 @@ from .stages import (
     RegisterWritebackStage,
 )
 from .pipeline import Pipeline
+from architecture_simulator.uarch.memory.instruction_memory_cache_system import (
+    InstructionMemoryCacheSystem,
+)
+from architecture_simulator.uarch.memory.write_through_memory_system import (
+    WriteThroughMemorySystem,
+)
 
 if TYPE_CHECKING:
     from architecture_simulator.uarch.memory.memory_system import MemorySystem
     from architecture_simulator.uarch.memory.instruction_memory_system import (
         InstructionMemorySystem,
     )
+    from architecture_simulator.uarch.memory.cache import CacheOptions
 
 
 class RiscvArchitecturalState:
@@ -35,6 +42,8 @@ class RiscvArchitecturalState:
         memory: Optional[MemorySystem] = None,
         register_file: Optional[RegisterFile] = None,
         instruction_memory: Optional[InstructionMemorySystem] = None,
+        data_cache: CacheOptions = Settings().get()["data_cache"],
+        instruction_cache: CacheOptions = Settings().get()["instruction_cache"],
     ):
         if pipeline_mode == "five_stage_pipeline":
             stages = [
@@ -52,25 +61,49 @@ class RiscvArchitecturalState:
             stages=stages, execution_ordering=execution_ordering, state=self
         )
         ###
-        self.instruction_memory = (
-            InstructionMemory[RiscvInstruction]()
-            if instruction_memory is None
-            else instruction_memory
-        )
+        if instruction_memory is not None:
+            self.instruction_memory = instruction_memory
+        else:
+            if instruction_cache.enable:
+                self.instruction_memory = InstructionMemoryCacheSystem(
+                    instruction_memory=InstructionMemory[RiscvInstruction](),
+                    num_index_bits=instruction_cache.num_index_bits,
+                    num_block_bits=instruction_cache.num_block_bits,
+                    associativity=instruction_cache.associativity,
+                )
+            else:
+                self.instruction_memory = InstructionMemory[RiscvInstruction]()
+
         ###
         address_length: int = Settings().get()["memory_address_length"]
-        self.memory = (
-            Memory(
-                AddressingType.BYTE,
-                address_length,
-                True,
-                range(
-                    Settings().get()["memory_address_min_bytes"], 2**address_length
-                ),
-            )
-            if memory is None
-            else memory
-        )
+        if memory is not None:
+            self.memory = memory
+        else:
+            if data_cache.enable:
+                self.memory = WriteThroughMemorySystem(
+                    memory=Memory(
+                        AddressingType.BYTE,
+                        address_length,
+                        True,
+                        range(
+                            Settings().get()["memory_address_min_bytes"],
+                            2**address_length,
+                        ),
+                    ),
+                    num_index_bits=data_cache.num_index_bits,
+                    num_block_bits=data_cache.num_block_bits,
+                    associativity=data_cache.associativity,
+                )
+            else:
+                self.memory = Memory(
+                    AddressingType.BYTE,
+                    address_length,
+                    True,
+                    range(
+                        Settings().get()["memory_address_min_bytes"],
+                        2**address_length,
+                    ),
+                )
         self.register_file = RegisterFile() if register_file is None else register_file
         self.csr_registers = CsrRegisterFile()
         self.program_counter = self.instruction_memory.get_address_range().start  # 0

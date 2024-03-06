@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from architecture_simulator.uarch.riscv.riscv_performance_metrics import (
         RiscvPerformanceMetrics,
     )
+    from architecture_simulator.uarch.memory.cache import CacheOptions
 from architecture_simulator.gui.riscv_fiveStage_svg_directives import (
     RiscvFiveStageIFSvgDirectives,
     RiscvFiveStageIDSvgDirectives,
@@ -51,6 +52,8 @@ class RiscvSimulation(Simulation):
         state: Optional[RiscvArchitecturalState] = None,
         mode: str = Settings().get()["default_pipeline_mode"],
         detect_data_hazards: bool = Settings().get()["hazard_detection"],
+        data_cache: CacheOptions = Settings().get()["data_cache"],
+        instruction_cache: CacheOptions = Settings().get()["instruction_cache"],
     ) -> None:
         """Constructor for RISC-V simulations.
 

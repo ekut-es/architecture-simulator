@@ -10,6 +10,16 @@ from architecture_simulator.util.integer_representations import to_hex_str
 T = TypeVar("T")
 
 
+class CacheOptions:
+    def __init__(
+        self, enable: bool, num_index_bits: int, num_block_bits: int, associativity: int
+    ) -> None:
+        self.enable = enable
+        self.num_index_bits = num_index_bits
+        self.num_block_bits = num_block_bits
+        self.associativity = associativity
+
+
 class CacheBlockRepr(Generic[T]):
     def __init__(
         self, valid_bit: bool, dirty_bit: bool, values: list[T], base_address: int
