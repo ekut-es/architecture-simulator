@@ -37,12 +37,12 @@ const textContainerPopulated = computed(
 
 const visualizationsContainerPopulated = computed(
     () =>
-        riscvSettings.showVisualization ||
-        riscvSettings.showDataCache ||
-        riscvSettings.showInstructionCache
+        riscvSettings.showVisualization.value ||
+        riscvSettings.showDataCache.value ||
+        riscvSettings.showInstructionCache.value
 );
 const enableSplit = computed(
-    () => textContainerPopulated.value && riscvSettings.showVisualization.value
+    () => textContainerPopulated.value && visualizationsContainerPopulated.value
 );
 
 // Creates or disables the split when enableSplit changes.
@@ -104,28 +104,28 @@ onUnmounted(() => {
                 v-show="riscvSettings.showRegistersOutput.value"
             />
         </div>
-        <div
-            v-show="riscvSettings.showVisualization.value"
-            ref="visualizationsContainer"
-            id="riscv-visualizations-container"
-        >
-            <RiscvVisualization
-                v-if="
-                    riscvSettings.pipelineMode.value === 'five_stage_pipeline'
-                "
-                :path="fiveStageVisualizationPath"
-                :simulation-store="simulationStore"
-            />
-            <RiscvVisualization
-                v-if="
-                    riscvSettings.pipelineMode.value === 'single_stage_pipeline'
-                "
-                :path="singleStageVisualizationPath"
-                :simulation-store="simulationStore"
-            />
+        <div ref="visualizationsContainer" id="riscv-visualizations-container">
+            <div v-show="riscvSettings.showVisualization.value">
+                <RiscvVisualization
+                    v-if="
+                        riscvSettings.pipelineMode.value ===
+                        'five_stage_pipeline'
+                    "
+                    :path="fiveStageVisualizationPath"
+                    :simulation-store="simulationStore"
+                />
+                <RiscvVisualization
+                    v-if="
+                        riscvSettings.pipelineMode.value ===
+                        'single_stage_pipeline'
+                    "
+                    :path="singleStageVisualizationPath"
+                    :simulation-store="simulationStore"
+                />
+            </div>
             <CacheView
                 v-if="riscvSettings.showDataCache.value"
-                :cache="simulationStore.dataCacheEntries"
+                :simulation-store="simulationStore"
             ></CacheView>
         </div>
     </div>

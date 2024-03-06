@@ -64,7 +64,10 @@ class RiscvSimulation(Simulation):
         """
         self.state = (
             RiscvArchitecturalState(
-                pipeline_mode=mode, detect_data_hazards=detect_data_hazards
+                pipeline_mode=mode,
+                detect_data_hazards=detect_data_hazards,
+                data_cache=data_cache,
+                instruction_cache=instruction_cache,
             )
             if state is None
             else state

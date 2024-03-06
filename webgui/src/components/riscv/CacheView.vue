@@ -1,23 +1,32 @@
 <script setup>
-const props = defineProps(["cache"]);
+import { computed } from "vue";
+
+const props = defineProps(["simulationStore"]);
+
+const stuff = computed(() => {
+    return props.simulationStore.dataCacheEntries;
+});
 </script>
 
 <template>
-    <table>
-        <template v-if="props.cache">
-            <template v-for="zet in props.cache.sets">
+    <template v-if="props.simulationStore.dataCacheEntries !== null">
+        Cache
+        <table>
+            <template
+                v-for="zet in props.simulationStore.dataCacheEntries.sets"
+            >
                 <tr v-for="block in zet.blocks">
-                    <td>{{ zet.index }}</td>
-                    <td>{{ block.valid_bit }}</td>
-                    <td>{{ block.dirty_bit }}</td>
+                    <td>index: {{ zet.index }}</td>
+                    <td>valid: {{ block.valid_bit }}</td>
+                    <td>dirty: {{ block.dirty_bit }}</td>
+                    <td>tag: {{ block.tag }}</td>
                     <template v-for="addr_value in block.address_value_list">
-                        <td>{{ addr_value[0] }}</td>
-                        <td>{{ addr_value[1] }}</td>
+                        <td>data: {{ addr_value[1] }}</td>
                     </template>
                 </tr>
             </template>
-        </template>
-    </table>
+        </table>
+    </template>
 </template>
 
 <style scoped></style>

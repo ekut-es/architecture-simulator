@@ -22,7 +22,12 @@ class CacheOptions:
 
 class CacheBlockRepr(Generic[T]):
     def __init__(
-        self, valid_bit: bool, dirty_bit: bool, values: list[T], base_address: int
+        self,
+        valid_bit: bool,
+        dirty_bit: bool,
+        values: list[T],
+        base_address: int,
+        tag: int,
     ) -> None:
         self.valid_bit = str(int(valid_bit))
         self.dirty_bit = str(int(dirty_bit))
@@ -30,6 +35,7 @@ class CacheBlockRepr(Generic[T]):
             (to_hex_str(base_address + i * 4, 32), str(entry))
             for i, entry in enumerate(values)
         ]
+        self.tag = tag
 
 
 class CacheBlock(Generic[T]):
@@ -66,6 +72,7 @@ class CacheBlock(Generic[T]):
             self.dirty_bit,
             self.values,
             self.decoded_address.block_alinged_address,
+            self.decoded_address.tag,
         )
 
 
