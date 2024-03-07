@@ -11,6 +11,7 @@ from architecture_simulator.simulation.runtime_errors import (
 
 if TYPE_CHECKING:
     from architecture_simulator.uarch.memory.cache import CacheOptions
+
 from architecture_simulator.uarch.memory.cache import CacheOptions
 
 
@@ -62,7 +63,11 @@ def get_last_error() -> tuple[str, str, int] | tuple[str, str]:
 
 if __name__ == "__main__":
     sim = RiscvSimulation(data_cache=CacheOptions(True, 2, 2, 2))
-    sim.load_program("nop")
+    sim.load_program(
+        """addi x1, x0, 49
+                     sw x1, -4(x0)
+                     lw x2, -4(x0)"""
+    )
     temp = sim.get_data_cache_entries()
-    sim.step()
+    sim.run()
     temp = sim.get_data_cache_entries()
