@@ -274,3 +274,30 @@ class TestCache(TestCase):
 
         self.assertEqual(memory_system.get_cache_stats()["hits"], "8")
         self.assertEqual(memory_system.get_cache_stats()["accesses"], "10")
+
+    def test_write_back_cache_3(self) -> None:
+        memory = Memory(AddressingType.BYTE, 32, True)
+        for i in range(32):
+            memory.write_word(i * 4, UInt32(i))
+        memory_system = WriteBackMemorySystem(
+            memory=memory, num_index_bits=1, num_block_bits=1, associativity=2
+        )
+
+        memory_system.read_word(0)
+        memory_system.read_word(16)
+
+        memory_system.read_word(8)
+        memory_system.read_word(24)
+
+        memory_system.write_word(4, UInt32(0xFFFFFFFF))
+
+        memory_system.read_word(32)
+
+        self.assertEqual(memory.read_halfword(4), UInt16(1))
+
+        memory_system.read_word(16)
+
+        self.assertEqual(memory.read_halfword(4), UInt16(0xFFFF))
+
+        self.assertEqual(memory_system.get_cache_stats()["hits"], "1")
+        self.assertEqual(memory_system.get_cache_stats()["accesses"], "7")
