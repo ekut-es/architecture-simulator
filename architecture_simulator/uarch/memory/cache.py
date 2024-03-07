@@ -18,6 +18,7 @@ class CacheOptions:
         self.num_index_bits = num_index_bits
         self.num_block_bits = num_block_bits
         self.associativity = associativity
+        # TODO: Impl ability to select WB or WT
 
 
 class CacheBlockRepr(Generic[T]):

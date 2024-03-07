@@ -23,6 +23,9 @@ from architecture_simulator.uarch.memory.instruction_memory_cache_system import 
 from architecture_simulator.uarch.memory.write_through_memory_system import (
     WriteThroughMemorySystem,
 )
+from architecture_simulator.uarch.memory.write_back_memory_system import (
+    WriteBackMemorySystem,
+)
 
 if TYPE_CHECKING:
     from architecture_simulator.uarch.memory.memory_system import MemorySystem
@@ -80,6 +83,9 @@ class RiscvArchitecturalState:
             self.memory = memory
         else:
             if data_cache.enable:
+                # TODO: Impl
+                # C = WriteThroughMemorySystem if ... else WriteBackMemorySystem
+                # self.memory = C(
                 self.memory = WriteThroughMemorySystem(
                     memory=Memory(
                         AddressingType.BYTE,
