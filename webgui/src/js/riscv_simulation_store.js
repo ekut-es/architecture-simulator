@@ -75,14 +75,12 @@ export class RiscvSimulationStore extends BaseSimulationStore {
      * Syncs the data cache entries and stats.
      */
     syncDataCache() {
-        this.dataCacheEntries = this.simulation.get_data_cache_entries();
-        this.dataCacheStats = this.simulation.get_data_cache_stats();
-        // this.dataCacheEntries = this.toJsSafe(
-        //     this.simulation.get_data_cache_entries()
-        // );
-        // this.dataCacheStats = this.toJsSafe(
-        //     this.simulation.get_data_cache_stats()
-        // );
+        this.dataCacheEntries = this.toJsSafe(
+            this.simulation.get_data_cache_entries_dict()
+        );
+        this.dataCacheStats = this.toJsSafe(
+            this.simulation.get_data_cache_stats()
+        );
     }
 
     /**

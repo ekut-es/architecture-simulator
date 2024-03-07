@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING, Any
+import json
 
 from architecture_simulator.settings.settings import Settings
 from architecture_simulator.uarch.riscv.riscv_architectural_state import (
@@ -158,11 +159,23 @@ class RiscvSimulation(Simulation):
     def get_data_cache_entries(self):
         return self.state.memory.cache_repr()
 
+    def get_data_cache_entries_dict(self):
+        return json.loads(
+            json.dumps(self.state.memory.cache_repr(), default=lambda o: vars(o))
+        )
+
     def get_data_cache_stats(self):
         return self.state.memory.get_cache_stats()
 
     def get_instruction_cache_entries(self):
         return self.state.instruction_memory.cache_repr()
+
+    def get_instruction_cache_entries_dict(self):
+        return json.loads(
+            json.dumps(
+                self.state.instruction_memory.cache_repr(), default=lambda o: vars(o)
+            )
+        )
 
     def get_instruction_cache_stats(self):
         return self.state.instruction_memory.get_cache_stats()
