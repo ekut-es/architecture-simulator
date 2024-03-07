@@ -64,7 +64,7 @@ export class RiscvSimulationStore extends BaseSimulationStore {
      */
     syncInstructionCache() {
         this.instructionCacheEntries = this.toJsSafe(
-            this.simulation.get_instruction_cache_entries()
+            this.simulation.get_instruction_cache_entries_dict()
         );
         this.instructionCacheStats = this.toJsSafe(
             this.simulation.get_instruction_cache_stats()

@@ -114,7 +114,9 @@ watch(
         </div>
     </div>
     <div class="row">
-        <div class="col-4">Data Cache</div>
+        <div class="col-4">
+            <h3 class="fs-6">Data Cache</h3>
+        </div>
         <div class="col-8">
             <label for="riscv-data-cache-enable">
                 <input
@@ -136,6 +138,37 @@ watch(
             <input type="number" min="0" v-model="dataCacheBlockBits" />
             <p>associativity:</p>
             <input type="number" min="1" v-model="dataCacheAssociativity" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <h3 class="fs-6">Instruction Cache</h3>
+        </div>
+        <div class="col-8">
+            <label for="riscv-instruction-cache-enable">
+                <input
+                    type="checkbox"
+                    id="riscv-instruction-cache-enable"
+                    :checked="enableInstructionCache"
+                    v-model="enableInstructionCache"
+                />
+                Enable
+            </label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4"></div>
+        <div class="col-8">
+            <p>2<sup>N</sup> sets:</p>
+            <input type="number" min="0" v-model="instructionCacheIndexBits" />
+            <p>2<sup>N</sup> words per block:</p>
+            <input type="number" min="0" v-model="instructionCacheBlockBits" />
+            <p>associativity:</p>
+            <input
+                type="number"
+                min="1"
+                v-model="instructionCacheAssociativity"
+            />
         </div>
     </div>
 </template>

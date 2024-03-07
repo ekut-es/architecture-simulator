@@ -125,7 +125,11 @@ onUnmounted(() => {
             </div>
             <CacheView
                 v-if="riscvSettings.showDataCache.value"
-                :simulation-store="simulationStore"
+                :cache="simulationStore.dataCacheEntries"
+            ></CacheView>
+            <CacheView
+                v-if="riscvSettings.showInstructionCache.value"
+                :cache="simulationStore.instructionCacheEntries"
             ></CacheView>
         </div>
     </div>
