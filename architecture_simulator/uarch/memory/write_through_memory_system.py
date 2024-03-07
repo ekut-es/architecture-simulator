@@ -66,42 +66,60 @@ class WriteThroughMemorySystem(MemorySystem):
         return word_from_block(decoded_address, block_values)
 
     def write_byte(
-        self, address: int, value: UInt8, update_statistics: bool = True
+        self, address: int, value: UInt8, directly_write_to_lower_memory: bool = False
     ) -> None:
         decoded_address = self._decode_address(address)
+
+        # Omit any cache related simulation
+        if directly_write_to_lower_memory:
+            self.memory.write_byte(address, value)
+            return None
+
         block_values = self.cache.read_block(decoded_address)
         hit = block_values is not None
-        if update_statistics:
-            self.hits += int(hit)
-            self.accesses += 1
+        self.hits += int(hit)
+        self.accesses += 1
+
         if block_values is not None:
             block_values = byte_into_block(decoded_address, block_values, value)
             self.cache.write_block(decoded_address, block_values)
         self.memory.write_byte(address, value)
 
     def write_halfword(
-        self, address: int, value: UInt16, update_statistics: bool = True
+        self, address: int, value: UInt16, directly_write_to_lower_memory: bool = False
     ) -> None:
         decoded_address = self._decode_address(address)
+
+        # Omit any cache related simulation
+        if directly_write_to_lower_memory:
+            self.memory.write_halfword(address, value)
+            return None
+
         block_values = self.cache.read_block(decoded_address)
         hit = block_values is not None
-        if update_statistics:
-            self.hits += int(hit)
-            self.accesses += 1
+        self.hits += int(hit)
+        self.accesses += 1
+
         if block_values is not None:
             block_values = halfword_into_block(decoded_address, block_values, value)
             self.cache.write_block(decoded_address, block_values)
         self.memory.write_halfword(address, value)
 
     def write_word(
-        self, address: int, value: UInt32, update_statistics: bool = True
+        self, address: int, value: UInt32, directly_write_to_lower_memory: bool = False
     ) -> None:
         decoded_address = self._decode_address(address)
+
+        # Omit any cache related simulation
+        if directly_write_to_lower_memory:
+            self.memory.write_word(address, value)
+            return None
+
         block_values = self.cache.read_block(decoded_address)
         hit = block_values is not None
-        if update_statistics:
-            self.hits += int(hit)
-            self.accesses += 1
+        self.hits += int(hit)
+        self.accesses += 1
+
         if block_values is not None:
             block_values = word_into_block(decoded_address, block_values, value)
             self.cache.write_block(decoded_address, block_values)

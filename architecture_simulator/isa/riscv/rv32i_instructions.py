@@ -872,7 +872,7 @@ class SB(STypeInstruction):
             architectural_state.memory.write_byte(
                 memory_address,
                 fixedint.UInt8(memory_write_data),
-                update_statistics=update_statistics,
+                directly_write_to_lower_memory=not update_statistics,
             )
         return None
 
@@ -930,7 +930,7 @@ class SH(STypeInstruction):
             architectural_state.memory.write_halfword(
                 memory_address,
                 fixedint.UInt16(memory_write_data),
-                update_statistics=update_statistics,
+                directly_write_to_lower_memory=not update_statistics,
             )
         return None
 
@@ -972,7 +972,7 @@ class SW(STypeInstruction):
             architectural_state.memory.write_word(
                 memory_address,
                 fixedint.UInt32(memory_write_data),
-                update_statistics=update_statistics,
+                directly_write_to_lower_memory=not update_statistics,
             )
         return None
 

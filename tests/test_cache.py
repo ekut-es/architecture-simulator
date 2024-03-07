@@ -6,6 +6,9 @@ from architecture_simulator.uarch.memory.memory import Memory, AddressingType
 from architecture_simulator.uarch.memory.write_through_memory_system import (
     WriteThroughMemorySystem,
 )
+from architecture_simulator.uarch.memory.write_back_memory_system import (
+    WriteBackMemorySystem,
+)
 
 
 class TestCache(TestCase):
@@ -192,3 +195,10 @@ class TestCache(TestCase):
         self.assertEqual(memory_system.hits, 4)
         self.assertEqual(memory_system.accesses, 6)
         self.assertEqual(memory_system.memory.read_word(0), 8)
+
+    def test_write_back_cache_1(self) -> None:
+        memory = Memory(AddressingType.BYTE, 32, True)
+        memory_system = WriteBackMemorySystem(
+            memory=memory, num_index_bits=0, num_block_bits=0, associativity=2
+        )
+        # TODO: impl

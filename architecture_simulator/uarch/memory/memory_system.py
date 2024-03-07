@@ -29,19 +29,19 @@ class MemorySystem(ABC):
 
     @abstractmethod
     def write_byte(
-        self, address: int, value: UInt8, update_statistics: bool = True
+        self, address: int, value: UInt8, directly_write_to_lower_memory: bool = False
     ) -> None:
         raise NotImplementedError
 
     @abstractmethod
     def write_halfword(
-        self, address: int, value: UInt16, update_statistics: bool = True
+        self, address: int, value: UInt16, directly_write_to_lower_memory: bool = False
     ) -> None:
         raise NotImplementedError
 
     @abstractmethod
     def write_word(
-        self, address: int, value: UInt32, update_statistics: bool = True
+        self, address: int, value: UInt32, directly_write_to_lower_memory: bool = False
     ) -> None:
         raise NotImplementedError
 

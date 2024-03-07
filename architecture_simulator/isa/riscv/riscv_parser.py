@@ -351,7 +351,7 @@ class RiscvParser(Parser):
                         self.state.memory.write_byte(
                             address_counter,
                             fixedint.UInt8(int(val, base=0)),
-                            update_statistics=False,
+                            directly_write_to_lower_memory=True,
                         )
                         address_counter += 1
                 elif line_parsed.type.type == "half":
@@ -362,7 +362,7 @@ class RiscvParser(Parser):
                         self.state.memory.write_halfword(
                             address_counter,
                             fixedint.UInt16(int(val, base=0)),
-                            update_statistics=False,
+                            directly_write_to_lower_memory=True,
                         )
                         address_counter += 2
                 elif line_parsed.type.type == "word":
@@ -373,7 +373,7 @@ class RiscvParser(Parser):
                         self.state.memory.write_word(
                             address_counter,
                             fixedint.UInt32(int(val, base=0)),
-                            update_statistics=False,
+                            directly_write_to_lower_memory=True,
                         )
                         address_counter += 4
                 # strings are saved as byte arrays
@@ -385,12 +385,14 @@ class RiscvParser(Parser):
                         self.state.memory.write_byte(
                             address_counter,
                             fixedint.UInt8(ord(char)),
-                            update_statistics=False,
+                            directly_write_to_lower_memory=True,
                         )
                         address_counter += 1
                     # write null terminator
                     self.state.memory.write_byte(
-                        address_counter, fixedint.UInt8(0), update_statistics=False
+                        address_counter,
+                        fixedint.UInt8(0),
+                        directly_write_to_lower_memory=True,
                     )
                     address_counter += 1
 
