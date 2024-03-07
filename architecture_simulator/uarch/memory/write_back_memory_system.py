@@ -15,7 +15,7 @@ from architecture_simulator.uarch.memory.decoded_address import DecodedAddress
 from architecture_simulator.uarch.memory.memory import Memory
 
 
-class WriteThroughMemorySystem(MemorySystem):
+class WriteBackMemorySystem(MemorySystem):
     def __init__(
         self,
         memory: Memory,
@@ -37,9 +37,6 @@ class WriteThroughMemorySystem(MemorySystem):
         self.hits = 0
         self.accesses = 0
         self.memory = memory
-
-    def get_address_range(self) -> range:
-        return self.memory.get_address_range()
 
     def read_byte(self, address: int, update_statistics: bool = True) -> UInt8:
         decoded_address = self._decode_address(address)
@@ -107,8 +104,37 @@ class WriteThroughMemorySystem(MemorySystem):
             self.cache.write_block(decoded_address, block_values)
         self.memory.write_word(address, value)
 
-    def wordwise_repr(self) -> dict[int, tuple[str, str, str, str]]:
-        return self.memory.wordwise_repr()
+    def _write_block_to_memory(
+        self, decoded_address: DecodedAddress, block: list[UInt32]
+    ) -> None:
+        for i, word in enumerate(block):
+            self.memory.write_word(decoded_address.block_alinged_address + 4 * i, word)
+
+    def _read_block(self, decoded_address: DecodedAddress) -> tuple[list[UInt32], bool]:
+        block_values = self.cache.read_block(decoded_address)
+        hit = block_values is not None
+        if block_values is None:
+            block_values = self._read_block_from_memory(decoded_address)
+            h, displaced_block = self.cache.write_block(decoded_address, block_values)
+            if displaced_block is not None:
+                db_addr, db_block = displaced_block
+                self._write_block_to_memory(db_addr, db_block)
+        # Probabily differentiate whether you had to write back a dirty block or not
+        return block_values, hit
+
+    def _read_block_from_memory(self, decoded_address: DecodedAddress) -> list[UInt32]:
+        return [
+            self.memory.read_word(decoded_address.block_alinged_address + 4 * i)
+            for i in range(self.cache.num_words_in_block)
+        ]
+
+    def _decode_address(self, address: int) -> DecodedAddress:
+        return DecodedAddress(
+            self.cache.num_index_bits, self.cache.num_block_bits, address
+        )
+
+    def get_cache_stats(self) -> dict[str, str]:
+        return {"hits": str(self.hits), "accesses": str(self.accesses)}
 
     def reset(self) -> None:
         self.cache = Cache[UInt32](
@@ -118,27 +144,11 @@ class WriteThroughMemorySystem(MemorySystem):
         )
         self.memory.reset()
 
+    def get_address_range(self) -> range:
+        return self.memory.get_address_range()
+
+    def wordwise_repr(self) -> dict[int, tuple[str, str, str, str]]:
+        return self.memory.wordwise_repr()
+
     def cache_repr(self) -> CacheRepr:
         return self.cache.get_repr()
-
-    def get_cache_stats(self) -> dict[str, str]:
-        return {"hits": str(self.hits), "accesses": str(self.accesses)}
-
-    def _decode_address(self, address: int) -> DecodedAddress:
-        return DecodedAddress(
-            self.cache.num_index_bits, self.cache.num_block_bits, address
-        )
-
-    def _read_block(self, decoded_address: DecodedAddress) -> tuple[list[UInt32], bool]:
-        block_values = self.cache.read_block(decoded_address)
-        hit = block_values is not None
-        if block_values is None:
-            block_values = self._read_block_from_memory(decoded_address)
-            self.cache.write_block(decoded_address, block_values)
-        return block_values, hit
-
-    def _read_block_from_memory(self, decoded_address: DecodedAddress) -> list[UInt32]:
-        return [
-            self.memory.read_word(decoded_address.block_alinged_address + 4 * i)
-            for i in range(self.cache.num_words_in_block)
-        ]
