@@ -26,17 +26,22 @@ class CacheBlockRepr(Generic[T]):
         valid_bit: bool,
         dirty_bit: bool,
         values: list[T],
+        block_size: int,
         base_address: int,
         tag: int,
         tag_width: int,
     ) -> None:
         self.valid_bit = str(int(valid_bit))
         self.dirty_bit = str(int(dirty_bit))
-        self.address_value_list = [
-            (to_hex_str(base_address + i * 4, 32), str(entry))
-            for i, entry in enumerate(values)
-        ]
-        self.tag = to_hex_str(tag, tag_width)
+        self.address_value_list = (
+            [
+                ((to_hex_str(base_address + i * 4, 32), str(entry)))
+                for i, entry in enumerate(values)
+            ]
+            if valid_bit
+            else [("", "") for _ in range(block_size)]
+        )
+        self.tag = to_hex_str(tag, tag_width) if valid_bit else " " * tag_width
 
 
 class CacheBlock(Generic[T]):
@@ -69,12 +74,13 @@ class CacheBlock(Generic[T]):
 
     def get_repr(self) -> CacheBlockRepr:
         return CacheBlockRepr(
-            self.valid_bit,
-            self.dirty_bit,
-            self.values,
-            self.decoded_address.block_alinged_address,
-            self.decoded_address.tag,
-            self.decoded_address.num_tag_bits,
+            valid_bit=self.valid_bit,
+            dirty_bit=self.dirty_bit,
+            values=self.values,
+            block_size=self.block_size,
+            base_address=self.decoded_address.block_alinged_address,
+            tag=self.decoded_address.tag,
+            tag_width=self.decoded_address.num_tag_bits,
         )
 
 
