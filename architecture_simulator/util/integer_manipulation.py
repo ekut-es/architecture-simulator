@@ -30,7 +30,7 @@ def byte_into_block(
 ) -> list[UInt32]:
     word = int(block[decoded_address.block_offset])
     word = word & (~(0xFF << (decoded_address.byte_offset * 8)))
-    word = word | (byte << (decoded_address.byte_offset * 8))
+    word = word | (int(byte) << (decoded_address.byte_offset * 8))
     block[decoded_address.block_offset] = UInt32(word)
     return block
 
@@ -41,7 +41,7 @@ def halfword_into_block(
     assert decoded_address.byte_offset <= 2  # TODO: Custom Error
     word = int(block[decoded_address.block_offset])
     word = word & (~(0xFFFF << (decoded_address.byte_offset * 8)))
-    word = word | (halfword << (decoded_address.byte_offset * 8))
+    word = word | (int(halfword) << (decoded_address.byte_offset * 8))
     block[decoded_address.block_offset] = UInt32(word)
     return block
 

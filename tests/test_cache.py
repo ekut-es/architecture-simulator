@@ -198,7 +198,79 @@ class TestCache(TestCase):
 
     def test_write_back_cache_1(self) -> None:
         memory = Memory(AddressingType.BYTE, 32, True)
+        for i in range(32):
+            memory.write_word(i * 4, UInt32(i))
         memory_system = WriteBackMemorySystem(
-            memory=memory, num_index_bits=0, num_block_bits=0, associativity=2
+            memory=memory, num_index_bits=0, num_block_bits=1, associativity=2
         )
-        # TODO: impl
+        memory_system.read_word(0)
+        memory_system.write_word(4, UInt32(44))
+
+        self.assertEqual(memory_system.read_word(4), UInt32(44))
+        self.assertEqual(memory.memory_file[0], UInt8(0))
+        self.assertEqual(memory.memory_file[4], UInt8(1))
+
+        memory_system.read_word(8)
+        self.assertEqual(memory_system.read_word(12), UInt8(3))
+
+        self.assertEqual(memory.memory_file[4], UInt8(1))
+
+        memory_system.read_word(16)
+
+        self.assertEqual(memory.memory_file[4], UInt8(44))
+
+        self.assertEqual(memory_system.hits, 3)
+        self.assertEqual(memory_system.accesses, 6)
+
+    def test_byte_into_block_fix(self) -> None:
+        memory = Memory(AddressingType.BYTE, 32, True)
+        memory_system = WriteBackMemorySystem(
+            memory=memory, num_index_bits=2, num_block_bits=0, associativity=1
+        )
+        memory_system.write_byte(16, UInt8(0xFF))
+        memory_system.write_byte(17, UInt8(0xFF))
+        memory_system.write_byte(18, UInt8(0xFF))
+        memory_system.write_byte(19, UInt8(0xFF))
+
+        self.assertEqual(memory_system.read_word(16), 0xFFFFFFFF)
+
+    def test_halfword_into_block_fix(self) -> None:
+        memory = Memory(AddressingType.BYTE, 32, True)
+        memory_system = WriteBackMemorySystem(
+            memory=memory, num_index_bits=2, num_block_bits=0, associativity=1
+        )
+        memory_system.write_halfword(16, UInt16(0xFFFF))
+        memory_system.write_halfword(18, UInt16(0xFFFF))
+
+        self.assertEqual(memory_system.read_word(16), 0xFFFFFFFF)
+
+    def test_write_back_cache_2(self) -> None:
+        memory = Memory(AddressingType.BYTE, 32, True)
+        memory.write_word(0, UInt32(0xAAAAAAAA))
+        memory.write_word(4, UInt32(0xBBBBBBBB))
+        memory.write_word(8, UInt32(0xCCCCCCCC))
+        memory.write_word(12, UInt32(0xDDDDDDDD))
+        memory.write_word(16, UInt32(0xEEEEEEEE))
+        memory_system = WriteBackMemorySystem(
+            memory=memory, num_index_bits=2, num_block_bits=0, associativity=1
+        )
+        memory_system.write_byte(0, UInt8(0))
+        memory_system.write_byte(1, UInt8(0))
+        memory_system.write_byte(2, UInt8(0))
+        memory_system.write_byte(3, UInt8(0))
+
+        self.assertEqual(memory_system.read_word(0), UInt32(0))
+        self.assertEqual(memory.read_word(0), UInt32(0xAAAAAAAA))
+
+        memory_system.write_byte(16, UInt8(0xFF))
+
+        self.assertEqual(memory.read_word(0), UInt32(0))
+
+        memory_system.write_byte(17, UInt8(0xFF))
+        memory_system.write_byte(18, UInt8(0xFF))
+        memory_system.write_byte(19, UInt8(0xFF))
+
+        self.assertEqual(memory_system.read_word(16), UInt32(0xFFFFFFFF))
+
+        self.assertEqual(memory_system.get_cache_stats()["hits"], "8")
+        self.assertEqual(memory_system.get_cache_stats()["accesses"], "10")
