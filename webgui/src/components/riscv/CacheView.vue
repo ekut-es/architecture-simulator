@@ -1,11 +1,8 @@
 <script setup>
-import { riscvSettings } from "@/js/riscv_settings";
 import { computed } from "vue";
 
-const props = defineProps(["cache"]);
-const blockSize = computed(() =>
-    Math.pow(2, riscvSettings.dataCache.value.num_block_bits)
-);
+const props = defineProps(["cache", "numBlockBits"]);
+const blockSize = computed(() => Math.pow(2, props.numBlockBits));
 </script>
 
 <template>
