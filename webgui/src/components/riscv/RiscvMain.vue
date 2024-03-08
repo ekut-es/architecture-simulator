@@ -36,10 +36,7 @@ const textContainerPopulated = computed(
 );
 
 const visualizationsContainerPopulated = computed(
-    () =>
-        riscvSettings.showVisualization.value ||
-        riscvSettings.showDataCache.value ||
-        riscvSettings.showInstructionCache.value
+    () => riscvSettings.visContainerSelection.value !== "None"
 );
 const enableSplit = computed(
     () => textContainerPopulated.value && visualizationsContainerPopulated.value
@@ -105,7 +102,11 @@ onUnmounted(() => {
             />
         </div>
         <div ref="visualizationsContainer" id="riscv-visualizations-container">
-            <div v-show="riscvSettings.showVisualization.value">
+            <div
+                v-show="
+                    riscvSettings.visContainerSelection.value == 'Processor'
+                "
+            >
                 <RiscvVisualization
                     v-if="
                         riscvSettings.pipelineMode.value ===
@@ -124,12 +125,17 @@ onUnmounted(() => {
                 />
             </div>
             <CacheView
-                v-if="riscvSettings.showDataCache.value"
+                v-if="
+                    riscvSettings.visContainerSelection.value === 'Data Cache'
+                "
                 :cache="simulationStore.dataCacheEntries"
                 :num-block-bits="riscvSettings.dataCache.value.num_block_bits"
             ></CacheView>
             <CacheView
-                v-if="riscvSettings.showInstructionCache.value"
+                v-if="
+                    riscvSettings.visContainerSelection.value ===
+                    'Instruction Cache'
+                "
                 :cache="simulationStore.instructionCacheEntries"
                 :num-block-bits="
                     riscvSettings.instructionCache.value.num_block_bits

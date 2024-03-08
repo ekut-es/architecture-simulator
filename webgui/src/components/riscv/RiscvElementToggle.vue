@@ -1,8 +1,26 @@
 <!-- The toggle button group for toggling the riscv elements. -->
 <script setup>
+import { watch } from "vue";
 import ToggleButton from "../ToggleButton.vue";
 
 import { riscvSettings } from "@/js/riscv_settings";
+
+// Select the processor view if the user disables the cache he is currently viewing.
+watch(
+    () => [
+        riscvSettings.dataCache.value.enable,
+        riscvSettings.instructionCache.value.enable,
+    ],
+    ([enableDataCache, enableInstructionCache]) => {
+        const selected = riscvSettings.visContainerSelection.value;
+        if (
+            (!enableDataCache && selected === "Data Cache") ||
+            (!enableInstructionCache && selected === "Instruction Cache")
+        ) {
+            riscvSettings.visContainerSelection.value = "Processor";
+        }
+    }
+);
 </script>
 
 <template>
@@ -27,27 +45,12 @@ import { riscvSettings } from "@/js/riscv_settings";
             >Registers/Output
         </ToggleButton>
     </div>
-    <div
-        class="btn-group"
-        role="group"
-        aria-label="Toggle visibility of the display elements on the right side"
-    >
-        <ToggleButton
-            v-model="riscvSettings.showVisualization.value"
-            base-id="riscv-toggle-visualization"
-            >Visualization
-        </ToggleButton>
-        <ToggleButton
-            v-if="riscvSettings.dataCache.value.enable"
-            v-model="riscvSettings.showDataCache.value"
-            base-id="riscv-toggle-data-cache"
-            >Data Cache
-        </ToggleButton>
-        <ToggleButton
-            v-if="riscvSettings.instructionCache.value.enable"
-            v-model="riscvSettings.showInstructionCache.value"
-            base-id="riscv-toggle-instruction-cache"
-            >Instruction Cache
-        </ToggleButton>
-    </div>
+    <select v-model="riscvSettings.visContainerSelection.value">
+        <option>None</option>
+        <option>Processor</option>
+        <option v-if="riscvSettings.dataCache.value.enable">Data Cache</option>
+        <option v-if="riscvSettings.instructionCache.value.enable">
+            Instruction Cache
+        </option>
+    </select>
 </template>

@@ -11,7 +11,6 @@ export const riscvSettings = {
     showInput: ref(true),
     showMemory: ref(true),
     showRegistersOutput: ref(true),
-    showVisualization: ref(true),
     dataCache: ref({
         enable: false,
         num_index_bits: 2,
@@ -24,6 +23,5 @@ export const riscvSettings = {
         num_block_bits: 0,
         associativity: 4,
     }),
-    showDataCache: ref(false),
-    showInstructionCache: ref(false),
+    visContainerSelection: ref("Processor"),
 };
