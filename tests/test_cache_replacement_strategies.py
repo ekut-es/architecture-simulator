@@ -10,7 +10,10 @@ from architecture_simulator.uarch.memory.write_back_memory_system import (
     WriteBackMemorySystem,
 )
 
-from architecture_simulator.uarch.memory.replacement_strategies import LRU, PLRU
+from architecture_simulator.uarch.memory.replacement_strategies import PLRU
+from architecture_simulator.uarch.riscv.riscv_performance_metrics import (
+    RiscvPerformanceMetrics,
+)
 
 
 class TestReplacementStrategies(TestCase):
@@ -24,6 +27,7 @@ class TestReplacementStrategies(TestCase):
             associativity=1,
             memory=memory,
             replacement_strategy=PLRU,
+            performance_metrics=RiscvPerformanceMetrics(),
         )
 
         memory_system.read_word(0)
@@ -44,6 +48,7 @@ class TestReplacementStrategies(TestCase):
             associativity=2,
             memory=memory,
             replacement_strategy=PLRU,
+            performance_metrics=RiscvPerformanceMetrics(),
         )
 
         memory_system.read_word(0)
@@ -63,6 +68,7 @@ class TestReplacementStrategies(TestCase):
             associativity=2,
             memory=memory,
             replacement_strategy=PLRU,
+            performance_metrics=RiscvPerformanceMetrics(),
         )
 
         memory_system.read_word(0)
@@ -84,6 +90,7 @@ class TestReplacementStrategies(TestCase):
             associativity=4,
             memory=memory,
             replacement_strategy=PLRU,
+            performance_metrics=RiscvPerformanceMetrics(),
         )
 
         self.assertEqual(

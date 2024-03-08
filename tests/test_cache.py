@@ -9,6 +9,9 @@ from architecture_simulator.uarch.memory.write_through_memory_system import (
 from architecture_simulator.uarch.memory.write_back_memory_system import (
     WriteBackMemorySystem,
 )
+from architecture_simulator.uarch.riscv.riscv_performance_metrics import (
+    RiscvPerformanceMetrics,
+)
 
 
 class TestCache(TestCase):
@@ -46,6 +49,7 @@ class TestCache(TestCase):
             num_block_bits=1,
             associativity=1,
             memory=memory,
+            performance_metrics=RiscvPerformanceMetrics(),
         )
 
         memory_system.read_word(0)
@@ -69,6 +73,7 @@ class TestCache(TestCase):
             num_block_bits=0,
             associativity=1,
             memory=memory,
+            performance_metrics=RiscvPerformanceMetrics(),
         )
         memory_system.read_word(0)
         memory_system.read_word(16)
@@ -91,6 +96,7 @@ class TestCache(TestCase):
             num_block_bits=0,
             associativity=2,
             memory=memory,
+            performance_metrics=RiscvPerformanceMetrics(),
         )
         memory_system.read_word(0)
         memory_system.read_word(16)
@@ -113,6 +119,7 @@ class TestCache(TestCase):
             num_block_bits=0,
             associativity=4,
             memory=memory,
+            performance_metrics=RiscvPerformanceMetrics(),
         )
         # 0 [ , , , ]
         # 1 [ , , , ]
@@ -140,6 +147,7 @@ class TestCache(TestCase):
             num_block_bits=0,
             associativity=4,
             memory=memory,
+            performance_metrics=RiscvPerformanceMetrics(),
         )
         # 0 [ , , , ]
         # 1 [ , , , ]
@@ -163,6 +171,7 @@ class TestCache(TestCase):
             num_block_bits=2,
             associativity=4,
             memory=memory,
+            performance_metrics=RiscvPerformanceMetrics(),
         )
         memory_system.write_byte(1, UInt8(72))
         memory_system.write_halfword(5, UInt16(500))
@@ -184,6 +193,7 @@ class TestCache(TestCase):
             num_block_bits=2,
             associativity=4,
             memory=memory,
+            performance_metrics=RiscvPerformanceMetrics(),
         )
         memory_system.write_byte(1, UInt8(72))
         memory_system.read_byte(1)
@@ -201,7 +211,11 @@ class TestCache(TestCase):
         for i in range(32):
             memory.write_word(i * 4, UInt32(i))
         memory_system = WriteBackMemorySystem(
-            memory=memory, num_index_bits=0, num_block_bits=1, associativity=2
+            memory=memory,
+            num_index_bits=0,
+            num_block_bits=1,
+            associativity=2,
+            performance_metrics=RiscvPerformanceMetrics(),
         )
         memory_system.read_word(0)
         memory_system.write_word(4, UInt32(44))
@@ -225,7 +239,11 @@ class TestCache(TestCase):
     def test_byte_into_block_fix(self) -> None:
         memory = Memory(AddressingType.BYTE, 32, True)
         memory_system = WriteBackMemorySystem(
-            memory=memory, num_index_bits=2, num_block_bits=0, associativity=1
+            memory=memory,
+            num_index_bits=2,
+            num_block_bits=0,
+            associativity=1,
+            performance_metrics=RiscvPerformanceMetrics(),
         )
         memory_system.write_byte(16, UInt8(0xFF))
         memory_system.write_byte(17, UInt8(0xFF))
@@ -237,7 +255,11 @@ class TestCache(TestCase):
     def test_halfword_into_block_fix(self) -> None:
         memory = Memory(AddressingType.BYTE, 32, True)
         memory_system = WriteBackMemorySystem(
-            memory=memory, num_index_bits=2, num_block_bits=0, associativity=1
+            memory=memory,
+            num_index_bits=2,
+            num_block_bits=0,
+            associativity=1,
+            performance_metrics=RiscvPerformanceMetrics(),
         )
         memory_system.write_halfword(16, UInt16(0xFFFF))
         memory_system.write_halfword(18, UInt16(0xFFFF))
@@ -252,7 +274,11 @@ class TestCache(TestCase):
         memory.write_word(12, UInt32(0xDDDDDDDD))
         memory.write_word(16, UInt32(0xEEEEEEEE))
         memory_system = WriteBackMemorySystem(
-            memory=memory, num_index_bits=2, num_block_bits=0, associativity=1
+            memory=memory,
+            num_index_bits=2,
+            num_block_bits=0,
+            associativity=1,
+            performance_metrics=RiscvPerformanceMetrics(),
         )
         memory_system.write_byte(0, UInt8(0))
         memory_system.write_byte(1, UInt8(0))
@@ -280,7 +306,11 @@ class TestCache(TestCase):
         for i in range(32):
             memory.write_word(i * 4, UInt32(i))
         memory_system = WriteBackMemorySystem(
-            memory=memory, num_index_bits=1, num_block_bits=1, associativity=2
+            memory=memory,
+            num_index_bits=1,
+            num_block_bits=1,
+            associativity=2,
+            performance_metrics=RiscvPerformanceMetrics(),
         )
 
         memory_system.read_word(0)

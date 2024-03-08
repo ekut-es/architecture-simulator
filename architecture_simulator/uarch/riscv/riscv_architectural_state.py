@@ -63,6 +63,7 @@ class RiscvArchitecturalState:
         self.pipeline = Pipeline(
             stages=stages, execution_ordering=execution_ordering, state=self
         )
+        self.performance_metrics = RiscvPerformanceMetrics()
         ###
         if instruction_memory is not None:
             self.instruction_memory = instruction_memory
@@ -73,6 +74,9 @@ class RiscvArchitecturalState:
                     num_index_bits=instruction_cache.num_index_bits,
                     num_block_bits=instruction_cache.num_block_bits,
                     associativity=instruction_cache.associativity,
+                    performance_metrics=self.performance_metrics
+                    # TODO: Impl
+                    # replacement_strategy= ...
                 )
             else:
                 self.instruction_memory = InstructionMemory[RiscvInstruction]()
@@ -99,6 +103,7 @@ class RiscvArchitecturalState:
                     num_index_bits=data_cache.num_index_bits,
                     num_block_bits=data_cache.num_block_bits,
                     associativity=data_cache.associativity,
+                    performance_metrics=self.performance_metrics
                     # TODO: Impl
                     # replacement_strategy= ...
                 )
@@ -116,7 +121,6 @@ class RiscvArchitecturalState:
         self.csr_registers = CsrRegisterFile()
         self.program_counter = self.instruction_memory.get_address_range().start  # 0
         self.previous_program_counter = self.program_counter
-        self.performance_metrics = RiscvPerformanceMetrics()
 
     def change_privilege_level(self, level: int):
         if not level < 0 and not level > 3:

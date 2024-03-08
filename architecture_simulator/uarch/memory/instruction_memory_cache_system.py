@@ -11,6 +11,9 @@ from architecture_simulator.uarch.memory.replacement_strategies import (
     ReplacementStrategy,
     LRU,
 )
+from architecture_simulator.uarch.riscv.riscv_performance_metrics import (
+    RiscvPerformanceMetrics,
+)
 
 
 class InstructionMemoryCacheSystem(InstructionMemorySystem):
@@ -20,6 +23,8 @@ class InstructionMemoryCacheSystem(InstructionMemorySystem):
         num_index_bits: int,
         num_block_bits: int,
         associativity: int,
+        performance_metrics: RiscvPerformanceMetrics,
+        miss_penality: int = 0,
         replacement_strategy: Type[ReplacementStrategy] = LRU,
     ) -> None:
         # TODO: check that num_index_bits, num_block_bits, associativity have legal values
@@ -37,6 +42,8 @@ class InstructionMemoryCacheSystem(InstructionMemorySystem):
         self.associativity = associativity
 
         self.instruction_memory = instruction_memory
+        self.performance_metrics = performance_metrics
+        self.miss_penality = miss_penality
         self.hits = 0
         self.accesses = 0
 
@@ -63,6 +70,9 @@ class InstructionMemoryCacheSystem(InstructionMemorySystem):
         block_values, hit = self._read_block(decoded_address)
         self.accesses += 1
         self.hits += int(hit)
+        if not hit:
+            self.performance_metrics.cycles += self.miss_penality
+        self.performance_metrics
         return block_values[decoded_address.block_offset]
 
     def write_instruction(self, address: int, instr: RiscvInstruction):

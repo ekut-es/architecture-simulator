@@ -18,6 +18,9 @@ from architecture_simulator.uarch.memory.replacement_strategies import (
     ReplacementStrategy,
     LRU,
 )
+from architecture_simulator.uarch.riscv.riscv_performance_metrics import (
+    RiscvPerformanceMetrics,
+)
 
 
 class WriteBackMemorySystem(MemorySystem):
@@ -27,6 +30,8 @@ class WriteBackMemorySystem(MemorySystem):
         num_index_bits: int,
         num_block_bits: int,
         associativity: int,
+        performance_metrics: RiscvPerformanceMetrics,
+        miss_penality: int = 0,
         replacement_strategy: Type[ReplacementStrategy] = LRU,
     ) -> None:
         # TODO: check that num_index_bits, num_block_bits, associativity have legal values
@@ -43,6 +48,8 @@ class WriteBackMemorySystem(MemorySystem):
         self.num_block_bits = num_block_bits
         self.associativity = associativity
 
+        self.performance_metrics = performance_metrics
+        self.miss_penality = miss_penality
         self.hits = 0
         self.accesses = 0
         self.memory = memory
@@ -53,6 +60,8 @@ class WriteBackMemorySystem(MemorySystem):
         if update_statistics:
             self.accesses += 1
             self.hits += int(hit)
+            if not hit:
+                self.performance_metrics.cycles += self.miss_penality
         return byte_from_block(decoded_address, block_values)
 
     def read_halfword(self, address: int, update_statistics: bool = True) -> UInt16:
@@ -61,6 +70,8 @@ class WriteBackMemorySystem(MemorySystem):
         if update_statistics:
             self.accesses += 1
             self.hits += int(hit)
+            if not hit:
+                self.performance_metrics.cycles += self.miss_penality
         return halfword_from_block(decoded_address, block_values)
 
     def read_word(self, address: int, update_statistics: bool = True) -> UInt32:
@@ -69,6 +80,8 @@ class WriteBackMemorySystem(MemorySystem):
         if update_statistics:
             self.accesses += 1
             self.hits += int(hit)
+            if not hit:
+                self.performance_metrics.cycles += self.miss_penality
         return word_from_block(decoded_address, block_values)
 
     def write_byte(
@@ -98,6 +111,8 @@ class WriteBackMemorySystem(MemorySystem):
             self._write_block_to_memory(db_addr, db_block)
 
         self.hits += int(hit)
+        if not hit:
+            self.performance_metrics.cycles += self.miss_penality
         self.accesses += 1
 
     def write_halfword(
@@ -127,6 +142,8 @@ class WriteBackMemorySystem(MemorySystem):
             self._write_block_to_memory(db_addr, db_block)
 
         self.hits += int(hit)
+        if not hit:
+            self.performance_metrics.cycles += self.miss_penality
         self.accesses += 1
 
     def write_word(
@@ -156,6 +173,8 @@ class WriteBackMemorySystem(MemorySystem):
             self._write_block_to_memory(db_addr, db_block)
 
         self.hits += int(hit)
+        if not hit:
+            self.performance_metrics.cycles += self.miss_penality
         self.accesses += 1
 
     def _write_block_to_memory(

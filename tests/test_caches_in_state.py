@@ -13,6 +13,9 @@ from architecture_simulator.uarch.memory.instruction_memory_cache_system import 
 from architecture_simulator.uarch.memory.instruction_memory import InstructionMemory
 from architecture_simulator.uarch.memory.memory import Memory
 from architecture_simulator.uarch.memory.memory import AddressingType
+from architecture_simulator.uarch.riscv.riscv_performance_metrics import (
+    RiscvPerformanceMetrics,
+)
 
 
 class TestCache(TestCase):
@@ -43,7 +46,7 @@ End: nop"""
         simulation = RiscvSimulation(
             state=RiscvArchitecturalState(
                 instruction_memory=InstructionMemoryCacheSystem(
-                    InstructionMemory(), 1, 2, 1
+                    InstructionMemory(), 1, 2, 1, RiscvPerformanceMetrics()
                 )
             )
         )
@@ -68,7 +71,7 @@ End: nop"""
         simulation = RiscvSimulation(
             state=RiscvArchitecturalState(
                 instruction_memory=InstructionMemoryCacheSystem(
-                    InstructionMemory(), 2, 1, 1
+                    InstructionMemory(), 2, 1, 1, RiscvPerformanceMetrics()
                 )
             )
         )
@@ -94,7 +97,7 @@ End: nop"""
         simulation = RiscvSimulation(
             state=RiscvArchitecturalState(
                 instruction_memory=InstructionMemoryCacheSystem(
-                    InstructionMemory(), 2, 0, 1
+                    InstructionMemory(), 2, 0, 1, RiscvPerformanceMetrics()
                 )
             )
         )
@@ -120,7 +123,7 @@ End: nop"""
         simulation = RiscvSimulation(
             state=RiscvArchitecturalState(
                 instruction_memory=InstructionMemoryCacheSystem(
-                    InstructionMemory(), 0, 0, 4
+                    InstructionMemory(), 0, 0, 4, RiscvPerformanceMetrics()
                 )
             )
         )
@@ -162,7 +165,7 @@ End: nop"""
         simulation = RiscvSimulation(
             state=RiscvArchitecturalState(
                 instruction_memory=InstructionMemoryCacheSystem(
-                    InstructionMemory(), 0, 1, 4
+                    InstructionMemory(), 0, 1, 4, RiscvPerformanceMetrics()
                 )
             )
         )
@@ -201,7 +204,7 @@ lw x0, 4(x1)
         simulation = RiscvSimulation(
             state=RiscvArchitecturalState(
                 memory=WriteThroughMemorySystem(
-                    Memory(AddressingType.BYTE, 32), 1, 2, 2
+                    Memory(AddressingType.BYTE, 32), 1, 2, 2, RiscvPerformanceMetrics()
                 )
             )
         )
@@ -230,7 +233,7 @@ lw x0, 12(x1)
         simulation = RiscvSimulation(
             state=RiscvArchitecturalState(
                 memory=WriteThroughMemorySystem(
-                    Memory(AddressingType.BYTE, 32), 0, 0, 4
+                    Memory(AddressingType.BYTE, 32), 0, 0, 4, RiscvPerformanceMetrics()
                 )
             )
         )
@@ -263,9 +266,18 @@ lw x0, 20(x1)
         simulation = RiscvSimulation(
             state=RiscvArchitecturalState(
                 memory=WriteThroughMemorySystem(
-                    Memory(AddressingType.BYTE, 32), 0, 1, 4
+                    Memory(AddressingType.BYTE, 32),
+                    0,
+                    1,
+                    4,
+                    performance_metrics=RiscvPerformanceMetrics(),
+                    miss_penality=3,
                 )
             )
+        )
+        # TODO: Change me once configuration is possible
+        simulation.state.memory.performance_metrics = (
+            simulation.state.performance_metrics
         )
 
         simulation.load_program(test_code)
@@ -273,3 +285,45 @@ lw x0, 20(x1)
 
         self.assertEqual(simulation.state.memory.get_cache_stats()["hits"], "6")
         self.assertEqual(simulation.state.memory.get_cache_stats()["accesses"], "12")
+        self.assertEqual(simulation.state.performance_metrics.cycles, 32)
+
+    def test_instr_cache_miss_penality_1(self):
+        test_code = """
+add x0, x0, x0
+add x0, x0, x0
+add x0, x0, x0
+add x0, x0, x0
+add x0, x0, x0
+add x0, x0, x0
+add x0, x0, x0
+add x0, x0, x0
+"""
+
+        simulation = RiscvSimulation(
+            state=RiscvArchitecturalState(
+                instruction_memory=InstructionMemoryCacheSystem(
+                    InstructionMemory(),
+                    1,
+                    1,
+                    1,
+                    RiscvPerformanceMetrics(),
+                    7,
+                )
+            )
+        )
+
+        # TODO: Change me once configuration is possible
+        simulation.state.instruction_memory.performance_metrics = (
+            simulation.state.performance_metrics
+        )
+
+        simulation.load_program(test_code)
+        simulation.run()
+
+        self.assertEqual(
+            simulation.state.instruction_memory.get_cache_stats()["hits"], "4"
+        )
+        self.assertEqual(
+            simulation.state.instruction_memory.get_cache_stats()["accesses"], "8"
+        )
+        self.assertEqual(simulation.state.performance_metrics.cycles, 36)

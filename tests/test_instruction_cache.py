@@ -5,12 +5,17 @@ from architecture_simulator.uarch.memory.instruction_memory_cache_system import 
 )
 from architecture_simulator.uarch.memory.instruction_memory import InstructionMemory
 from architecture_simulator.isa.riscv.rv32i_instructions import ADDI
+from architecture_simulator.uarch.riscv.riscv_performance_metrics import (
+    RiscvPerformanceMetrics,
+)
 
 
 class TestCache(TestCase):
     def test_case_1(self):
         instr_mem = InstructionMemory()
-        mem_sys = InstructionMemoryCacheSystem(instr_mem, 2, 0, 1)
+        mem_sys = InstructionMemoryCacheSystem(
+            instr_mem, 2, 0, 1, RiscvPerformanceMetrics()
+        )
 
         mem_sys.write_instructions([ADDI(0, 0, i * 4) for i in range(32)])
         mem_sys.read_instruction(0)
@@ -27,7 +32,9 @@ class TestCache(TestCase):
 
     def test_case_2(self):
         instr_mem = InstructionMemory()
-        mem_sys = InstructionMemoryCacheSystem(instr_mem, 1, 3, 1)
+        mem_sys = InstructionMemoryCacheSystem(
+            instr_mem, 1, 3, 1, RiscvPerformanceMetrics()
+        )
 
         mem_sys.write_instructions([ADDI(0, 0, i * 4) for i in range(32)])
 
@@ -52,7 +59,9 @@ class TestCache(TestCase):
 
     def test_case_3(self):
         instr_mem = InstructionMemory()
-        mem_sys = InstructionMemoryCacheSystem(instr_mem, 0, 0, 4)
+        mem_sys = InstructionMemoryCacheSystem(
+            instr_mem, 0, 0, 4, RiscvPerformanceMetrics()
+        )
 
         mem_sys.write_instructions([ADDI(0, 0, i * 4) for i in range(32)])
 
