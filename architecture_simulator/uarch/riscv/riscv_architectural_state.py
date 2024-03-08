@@ -99,6 +99,8 @@ class RiscvArchitecturalState:
                     num_index_bits=data_cache.num_index_bits,
                     num_block_bits=data_cache.num_block_bits,
                     associativity=data_cache.associativity,
+                    # TODO: Impl
+                    # replacement_strategy= ...
                 )
             else:
                 self.memory = Memory(

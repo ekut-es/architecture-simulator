@@ -1,5 +1,4 @@
-from typing import Optional
-from typing import TypeVar, Generic
+from typing import TypeVar, Generic, Optional, Type
 from architecture_simulator.uarch.memory.decoded_address import DecodedAddress
 from architecture_simulator.uarch.memory.replacement_strategies import (
     ReplacementStrategy,
@@ -194,6 +193,7 @@ class Cache(Generic[T]):
         num_index_bits: int,
         num_block_bits: int,
         associativity: int,
+        replacement_strategy: Type[ReplacementStrategy],
     ) -> None:
 
         self.num_index_bits = num_index_bits
@@ -205,7 +205,7 @@ class Cache(Generic[T]):
             CacheSet[T](
                 associativity,
                 num_block_bits,
-                LRU(associativity),
+                replacement_strategy(associativity),
                 to_hex_str(i, self.num_index_bits),
             )
             for i in range(2**num_index_bits)

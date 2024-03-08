@@ -13,6 +13,11 @@ from architecture_simulator.util.integer_manipulation import (
 from architecture_simulator.uarch.memory.cache import Cache, CacheRepr
 from architecture_simulator.uarch.memory.decoded_address import DecodedAddress
 from architecture_simulator.uarch.memory.memory import Memory
+from typing import Type
+from architecture_simulator.uarch.memory.replacement_strategies import (
+    ReplacementStrategy,
+    LRU,
+)
 
 
 class WriteThroughMemorySystem(MemorySystem):
@@ -22,13 +27,17 @@ class WriteThroughMemorySystem(MemorySystem):
         num_index_bits: int,
         num_block_bits: int,
         associativity: int,
+        replacement_strategy: Type[ReplacementStrategy] = LRU,
     ) -> None:
         # TODO: check that num_index_bits, num_block_bits, associativity have legal values
         self.cache = Cache[UInt32](
             num_index_bits=num_index_bits,
             num_block_bits=num_block_bits,
             associativity=associativity,
+            replacement_strategy=replacement_strategy,
         )
+
+        self.replacement_strategy = replacement_strategy
 
         self.num_index_bits = num_index_bits
         self.num_block_bits = num_block_bits
@@ -133,6 +142,7 @@ class WriteThroughMemorySystem(MemorySystem):
             num_index_bits=self.num_index_bits,
             num_block_bits=self.num_block_bits,
             associativity=self.associativity,
+            replacement_strategy=self.replacement_strategy,
         )
         self.memory.reset()
 
