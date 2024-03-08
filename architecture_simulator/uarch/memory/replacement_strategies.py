@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import math
 
 
 class ReplacementStrategy(ABC):
@@ -39,3 +40,31 @@ class LRU(ReplacementStrategy):
 
     def get_next_to_replace(self) -> int:
         return self.lru[0]
+
+
+class PLRU(ReplacementStrategy):
+    def __init__(self, associativity: int) -> None:
+        # ensure associativity is a power of two and not zero
+        assert (associativity != 0) and ((associativity & (associativity - 1)) == 0)
+
+        super().__init__(associativity)
+        self.tree_array = [False] * (associativity - 1)
+        self.tree_depth = int(math.log2(self.associativity))
+
+    def access(self, index: int) -> None:
+        assert index >= 0
+
+        i = index + self.associativity - 1
+        for _ in range(self.tree_depth):
+            is_right_child = i % 2 == 0
+            i = (i - 1) // 2
+            self.tree_array[i] = is_right_child
+
+    def get_next_to_replace(self) -> int:
+        i = 0
+        for _ in range(self.tree_depth):
+            if self.tree_array[i]:
+                i = 2 * i + 1
+            else:
+                i = 2 * i + 2
+        return i + 1 - self.associativity

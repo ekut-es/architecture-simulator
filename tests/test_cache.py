@@ -1,5 +1,5 @@
 from unittest import TestCase
-from fixedint import UInt8, UInt16, UInt32, UInt8, UInt16, UInt32
+from fixedint import UInt8, UInt16, UInt32
 
 from architecture_simulator.uarch.memory.decoded_address import DecodedAddress
 from architecture_simulator.uarch.memory.memory import Memory, AddressingType
