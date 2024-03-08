@@ -1,8 +1,9 @@
 <!-- RISCV settings page -->
 <script setup>
-import { ref, watch, watchEffect } from "vue";
+import { ref, watch } from "vue";
 import RadioSettingsRow from "../RadioSettingsRow.vue";
 import RepresentationSettingsRow from "../RepresentationSettingsRow.vue";
+import CacheParameters from "./CacheParameters.vue";
 
 import { useRiscvSimulationStore } from "@/js/riscv_simulation_store";
 import { useEditorStore } from "@/js/editor_store";
@@ -15,19 +16,7 @@ const editorStore = useEditorStore(simulationStore, "riscv");
 const pipelineMode = ref(riscvSettings.pipelineMode.value);
 const dataHazardDetection = ref(riscvSettings.dataHazardDetection.value);
 const enableDataCache = ref(riscvSettings.dataCache.value.enable);
-const dataCacheIndexBits = ref(riscvSettings.dataCache.value.num_index_bits);
-const dataCacheBlockBits = ref(riscvSettings.dataCache.value.num_block_bits);
-const dataCacheAssociativity = ref(riscvSettings.dataCache.value.associativity);
 const enableInstructionCache = ref(riscvSettings.instructionCache.value.enable);
-const instructionCacheIndexBits = ref(
-    riscvSettings.instructionCache.value.num_index_bits
-);
-const instructionCacheBlockBits = ref(
-    riscvSettings.instructionCache.value.num_block_bits
-);
-const instructionCacheAssociativity = ref(
-    riscvSettings.instructionCache.value.associativity
-);
 
 // Reset the sim and parse the input if the pipeline or data hazard detection changes
 watch(
@@ -35,39 +24,18 @@ watch(
         pipelineMode.value,
         dataHazardDetection.value,
         enableDataCache.value,
-        dataCacheIndexBits.value,
-        dataCacheBlockBits.value,
-        dataCacheAssociativity.value,
         enableInstructionCache.value,
-        instructionCacheIndexBits.value,
-        instructionCacheBlockBits.value,
-        instructionCacheAssociativity.value,
     ],
     ([
         pipelineMode,
         dataHazardDetection,
         enableDataCache,
-        dataCacheIndexBits,
-        dataCacheBlockBits,
-        dataCacheAssociativity,
         enableInstructionCache,
-        instructionCacheIndexBits,
-        instructionCacheBlockBits,
-        instructionCacheAssociativity,
     ]) => {
         riscvSettings.pipelineMode.value = pipelineMode;
         riscvSettings.dataHazardDetection.value = dataHazardDetection;
         riscvSettings.dataCache.value.enable = enableDataCache;
-        riscvSettings.dataCache.value.num_index_bits = dataCacheIndexBits;
-        riscvSettings.dataCache.value.num_block_bits = dataCacheBlockBits;
-        riscvSettings.dataCache.value.associativity = dataCacheAssociativity;
         riscvSettings.instructionCache.value.enable = enableInstructionCache;
-        riscvSettings.instructionCache.value.num_index_bits =
-            instructionCacheIndexBits;
-        riscvSettings.instructionCache.value.num_block_bits =
-            instructionCacheBlockBits;
-        riscvSettings.instructionCache.value.associativity =
-            instructionCacheAssociativity;
         // FIXME: This is the same as the reset button does in RiscvControlBar.vue
         simulationStore.resetSimulation();
         editorStore.loadProgram();
@@ -132,12 +100,7 @@ watch(
     <div class="row">
         <div class="col-4"></div>
         <div class="col-8">
-            <p>2<sup>N</sup> sets:</p>
-            <input type="number" min="0" v-model="dataCacheIndexBits" />
-            <p>2<sup>N</sup> words per block:</p>
-            <input type="number" min="0" v-model="dataCacheBlockBits" />
-            <p>associativity:</p>
-            <input type="number" min="1" v-model="dataCacheAssociativity" />
+            <CacheParameters v-model="riscvSettings.dataCache.value" />
         </div>
     </div>
     <div class="row">
@@ -159,16 +122,9 @@ watch(
     <div class="row">
         <div class="col-4"></div>
         <div class="col-8">
-            <p>2<sup>N</sup> sets:</p>
-            <input type="number" min="0" v-model="instructionCacheIndexBits" />
-            <p>2<sup>N</sup> words per block:</p>
-            <input type="number" min="0" v-model="instructionCacheBlockBits" />
-            <p>associativity:</p>
-            <input
-                type="number"
-                min="1"
-                v-model="instructionCacheAssociativity"
-            />
+            <CacheParameters v-model="riscvSettings.instructionCache.value" />
         </div>
     </div>
 </template>
+
+<style scoped></style>

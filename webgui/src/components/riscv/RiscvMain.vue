@@ -102,22 +102,28 @@ onUnmounted(() => {
             />
         </div>
         <div ref="visualizationsContainer" id="riscv-visualizations-container">
-            <RiscvVisualization
-                v-if="
-                    riscvSettings.visContainerSelection.value == 'Processor' &&
-                    riscvSettings.pipelineMode.value === 'five_stage_pipeline'
-                "
-                :path="fiveStageVisualizationPath"
-                :simulation-store="simulationStore"
-            />
-            <RiscvVisualization
-                v-if="
-                    riscvSettings.visContainerSelection.value == 'Processor' &&
-                    riscvSettings.pipelineMode.value === 'single_stage_pipeline'
-                "
-                :path="singleStageVisualizationPath"
-                :simulation-store="simulationStore"
-            />
+            <div
+                class="processor-view-wrapper"
+                v-if="riscvSettings.visContainerSelection.value == 'Processor'"
+            >
+                <RiscvVisualization
+                    v-if="
+                        riscvSettings.pipelineMode.value ===
+                        'five_stage_pipeline'
+                    "
+                    :path="fiveStageVisualizationPath"
+                    :simulation-store="simulationStore"
+                />
+                <RiscvVisualization
+                    v-if="
+                        riscvSettings.pipelineMode.value ===
+                        'single_stage_pipeline'
+                    "
+                    :path="singleStageVisualizationPath"
+                    :simulation-store="simulationStore"
+                />
+            </div>
+
             <CacheView
                 v-if="
                     riscvSettings.visContainerSelection.value === 'Data Cache'
@@ -149,11 +155,15 @@ onUnmounted(() => {
 #riscv-visualizations-container {
     padding: 1em;
     height: 100%;
+    overflow: auto;
 }
 
 #riscv-text-content-container {
-    overflow-x: auto;
     gap: 1em;
+}
+
+.processor-view-wrapper {
+    height: 100%;
 }
 
 .editor {

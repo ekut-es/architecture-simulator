@@ -6,36 +6,38 @@ const blockSize = computed(() => Math.pow(2, props.numBlockBits));
 </script>
 
 <template>
-    <template v-if="props.cache !== null">
-        <table class="table table-sm table-bordered archsim-mono-table">
-            <thead>
-                <tr>
-                    <th>Index</th>
-                    <th>Valid</th>
-                    <th>Dirty</th>
-                    <th>Tag</th>
-                    <th v-for="i in blockSize">Word {{ i }}</th>
-                </tr>
-            </thead>
-            <tbody class="cache-table-body">
-                <template v-for="zet in props.cache.get('sets')">
-                    <tr v-for="block in zet.get('blocks')">
-                        <td>{{ zet.get("index") }}</td>
-                        <td>{{ block.get("valid_bit") }}</td>
-                        <td>{{ block.get("dirty_bit") }}</td>
-                        <td>{{ block.get("tag") }}</td>
-                        <template
-                            v-for="addr_value in block.get(
-                                'address_value_list'
-                            )"
-                        >
-                            <td>{{ addr_value[1] }}</td>
-                        </template>
+    <div>
+        <template v-if="props.cache !== null">
+            <table class="table table-sm table-bordered archsim-mono-table">
+                <thead>
+                    <tr>
+                        <th>Index</th>
+                        <th>Valid</th>
+                        <th>Dirty</th>
+                        <th>Tag</th>
+                        <th v-for="i in blockSize">Word {{ i }}</th>
                     </tr>
-                </template>
-            </tbody>
-        </table>
-    </template>
+                </thead>
+                <tbody class="cache-table-body">
+                    <template v-for="zet in props.cache.get('sets')">
+                        <tr v-for="block in zet.get('blocks')">
+                            <td>{{ zet.get("index") }}</td>
+                            <td>{{ block.get("valid_bit") }}</td>
+                            <td>{{ block.get("dirty_bit") }}</td>
+                            <td>{{ block.get("tag") }}</td>
+                            <template
+                                v-for="addr_value in block.get(
+                                    'address_value_list'
+                                )"
+                            >
+                                <td>{{ addr_value[1] }}</td>
+                            </template>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </template>
+    </div>
 </template>
 
 <style scoped>
