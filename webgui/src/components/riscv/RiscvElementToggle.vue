@@ -45,7 +45,10 @@ watch(
             >Registers/Output
         </ToggleButton>
     </div>
-    <select v-model="riscvSettings.visContainerSelection.value">
+    <select
+        v-model="riscvSettings.visContainerSelection.value"
+        aria-label="Select the element to be displayed on the right side"
+    >
         <option>None</option>
         <option>Processor</option>
         <option v-if="riscvSettings.dataCache.value.enable">Data Cache</option>

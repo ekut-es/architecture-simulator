@@ -37,7 +37,7 @@ import { toySettings } from "@/js/toy_settings";
         <ToggleButton
             v-model="toySettings.showVisualization.value"
             base-id="toy-toggle-visualization"
-            >Visualization
+            >Processor
         </ToggleButton>
     </div>
 </template>
