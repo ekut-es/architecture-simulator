@@ -26,7 +26,7 @@ class TestReplacementStrategies(TestCase):
             num_block_bits=0,
             associativity=1,
             memory=memory,
-            replacement_strategy=PLRU,
+            replacement_strategy="plru",
             performance_metrics=RiscvPerformanceMetrics(),
         )
 
@@ -47,7 +47,7 @@ class TestReplacementStrategies(TestCase):
             num_block_bits=0,
             associativity=2,
             memory=memory,
-            replacement_strategy=PLRU,
+            replacement_strategy="plru",
             performance_metrics=RiscvPerformanceMetrics(),
         )
 
@@ -67,7 +67,7 @@ class TestReplacementStrategies(TestCase):
             num_block_bits=0,
             associativity=2,
             memory=memory,
-            replacement_strategy=PLRU,
+            replacement_strategy="plru",
             performance_metrics=RiscvPerformanceMetrics(),
         )
 
@@ -89,7 +89,7 @@ class TestReplacementStrategies(TestCase):
             num_block_bits=0,
             associativity=4,
             memory=memory,
-            replacement_strategy=PLRU,
+            replacement_strategy="plru",
             performance_metrics=RiscvPerformanceMetrics(),
         )
 
