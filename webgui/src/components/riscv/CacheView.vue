@@ -43,17 +43,27 @@ const wordWidth = "12ch";
                 </thead>
                 <tbody class="cache-table-body">
                     <template v-for="zet in props.cacheEntries.get('sets')">
-                        <tr v-for="block in zet.get('blocks')">
-                            <td>{{ zet.get("index") }}</td>
-                            <td>{{ block.get("valid_bit") }}</td>
-                            <td>{{ block.get("dirty_bit") }}</td>
-                            <td>{{ block.get("tag") }}</td>
+                        <tr v-for="(block, index) in zet.get('blocks')">
+                            <td
+                                v-if="
+                                    index %
+                                        props.cacheSettings.associativity ===
+                                    0
+                                "
+                                :rowspan="props.cacheSettings.associativity"
+                                class="index"
+                            >
+                                {{ zet.get("index") }}
+                            </td>
+                            <td class="valid">{{ block.get("valid_bit") }}</td>
+                            <td class="dirty">{{ block.get("dirty_bit") }}</td>
+                            <td class="tag">{{ block.get("tag") }}</td>
                             <template
                                 v-for="addr_value in block.get(
                                     'address_value_list'
                                 )"
                             >
-                                <td>{{ addr_value[1] }}</td>
+                                <td class="word">{{ addr_value[1] }}</td>
                             </template>
                         </tr>
                     </template>
@@ -64,17 +74,23 @@ const wordWidth = "12ch";
 </template>
 
 <style scoped>
-.cache-table-body > tr > td {
-    text-align: right;
-}
-
-.cache-table-body > tr > td:nth-child(2),
-.cache-table-body > tr > td:nth-child(3) {
-    text-align: center;
-}
-
 .cache-table {
     margin-bottom: 0em;
     width: auto;
+}
+
+.index {
+    vertical-align: middle;
+    text-align: right;
+}
+
+.valid,
+.dirty {
+    text-align: center;
+}
+
+.tag,
+.word {
+    text-align: right;
 }
 </style>
