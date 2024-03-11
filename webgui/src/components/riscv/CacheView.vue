@@ -16,7 +16,7 @@ const tagWidth = computed(() => {
     return hexWidth + "ch";
 });
 
-const wordWidth = "12ch";
+const wordWidth = "12ch"; // enough space for udec
 </script>
 
 <template>

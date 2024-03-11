@@ -5,7 +5,10 @@ from architecture_simulator.uarch.memory.replacement_strategies import (
     ReplacementStrategy,
     LRU,
 )
-from architecture_simulator.util.integer_representations import to_hex_str
+from architecture_simulator.util.integer_representations import (
+    to_hex_str,
+    get_32_bit_representations,
+)
 
 T = TypeVar("T")
 
@@ -41,7 +44,7 @@ class CacheBlockRepr(Generic[T]):
             if valid_bit
             else [("", "") for _ in range(block_size)]
         )
-        self.tag = to_hex_str(tag, tag_width) if valid_bit else " " * tag_width
+        self.tag = ("0x" + to_hex_str(tag, tag_width)) if valid_bit else " " * tag_width
 
 
 class CacheBlock(Generic[T]):
@@ -205,7 +208,7 @@ class Cache(Generic[T]):
                 associativity,
                 num_block_bits,
                 LRU(associativity),
-                to_hex_str(i, self.num_index_bits),
+                ("0x" + to_hex_str(i, self.num_index_bits)),
             )
             for i in range(2**num_index_bits)
         ]
