@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from "vue";
 
-const props = defineProps(["cacheEntries", "cacheSettings"]);
+const props = defineProps(["cacheEntries", "cacheSettings", "isDataCache"]);
 const blockSize = computed(() =>
     Math.pow(2, props.cacheSettings.num_block_bits)
 );
@@ -17,6 +17,15 @@ const tagWidth = computed(() => {
 });
 
 const wordWidth = "12ch"; // enough space for udec
+const instrWidth = "20ch";
+const wordStyle = (() => {
+    const style = { minWidth: props.isDataCache ? wordWidth : instrWidth };
+    if (props.isDataCache) {
+        // instructions may use more space
+        style.width = wordWidth;
+    }
+    return style;
+})();
 </script>
 
 <template>
@@ -33,10 +42,7 @@ const wordWidth = "12ch"; // enough space for udec
                         <th :style="{ width: tagWidth, minWidth: tagWidth }">
                             Tag
                         </th>
-                        <th
-                            v-for="i in blockSize"
-                            :style="{ width: wordWidth, minWidth: wordWidth }"
-                        >
+                        <th v-for="i in blockSize" :style="wordStyle">
                             Word {{ i }}
                         </th>
                     </tr>
