@@ -158,6 +158,10 @@ onUnmounted(() => {
     overflow: auto;
 }
 
+#riscv-visualizations-container {
+    flex: 1 1 auto;
+}
+
 #riscv-text-content-container {
     gap: 1em;
 }
