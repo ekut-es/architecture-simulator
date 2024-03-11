@@ -123,24 +123,32 @@ onUnmounted(() => {
                     :simulation-store="simulationStore"
                 />
             </div>
-
-            <CacheView
-                v-if="
-                    riscvSettings.visContainerSelection.value === 'Data Cache'
-                "
-                :cache="simulationStore.dataCacheEntries"
-                :num-block-bits="riscvSettings.dataCache.value.num_block_bits"
-            ></CacheView>
-            <CacheView
+            <div
                 v-if="
                     riscvSettings.visContainerSelection.value ===
-                    'Instruction Cache'
+                        'Data Cache' ||
+                    riscvSettings.visContainerSelection.value ===
+                        'Instruction Cache'
                 "
-                :cache="simulationStore.instructionCacheEntries"
-                :num-block-bits="
-                    riscvSettings.instructionCache.value.num_block_bits
-                "
-            ></CacheView>
+                class="cache-view-wrapper"
+            >
+                <CacheView
+                    v-if="
+                        riscvSettings.visContainerSelection.value ===
+                        'Data Cache'
+                    "
+                    :cache-entries="simulationStore.dataCacheEntries"
+                    :cache-settings="riscvSettings.dataCache.value"
+                ></CacheView>
+                <CacheView
+                    v-if="
+                        riscvSettings.visContainerSelection.value ===
+                        'Instruction Cache'
+                    "
+                    :cache-entries="simulationStore.instructionCacheEntries"
+                    :cache-settings="riscvSettings.instructionCache.value"
+                ></CacheView>
+            </div>
         </div>
     </div>
 </template>
@@ -155,7 +163,6 @@ onUnmounted(() => {
 #riscv-visualizations-container {
     padding: 1em;
     height: 100%;
-    overflow: auto;
 }
 
 #riscv-visualizations-container {
@@ -164,10 +171,16 @@ onUnmounted(() => {
 
 #riscv-text-content-container {
     gap: 1em;
+    overflow: auto;
 }
 
 .processor-view-wrapper {
     height: 100%;
+}
+
+.cache-view-wrapper {
+    height: 100%;
+    overflow: auto;
 }
 
 .editor {
