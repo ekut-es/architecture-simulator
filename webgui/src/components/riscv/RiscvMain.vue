@@ -36,10 +36,7 @@ const textContainerPopulated = computed(
 );
 
 const visualizationsContainerPopulated = computed(
-    () =>
-        riscvSettings.showVisualization.value ||
-        riscvSettings.showDataCache.value ||
-        riscvSettings.showInstructionCache.value
+    () => riscvSettings.visContainerSelection.value !== "None"
 );
 const enableSplit = computed(
     () => textContainerPopulated.value && visualizationsContainerPopulated.value
@@ -105,7 +102,10 @@ onUnmounted(() => {
             />
         </div>
         <div ref="visualizationsContainer" id="riscv-visualizations-container">
-            <div v-show="riscvSettings.showVisualization.value">
+            <div
+                class="processor-view-wrapper"
+                v-if="riscvSettings.visContainerSelection.value == 'Processor'"
+            >
                 <RiscvVisualization
                     v-if="
                         riscvSettings.pipelineMode.value ===
@@ -123,14 +123,34 @@ onUnmounted(() => {
                     :simulation-store="simulationStore"
                 />
             </div>
-            <CacheView
-                v-if="riscvSettings.showDataCache.value"
-                :cache="simulationStore.dataCacheEntries"
-            ></CacheView>
-            <CacheView
-                v-if="riscvSettings.showInstructionCache.value"
-                :cache="simulationStore.instructionCacheEntries"
-            ></CacheView>
+            <div
+                v-if="
+                    riscvSettings.visContainerSelection.value ===
+                        'Data Cache' ||
+                    riscvSettings.visContainerSelection.value ===
+                        'Instruction Cache'
+                "
+                class="cache-view-wrapper"
+            >
+                <CacheView
+                    v-if="
+                        riscvSettings.visContainerSelection.value ===
+                        'Data Cache'
+                    "
+                    :cache-entries="simulationStore.dataCacheEntries"
+                    :cache-settings="riscvSettings.dataCache.value"
+                    :is-data-cache="true"
+                ></CacheView>
+                <CacheView
+                    v-if="
+                        riscvSettings.visContainerSelection.value ===
+                        'Instruction Cache'
+                    "
+                    :cache-entries="simulationStore.instructionCacheEntries"
+                    :cache-settings="riscvSettings.instructionCache.value"
+                    :is-data-cache="false"
+                ></CacheView>
+            </div>
         </div>
     </div>
 </template>
@@ -147,9 +167,23 @@ onUnmounted(() => {
     height: 100%;
 }
 
+#riscv-visualizations-container {
+    flex: 1 1 auto;
+    width: 100%;
+}
+
 #riscv-text-content-container {
-    overflow-x: auto;
     gap: 1em;
+    overflow: auto;
+}
+
+.processor-view-wrapper {
+    height: 100%;
+}
+
+.cache-view-wrapper {
+    height: 100%;
+    overflow: auto;
 }
 
 .editor {

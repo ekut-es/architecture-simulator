@@ -1,53 +1,102 @@
 <script setup>
-import { riscvSettings } from "@/js/riscv_settings";
 import { computed } from "vue";
 
-const props = defineProps(["cache"]);
+const props = defineProps(["cacheEntries", "cacheSettings", "isDataCache"]);
 const blockSize = computed(() =>
-    Math.pow(2, riscvSettings.dataCache.value.num_block_bits)
+    Math.pow(2, props.cacheSettings.num_block_bits)
 );
+
+const tagWidth = computed(() => {
+    const bitWidth =
+        32 -
+        (props.cacheSettings.num_index_bits +
+            props.cacheSettings.num_block_bits +
+            2);
+    const hexWidth = 4 + Math.ceil(bitWidth / 4);
+    return hexWidth + "ch";
+});
+
+const wordWidth = "12ch"; // enough space for udec
+const instrWidth = "20ch";
+const wordStyle = (() => {
+    const style = { minWidth: props.isDataCache ? wordWidth : instrWidth };
+    if (props.isDataCache) {
+        // instructions may use more space
+        style.width = wordWidth;
+    }
+    return style;
+})();
 </script>
 
 <template>
-    <template v-if="props.cache !== null">
-        <table class="table table-sm table-bordered archsim-mono-table">
-            <thead>
-                <tr>
-                    <th>Index</th>
-                    <th>Valid</th>
-                    <th>Dirty</th>
-                    <th>Tag</th>
-                    <th v-for="i in blockSize">Word {{ i }}</th>
-                </tr>
-            </thead>
-            <tbody class="cache-table-body">
-                <template v-for="zet in props.cache.get('sets')">
-                    <tr v-for="block in zet.get('blocks')">
-                        <td>{{ zet.get("index") }}</td>
-                        <td>{{ block.get("valid_bit") }}</td>
-                        <td>{{ block.get("dirty_bit") }}</td>
-                        <td>{{ block.get("tag") }}</td>
-                        <template
-                            v-for="addr_value in block.get(
-                                'address_value_list'
-                            )"
-                        >
-                            <td>{{ addr_value[1] }}</td>
-                        </template>
+    <div>
+        <template v-if="props.cacheEntries !== null">
+            <table
+                class="table table-sm table-bordered archsim-mono-table cache-table"
+            >
+                <thead>
+                    <tr>
+                        <th style="width: 0em">Index</th>
+                        <th style="width: 0em">Valid</th>
+                        <th style="width: 0em">Dirty</th>
+                        <th :style="{ width: tagWidth, minWidth: tagWidth }">
+                            Tag
+                        </th>
+                        <th v-for="i in blockSize" :style="wordStyle">
+                            Word {{ i }}
+                        </th>
                     </tr>
-                </template>
-            </tbody>
-        </table>
-    </template>
+                </thead>
+                <tbody class="cache-table-body">
+                    <template v-for="zet in props.cacheEntries.get('sets')">
+                        <tr v-for="(block, index) in zet.get('blocks')">
+                            <td
+                                v-if="
+                                    index %
+                                        props.cacheSettings.associativity ===
+                                    0
+                                "
+                                :rowspan="props.cacheSettings.associativity"
+                                class="index"
+                            >
+                                {{ zet.get("index") }}
+                            </td>
+                            <td class="valid">{{ block.get("valid_bit") }}</td>
+                            <td class="dirty">{{ block.get("dirty_bit") }}</td>
+                            <td class="tag">{{ block.get("tag") }}</td>
+                            <template
+                                v-for="addr_value in block.get(
+                                    'address_value_list'
+                                )"
+                            >
+                                <td class="word">{{ addr_value[1] }}</td>
+                            </template>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </template>
+    </div>
 </template>
 
 <style scoped>
-.cache-table-body > tr > td {
+.cache-table {
+    margin-bottom: 0em;
+    width: auto;
+}
+
+.index {
+    vertical-align: middle;
     text-align: right;
 }
 
-.cache-table-body > tr > td:nth-child(2),
-.cache-table-body > tr > td:nth-child(3) {
+.valid,
+.dirty {
     text-align: center;
+}
+
+.tag,
+.word {
+    text-align: right;
 }
 </style>
