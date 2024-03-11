@@ -10,10 +10,10 @@ from architecture_simulator.util.integer_manipulation import (
 from architecture_simulator.uarch.memory.cache import Cache, CacheRepr
 from architecture_simulator.uarch.memory.decoded_address import DecodedAddress
 from architecture_simulator.uarch.memory.memory import Memory
-from typing import Type
 from architecture_simulator.uarch.memory.replacement_strategies import (
     ReplacementStrategy,
     LRU,
+    PLRU,
 )
 from architecture_simulator.uarch.riscv.riscv_performance_metrics import (
     RiscvPerformanceMetrics,
@@ -34,17 +34,16 @@ class BaseCacheMemorySystem(MemorySystem):
         associativity: int,
         performance_metrics: RiscvPerformanceMetrics,
         miss_penality: int,
-        replacement_strategy: Type[ReplacementStrategy],
+        replacement_strategy: str,
     ) -> None:
         # TODO: check that num_index_bits, num_block_bits, associativity have legal values
+        self.replacement_strategy_class: type[ReplacementStrategy] = LRU if replacement_strategy == "lru" else PLRU  # type: ignore[type-abstract]
         self.cache = Cache[UInt32](
             num_index_bits=num_index_bits,
             num_block_bits=num_block_bits,
             associativity=associativity,
-            replacement_strategy=replacement_strategy,
+            replacement_strategy=self.replacement_strategy_class,
         )
-
-        self.replacement_strategy = replacement_strategy
 
         self.num_index_bits = num_index_bits
         self.num_block_bits = num_block_bits
@@ -105,7 +104,7 @@ class BaseCacheMemorySystem(MemorySystem):
             num_index_bits=self.num_index_bits,
             num_block_bits=self.num_block_bits,
             associativity=self.associativity,
-            replacement_strategy=self.replacement_strategy,
+            replacement_strategy=self.replacement_strategy_class,
         )
         self.memory.reset()
 

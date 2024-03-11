@@ -14,13 +14,22 @@ T = TypeVar("T")
 
 class CacheOptions:
     def __init__(
-        self, enable: bool, num_index_bits: int, num_block_bits: int, associativity: int
+        self,
+        enable: bool,
+        num_index_bits: int,
+        num_block_bits: int,
+        associativity: int,
+        cache_type: str,
+        replacement_strategy: str,
+        miss_penalty: int,
     ) -> None:
         self.enable = enable
         self.num_index_bits = num_index_bits
         self.num_block_bits = num_block_bits
         self.associativity = associativity
-        # TODO: Impl ability to select WB or WT
+        self.cache_type = cache_type  # "wb" or "wt"
+        self.replacement_strategy = replacement_strategy  # "lru" or "plru"
+        self.miss_penalty = miss_penalty
 
 
 class CacheBlockRepr(Generic[T]):

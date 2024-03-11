@@ -6,10 +6,10 @@ from architecture_simulator.uarch.memory.instruction_memory import InstructionMe
 from architecture_simulator.isa.riscv.rv32i_instructions import RiscvInstruction
 from architecture_simulator.uarch.memory.decoded_address import DecodedAddress
 from architecture_simulator.isa.riscv.instruction_types import EmptyInstruction
-from typing import Type
 from architecture_simulator.uarch.memory.replacement_strategies import (
     ReplacementStrategy,
     LRU,
+    PLRU,
 )
 from architecture_simulator.uarch.riscv.riscv_performance_metrics import (
     RiscvPerformanceMetrics,
@@ -25,17 +25,16 @@ class InstructionMemoryCacheSystem(InstructionMemorySystem):
         associativity: int,
         performance_metrics: RiscvPerformanceMetrics,
         miss_penality: int = 0,
-        replacement_strategy: Type[ReplacementStrategy] = LRU,
+        replacement_strategy: str = "lru",
     ) -> None:
         # TODO: check that num_index_bits, num_block_bits, associativity have legal values
+        self.replacement_strategy_class: type[ReplacementStrategy] = LRU if replacement_strategy == "lru" else PLRU  # type: ignore[type-abstract]
         self.cache = Cache[RiscvInstruction](
             num_index_bits=num_index_bits,
             num_block_bits=num_block_bits,
             associativity=associativity,
-            replacement_strategy=replacement_strategy,
+            replacement_strategy=self.replacement_strategy_class,
         )
-
-        self.replacement_strategy = replacement_strategy
 
         self.num_index_bits = num_index_bits
         self.num_block_bits = num_block_bits
@@ -53,7 +52,7 @@ class InstructionMemoryCacheSystem(InstructionMemorySystem):
             num_index_bits=self.num_index_bits,
             num_block_bits=self.num_block_bits,
             associativity=self.associativity,
-            replacement_strategy=self.replacement_strategy,
+            replacement_strategy=self.replacement_strategy_class,
         )
 
     def has_instructions(self) -> bool:

@@ -58,10 +58,22 @@ class Settings:
         },
         "toy_memory_max_bytes": 4096,
         "instruction_cache": CacheOptions(
-            enable=False, num_index_bits=0, num_block_bits=0, associativity=1
+            enable=False,
+            num_index_bits=0,
+            num_block_bits=0,
+            associativity=1,
+            cache_type="wb",
+            replacement_strategy="lru",
+            miss_penalty=0,
         ),
         "data_cache": CacheOptions(
-            enable=False, num_index_bits=0, num_block_bits=0, associativity=1
+            enable=False,
+            num_index_bits=0,
+            num_block_bits=0,
+            associativity=1,
+            cache_type="wb",
+            replacement_strategy="lru",
+            miss_penalty=0,
         ),
     }
 

@@ -12,7 +12,6 @@ from architecture_simulator.util.integer_manipulation import (
 from architecture_simulator.uarch.memory.cache import Cache, CacheRepr
 from architecture_simulator.uarch.memory.decoded_address import DecodedAddress
 from architecture_simulator.uarch.memory.memory import Memory
-from typing import Type
 from architecture_simulator.uarch.memory.replacement_strategies import (
     ReplacementStrategy,
     LRU,
@@ -31,7 +30,7 @@ class WriteBackMemorySystem(BaseCacheMemorySystem):
         associativity: int,
         performance_metrics: RiscvPerformanceMetrics,
         miss_penality: int = 0,
-        replacement_strategy: Type[ReplacementStrategy] = LRU,
+        replacement_strategy: str = "lru",
     ) -> None:
         super().__init__(
             memory,

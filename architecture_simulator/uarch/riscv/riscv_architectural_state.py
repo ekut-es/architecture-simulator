@@ -33,6 +33,9 @@ if TYPE_CHECKING:
         InstructionMemorySystem,
     )
     from architecture_simulator.uarch.memory.cache import CacheOptions
+    from architecture_simulator.uarch.memory.base_cache_memory_system import (
+        BaseCacheMemorySystem,
+    )
 
 
 class RiscvArchitecturalState:
@@ -45,8 +48,8 @@ class RiscvArchitecturalState:
         memory: Optional[MemorySystem] = None,
         register_file: Optional[RegisterFile] = None,
         instruction_memory: Optional[InstructionMemorySystem] = None,
-        data_cache: CacheOptions = Settings().get()["data_cache"],
-        instruction_cache: CacheOptions = Settings().get()["instruction_cache"],
+        data_cache_options: CacheOptions = Settings().get()["data_cache"],
+        instruction_cache_options: CacheOptions = Settings().get()["instruction_cache"],
     ):
         if pipeline_mode == "five_stage_pipeline":
             stages = [
@@ -68,15 +71,15 @@ class RiscvArchitecturalState:
         if instruction_memory is not None:
             self.instruction_memory = instruction_memory
         else:
-            if instruction_cache.enable:
+            if instruction_cache_options.enable:
                 self.instruction_memory = InstructionMemoryCacheSystem(
                     instruction_memory=InstructionMemory[RiscvInstruction](),
-                    num_index_bits=instruction_cache.num_index_bits,
-                    num_block_bits=instruction_cache.num_block_bits,
-                    associativity=instruction_cache.associativity,
-                    performance_metrics=self.performance_metrics
-                    # TODO: Impl
-                    # replacement_strategy= ...
+                    num_index_bits=instruction_cache_options.num_index_bits,
+                    num_block_bits=instruction_cache_options.num_block_bits,
+                    associativity=instruction_cache_options.associativity,
+                    performance_metrics=self.performance_metrics,
+                    replacement_strategy=instruction_cache_options.replacement_strategy,
+                    miss_penality=instruction_cache_options.miss_penalty,
                 )
             else:
                 self.instruction_memory = InstructionMemory[RiscvInstruction]()
@@ -86,11 +89,12 @@ class RiscvArchitecturalState:
         if memory is not None:
             self.memory = memory
         else:
-            if data_cache.enable:
-                # TODO: Impl
-                # C = WriteThroughMemorySystem if ... else WriteBackMemorySystem
-                # self.memory = C(
-                self.memory = WriteThroughMemorySystem(
+            if data_cache_options.enable:
+                if data_cache_options.cache_type == "wt":
+                    cache_class: type[BaseCacheMemorySystem] = WriteThroughMemorySystem
+                else:
+                    cache_class = WriteBackMemorySystem
+                self.memory = cache_class(
                     memory=Memory(
                         AddressingType.BYTE,
                         address_length,
@@ -100,12 +104,12 @@ class RiscvArchitecturalState:
                             2**address_length,
                         ),
                     ),
-                    num_index_bits=data_cache.num_index_bits,
-                    num_block_bits=data_cache.num_block_bits,
-                    associativity=data_cache.associativity,
-                    performance_metrics=self.performance_metrics
-                    # TODO: Impl
-                    # replacement_strategy= ...
+                    num_index_bits=data_cache_options.num_index_bits,
+                    num_block_bits=data_cache_options.num_block_bits,
+                    associativity=data_cache_options.associativity,
+                    performance_metrics=self.performance_metrics,
+                    replacement_strategy=data_cache_options.replacement_strategy,
+                    miss_penality=data_cache_options.miss_penalty,
                 )
             else:
                 self.memory = Memory(
