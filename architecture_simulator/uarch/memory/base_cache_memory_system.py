@@ -18,6 +18,7 @@ from architecture_simulator.uarch.memory.replacement_strategies import (
 from architecture_simulator.uarch.riscv.riscv_performance_metrics import (
     RiscvPerformanceMetrics,
 )
+from abc import abstractmethod
 
 
 class BaseCacheMemorySystem(MemorySystem):
@@ -117,5 +118,6 @@ class BaseCacheMemorySystem(MemorySystem):
     def cache_repr(self) -> CacheRepr:
         return self.cache.get_repr()
 
+    @abstractmethod
     def _read_block(self, decoded_address: DecodedAddress) -> tuple[list[UInt32], bool]:
         raise NotImplementedError
