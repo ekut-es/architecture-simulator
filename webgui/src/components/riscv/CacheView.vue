@@ -26,6 +26,8 @@ const wordStyle = (() => {
     }
     return style;
 })();
+
+const showDirtyBit = computed(() => props.cacheSettings.cache_type === "wb");
 </script>
 
 <template>
@@ -38,7 +40,7 @@ const wordStyle = (() => {
                     <tr>
                         <th style="width: 0em">Index</th>
                         <th style="width: 0em">Valid</th>
-                        <th style="width: 0em">Dirty</th>
+                        <th v-if="showDirtyBit" style="width: 0em">Dirty</th>
                         <th :style="{ width: tagWidth, minWidth: tagWidth }">
                             Tag
                         </th>
@@ -62,7 +64,9 @@ const wordStyle = (() => {
                                 {{ zet.get("index") }}
                             </td>
                             <td class="valid">{{ block.get("valid_bit") }}</td>
-                            <td class="dirty">{{ block.get("dirty_bit") }}</td>
+                            <td v-if="showDirtyBit" class="dirty">
+                                {{ block.get("dirty_bit") }}
+                            </td>
                             <td class="tag">{{ block.get("tag") }}</td>
                             <template
                                 v-for="addr_value in block.get(
