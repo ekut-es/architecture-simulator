@@ -97,10 +97,13 @@ watch(
             </label>
         </div>
     </div>
-    <div class="row">
+    <div v-if="riscvSettings.dataCache.value.enable" class="row">
         <div class="col-4"></div>
         <div class="col-8">
-            <CacheParameters v-model="riscvSettings.dataCache.value" />
+            <CacheParameters
+                v-model="riscvSettings.dataCache.value"
+                :is-data-cache="true"
+            />
         </div>
     </div>
     <div class="row">
@@ -119,10 +122,13 @@ watch(
             </label>
         </div>
     </div>
-    <div class="row">
+    <div v-if="riscvSettings.instructionCache.value.enable" class="row">
         <div class="col-4"></div>
         <div class="col-8">
-            <CacheParameters v-model="riscvSettings.instructionCache.value" />
+            <CacheParameters
+                v-model="riscvSettings.instructionCache.value"
+                :is-data-cache="false"
+            />
         </div>
     </div>
 </template>

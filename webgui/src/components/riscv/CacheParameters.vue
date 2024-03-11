@@ -4,6 +4,7 @@ import { useRiscvSimulationStore } from "@/js/riscv_simulation_store";
 import { ref, watch } from "vue";
 
 const model = defineModel();
+const props = defineProps(["isDataCache"]);
 
 const indexBits = ref(model.value.num_index_bits);
 const blockBits = ref(model.value.num_block_bits);
@@ -13,6 +14,10 @@ const blockBitsStatus = ref("");
 const associativityStatus = ref("");
 const totalSize = ref(0);
 const totalSizeValid = ref(true);
+const replacementStrategy = ref(model.value.replacement_strategy);
+const cacheType = ref(model.value.cache_type);
+// const replacementStrategy = ref(model.value.replacement_strategy.toUpperCase());
+// const cacheTypeReadable = ref(cacheTypeToReadable(model.value.cache_type));
 
 const totalSizeThreshold = 2048;
 
@@ -50,10 +55,21 @@ watch(
         if (associativityStatus.value === "") {
             model.value.associativity = newAssociativity;
         }
+
         simulationStore.resetSimulation();
         editorStore.loadProgram();
     },
     { immediate: true }
+);
+
+watch(
+    [cacheType, replacementStrategy],
+    ([newCacheType, neweReplacementStrategy]) => {
+        model.value.cache_type = newCacheType;
+        model.value.replacement_strategy = neweReplacementStrategy;
+        simulationStore.resetSimulation();
+        editorStore.loadProgram();
+    }
 );
 
 function validateInput(number, min) {
@@ -68,6 +84,20 @@ function validateInput(number, min) {
 </script>
 
 <template>
+    <p v-if="props.isDataCache">
+        Type:
+        <select v-model="cacheType">
+            <option value="wb">Write-back, Write allocate</option>
+            <option value="wt">Write-through, Write no-allocate</option>
+        </select>
+    </p>
+    <p>
+        Replacement Strategy:
+        <select v-model="replacementStrategy">
+            <option value="lru">LRU</option>
+            <option value="plru">PLRU</option>
+        </select>
+    </p>
     <div
         v-if="!totalSizeValid"
         class="alert alert-warning d-flex align-items-center"

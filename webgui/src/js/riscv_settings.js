@@ -16,12 +16,18 @@ export const riscvSettings = {
         num_index_bits: 2,
         num_block_bits: 0,
         associativity: 4,
+        miss_penalty: 0,
+        replacement_strategy: "lru",
+        cache_type: "wt",
     }),
     instructionCache: ref({
         enable: false,
         num_index_bits: 2,
         num_block_bits: 0,
         associativity: 4,
+        miss_penalty: 0,
+        replacement_strategy: "lru",
+        cache_type: "wb",
     }),
     visContainerSelection: ref("Processor"),
 };
