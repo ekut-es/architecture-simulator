@@ -350,4 +350,4 @@ class TestCache(TestCase):
         simulation.load_program("lw x1, -4(x0)")
         simulation.run()
         stats = simulation.get_data_cache_stats()
-        self.assertEqual(stats["address"], 0xFFFFFFFC)
+        self.assertEqual(stats["address"], "11111111111111111111111111111100")
