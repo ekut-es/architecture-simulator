@@ -1,5 +1,12 @@
 <script setup>
-import { computed } from "vue";
+import CacheArrows from "./CacheArrows.vue";
+import { computed, ref } from "vue";
+
+const tagCell = ref(null);
+const indexCell = ref(null);
+// const blockOffsetCell = ref(null);
+const wordOffsetCell = ref(null);
+const addressTable = ref(null);
 
 const props = defineProps([
     "cacheEntries",
@@ -7,6 +14,7 @@ const props = defineProps([
     "isDataCache",
     "cacheStats",
 ]);
+
 const blockSize = computed(() =>
     Math.pow(2, props.cacheSettings.num_block_bits)
 );
@@ -71,6 +79,23 @@ const address = computed(() => {
     }
     return result;
 });
+
+const tagArrow = computed(() => {
+    if (tagCell.value === null) {
+        return null;
+    }
+    const cords = {
+        start: {
+            x: tagCell.value.offsetWidth / 2 + addressTable.value.offsetLeft,
+            y: tagCell.value.offsetHeight + addressTable.value.offsetTop,
+        },
+        stop: {
+            x: tagCell.value.offsetWidth / 2 + addressTable.value.offsetLeft,
+            y: tagCell.value.offsetHeight + addressTable.value.offsetTop + 50,
+        },
+    };
+    return cords;
+});
 </script>
 
 <template>
@@ -79,26 +104,33 @@ const address = computed(() => {
         <p>Misses: {{ misses }}</p>
         <p>Address: {{ props.cacheStats.get("address") }}</p>
         <div class="tables-vis-wrapper">
-            <div class="arrow-layer">
-                <p>Lots of arrows here!</p>
-            </div>
-
+            <CacheArrows
+                class="arrow-layer"
+                width="300"
+                height="500"
+                base-id="riscv-cache-canvas"
+                :tag-arrow="tagArrow"
+            />
             <div class="tables-wrapper">
                 <table
+                    ref="addressTable"
                     class="table table-sm table-bordered archsim-mono-table address-table"
                 >
                     <tbody>
                         <tr>
-                            <td v-if="address.tagBits">
+                            <td ref="tagCell" v-if="address.tagBits">
                                 {{ address.tagBits }}
                             </td>
-                            <td v-if="address.indexBits">
+                            <td ref="indexCell" v-if="address.indexBits">
                                 {{ address.indexBits }}
                             </td>
                             <td v-if="address.blockOffsetBits">
                                 {{ address.blockOffsetBits }}
                             </td>
-                            <td v-if="address.wordOffsetBits">
+                            <td
+                                ref="wordOffsetCell"
+                                v-if="address.wordOffsetBits"
+                            >
                                 {{ address.wordOffsetBits }}
                             </td>
                         </tr>
