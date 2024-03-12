@@ -80,6 +80,7 @@ const address = computed(() => {
     return result;
 });
 
+// TODO: This doesn't work, the computed doesn't detect changes to the cell size
 const tagArrow = computed(() => {
     if (tagCell.value === null) {
         return null;
@@ -96,6 +97,35 @@ const tagArrow = computed(() => {
     };
     return cords;
 });
+
+const indexArrow = computed(() => {
+    if (indexCell.value === null) {
+        return null;
+    }
+    const cords = {
+        start: {
+            x:
+                indexCell.value.offsetWidth / 2 +
+                addressTable.value.offsetLeft +
+                indexCell.value.offsetLeft,
+            y:
+                indexCell.value.offsetHeight +
+                addressTable.value.offsetTop +
+                indexCell.value.offsetTop,
+        },
+        stop: {
+            x: tagCell.value.offsetWidth / 2 + addressTable.value.offsetLeft,
+            y: tagCell.value.offsetHeight + addressTable.value.offsetTop + 50,
+        },
+    };
+    return cords;
+});
+
+function computeOffset(a, b) {
+    const aRect = a.getBoundingClientRect();
+    const bRect = b.getBoundingClientRect();
+    return { x: aRect.left - bRect.left, y: aRect.top - bRect.top };
+}
 </script>
 
 <template>
