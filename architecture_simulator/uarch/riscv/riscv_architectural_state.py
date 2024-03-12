@@ -51,6 +51,7 @@ class RiscvArchitecturalState:
         data_cache_options: CacheOptions = Settings().get()["data_cache"],
         instruction_cache_options: CacheOptions = Settings().get()["instruction_cache"],
     ):
+        self.pipeline_mode = pipeline_mode
         if pipeline_mode == "five_stage_pipeline":
             stages = [
                 InstructionFetchStage(),

@@ -46,6 +46,7 @@ const misses = computed(() =>
     <div>
         <p>Hits: {{ props.cacheStats.get("hits") }}</p>
         <p>Misses: {{ misses }}</p>
+        <p>Address: {{ props.cacheStats.get("address") }}</p>
         <template v-if="props.cacheEntries !== null">
             <table
                 class="table table-sm table-bordered archsim-mono-table cache-table"

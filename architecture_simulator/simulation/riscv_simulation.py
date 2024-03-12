@@ -165,7 +165,26 @@ class RiscvSimulation(Simulation):
         )
 
     def get_data_cache_stats(self):
-        return self.state.memory.get_cache_stats()
+        stats = self.state.memory.get_cache_stats()
+        if stats is None:
+            return None
+
+        if self.state.pipeline_mode == "five_stage_pipeline":
+            pipeline_register = self.state.pipeline.pipeline_registers[3]
+        else:
+            pipeline_register = self.state.pipeline.pipeline_registers[0]
+
+        if isinstance(pipeline_register, MemoryAccessPipelineRegister) or isinstance(
+            pipeline_register, SingleStagePipelineRegister
+        ):
+            address = pipeline_register.memory_address
+            if address is not None:
+                address = address % (2**32)  # address might be negative
+        else:
+            address = None
+        stats = self.state.memory.get_cache_stats()
+        stats["address"] = address
+        return stats
 
     def get_instruction_cache_entries(self):
         return self.state.instruction_memory.cache_repr()
@@ -178,7 +197,19 @@ class RiscvSimulation(Simulation):
         )
 
     def get_instruction_cache_stats(self):
-        return self.state.instruction_memory.get_cache_stats()
+        stats = self.state.instruction_memory.get_cache_stats()
+        if stats is None:
+            return None
+
+        pipeline_register = self.state.pipeline.pipeline_registers[0]
+        if isinstance(
+            pipeline_register, InstructionFetchPipelineRegister
+        ) or isinstance(pipeline_register, SingleStagePipelineRegister):
+            address = pipeline_register.address_of_instruction
+        else:
+            address = None
+        stats["address"] = address
+        return stats
 
     def get_riscv_five_stage_svg_update_values(self) -> list[tuple[str, str, Any]]:
         """Returns all information needed to update the svg.

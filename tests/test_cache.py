@@ -12,6 +12,8 @@ from architecture_simulator.uarch.memory.write_back_memory_system import (
 from architecture_simulator.uarch.riscv.riscv_performance_metrics import (
     RiscvPerformanceMetrics,
 )
+from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
+from architecture_simulator.uarch.memory.cache import CacheOptions
 
 
 class TestCache(TestCase):
@@ -331,3 +333,21 @@ class TestCache(TestCase):
 
         self.assertEqual(memory_system.get_cache_stats()["hits"], "1")
         self.assertEqual(memory_system.get_cache_stats()["accesses"], "7")
+
+    def test_address_logging(self) -> None:
+        simulation = RiscvSimulation(
+            data_cache=CacheOptions(
+                enable=True,
+                num_index_bits=2,
+                num_block_bits=1,
+                associativity=2,
+                cache_type="wb",
+                replacement_strategy="lru",
+                miss_penalty=0,
+            )
+        )
+
+        simulation.load_program("lw x1, -4(x0)")
+        simulation.run()
+        stats = simulation.get_data_cache_stats()
+        self.assertEqual(stats["address"], 0xFFFFFFFC)
