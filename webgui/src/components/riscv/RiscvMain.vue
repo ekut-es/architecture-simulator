@@ -140,6 +140,7 @@ onUnmounted(() => {
                     :cache-entries="simulationStore.dataCacheEntries"
                     :cache-settings="riscvSettings.dataCache.value"
                     :is-data-cache="true"
+                    :cache-stats="simulationStore.dataCacheStats"
                 ></CacheView>
                 <CacheView
                     v-if="
@@ -149,6 +150,7 @@ onUnmounted(() => {
                     :cache-entries="simulationStore.instructionCacheEntries"
                     :cache-settings="riscvSettings.instructionCache.value"
                     :is-data-cache="false"
+                    :cache-stats="simulationStore.instructionCacheStats"
                 ></CacheView>
             </div>
         </div>

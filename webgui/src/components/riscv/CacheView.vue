@@ -1,7 +1,12 @@
 <script setup>
 import { computed } from "vue";
 
-const props = defineProps(["cacheEntries", "cacheSettings", "isDataCache"]);
+const props = defineProps([
+    "cacheEntries",
+    "cacheSettings",
+    "isDataCache",
+    "cacheStats",
+]);
 const blockSize = computed(() =>
     Math.pow(2, props.cacheSettings.num_block_bits)
 );
@@ -28,10 +33,19 @@ const wordStyle = (() => {
 })();
 
 const showDirtyBit = computed(() => props.cacheSettings.cache_type === "wb");
+
+const misses = computed(() =>
+    String(
+        Number(props.cacheStats.get("accesses")) -
+            Number(props.cacheStats.get("hits"))
+    )
+);
 </script>
 
 <template>
     <div>
+        <p>Hits: {{ props.cacheStats.get("hits") }}</p>
+        <p>Misses: {{ misses }}</p>
         <template v-if="props.cacheEntries !== null">
             <table
                 class="table table-sm table-bordered archsim-mono-table cache-table"
