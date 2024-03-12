@@ -78,74 +78,120 @@ const address = computed(() => {
         <p>Hits: {{ props.cacheStats.get("hits") }}</p>
         <p>Misses: {{ misses }}</p>
         <p>Address: {{ props.cacheStats.get("address") }}</p>
-        <table
-            class="table table-sm table-bordered archsim-mono-table address-table"
-        >
-            <tbody>
-                <tr>
-                    <td v-if="address.tagBits">{{ address.tagBits }}</td>
-                    <td v-if="address.indexBits">{{ address.indexBits }}</td>
-                    <td v-if="address.blockOffsetBits">
-                        {{ address.blockOffsetBits }}
-                    </td>
-                    <td v-if="address.wordOffsetBits">
-                        {{ address.wordOffsetBits }}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <template v-if="props.cacheEntries !== null">
-            <table
-                class="table table-sm table-bordered archsim-mono-table cache-table"
-            >
-                <thead>
-                    <tr>
-                        <th style="width: 0em">Index</th>
-                        <th style="width: 0em">Valid</th>
-                        <th v-if="showDirtyBit" style="width: 0em">Dirty</th>
-                        <th :style="{ width: tagWidth, minWidth: tagWidth }">
-                            Tag
-                        </th>
-                        <th v-for="i in blockSize" :style="wordStyle">
-                            Word {{ i }}
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="cache-table-body">
-                    <template v-for="zet in props.cacheEntries.get('sets')">
-                        <tr v-for="(block, index) in zet.get('blocks')">
-                            <td
-                                v-if="
-                                    index %
-                                        props.cacheSettings.associativity ===
-                                    0
-                                "
-                                :rowspan="props.cacheSettings.associativity"
-                                class="index"
-                            >
-                                {{ zet.get("index") }}
+        <div class="tables-vis-wrapper">
+            <div class="arrow-layer">
+                <p>Lots of arrows here!</p>
+            </div>
+
+            <div class="tables-wrapper">
+                <table
+                    class="table table-sm table-bordered archsim-mono-table address-table"
+                >
+                    <tbody>
+                        <tr>
+                            <td v-if="address.tagBits">
+                                {{ address.tagBits }}
                             </td>
-                            <td class="valid">{{ block.get("valid_bit") }}</td>
-                            <td v-if="showDirtyBit" class="dirty">
-                                {{ block.get("dirty_bit") }}
+                            <td v-if="address.indexBits">
+                                {{ address.indexBits }}
                             </td>
-                            <td class="tag">{{ block.get("tag") }}</td>
-                            <template
-                                v-for="addr_value in block.get(
-                                    'address_value_list'
-                                )"
-                            >
-                                <td class="word">{{ addr_value[1] }}</td>
-                            </template>
+                            <td v-if="address.blockOffsetBits">
+                                {{ address.blockOffsetBits }}
+                            </td>
+                            <td v-if="address.wordOffsetBits">
+                                {{ address.wordOffsetBits }}
+                            </td>
                         </tr>
-                    </template>
-                </tbody>
-            </table>
-        </template>
+                    </tbody>
+                </table>
+                <template v-if="props.cacheEntries !== null">
+                    <table
+                        class="table table-sm table-bordered archsim-mono-table cache-table"
+                    >
+                        <thead>
+                            <tr>
+                                <th style="width: 0em">Index</th>
+                                <th style="width: 0em">Valid</th>
+                                <th v-if="showDirtyBit" style="width: 0em">
+                                    Dirty
+                                </th>
+                                <th
+                                    :style="{
+                                        width: tagWidth,
+                                        minWidth: tagWidth,
+                                    }"
+                                >
+                                    Tag
+                                </th>
+                                <th v-for="i in blockSize" :style="wordStyle">
+                                    Word {{ i }}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="cache-table-body">
+                            <template
+                                v-for="zet in props.cacheEntries.get('sets')"
+                            >
+                                <tr v-for="(block, index) in zet.get('blocks')">
+                                    <td
+                                        v-if="
+                                            index %
+                                                props.cacheSettings
+                                                    .associativity ===
+                                            0
+                                        "
+                                        :rowspan="
+                                            props.cacheSettings.associativity
+                                        "
+                                        class="index"
+                                    >
+                                        {{ zet.get("index") }}
+                                    </td>
+                                    <td class="valid">
+                                        {{ block.get("valid_bit") }}
+                                    </td>
+                                    <td v-if="showDirtyBit" class="dirty">
+                                        {{ block.get("dirty_bit") }}
+                                    </td>
+                                    <td class="tag">{{ block.get("tag") }}</td>
+                                    <template
+                                        v-for="addr_value in block.get(
+                                            'address_value_list'
+                                        )"
+                                    >
+                                        <td class="word">
+                                            {{ addr_value[1] }}
+                                        </td>
+                                    </template>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </template>
+            </div>
+        </div>
     </div>
 </template>
 
 <style scoped>
+.tables-vis-wrapper {
+    position: relative;
+}
+
+.arrow-layer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 2;
+}
+
+.tables-wrapper {
+    padding-left: 4em;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1;
+}
 .cache-table {
     margin-bottom: 0em;
     width: auto;
