@@ -40,6 +40,37 @@ const misses = computed(() =>
             Number(props.cacheStats.get("hits"))
     )
 );
+
+// address, settings
+const address = computed(() => {
+    const address = props.cacheStats.get("address");
+    const numWordBits = 2;
+    const numBlockBits = props.cacheSettings.num_block_bits;
+    const numIndexBits = props.cacheSettings.num_index_bits;
+    const numTagBits = 32 - numBlockBits - numIndexBits - numWordBits;
+    let result = null;
+    if (typeof address === "undefined" || address == null) {
+        result = {
+            wordOffsetBits: " ".repeat(numWordBits),
+            blockOffsetBits: " ".repeat(numBlockBits),
+            indexBits: " ".repeat(numIndexBits),
+            tagBits: " ".repeat(numTagBits),
+        };
+    } else {
+        result = {
+            wordOffsetBits: address.slice(
+                numTagBits + numIndexBits + numBlockBits
+            ),
+            blockOffsetBits: address.slice(
+                numTagBits + numIndexBits,
+                numTagBits + numIndexBits + numBlockBits
+            ),
+            indexBits: address.slice(numTagBits, numTagBits + numIndexBits),
+            tagBits: address.slice(0, numTagBits),
+        };
+    }
+    return result;
+});
 </script>
 
 <template>
@@ -47,6 +78,22 @@ const misses = computed(() =>
         <p>Hits: {{ props.cacheStats.get("hits") }}</p>
         <p>Misses: {{ misses }}</p>
         <p>Address: {{ props.cacheStats.get("address") }}</p>
+        <table
+            class="table table-sm table-bordered archsim-mono-table address-table"
+        >
+            <tbody>
+                <tr>
+                    <td v-if="address.tagBits">{{ address.tagBits }}</td>
+                    <td v-if="address.indexBits">{{ address.indexBits }}</td>
+                    <td v-if="address.blockOffsetBits">
+                        {{ address.blockOffsetBits }}
+                    </td>
+                    <td v-if="address.wordOffsetBits">
+                        {{ address.wordOffsetBits }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
         <template v-if="props.cacheEntries !== null">
             <table
                 class="table table-sm table-bordered archsim-mono-table cache-table"
@@ -102,6 +149,11 @@ const misses = computed(() =>
 .cache-table {
     margin-bottom: 0em;
     width: auto;
+}
+
+.address-table {
+    width: auto;
+    white-space: pre;
 }
 
 .index {

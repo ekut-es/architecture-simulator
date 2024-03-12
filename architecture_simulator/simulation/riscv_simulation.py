@@ -165,6 +165,11 @@ class RiscvSimulation(Simulation):
         )
 
     def get_data_cache_stats(self):
+        """Returns the stats of the data cache (will be None if no cache is used).
+
+        Returns:
+            dict[str, Optional[str]] | None: The cache stats, plus the last address that was accessed under the key "address".
+        """
         stats = self.state.memory.get_cache_stats()
         if stats is None:
             return None
@@ -179,7 +184,9 @@ class RiscvSimulation(Simulation):
         ):
             address = pipeline_register.memory_address
             if address is not None:
-                address = address % (2**32)  # address might be negative
+                address = "{:032b}".format(
+                    address % (2**32)
+                )  # address might be negative
         else:
             address = None
         stats = self.state.memory.get_cache_stats()
@@ -197,6 +204,11 @@ class RiscvSimulation(Simulation):
         )
 
     def get_instruction_cache_stats(self):
+        """Returns the stats of the instruction cache (will be None if no cache is used).
+
+        Returns:
+            dict[str, Optional[str]] | None: The cache stats, plus the last address that was accessed under the key "address".
+        """
         stats = self.state.instruction_memory.get_cache_stats()
         if stats is None:
             return None
@@ -206,6 +218,10 @@ class RiscvSimulation(Simulation):
             pipeline_register, InstructionFetchPipelineRegister
         ) or isinstance(pipeline_register, SingleStagePipelineRegister):
             address = pipeline_register.address_of_instruction
+            if address is not None:
+                address = "{:032b}".format(
+                    address % (2**32)
+                )  # address shouldn't be negative, but lets check anyway
         else:
             address = None
         stats["address"] = address
