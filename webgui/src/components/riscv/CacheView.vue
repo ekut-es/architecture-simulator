@@ -294,6 +294,7 @@ onMounted(() => {
 .address-table {
     width: auto;
     white-space: pre;
+    margin-bottom: 4em;
 }
 
 .index {

@@ -28,9 +28,9 @@ function drawCanvas() {
 
     if (exists(props.indexStartCell) && exists(props.indexEndCell)) {
         ctx.beginPath();
-        let xy = computeOffset(props.indexStartCell);
+        let xy = computeOffset(props.indexStartCell, 0.5, 1);
         ctx.moveTo(xy.x, xy.y);
-        xy = computeOffset(props.indexEndCell);
+        xy = computeOffset(props.indexEndCell, 0, 0.5);
         ctx.lineTo(xy.x, xy.y);
         ctx.stroke();
     }
@@ -40,9 +40,9 @@ function drawCanvas() {
         exists(props.blockOffsetEndCell)
     ) {
         ctx.beginPath();
-        let xy = computeOffset(props.blockOffsetStartCell);
+        let xy = computeOffset(props.blockOffsetStartCell, 0.5, 1);
         ctx.moveTo(xy.x, xy.y);
-        xy = computeOffset(props.blockOffsetEndCell);
+        xy = computeOffset(props.blockOffsetEndCell, 0.5, 0);
         ctx.lineTo(xy.x, xy.y);
         ctx.stroke();
     }
@@ -52,10 +52,16 @@ function exists(x) {
     return typeof x !== "undefined" && x !== null;
 }
 
-function computeOffset(el) {
+function computeOffset(el, relHOffset = 0, relVOffset = 0) {
     const selfRect = canvas.value.getBoundingClientRect();
     const elRect = el.getBoundingClientRect();
-    return { x: elRect.left - selfRect.left, y: elRect.top - selfRect.top };
+    let hOffset = elRect.width * relHOffset;
+    let vOffset = elRect.height * relVOffset;
+
+    return {
+        x: elRect.left - selfRect.left + hOffset,
+        y: elRect.top - selfRect.top + vOffset,
+    };
 }
 </script>
 
