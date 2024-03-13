@@ -101,7 +101,11 @@ onUnmounted(() => {
                 v-show="riscvSettings.showRegistersOutput.value"
             />
         </div>
-        <div ref="visualizationsContainer" id="riscv-visualizations-container">
+        <div
+            :class="{ 'flex-grow-1': !textContainerPopulated }"
+            ref="visualizationsContainer"
+            id="riscv-visualizations-container"
+        >
             <div
                 class="processor-view-wrapper"
                 v-if="riscvSettings.visContainerSelection.value == 'Processor'"
@@ -167,11 +171,6 @@ onUnmounted(() => {
 #riscv-visualizations-container {
     padding: 1em;
     height: 100%;
-}
-
-#riscv-visualizations-container {
-    flex: 1 1 auto;
-    width: 100%;
 }
 
 #riscv-text-content-container {

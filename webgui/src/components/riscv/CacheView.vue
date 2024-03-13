@@ -175,7 +175,11 @@ onUnmounted(() => {
         <p>Hits: {{ props.cacheStats.get("hits") }}</p>
         <p>Misses: {{ misses }}</p>
         <p>Address: {{ props.cacheStats.get("address") }}</p>
-        <div class="tables-vis-wrapper">
+        <div
+            class="tables-vis-wrapper"
+            :width="canvasWidth"
+            :height="canvasHeight"
+        >
             <CacheArrows
                 class="arrow-layer"
                 :width="canvasWidth"
