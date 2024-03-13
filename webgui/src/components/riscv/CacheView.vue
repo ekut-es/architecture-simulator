@@ -1,12 +1,24 @@
 <script setup>
 import CacheArrows from "./CacheArrows.vue";
-import { computed, ref } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 
 const tagCell = ref(null);
 const indexCell = ref(null);
-// const blockOffsetCell = ref(null);
+const blockOffsetCell = ref(null);
 const wordOffsetCell = ref(null);
+
+const tablesWrapper = ref(null);
 const addressTable = ref(null);
+const cacheTable = ref(null);
+
+// props for the arrows
+const indexStartCell = ref(null);
+const indexEndCell = ref(null);
+const blockOffsetStartCell = ref(null);
+const blockOffsetEndCell = ref(null);
+
+const canvasWidth = ref(500);
+const canvasHeight = ref(500);
 
 const props = defineProps([
     "cacheEntries",
@@ -98,34 +110,56 @@ const tagArrow = computed(() => {
     return cords;
 });
 
-const indexArrow = computed(() => {
-    if (indexCell.value === null) {
-        return null;
-    }
-    const cords = {
-        start: {
-            x:
-                indexCell.value.offsetWidth / 2 +
-                addressTable.value.offsetLeft +
-                indexCell.value.offsetLeft,
-            y:
-                indexCell.value.offsetHeight +
-                addressTable.value.offsetTop +
-                indexCell.value.offsetTop,
-        },
-        stop: {
-            x: tagCell.value.offsetWidth / 2 + addressTable.value.offsetLeft,
-            y: tagCell.value.offsetHeight + addressTable.value.offsetTop + 50,
-        },
-    };
-    return cords;
-});
-
-function computeOffset(a, b) {
-    const aRect = a.getBoundingClientRect();
-    const bRect = b.getBoundingClientRect();
-    return { x: aRect.left - bRect.left, y: aRect.top - bRect.top };
+function updateCanvasSize() {
+    canvasWidth.value = tablesWrapper.value.offsetWidth;
+    canvasHeight.value = tablesWrapper.value.offsetHeight;
 }
+
+onMounted(() => {
+    watch(address, (addr) => {
+        const targetTag = parseInt(addr.tagBits, 2);
+        const targetIndex = parseInt(addr.indexBits, 2);
+        const targetBlockOffset = parseInt(addr.blockOffsetBits, 2);
+        const blockSize = Math.pow(2, props.cacheSettings.num_block_bits);
+
+        indexStartCell.value = null;
+        indexEndCell.value = null;
+        blockOffsetStartCell.value = null;
+        blockOffsetEndCell.value = null;
+
+        if (!isNaN(targetIndex)) {
+            indexStartCell.value = indexCell.value;
+            indexEndCell.value =
+                cacheTable.value.rows[
+                    targetIndex * props.cacheSettings.associativity + 1
+                ].cells[0];
+        }
+        if (!isNaN(targetBlockOffset)) {
+            const header = cacheTable.value.rows[0];
+            blockOffsetStartCell.value = blockOffsetCell.value;
+            blockOffsetEndCell.value =
+                header.cells[
+                    header.cells.length - blockSize + targetBlockOffset
+                ];
+        }
+        // if (!isNaN(index)) {
+        //     indexStartCell.value = indexCell.value;
+        //     // See if there is a block with the correct tag
+        //     for (let i=0; i < blockSize; i++) {
+        //         const row = cacheTableBody.value.rows[i + index];
+        //         const tag = Number(row.querySelector(".tag").innerText);
+        //         if (targetTag === tag) {
+        //             blockOffsetEndCell.value = row.querySelectorAll(".word")[targetBlockOffset];
+        //             blockOffsetStartCell.value = blockOffsetCell.value;
+        //             break;
+        //         }
+        //     }
+        // }
+    });
+
+    // watch for resizes (be it by changing the cache config, zooming or whatever)
+    new ResizeObserver(updateCanvasSize).observe(tablesWrapper.value);
+});
 </script>
 
 <template>
@@ -136,100 +170,98 @@ function computeOffset(a, b) {
         <div class="tables-vis-wrapper">
             <CacheArrows
                 class="arrow-layer"
-                width="300"
-                height="500"
+                :width="canvasWidth"
+                :height="canvasHeight"
                 base-id="riscv-cache-canvas"
-                :tag-arrow="tagArrow"
+                :index-start-cell="indexStartCell"
+                :index-end-cell="indexEndCell"
+                :block-offset-start-cell="blockOffsetStartCell"
+                :block-offset-end-cell="blockOffsetEndCell"
             />
-            <div class="tables-wrapper">
+            <div ref="tablesWrapper" class="tables-wrapper">
                 <table
                     ref="addressTable"
                     class="table table-sm table-bordered archsim-mono-table address-table"
                 >
                     <tbody>
                         <tr>
-                            <td ref="tagCell" v-if="address.tagBits">
+                            <td ref="tagCell">
                                 {{ address.tagBits }}
                             </td>
-                            <td ref="indexCell" v-if="address.indexBits">
+                            <td ref="indexCell">
                                 {{ address.indexBits }}
                             </td>
-                            <td v-if="address.blockOffsetBits">
+                            <td
+                                ref="blockOffsetCell"
+                                v-show="address.blockOffsetBits"
+                            >
                                 {{ address.blockOffsetBits }}
                             </td>
-                            <td
-                                ref="wordOffsetCell"
-                                v-if="address.wordOffsetBits"
-                            >
+                            <td ref="wordOffsetCell">
                                 {{ address.wordOffsetBits }}
                             </td>
                         </tr>
                     </tbody>
                 </table>
-                <template v-if="props.cacheEntries !== null">
-                    <table
-                        class="table table-sm table-bordered archsim-mono-table cache-table"
-                    >
-                        <thead>
-                            <tr>
-                                <th style="width: 0em">Index</th>
-                                <th style="width: 0em">Valid</th>
-                                <th v-if="showDirtyBit" style="width: 0em">
-                                    Dirty
-                                </th>
-                                <th
-                                    :style="{
-                                        width: tagWidth,
-                                        minWidth: tagWidth,
-                                    }"
-                                >
-                                    Tag
-                                </th>
-                                <th v-for="i in blockSize" :style="wordStyle">
-                                    Word {{ i }}
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="cache-table-body">
-                            <template
-                                v-for="zet in props.cacheEntries.get('sets')"
+                <table
+                    ref="cacheTable"
+                    class="table table-sm table-bordered archsim-mono-table cache-table"
+                >
+                    <thead>
+                        <tr>
+                            <th style="width: 0em">Index</th>
+                            <th style="width: 0em">Valid</th>
+                            <th v-if="showDirtyBit" style="width: 0em">
+                                Dirty
+                            </th>
+                            <th
+                                :style="{
+                                    width: tagWidth,
+                                    minWidth: tagWidth,
+                                }"
                             >
-                                <tr v-for="(block, index) in zet.get('blocks')">
-                                    <td
-                                        v-if="
-                                            index %
-                                                props.cacheSettings
-                                                    .associativity ===
-                                            0
-                                        "
-                                        :rowspan="
-                                            props.cacheSettings.associativity
-                                        "
-                                        class="index"
-                                    >
-                                        {{ zet.get("index") }}
+                                Tag
+                            </th>
+                            <th v-for="i in blockSize" :style="wordStyle">
+                                Word {{ i }}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="cache-table-body">
+                        <template v-for="zet in props.cacheEntries.get('sets')">
+                            <tr v-for="(block, index) in zet.get('blocks')">
+                                <td
+                                    v-if="
+                                        index %
+                                            props.cacheSettings
+                                                .associativity ===
+                                        0
+                                    "
+                                    :rowspan="props.cacheSettings.associativity"
+                                    class="index"
+                                >
+                                    {{ zet.get("index") }}
+                                </td>
+                                <td class="valid">
+                                    {{ block.get("valid_bit") }}
+                                </td>
+                                <td v-if="showDirtyBit" class="dirty">
+                                    {{ block.get("dirty_bit") }}
+                                </td>
+                                <td class="tag">{{ block.get("tag") }}</td>
+                                <template
+                                    v-for="addr_value in block.get(
+                                        'address_value_list'
+                                    )"
+                                >
+                                    <td class="word">
+                                        {{ addr_value[1] }}
                                     </td>
-                                    <td class="valid">
-                                        {{ block.get("valid_bit") }}
-                                    </td>
-                                    <td v-if="showDirtyBit" class="dirty">
-                                        {{ block.get("dirty_bit") }}
-                                    </td>
-                                    <td class="tag">{{ block.get("tag") }}</td>
-                                    <template
-                                        v-for="addr_value in block.get(
-                                            'address_value_list'
-                                        )"
-                                    >
-                                        <td class="word">
-                                            {{ addr_value[1] }}
-                                        </td>
-                                    </template>
-                                </tr>
-                            </template>
-                        </tbody>
-                    </table>
-                </template>
+                                </template>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
