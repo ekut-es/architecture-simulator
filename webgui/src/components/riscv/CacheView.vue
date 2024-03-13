@@ -1,6 +1,6 @@
 <script setup>
 import CacheArrows from "./CacheArrows.vue";
-import { computed, nextTick, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 
 const tagCell = ref(null);
 const indexCell = ref(null);
@@ -19,6 +19,7 @@ const blockOffsetEndCell = ref(null);
 
 const canvasWidth = ref(500);
 const canvasHeight = ref(500);
+let resizeObserver = null;
 
 const props = defineProps([
     "cacheEntries",
@@ -158,7 +159,14 @@ onMounted(() => {
     });
 
     // watch for resizes (be it by changing the cache config, zooming or whatever)
-    new ResizeObserver(updateCanvasSize).observe(tablesWrapper.value);
+    resizeObserver = new ResizeObserver(updateCanvasSize);
+    resizeObserver.observe(tablesWrapper.value);
+});
+
+onUnmounted(() => {
+    if (resizeObserver !== null) {
+        resizeObserver.disconnect();
+    }
 });
 </script>
 
