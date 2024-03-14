@@ -26,14 +26,20 @@ function drawCanvas() {
         const start = computeOffset(props.indexStartCell, 0.5, 1);
         const dest = computeOffset(props.indexEndCell, 0, 0.5);
         const table = computeOffset(props.cacheTable, 0, 0); // top left corner of the whole cache table
-        const yCenter = table.y / 2 + start.y / 2; // vertical center between address and cache tables
-        const xCenter = table.x / 2; // horizontal center between the start of the canvas and the cache table
+        const yCenter = Math.round(table.y / 2 + start.y / 2); // vertical center between address and cache tables
+        const xCenter = Math.round(table.x / 2); // horizontal center between the start of the canvas and the cache table
         ctx.moveTo(start.x, start.y);
         ctx.lineTo(start.x, yCenter); // move halfway down to the cache table
         ctx.lineTo(xCenter, yCenter); // go to the left
         ctx.lineTo(xCenter, dest.y); // go fully down
         ctx.lineTo(dest.x, dest.y); // go to the right to connect to the table
         ctx.stroke();
+        ctx.beginPath(); // draw an arrowhead
+        ctx.moveTo(dest.x, dest.y);
+        ctx.lineTo(dest.x - 10, dest.y - 5);
+        ctx.lineTo(dest.x - 10, dest.y + 5);
+        ctx.closePath();
+        ctx.fill();
     }
 
     if (
@@ -43,12 +49,18 @@ function drawCanvas() {
         ctx.beginPath();
         const start = computeOffset(props.blockOffsetStartCell, 0.5, 1);
         const dest = computeOffset(props.blockOffsetEndCell, 0.5, 0);
-        const yCenter = dest.y / 2 + start.y / 2; // vertical center between address and cache tables
+        const yCenter = Math.round(dest.y / 2 + start.y / 2); // vertical center between address and cache tables
         ctx.moveTo(start.x, start.y);
         ctx.lineTo(start.x, yCenter); // move halfway down
         ctx.lineTo(dest.x, yCenter); // move sideways
         ctx.lineTo(dest.x, dest.y); // move fully down
         ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(dest.x, dest.y);
+        ctx.lineTo(dest.x + 5, dest.y - 10);
+        ctx.lineTo(dest.x - 5, dest.y - 10);
+        ctx.closePath();
+        ctx.fill();
     }
 }
 
@@ -63,8 +75,8 @@ function computeOffset(el, relHOffset = 0, relVOffset = 0) {
     let vOffset = elRect.height * relVOffset;
 
     return {
-        x: elRect.left - selfRect.left + hOffset,
-        y: elRect.top - selfRect.top + vOffset,
+        x: Math.round(elRect.left - selfRect.left + hOffset),
+        y: Math.round(elRect.top - selfRect.top + vOffset),
     };
 }
 </script>

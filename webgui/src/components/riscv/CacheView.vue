@@ -93,24 +93,6 @@ const address = computed(() => {
     return result;
 });
 
-// TODO: This doesn't work, the computed doesn't detect changes to the cell size
-const tagArrow = computed(() => {
-    if (tagCell.value === null) {
-        return null;
-    }
-    const cords = {
-        start: {
-            x: tagCell.value.offsetWidth / 2 + addressTable.value.offsetLeft,
-            y: tagCell.value.offsetHeight + addressTable.value.offsetTop,
-        },
-        stop: {
-            x: tagCell.value.offsetWidth / 2 + addressTable.value.offsetLeft,
-            y: tagCell.value.offsetHeight + addressTable.value.offsetTop + 50,
-        },
-    };
-    return cords;
-});
-
 function updateCanvasSize() {
     canvasWidth.value = tablesWrapper.value.offsetWidth;
     canvasHeight.value = tablesWrapper.value.offsetHeight;
