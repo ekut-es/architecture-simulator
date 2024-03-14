@@ -1,6 +1,6 @@
 <script setup>
 import CacheArrows from "./CacheArrows.vue";
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 
 const tagCell = ref(null);
 const indexCell = ref(null);
@@ -20,6 +20,7 @@ const blockOffsetEndCell = ref(null);
 const canvasWidth = ref(0);
 const canvasHeight = ref(0);
 let resizeObserver = null;
+let highlightedCell = null;
 
 const props = defineProps([
     "cacheEntries",
@@ -98,12 +99,26 @@ function updateCanvasSize() {
     canvasHeight.value = tablesWrapper.value.offsetHeight;
 }
 
+function highlightCell(cell) {
+    if (highlightedCell !== null) {
+        highlightedCell.classList.remove("archsim-cache-highlight");
+    }
+
+    if (cell !== null) {
+        highlightedCell = cell;
+        cell.classList.add("archsim-cache-highlight");
+    }
+}
+
 onMounted(() => {
     watch(address, (addr) => {
         const targetTag = parseInt(addr.tagBits, 2);
         const targetIndex = parseInt(addr.indexBits, 2);
         const targetBlockOffset = parseInt(addr.blockOffsetBits, 2);
         const blockSize = Math.pow(2, props.cacheSettings.num_block_bits);
+        const associativity = props.cacheSettings.associativity;
+
+        highlightCell(null);
 
         indexStartCell.value = null;
         indexEndCell.value = null;
@@ -113,9 +128,7 @@ onMounted(() => {
         if (!isNaN(targetIndex)) {
             indexStartCell.value = indexCell.value;
             indexEndCell.value =
-                cacheTable.value.rows[
-                    targetIndex * props.cacheSettings.associativity + 1
-                ].cells[0];
+                cacheTable.value.rows[targetIndex * associativity + 1].cells[0];
         }
         if (!isNaN(targetBlockOffset)) {
             const header = cacheTable.value.rows[0];
@@ -125,19 +138,23 @@ onMounted(() => {
                     header.cells.length - blockSize + targetBlockOffset
                 ];
         }
-        // if (!isNaN(index)) {
-        //     indexStartCell.value = indexCell.value;
-        //     // See if there is a block with the correct tag
-        //     for (let i=0; i < blockSize; i++) {
-        //         const row = cacheTableBody.value.rows[i + index];
-        //         const tag = Number(row.querySelector(".tag").innerText);
-        //         if (targetTag === tag) {
-        //             blockOffsetEndCell.value = row.querySelectorAll(".word")[targetBlockOffset];
-        //             blockOffsetStartCell.value = blockOffsetCell.value;
-        //             break;
-        //         }
-        //     }
-        // }
+        if (!isNaN(targetIndex)) {
+            // See if there is a block with the correct tag
+            nextTick(() => {
+                for (let i = 0; i < associativity; i++) {
+                    const row =
+                        cacheTable.value.rows[
+                            i + targetIndex * associativity + 1
+                        ];
+                    const cell = row.querySelector(".tag");
+                    const tag = Number(cell.innerText);
+                    if (targetTag === tag) {
+                        highlightCell(cell);
+                        break;
+                    }
+                }
+            });
+        }
     });
 
     // watch for resizes (be it by changing the cache config, zooming or whatever)

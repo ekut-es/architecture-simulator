@@ -43,6 +43,10 @@ body {
     background: var(--highlight-color);
 }
 
+.archsim-cache-highlight {
+    background-color: var(--highlight-color) !important;
+}
+
 /* Overwrites */
 
 .cm-focused {
