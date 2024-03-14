@@ -2,9 +2,11 @@
 import { useEditorStore } from "@/js/editor_store";
 import { useRiscvSimulationStore } from "@/js/riscv_simulation_store";
 import { ref, watch } from "vue";
+import ErrorTooltip from "../ErrorTooltip.vue";
 
 const model = defineModel();
 const props = defineProps(["isDataCache"]);
+const emit = defineEmits(["sizeStatus"]);
 
 const indexBits = ref(model.value.num_index_bits);
 const blockBits = ref(model.value.num_block_bits);
@@ -12,8 +14,6 @@ const associativity = ref(model.value.associativity);
 const indexBitsStatus = ref("");
 const blockBitsStatus = ref("");
 const associativityStatus = ref("");
-const totalSize = ref(0);
-const totalSizeValid = ref(true);
 const replacementStrategy = ref(model.value.replacement_strategy);
 const cacheType = ref(model.value.cache_type);
 // const replacementStrategy = ref(model.value.replacement_strategy.toUpperCase());
@@ -33,6 +33,10 @@ watch(
         newCacheType,
         newReplacementStrategy,
     ]) => {
+        newIndexBits = Number(newIndexBits);
+        newBlockBits = Number(newBlockBits);
+        newAssociativity = Number(newAssociativity);
+
         indexBitsStatus.value = validateGreaterEquals(newIndexBits, 0);
         blockBitsStatus.value = validateGreaterEquals(newBlockBits, 0);
         associativityStatus.value = validateAssociativity(
@@ -45,32 +49,30 @@ watch(
             blockBitsStatus.value === "" &&
             associativityStatus.value === ""
         ) {
-            totalSize.value =
+            const totalSize =
                 Math.pow(2, newIndexBits + newBlockBits) * newAssociativity;
-        }
+            if (totalSize > totalSizeThreshold) {
+                emit("sizeStatus", getSizeWarning(totalSize));
+                return;
+            }
+            emit("sizeStatus", "");
 
-        totalSizeValid.value = totalSize.value <= totalSizeThreshold;
-
-        if (!totalSizeValid.value) {
-            return;
-        }
-
-        if (
-            indexBitsStatus.value === "" &&
-            blockBitsStatus.value === "" &&
-            associativityStatus.value === ""
-        ) {
             model.value.num_index_bits = newIndexBits;
             model.value.num_block_bits = newBlockBits;
             model.value.associativity = newAssociativity;
             model.value.cache_type = newCacheType;
             model.value.replacement_strategy = newReplacementStrategy;
+
             simulationStore.resetSimulation();
             editorStore.loadProgram();
         }
     },
     { immediate: true }
 );
+
+function getSizeWarning(size) {
+    return `The current configuration is invalid as it would create more than ${totalSizeThreshold} words, which could cause the app to become unresponsive.`;
+}
 
 function validateGreaterEquals(number, min) {
     if (Number.isNaN(number)) {
@@ -109,26 +111,15 @@ function validateAssociativity(number, strategy) {
             <option value="plru">PLRU</option>
         </select>
     </p>
-    <div
-        v-if="!totalSizeValid"
-        class="alert alert-warning d-flex align-items-center"
-        role="alert"
-    >
-        <i class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2"></i>
-        <div>
-            The current cache configuration is invalid because it would create
-            more than {{ totalSizeThreshold }} words.
-        </div>
-    </div>
     <p>
         2<sup>N</sup> sets:
         <input class="number-input" type="number" min="0" v-model="indexBits" />
-        {{ indexBitsStatus }}
+        <ErrorTooltip v-if="indexBitsStatus" :message="indexBitsStatus" />
     </p>
     <p>
         2<sup>N</sup> words per block:
         <input class="number-input" type="number" min="0" v-model="blockBits" />
-        {{ blockBitsStatus }}
+        <ErrorTooltip v-if="blockBitsStatus" :message="blockBitsStatus" />
     </p>
     <p>
         associativity:
@@ -138,7 +129,10 @@ function validateAssociativity(number, strategy) {
             min="1"
             v-model="associativity"
         />
-        {{ associativityStatus }}
+        <ErrorTooltip
+            v-if="associativityStatus"
+            :message="associativityStatus"
+        />
     </p>
 </template>
 

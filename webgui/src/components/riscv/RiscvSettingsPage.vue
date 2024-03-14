@@ -4,6 +4,7 @@ import { ref, watch } from "vue";
 import RadioSettingsRow from "../RadioSettingsRow.vue";
 import RepresentationSettingsRow from "../RepresentationSettingsRow.vue";
 import CacheParameters from "./CacheParameters.vue";
+import ErrorTooltip from "../ErrorTooltip.vue";
 
 import { useRiscvSimulationStore } from "@/js/riscv_simulation_store";
 import { useEditorStore } from "@/js/editor_store";
@@ -17,6 +18,17 @@ const pipelineMode = ref(riscvSettings.pipelineMode.value);
 const dataHazardDetection = ref(riscvSettings.dataHazardDetection.value);
 const enableDataCache = ref(riscvSettings.dataCache.value.enable);
 const enableInstructionCache = ref(riscvSettings.instructionCache.value.enable);
+
+const dataCacheStatus = ref("");
+const instructionCacheStatus = ref("");
+
+function updateDataCacheStatus(msg) {
+    dataCacheStatus.value = msg;
+}
+
+function updateInstructionCacheStatus(msg) {
+    instructionCacheStatus.value = msg;
+}
 
 // Reset the sim and parse the input if the pipeline or data hazard detection changes
 watch(
@@ -95,6 +107,7 @@ watch(
                 />
                 Enable
             </label>
+            <ErrorTooltip v-if="dataCacheStatus" :message="dataCacheStatus" />
         </div>
     </div>
     <div v-if="riscvSettings.dataCache.value.enable" class="row">
@@ -103,6 +116,7 @@ watch(
             <CacheParameters
                 v-model="riscvSettings.dataCache.value"
                 :is-data-cache="true"
+                @size-status="updateDataCacheStatus"
             />
         </div>
     </div>
@@ -120,6 +134,10 @@ watch(
                 />
                 Enable
             </label>
+            <ErrorTooltip
+                v-if="instructionCacheStatus"
+                :message="instructionCacheStatus"
+            />
         </div>
     </div>
     <div v-if="riscvSettings.instructionCache.value.enable" class="row">
@@ -128,6 +146,7 @@ watch(
             <CacheParameters
                 v-model="riscvSettings.instructionCache.value"
                 :is-data-cache="false"
+                @size-status="updateInstructionCacheStatus"
             />
         </div>
     </div>
