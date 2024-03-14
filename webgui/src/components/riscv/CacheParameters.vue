@@ -25,11 +25,20 @@ const simulationStore = useRiscvSimulationStore();
 const editorStore = useEditorStore(simulationStore, "riscv");
 
 watch(
-    () => [indexBits.value, blockBits.value, associativity.value],
-    ([newIndexBits, newBlockBits, newAssociativity]) => {
-        indexBitsStatus.value = validateInput(newIndexBits, 0);
-        blockBitsStatus.value = validateInput(newBlockBits, 0);
-        associativityStatus.value = validateInput(newAssociativity, 0);
+    [indexBits, blockBits, associativity, cacheType, replacementStrategy],
+    ([
+        newIndexBits,
+        newBlockBits,
+        newAssociativity,
+        newCacheType,
+        newReplacementStrategy,
+    ]) => {
+        indexBitsStatus.value = validateGreaterEquals(newIndexBits, 0);
+        blockBitsStatus.value = validateGreaterEquals(newBlockBits, 0);
+        associativityStatus.value = validateAssociativity(
+            newAssociativity,
+            newReplacementStrategy
+        );
 
         if (
             indexBitsStatus.value === "" &&
@@ -46,38 +55,40 @@ watch(
             return;
         }
 
-        if (indexBitsStatus.value === "") {
+        if (
+            indexBitsStatus.value === "" &&
+            blockBitsStatus.value === "" &&
+            associativityStatus.value === ""
+        ) {
             model.value.num_index_bits = newIndexBits;
-        }
-        if (blockBitsStatus.value === "") {
             model.value.num_block_bits = newBlockBits;
-        }
-        if (associativityStatus.value === "") {
             model.value.associativity = newAssociativity;
+            model.value.cache_type = newCacheType;
+            model.value.replacement_strategy = newReplacementStrategy;
+            simulationStore.resetSimulation();
+            editorStore.loadProgram();
         }
-
-        simulationStore.resetSimulation();
-        editorStore.loadProgram();
     },
     { immediate: true }
 );
 
-watch(
-    [cacheType, replacementStrategy],
-    ([newCacheType, neweReplacementStrategy]) => {
-        model.value.cache_type = newCacheType;
-        model.value.replacement_strategy = neweReplacementStrategy;
-        simulationStore.resetSimulation();
-        editorStore.loadProgram();
-    }
-);
-
-function validateInput(number, min) {
+function validateGreaterEquals(number, min) {
     if (Number.isNaN(number)) {
         return "Error: The value must be a number.";
     }
     if (!(min <= number)) {
-        return `Error: The value must be greater than ${min}.`;
+        return `Error: The value must be at least ${min}.`;
+    }
+    return "";
+}
+
+function validateAssociativity(number, strategy) {
+    let status = validateGreaterEquals(number, 1);
+    if (status !== "") {
+        return status;
+    }
+    if (strategy === "plru" && !Number.isInteger(Math.log2(number))) {
+        return "When using PLRU, associativity must be a power of 2";
     }
     return "";
 }
