@@ -154,9 +154,12 @@ onUnmounted(() => {
 
 <template>
     <div>
-        <p>Hits: {{ props.cacheStats.get("hits") }}</p>
-        <p>Misses: {{ misses }}</p>
-        <p>Address: {{ props.cacheStats.get("address") }}</p>
+        <span class="badge text-bg-secondary me-3 stats-badge"
+            >Hits: {{ props.cacheStats.get("hits") }}</span
+        >
+        <span class="badge text-bg-secondary mb-3 stats-badge"
+            >Misses: {{ misses }}</span
+        >
         <div
             class="tables-vis-wrapper"
             :width="canvasWidth"
@@ -174,6 +177,7 @@ onUnmounted(() => {
                 :cache-table="cacheTable"
             />
             <div ref="tablesWrapper" class="tables-wrapper">
+                Address:
                 <table
                     ref="addressTable"
                     class="table table-sm table-bordered archsim-mono-table address-table"
@@ -263,6 +267,9 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.stats-badge {
+    min-width: 8em;
+}
 .tables-vis-wrapper {
     position: relative;
 }
@@ -271,7 +278,7 @@ onUnmounted(() => {
     position: absolute;
     left: 0;
     top: 0;
-    z-index: 2;
+    z-index: 1;
 }
 
 .tables-wrapper {
@@ -279,7 +286,7 @@ onUnmounted(() => {
     position: absolute;
     left: 0;
     top: 0;
-    z-index: 1;
+    z-index: 2;
 }
 .cache-table {
     margin-bottom: 0em;
