@@ -9,6 +9,7 @@ const props = defineProps([
     "indexEndCell",
     "blockOffsetStartCell",
     "blockOffsetEndCell",
+    "cacheTable",
 ]);
 const canvas = ref(null);
 
@@ -28,10 +29,16 @@ function drawCanvas() {
 
     if (exists(props.indexStartCell) && exists(props.indexEndCell)) {
         ctx.beginPath();
-        let xy = computeOffset(props.indexStartCell, 0.5, 1);
-        ctx.moveTo(xy.x, xy.y);
-        xy = computeOffset(props.indexEndCell, 0, 0.5);
-        ctx.lineTo(xy.x, xy.y);
+        const start = computeOffset(props.indexStartCell, 0.5, 1);
+        const dest = computeOffset(props.indexEndCell, 0, 0.5);
+        const table = computeOffset(props.cacheTable, 0, 0); // top left corner of the whole cache table
+        const yCenter = table.y / 2 + start.y / 2; // vertical center between address and cache tables
+        const xCenter = table.x / 2; // horizontal center between the start of the canvas and the cache table
+        ctx.moveTo(start.x, start.y);
+        ctx.lineTo(start.x, yCenter); // move halfway down to the cache table
+        ctx.lineTo(xCenter, yCenter); // go to the left
+        ctx.lineTo(xCenter, dest.y); // go fully down
+        ctx.lineTo(dest.x, dest.y); // go to the right to connect to the table
         ctx.stroke();
     }
 
@@ -40,10 +47,13 @@ function drawCanvas() {
         exists(props.blockOffsetEndCell)
     ) {
         ctx.beginPath();
-        let xy = computeOffset(props.blockOffsetStartCell, 0.5, 1);
-        ctx.moveTo(xy.x, xy.y);
-        xy = computeOffset(props.blockOffsetEndCell, 0.5, 0);
-        ctx.lineTo(xy.x, xy.y);
+        const start = computeOffset(props.blockOffsetStartCell, 0.5, 1);
+        const dest = computeOffset(props.blockOffsetEndCell, 0.5, 0);
+        const yCenter = dest.y / 2 + start.y / 2; // vertical center between address and cache tables
+        ctx.moveTo(start.x, start.y);
+        ctx.lineTo(start.x, yCenter); // move halfway down
+        ctx.lineTo(dest.x, yCenter); // move sideways
+        ctx.lineTo(dest.x, dest.y); // move fully down
         ctx.stroke();
     }
 }

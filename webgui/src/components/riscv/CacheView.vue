@@ -189,6 +189,7 @@ onUnmounted(() => {
                 :index-end-cell="indexEndCell"
                 :block-offset-start-cell="blockOffsetStartCell"
                 :block-offset-end-cell="blockOffsetEndCell"
+                :cache-table="cacheTable"
             />
             <div ref="tablesWrapper" class="tables-wrapper">
                 <table
