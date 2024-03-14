@@ -1,6 +1,6 @@
 <script setup>
 import CacheArrows from "./CacheArrows.vue";
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 
 const tagCell = ref(null);
 const indexCell = ref(null);
@@ -17,8 +17,8 @@ const indexEndCell = ref(null);
 const blockOffsetStartCell = ref(null);
 const blockOffsetEndCell = ref(null);
 
-const canvasWidth = ref(500);
-const canvasHeight = ref(500);
+const canvasWidth = ref(0);
+const canvasHeight = ref(0);
 let resizeObserver = null;
 
 const props = defineProps([

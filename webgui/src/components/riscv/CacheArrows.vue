@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import { ref, watch } from "vue";
 
 const props = defineProps([
     "width",
@@ -13,19 +13,13 @@ const props = defineProps([
 ]);
 const canvas = ref(null);
 
-const width = ref(props.width);
-const height = ref(props.width);
-
-onMounted(drawCanvas);
-watch(props, (p) => {
-    width.value = p.width;
-    height.value = p.height;
-    drawCanvas();
-});
+watch(props, drawCanvas);
 
 function drawCanvas() {
     const ctx = canvas.value.getContext("2d");
-    ctx.clearRect(0, 0, width.value, height.value);
+    canvas.value.width = props.width;
+    canvas.value.height = props.height;
+    ctx.clearRect(0, 0, props.width, props.height);
 
     if (exists(props.indexStartCell) && exists(props.indexEndCell)) {
         ctx.beginPath();
@@ -76,7 +70,7 @@ function computeOffset(el, relHOffset = 0, relVOffset = 0) {
 </script>
 
 <template>
-    <canvas ref="canvas" id="baseId" :width="width" :height="height"></canvas>
+    <canvas ref="canvas" id="baseId"></canvas>
 </template>
 
 <style scoped></style>
