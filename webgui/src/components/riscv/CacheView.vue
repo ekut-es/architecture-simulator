@@ -111,51 +111,57 @@ function highlightCell(cell) {
 }
 
 onMounted(() => {
-    watch(address, (addr) => {
-        const targetTag = parseInt(addr.tagBits, 2);
-        const targetIndex = parseInt(addr.indexBits, 2);
-        const targetBlockOffset = parseInt(addr.blockOffsetBits, 2);
-        const blockSize = Math.pow(2, props.cacheSettings.num_block_bits);
-        const associativity = props.cacheSettings.associativity;
+    watch(
+        address,
+        (addr) => {
+            const targetTag = parseInt(addr.tagBits, 2);
+            const targetIndex = parseInt(addr.indexBits, 2);
+            const targetBlockOffset = parseInt(addr.blockOffsetBits, 2);
+            const blockSize = Math.pow(2, props.cacheSettings.num_block_bits);
+            const associativity = props.cacheSettings.associativity;
 
-        highlightCell(null);
+            highlightCell(null);
 
-        indexStartCell.value = null;
-        indexEndCell.value = null;
-        blockOffsetStartCell.value = null;
-        blockOffsetEndCell.value = null;
+            indexStartCell.value = null;
+            indexEndCell.value = null;
+            blockOffsetStartCell.value = null;
+            blockOffsetEndCell.value = null;
 
-        if (!isNaN(targetIndex)) {
-            indexStartCell.value = indexCell.value;
-            indexEndCell.value =
-                cacheTable.value.rows[targetIndex * associativity + 1].cells[0];
-        }
-        if (!isNaN(targetBlockOffset)) {
-            const header = cacheTable.value.rows[0];
-            blockOffsetStartCell.value = blockOffsetCell.value;
-            blockOffsetEndCell.value =
-                header.cells[
-                    header.cells.length - blockSize + targetBlockOffset
-                ];
-        }
-        if (!isNaN(targetIndex)) {
-            // See if there is a block with the correct tag
-            nextTick(() => {
-                for (let i = 0; i < associativity; i++) {
-                    const row =
-                        cacheTable.value.rows[
-                            i + targetIndex * associativity + 1
-                        ];
-                    const cell = row.querySelector(".tag");
-                    const tag = Number(cell.innerText);
-                    if (targetTag === tag) {
-                        highlightCell(cell);
-                        break;
+            if (!isNaN(targetIndex)) {
+                indexStartCell.value = indexCell.value;
+                indexEndCell.value =
+                    cacheTable.value.rows[
+                        targetIndex * associativity + 1
+                    ].cells[0];
+            }
+            if (!isNaN(targetBlockOffset)) {
+                const header = cacheTable.value.rows[0];
+                blockOffsetStartCell.value = blockOffsetCell.value;
+                blockOffsetEndCell.value =
+                    header.cells[
+                        header.cells.length - blockSize + targetBlockOffset
+                    ];
+            }
+            if (!isNaN(targetIndex)) {
+                // See if there is a block with the correct tag
+                nextTick(() => {
+                    for (let i = 0; i < associativity; i++) {
+                        const row =
+                            cacheTable.value.rows[
+                                i + targetIndex * associativity + 1
+                            ];
+                        const cell = row.querySelector(".tag");
+                        const tag = Number(cell.innerText);
+                        if (targetTag === tag) {
+                            highlightCell(cell);
+                            break;
+                        }
                     }
-                }
-            });
-        }
-    });
+                });
+            }
+        },
+        { immediate: true }
+    );
 
     // watch for resizes (be it by changing the cache config, zooming or whatever)
     resizeObserver = new ResizeObserver(updateCanvasSize);
