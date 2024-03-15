@@ -12,4 +12,5 @@ export const riscvSettings = {
     showMemory: ref(true),
     showRegistersOutput: ref(true),
     showVisualization: ref(true),
+    followCurrentInstruction: ref(true),
 };
