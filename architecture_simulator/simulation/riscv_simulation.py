@@ -159,7 +159,12 @@ class RiscvSimulation(Simulation):
     def get_data_cache_entries(self):
         return self.state.memory.cache_repr()
 
-    def get_data_cache_entries_dict(self):
+    def get_data_cache_entries_dict(self) -> dict[str, Any]:
+        """Returns the data cache entries as a dict (deeply converted).
+
+        Returns:
+            dict[str, Any]: The data cache entries as dict.
+        """
         return json.loads(
             json.dumps(self.state.memory.cache_repr(), default=lambda o: vars(o))
         )
@@ -194,6 +199,11 @@ class RiscvSimulation(Simulation):
         return stats
 
     def get_instruction_cache_entries(self):
+        """Returns the instruction cache entries as a dict (deeply converted).
+
+        Returns:
+            dict[str, Any]: The instruction cache entries as dict.
+        """
         return self.state.instruction_memory.cache_repr()
 
     def get_instruction_cache_entries_dict(self):

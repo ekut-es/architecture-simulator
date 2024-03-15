@@ -22,10 +22,20 @@ const enableInstructionCache = ref(riscvSettings.instructionCache.value.enable);
 const dataCacheStatus = ref("");
 const instructionCacheStatus = ref("");
 
+/**
+ * Sets the dataCacheStatus.
+ *
+ * @param {String} msg The message to set
+ */
 function updateDataCacheStatus(msg) {
     dataCacheStatus.value = msg;
 }
 
+/**
+ * Sets the instructionCacheStatus.
+ *
+ * @param {String} msg The message to set
+ */
 function updateInstructionCacheStatus(msg) {
     instructionCacheStatus.value = msg;
 }

@@ -1,3 +1,4 @@
+<!-- A bootstrap tooltip component to show error messages. -->
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { Tooltip } from "bootstrap";
@@ -12,6 +13,8 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+    // You need to hide the tooltip before removing it from the DOM, apparently.
+    // This should always be the case, but lets do it here anyway (not sure if I'm doing it correctly though).
     tooltipObject.hide();
 });
 </script>
