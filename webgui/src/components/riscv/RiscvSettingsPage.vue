@@ -1,6 +1,6 @@
 <!-- RISCV settings page -->
 <script setup>
-import { ref, watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 import RadioSettingsRow from "../RadioSettingsRow.vue";
 import RepresentationSettingsRow from "../RepresentationSettingsRow.vue";
 import CacheParameters from "./CacheParameters.vue";
@@ -58,9 +58,12 @@ watch(
         riscvSettings.dataHazardDetection.value = dataHazardDetection;
         riscvSettings.dataCache.value.enable = enableDataCache;
         riscvSettings.instructionCache.value.enable = enableInstructionCache;
-        // FIXME: This is the same as the reset button does in RiscvControlBar.vue
-        simulationStore.resetSimulation();
-        editorStore.loadProgram();
+        // Do this in the next tick because if the cache gets disabled,
+        // the CacheView needs time to disappear first
+        nextTick(() => {
+            simulationStore.resetSimulation();
+            editorStore.loadProgram();
+        });
     }
 );
 </script>
