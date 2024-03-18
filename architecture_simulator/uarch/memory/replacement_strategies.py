@@ -1,3 +1,4 @@
+from typing import Any
 from abc import ABC, abstractmethod
 import math
 
@@ -28,6 +29,14 @@ class ReplacementStrategy(ABC):
             int: The index of the block inside the set to be replaced next.
         """
 
+    @abstractmethod
+    def get_repr(self) -> Any:
+        """Return some form of representation for the state of the strategy.
+
+        Returns:
+            Any:
+        """
+
 
 class LRU(ReplacementStrategy):
     def __init__(self, associativity: int) -> None:
@@ -40,6 +49,15 @@ class LRU(ReplacementStrategy):
 
     def get_next_to_replace(self) -> int:
         return self.lru[0]
+
+    def get_repr(self) -> list[int]:
+        """Returns the lru value for each block. The least recently used block has the value 0,
+        older blocks have higher values.
+
+        Returns:
+            list[int]: A list of lru values.
+        """
+        return [self.lru.index(i) for i in range(len(self.lru))]
 
 
 class PLRU(ReplacementStrategy):
@@ -68,3 +86,6 @@ class PLRU(ReplacementStrategy):
             else:
                 i = 2 * i + 2
         return i + 1 - self.associativity
+
+    def get_repr(self) -> Any:
+        return None

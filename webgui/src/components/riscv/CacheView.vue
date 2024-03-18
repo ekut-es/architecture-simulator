@@ -55,6 +55,9 @@ const wordStyle = (() => {
 })();
 
 const showDirtyBit = computed(() => props.cacheSettings.cache_type === "wb");
+const showLRU = computed(
+    () => props.cacheSettings.replacement_strategy === "lru"
+);
 
 const misses = computed(() =>
     String(
@@ -236,6 +239,7 @@ onUnmounted(() => {
                             <th v-if="showDirtyBit" style="width: 0em">
                                 Dirty
                             </th>
+                            <th v-if="showLRU">LRU</th>
                             <th
                                 :style="{
                                     width: tagWidth,
@@ -269,6 +273,9 @@ onUnmounted(() => {
                                 </td>
                                 <td v-if="showDirtyBit" class="dirty">
                                     {{ block.get("dirty_bit") }}
+                                </td>
+                                <td v-if="showLRU" class="lru">
+                                    {{ zet.get("replacement_status")[index] }}
                                 </td>
                                 <td class="tag">{{ block.get("tag") }}</td>
                                 <template
@@ -328,7 +335,8 @@ onUnmounted(() => {
 }
 
 .valid,
-.dirty {
+.dirty,
+.lru {
     text-align: center;
 }
 

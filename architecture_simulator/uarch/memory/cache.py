@@ -1,4 +1,4 @@
-from typing import TypeVar, Generic, Optional, Type
+from typing import TypeVar, Generic, Optional, Type, Any
 from architecture_simulator.uarch.memory.decoded_address import DecodedAddress
 from architecture_simulator.uarch.memory.replacement_strategies import (
     ReplacementStrategy,
@@ -97,9 +97,12 @@ class CacheBlock(Generic[T]):
 
 
 class CacheSetRepr:
-    def __init__(self, index_str: str, blocks: list[CacheBlockRepr]) -> None:
+    def __init__(
+        self, index_str: str, blocks: list[CacheBlockRepr], replacement_status: Any
+    ) -> None:
         self.index = index_str
         self.blocks = blocks
+        self.replacement_status = replacement_status
 
 
 class CacheSet(Generic[T]):
@@ -191,7 +194,11 @@ class CacheSet(Generic[T]):
         return None
 
     def get_repr(self) -> CacheSetRepr:
-        return CacheSetRepr(self.index_str, [block.get_repr() for block in self.blocks])
+        return CacheSetRepr(
+            self.index_str,
+            [block.get_repr() for block in self.blocks],
+            self.replacement_strategy.get_repr(),
+        )
 
 
 class CacheRepr:
