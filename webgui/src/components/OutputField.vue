@@ -1,7 +1,7 @@
 <!-- An output field that works with any simulation store -->
 <script setup>
 import { computed } from "vue";
-const props = defineProps(["simulationStore"]);
+const props = defineProps(["simulationStore", "additionalMessageGetter"]);
 const simulationStore = props.simulationStore;
 
 /**
@@ -29,7 +29,11 @@ let output = computed(() => {
         return ["Ready!"];
     }
 
-    return simulationStore.performanceMetricsStr.split(/\n/);
+    let messages = simulationStore.performanceMetricsStr.split(/\n/);
+    if (typeof props.additionalMessageGetter !== "undefined") {
+        messages = messages.concat(props.additionalMessageGetter());
+    }
+    return messages;
 });
 </script>
 
