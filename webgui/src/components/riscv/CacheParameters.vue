@@ -4,10 +4,11 @@ import { useEditorStore } from "@/js/editor_store";
 import { useRiscvSimulationStore } from "@/js/riscv_simulation_store";
 import { ref, watch } from "vue";
 import ErrorTooltip from "../ErrorTooltip.vue";
+import CacheDisabledTooltip from "./CacheDisabledTooltip.vue";
 
 const cacheSettings = defineModel("cacheSettings");
 const tooBigSetting = defineModel("tooBigSetting");
-const props = defineProps(["isDataCache"]);
+const props = defineProps(["isDataCache", "baseId"]);
 
 // refs to bind to the inputs so they can be validated first
 const indexBits = ref(cacheSettings.value.num_index_bits);
@@ -20,8 +21,9 @@ const cacheType = ref(cacheSettings.value.cache_type);
 const indexBitsStatus = ref("");
 const blockBitsStatus = ref("");
 const associativityStatus = ref("");
+const tooManyBitsUsed = ref(false);
 
-// Performance sucks right now, this is the max amount of words that works well
+// Disable the visualization if the cache exceeds this amount of words.
 const totalSizeThreshold = 2048;
 
 const simulationStore = useRiscvSimulationStore();
@@ -53,6 +55,11 @@ watch(
             blockBitsStatus.value === "" &&
             associativityStatus.value === ""
         ) {
+            tooManyBitsUsed.value = newIndexBits + newBlockBits + 2 > 32;
+            if (tooManyBitsUsed.value) {
+                return;
+            }
+
             const tooBig =
                 Math.pow(2, newIndexBits + newBlockBits) * newAssociativity >
                 totalSizeThreshold;
@@ -111,43 +118,87 @@ function validateAssociativity(number, strategy) {
 </script>
 
 <template>
-    <p v-if="props.isDataCache">
-        Type:
-        <select v-model="cacheType">
-            <option value="wb">Write-back, Write allocate</option>
-            <option value="wt">Write-through, Write no-allocate</option>
-        </select>
-    </p>
-    <p>
-        Replacement Strategy:
-        <select v-model="replacementStrategy">
-            <option value="lru">LRU</option>
-            <option value="plru">PLRU</option>
-        </select>
-    </p>
-    <p>
-        2<sup>N</sup> sets:
-        <input class="number-input" type="number" min="0" v-model="indexBits" />
-        <ErrorTooltip v-if="indexBitsStatus" :message="indexBitsStatus" />
-    </p>
-    <p>
-        2<sup>N</sup> words per block:
-        <input class="number-input" type="number" min="0" v-model="blockBits" />
-        <ErrorTooltip v-if="blockBitsStatus" :message="blockBitsStatus" />
-    </p>
-    <p>
-        associativity:
-        <input
-            class="number-input"
-            type="number"
-            min="1"
-            v-model="associativity"
-        />
-        <ErrorTooltip
-            v-if="associativityStatus"
-            :message="associativityStatus"
-        />
-    </p>
+    <div class="row">
+        <div class="col-4">
+            <h3 class="fs-6">
+                <slot> </slot>
+            </h3>
+        </div>
+        <div class="col-8">
+            <label for="riscv-data-cache-enable">
+                <input
+                    type="checkbox"
+                    :id="props.baseId + '-enable'"
+                    :checked="cacheSettings.enable"
+                    v-model="cacheSettings.enable"
+                />
+                Enable
+            </label>
+            <CacheDisabledTooltip v-if="tooBigSetting" />
+            <ErrorTooltip
+                v-if="tooManyBitsUsed"
+                message="This configuration uses more than 32 bits."
+            />
+        </div>
+    </div>
+    <div v-if="cacheSettings.enable" class="row">
+        <div class="col-4"></div>
+        <div class="col-8">
+            <p v-if="props.isDataCache">
+                Type:
+                <select v-model="cacheType">
+                    <option value="wb">Write-back, Write allocate</option>
+                    <option value="wt">Write-through, Write no-allocate</option>
+                </select>
+            </p>
+            <p>
+                Replacement Strategy:
+                <select v-model="replacementStrategy">
+                    <option value="lru">LRU</option>
+                    <option value="plru">PLRU</option>
+                </select>
+            </p>
+            <p>
+                2<sup>N</sup> sets:
+                <input
+                    class="number-input"
+                    type="number"
+                    min="0"
+                    v-model="indexBits"
+                />
+                <ErrorTooltip
+                    v-if="indexBitsStatus"
+                    :message="indexBitsStatus"
+                />
+            </p>
+            <p>
+                2<sup>N</sup> words per block:
+                <input
+                    class="number-input"
+                    type="number"
+                    min="0"
+                    v-model="blockBits"
+                />
+                <ErrorTooltip
+                    v-if="blockBitsStatus"
+                    :message="blockBitsStatus"
+                />
+            </p>
+            <p>
+                associativity:
+                <input
+                    class="number-input"
+                    type="number"
+                    min="1"
+                    v-model="associativity"
+                />
+                <ErrorTooltip
+                    v-if="associativityStatus"
+                    :message="associativityStatus"
+                />
+            </p>
+        </div>
+    </div>
 </template>
 
 <style scoped>

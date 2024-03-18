@@ -4,7 +4,6 @@ import { nextTick, ref, watch } from "vue";
 import RadioSettingsRow from "../RadioSettingsRow.vue";
 import RepresentationSettingsRow from "../RepresentationSettingsRow.vue";
 import CacheParameters from "./CacheParameters.vue";
-import CacheDisabledTooltip from "./CacheDisabledTooltip.vue";
 
 import { useRiscvSimulationStore } from "@/js/riscv_simulation_store";
 import { useEditorStore } from "@/js/editor_store";
@@ -85,64 +84,24 @@ watch(
             </label>
         </div>
     </div>
-    <div class="row">
-        <div class="col-4">
-            <h3 class="fs-6">Data Cache</h3>
-        </div>
-        <div class="col-8">
-            <label for="riscv-data-cache-enable">
-                <input
-                    type="checkbox"
-                    id="riscv-data-cache-enable"
-                    :checked="enableDataCache"
-                    v-model="enableDataCache"
-                />
-                Enable
-            </label>
-            <CacheDisabledTooltip v-if="riscvSettings.dataCacheTooBig.value" />
-        </div>
-    </div>
-    <div v-if="riscvSettings.dataCache.value.enable" class="row">
-        <div class="col-4"></div>
-        <div class="col-8">
-            <CacheParameters
-                v-model:cache-settings="riscvSettings.dataCache.value"
-                v-model:too-big-setting="riscvSettings.dataCacheTooBig.value"
-                :is-data-cache="true"
-            />
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-4">
-            <h3 class="fs-6">Instruction Cache</h3>
-        </div>
-        <div class="col-8">
-            <label for="riscv-instruction-cache-enable">
-                <input
-                    type="checkbox"
-                    id="riscv-instruction-cache-enable"
-                    :checked="enableInstructionCache"
-                    v-model="enableInstructionCache"
-                />
-                Enable
-            </label>
-            <CacheDisabledTooltip
-                v-if="riscvSettings.instructionCacheTooBig.value"
-            />
-        </div>
-    </div>
-    <div v-if="riscvSettings.instructionCache.value.enable" class="row">
-        <div class="col-4"></div>
-        <div class="col-8">
-            <CacheParameters
-                v-model:cache-settings="riscvSettings.instructionCache.value"
-                v-model:too-big-setting="
-                    riscvSettings.instructionCacheTooBig.value
-                "
-                :is-data-cache="false"
-            />
-        </div>
-    </div>
+
+    <CacheParameters
+        v-model:cache-settings="riscvSettings.dataCache.value"
+        v-model:too-big-setting="riscvSettings.dataCacheTooBig.value"
+        :is-data-cache="true"
+        base-id="riscv-data-cache"
+    >
+        Data Cache
+    </CacheParameters>
+
+    <CacheParameters
+        v-model:cache-settings="riscvSettings.instructionCache.value"
+        v-model:too-big-setting="riscvSettings.instructionCacheTooBig.value"
+        :is-data-cache="false"
+        base-id="ricsv-instruction-cache"
+    >
+        Instruction Cache
+    </CacheParameters>
 </template>
 
 <style scoped></style>
