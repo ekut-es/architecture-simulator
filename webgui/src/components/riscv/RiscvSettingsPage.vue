@@ -15,16 +15,14 @@ const editorStore = useEditorStore(simulationStore, "riscv");
 // Changes to these values must be watched to perform side effects
 const pipelineMode = ref(riscvSettings.pipelineMode.value);
 const dataHazardDetection = ref(riscvSettings.dataHazardDetection.value);
-const enableDataCache = ref(riscvSettings.dataCache.value.enable);
-const enableInstructionCache = ref(riscvSettings.instructionCache.value.enable);
 
 // Reset the sim and parse the input if the pipeline or data hazard detection changes
 watch(
     () => [
         pipelineMode.value,
         dataHazardDetection.value,
-        enableDataCache.value,
-        enableInstructionCache.value,
+        riscvSettings.dataCache.value.enable,
+        riscvSettings.instructionCache.value.enable,
     ],
     ([
         pipelineMode,
@@ -34,8 +32,6 @@ watch(
     ]) => {
         riscvSettings.pipelineMode.value = pipelineMode;
         riscvSettings.dataHazardDetection.value = dataHazardDetection;
-        riscvSettings.dataCache.value.enable = enableDataCache;
-        riscvSettings.instructionCache.value.enable = enableInstructionCache;
         // Do this in the next tick because if the cache gets disabled,
         // the CacheView needs time to disappear first
         nextTick(() => {

@@ -125,7 +125,7 @@ function validateAssociativity(number, strategy) {
             </h3>
         </div>
         <div class="col-8">
-            <label for="riscv-data-cache-enable">
+            <label :for="props.baseId + '-enable'">
                 <input
                     type="checkbox"
                     :id="props.baseId + '-enable'"
