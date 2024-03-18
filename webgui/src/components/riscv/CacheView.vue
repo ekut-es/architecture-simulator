@@ -145,14 +145,14 @@ onMounted(() => {
                         header.cells.length - blockSize + targetBlockOffset
                     ];
             }
-            if (!isNaN(targetIndex)) {
+            if (!isNaN(targetTag)) {
                 // See if there is a block with the correct tag
                 nextTick(() => {
+                    const rowOffset =
+                        1 +
+                        (isNaN(targetIndex) ? 0 : targetIndex * associativity);
                     for (let i = 0; i < associativity; i++) {
-                        const row =
-                            cacheTable.value.rows[
-                                i + targetIndex * associativity + 1
-                            ];
+                        const row = cacheTable.value.rows[i + rowOffset];
                         const cell = row.querySelector(".tag");
                         const tag = Number(cell.innerText);
                         if (targetTag === tag) {
@@ -213,7 +213,7 @@ onUnmounted(() => {
                             <td ref="tagCell">
                                 {{ address.tagBits }}
                             </td>
-                            <td ref="indexCell">
+                            <td ref="indexCell" v-show="address.indexBits">
                                 {{ address.indexBits }}
                             </td>
                             <td
