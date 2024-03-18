@@ -45,9 +45,13 @@ class InstructionMemoryCacheSystem(InstructionMemorySystem):
         self.miss_penality = miss_penality
         self.hits = 0
         self.accesses = 0
+        self.last_was_hit = False
 
     def reset(self) -> None:
         self.instruction_memory.reset()
+        self.hits = 0
+        self.accesses = 0
+        self.last_was_hit = False
         self.cache = Cache[RiscvInstruction](
             num_index_bits=self.num_index_bits,
             num_block_bits=self.num_block_bits,
@@ -69,6 +73,7 @@ class InstructionMemoryCacheSystem(InstructionMemorySystem):
         block_values, hit = self._read_block(decoded_address)
         self.accesses += 1
         self.hits += int(hit)
+        self.last_was_hit = hit
         if not hit:
             self.performance_metrics.cycles += self.miss_penality
         self.performance_metrics
@@ -83,8 +88,12 @@ class InstructionMemoryCacheSystem(InstructionMemorySystem):
     def instruction_at_address(self, address: int) -> bool:
         return self.instruction_memory.instruction_at_address(address)
 
-    def get_cache_stats(self) -> dict[str, str]:
-        return {"hits": str(self.hits), "accesses": str(self.accesses)}
+    def get_cache_stats(self) -> dict[str, str | bool]:
+        return {
+            "hits": str(self.hits),
+            "accesses": str(self.accesses),
+            "last_hit": self.last_was_hit,
+        }
 
     def cache_repr(self) -> CacheRepr:
         return self.cache.get_repr()

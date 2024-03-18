@@ -69,6 +69,7 @@ class WriteBackMemorySystem(BaseCacheMemorySystem):
             self._write_block_to_memory(db_addr, db_block)
 
         self.hits += int(hit)
+        self.last_was_hit = hit
         if not hit:
             self.performance_metrics.cycles += self.miss_penality
         self.accesses += 1
@@ -100,6 +101,7 @@ class WriteBackMemorySystem(BaseCacheMemorySystem):
             self._write_block_to_memory(db_addr, db_block)
 
         self.hits += int(hit)
+        self.last_was_hit = hit
         if not hit:
             self.performance_metrics.cycles += self.miss_penality
         self.accesses += 1
@@ -131,6 +133,7 @@ class WriteBackMemorySystem(BaseCacheMemorySystem):
             self._write_block_to_memory(db_addr, db_block)
 
         self.hits += int(hit)
+        self.last_was_hit = hit
         if not hit:
             self.performance_metrics.cycles += self.miss_penality
         self.accesses += 1

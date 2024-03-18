@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TypeVar, Generic, Optional, TYPE_CHECKING
+from typing import TypeVar, Generic, Optional, TYPE_CHECKING, Any
 from abc import ABC, abstractmethod
 
 from architecture_simulator.isa.instruction import Instruction
@@ -44,7 +44,7 @@ class InstructionMemorySystem(ABC, Generic[T]):
     def instruction_at_address(self, address: int) -> bool:
         pass
 
-    def get_cache_stats(self) -> Optional[dict[str, str]]:
+    def get_cache_stats(self) -> Optional[dict[str, Any]]:
         return None
 
     def cache_repr(self) -> Optional[CacheRepr]:

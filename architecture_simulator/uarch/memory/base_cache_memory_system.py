@@ -54,6 +54,7 @@ class BaseCacheMemorySystem(MemorySystem):
         self.hits = 0
         self.accesses = 0
         self.memory = memory
+        self.last_was_hit = False
 
     def read_byte(self, address: int, update_statistics: bool = True) -> UInt8:
         decoded_address = self._decode_address(address)
@@ -61,6 +62,7 @@ class BaseCacheMemorySystem(MemorySystem):
         if update_statistics:
             self.accesses += 1
             self.hits += int(hit)
+            self.last_was_hit = hit
             if not hit:
                 self.performance_metrics.cycles += self.miss_penality
         return byte_from_block(decoded_address, block_values)
@@ -71,6 +73,7 @@ class BaseCacheMemorySystem(MemorySystem):
         if update_statistics:
             self.accesses += 1
             self.hits += int(hit)
+            self.last_was_hit = hit
             if not hit:
                 self.performance_metrics.cycles += self.miss_penality
         return halfword_from_block(decoded_address, block_values)
@@ -81,6 +84,7 @@ class BaseCacheMemorySystem(MemorySystem):
         if update_statistics:
             self.accesses += 1
             self.hits += int(hit)
+            self.last_was_hit = hit
             if not hit:
                 self.performance_metrics.cycles += self.miss_penality
         return word_from_block(decoded_address, block_values)
@@ -96,8 +100,12 @@ class BaseCacheMemorySystem(MemorySystem):
             self.cache.num_index_bits, self.cache.num_block_bits, address
         )
 
-    def get_cache_stats(self) -> dict[str, str]:
-        return {"hits": str(self.hits), "accesses": str(self.accesses)}
+    def get_cache_stats(self) -> dict[str, str | bool]:
+        return {
+            "hits": str(self.hits),
+            "accesses": str(self.accesses),
+            "last_hit": self.last_was_hit,
+        }
 
     def reset(self) -> None:
         self.cache = Cache[UInt32](

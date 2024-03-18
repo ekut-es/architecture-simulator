@@ -55,6 +55,7 @@ class WriteThroughMemorySystem(BaseCacheMemorySystem):
         block_values = self.cache.read_block(decoded_address)
         hit = block_values is not None
         self.hits += int(hit)
+        self.last_was_hit = hit
         if not hit:
             self.performance_metrics.cycles += self.miss_penality
         self.accesses += 1
@@ -77,6 +78,7 @@ class WriteThroughMemorySystem(BaseCacheMemorySystem):
         block_values = self.cache.read_block(decoded_address)
         hit = block_values is not None
         self.hits += int(hit)
+        self.last_was_hit = hit
         if not hit:
             self.performance_metrics.cycles += self.miss_penality
         self.accesses += 1
@@ -99,6 +101,7 @@ class WriteThroughMemorySystem(BaseCacheMemorySystem):
         block_values = self.cache.read_block(decoded_address)
         hit = block_values is not None
         self.hits += int(hit)
+        self.last_was_hit = hit
         if not hit:
             self.performance_metrics.cycles += self.miss_penality
         self.accesses += 1

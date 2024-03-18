@@ -1,6 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Any
 from fixedint import UInt32, UInt16, UInt8
 
 if TYPE_CHECKING:
@@ -53,7 +53,7 @@ class MemorySystem(ABC):
     def wordwise_repr(self) -> dict[int, tuple[str, str, str, str]]:
         raise NotImplementedError
 
-    def get_cache_stats(self) -> Optional[dict[str, str]]:
+    def get_cache_stats(self) -> Optional[dict[str, Any]]:
         return None
 
     def cache_repr(self) -> Optional[CacheRepr]:

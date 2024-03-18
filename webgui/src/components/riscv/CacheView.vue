@@ -20,7 +20,8 @@ const blockOffsetEndCell = ref(null);
 const canvasWidth = ref(0);
 const canvasHeight = ref(0);
 let resizeObserver = null;
-let highlightedCell = null;
+let highlightedTagCell = null;
+let highlightedWordCell = null;
 
 const props = defineProps([
     "cacheEntries",
@@ -102,14 +103,29 @@ function updateCanvasSize() {
     canvasHeight.value = tablesWrapper.value.offsetHeight;
 }
 
-function highlightCell(cell) {
-    if (highlightedCell !== null) {
-        highlightedCell.classList.remove("archsim-cache-highlight");
+function highlightTagCell(cell) {
+    if (highlightedTagCell !== null) {
+        highlightedTagCell.classList.remove("archsim-cache-highlight");
     }
 
     if (cell !== null) {
-        highlightedCell = cell;
+        highlightedTagCell = cell;
         cell.classList.add("archsim-cache-highlight");
+    }
+}
+
+function highlightWordCell(cell, hit) {
+    if (highlightedWordCell !== null) {
+        highlightedWordCell.classList.remove(
+            "archsim-cache-hit",
+            "archsim-cache-miss"
+        );
+    }
+
+    if (cell !== null) {
+        const clazz = hit ? "archsim-cache-hit" : "archsim-cache-miss";
+        highlightedWordCell = cell;
+        cell.classList.add(clazz);
     }
 }
 
@@ -123,7 +139,8 @@ onMounted(() => {
             const blockSize = Math.pow(2, props.cacheSettings.num_block_bits);
             const associativity = props.cacheSettings.associativity;
 
-            highlightCell(null);
+            highlightTagCell(null);
+            highlightWordCell(null, true);
 
             indexStartCell.value = null;
             indexEndCell.value = null;
@@ -145,20 +162,35 @@ onMounted(() => {
                         header.cells.length - blockSize + targetBlockOffset
                     ];
             }
+
             if (!isNaN(targetTag)) {
                 // See if there is a block with the correct tag
                 nextTick(() => {
                     const rowOffset =
                         1 +
                         (isNaN(targetIndex) ? 0 : targetIndex * associativity);
+                    let tagCell = null;
                     for (let i = 0; i < associativity; i++) {
                         const row = cacheTable.value.rows[i + rowOffset];
-                        const cell = row.querySelector(".tag");
-                        const tag = Number(cell.innerText);
+                        const currentCell = row.querySelector(".tag");
+                        const tag = Number(currentCell.innerText);
                         if (targetTag === tag) {
-                            highlightCell(cell);
+                            tagCell = currentCell;
+                            highlightTagCell(tagCell);
                             break;
                         }
+                    }
+                    // Make the correct cell green/red for hit/miss
+                    if (tagCell !== null) {
+                        const hit = props.cacheStats.get("last_hit");
+                        const blockOffset = isNaN(targetBlockOffset)
+                            ? 0
+                            : targetBlockOffset;
+                        const wordCell =
+                            tagCell.parentNode.querySelectorAll(".word")[
+                                blockOffset
+                            ];
+                        highlightWordCell(wordCell, hit);
                     }
                 });
             }
@@ -203,7 +235,20 @@ onUnmounted(() => {
                 :cache-table="cacheTable"
             />
             <div ref="tablesWrapper" class="tables-wrapper">
-                Address:
+                <div class="mb-1">
+                    Address:
+                    <template v-if="props.cacheStats.get('address')">
+                        <span
+                            v-if="props.cacheStats.get('last_hit')"
+                            class="badge archsim-cache-hit"
+                        >
+                            Hit
+                        </span>
+                        <span v-else class="badge archsim-cache-miss">
+                            Miss
+                        </span>
+                    </template>
+                </div>
                 <table
                     ref="addressTable"
                     class="table table-sm table-bordered archsim-mono-table address-table"
