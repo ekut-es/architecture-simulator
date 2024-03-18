@@ -164,6 +164,8 @@ class WriteThroughMemorySystem(BaseCacheMemorySystem):
 
         Parameters:
             decoded_address (DecodedAddress): Decoded address that provides the address of the block.
+        Returns:
+            tuple[list[UInt32], bool]: Words of the block read from lower memory, and whether the read was a hit.
         """
         block_values = self.cache.read_block(decoded_address)
         hit = block_values is not None
