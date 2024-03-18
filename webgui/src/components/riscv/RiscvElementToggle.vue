@@ -10,12 +10,21 @@ watch(
     () => [
         riscvSettings.dataCache.value.enable,
         riscvSettings.instructionCache.value.enable,
+        riscvSettings.dataCacheTooBig.value,
+        riscvSettings.instructionCacheTooBig.value,
     ],
-    ([enableDataCache, enableInstructionCache]) => {
+    ([
+        enableDataCache,
+        enableInstructionCache,
+        dataCacheTooBig,
+        instructionCacheTooBig,
+    ]) => {
         const selected = riscvSettings.visContainerSelection.value;
         if (
-            (!enableDataCache && selected === "Data Cache") ||
-            (!enableInstructionCache && selected === "Instruction Cache")
+            ((!enableDataCache || dataCacheTooBig) &&
+                selected === "Data Cache") ||
+            ((!enableInstructionCache || instructionCacheTooBig) &&
+                selected === "Instruction Cache")
         ) {
             riscvSettings.visContainerSelection.value = "Processor";
         }
@@ -51,8 +60,20 @@ watch(
     >
         <option>None</option>
         <option>Processor</option>
-        <option v-if="riscvSettings.dataCache.value.enable">Data Cache</option>
-        <option v-if="riscvSettings.instructionCache.value.enable">
+        <option
+            v-if="
+                riscvSettings.dataCache.value.enable &&
+                !riscvSettings.dataCacheTooBig.value
+            "
+        >
+            Data Cache
+        </option>
+        <option
+            v-if="
+                riscvSettings.instructionCache.value.enable &&
+                !riscvSettings.instructionCacheTooBig.value
+            "
+        >
             Instruction Cache
         </option>
     </select>

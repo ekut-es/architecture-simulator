@@ -61,11 +61,16 @@ export class RiscvSimulationStore extends BaseSimulationStore {
 
     /**
      * Syncs the instruction cache entries and stats.
+     *
+     * Entries are kept as proxy because syncing them could take a lot of time.
      */
     syncInstructionCache() {
-        this.instructionCacheEntries = this.toJsSafe(
-            this.simulation.get_instruction_cache_entries_dict()
-        );
+        const temp = this.instructionCacheEntries;
+        this.instructionCacheEntries =
+            this.simulation.get_instruction_cache_entries();
+        if (typeof temp !== "undefined" && temp !== null) {
+            temp.destroy();
+        }
         this.instructionCacheStats = this.toJsSafe(
             this.simulation.get_instruction_cache_stats()
         );
@@ -73,11 +78,15 @@ export class RiscvSimulationStore extends BaseSimulationStore {
 
     /**
      * Syncs the data cache entries and stats.
+     *
+     * Entries are kept as proxy because syncing them could take a lot of time.
      */
     syncDataCache() {
-        this.dataCacheEntries = this.toJsSafe(
-            this.simulation.get_data_cache_entries_dict()
-        );
+        const temp = this.dataCacheEntries;
+        this.dataCacheEntries = this.simulation.get_data_cache_entries();
+        if (typeof temp !== "undefined" && temp !== null) {
+            temp.destroy();
+        }
         this.dataCacheStats = this.toJsSafe(
             this.simulation.get_data_cache_stats()
         );

@@ -30,4 +30,6 @@ export const riscvSettings = {
         cache_type: "wt", // doesn't matter except dirty bit would be shown with wb
     }),
     visContainerSelection: ref("Processor"),
+    dataCacheTooBig: ref(false),
+    instructionCacheTooBig: ref(false),
 };

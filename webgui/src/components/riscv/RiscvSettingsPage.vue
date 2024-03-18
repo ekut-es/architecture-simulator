@@ -4,7 +4,7 @@ import { nextTick, ref, watch } from "vue";
 import RadioSettingsRow from "../RadioSettingsRow.vue";
 import RepresentationSettingsRow from "../RepresentationSettingsRow.vue";
 import CacheParameters from "./CacheParameters.vue";
-import ErrorTooltip from "../ErrorTooltip.vue";
+import CacheDisabledTooltip from "./CacheDisabledTooltip.vue";
 
 import { useRiscvSimulationStore } from "@/js/riscv_simulation_store";
 import { useEditorStore } from "@/js/editor_store";
@@ -18,27 +18,6 @@ const pipelineMode = ref(riscvSettings.pipelineMode.value);
 const dataHazardDetection = ref(riscvSettings.dataHazardDetection.value);
 const enableDataCache = ref(riscvSettings.dataCache.value.enable);
 const enableInstructionCache = ref(riscvSettings.instructionCache.value.enable);
-
-const dataCacheStatus = ref("");
-const instructionCacheStatus = ref("");
-
-/**
- * Sets the dataCacheStatus.
- *
- * @param {String} msg The message to set
- */
-function updateDataCacheStatus(msg) {
-    dataCacheStatus.value = msg;
-}
-
-/**
- * Sets the instructionCacheStatus.
- *
- * @param {String} msg The message to set
- */
-function updateInstructionCacheStatus(msg) {
-    instructionCacheStatus.value = msg;
-}
 
 // Reset the sim and parse the input if the pipeline or data hazard detection changes
 watch(
@@ -120,16 +99,16 @@ watch(
                 />
                 Enable
             </label>
-            <ErrorTooltip v-if="dataCacheStatus" :message="dataCacheStatus" />
+            <CacheDisabledTooltip v-if="riscvSettings.dataCacheTooBig.value" />
         </div>
     </div>
     <div v-if="riscvSettings.dataCache.value.enable" class="row">
         <div class="col-4"></div>
         <div class="col-8">
             <CacheParameters
-                v-model="riscvSettings.dataCache.value"
+                v-model:cache-settings="riscvSettings.dataCache.value"
+                v-model:too-big-setting="riscvSettings.dataCacheTooBig.value"
                 :is-data-cache="true"
-                @size-status="updateDataCacheStatus"
             />
         </div>
     </div>
@@ -147,9 +126,8 @@ watch(
                 />
                 Enable
             </label>
-            <ErrorTooltip
-                v-if="instructionCacheStatus"
-                :message="instructionCacheStatus"
+            <CacheDisabledTooltip
+                v-if="riscvSettings.instructionCacheTooBig.value"
             />
         </div>
     </div>
@@ -157,9 +135,11 @@ watch(
         <div class="col-4"></div>
         <div class="col-8">
             <CacheParameters
-                v-model="riscvSettings.instructionCache.value"
+                v-model:cache-settings="riscvSettings.instructionCache.value"
+                v-model:too-big-setting="
+                    riscvSettings.instructionCacheTooBig.value
+                "
                 :is-data-cache="false"
-                @size-status="updateInstructionCacheStatus"
             />
         </div>
     </div>

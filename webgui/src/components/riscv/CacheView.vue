@@ -254,8 +254,8 @@ onUnmounted(() => {
                         </tr>
                     </thead>
                     <tbody class="cache-table-body">
-                        <template v-for="zet in props.cacheEntries.get('sets')">
-                            <tr v-for="(block, index) in zet.get('blocks')">
+                        <template v-for="zet in props.cacheEntries.sets">
+                            <tr v-for="(block, index) in zet.blocks">
                                 <td
                                     v-if="
                                         index %
@@ -266,25 +266,23 @@ onUnmounted(() => {
                                     :rowspan="props.cacheSettings.associativity"
                                     class="index"
                                 >
-                                    {{ zet.get("index") }}
+                                    {{ zet.index }}
                                 </td>
                                 <td class="valid">
-                                    {{ block.get("valid_bit") }}
+                                    {{ block.valid_bit }}
                                 </td>
                                 <td v-if="showDirtyBit" class="dirty">
-                                    {{ block.get("dirty_bit") }}
+                                    {{ block.dirty_bit }}
                                 </td>
                                 <td v-if="showLRU" class="lru">
-                                    {{ zet.get("replacement_status")[index] }}
+                                    {{ zet.replacement_status.get(index) }}
                                 </td>
-                                <td class="tag">{{ block.get("tag") }}</td>
+                                <td class="tag">{{ block.tag }}</td>
                                 <template
-                                    v-for="addr_value in block.get(
-                                        'address_value_list'
-                                    )"
+                                    v-for="addr_value in block.address_value_list"
                                 >
                                     <td class="word">
-                                        {{ addr_value[1] }}
+                                        {{ addr_value.get(1) }}
                                     </td>
                                 </template>
                             </tr>
