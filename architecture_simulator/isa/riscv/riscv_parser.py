@@ -46,6 +46,7 @@ class RiscvParser(Parser):
         "or",
         "and",
         "mul",
+        "mulh",
     ]
 
     _normal_i_type_mnemonics = [

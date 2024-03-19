@@ -48,6 +48,7 @@ from architecture_simulator.isa.riscv.rv32i_instructions import (
     SRLI,
     InstructionNotImplemented,
     MUL,
+    MULH,
 )
 from architecture_simulator.uarch.riscv.register_file import RegisterFile
 from architecture_simulator.uarch.riscv.riscv_architectural_state import (
@@ -2421,4 +2422,34 @@ csrrci x0, 0x40f, 16"""
 
             self.assertEqual(
                 fixedint.UInt32(mul.alu_compute(left, right)[1]), fixedint.UInt32(res)
+            )
+
+    def test_mulh(self):
+
+        left_right_res_values = [
+            (0x80000000, 0x7FFFFFFF, 0xC0000000),
+            (0xFFFFFFFF, 0xFFFFFFFF, 0x0),
+            (0xFFFFFF9D, 0x6F, 0xFFFFFFFF),
+            (0, -1, 0),
+            (0xF000000E, 0xFFFFFF, 0xFFF00000),
+        ]
+        mulh = MULH(rs1=0, rs2=1, rd=2)
+        for left, right, res in left_right_res_values:
+            state = RiscvArchitecturalState(
+                register_file=RegisterFile(
+                    registers=[
+                        fixedint.UInt32(left),
+                        fixedint.UInt32(right),
+                        fixedint.UInt32(0),
+                    ]
+                )
+            )
+            state = mulh.behavior(state)
+            self.assertEqual(
+                state.register_file.registers,
+                [fixedint.UInt32(left), fixedint.UInt32(right), fixedint.UInt32(res)],
+            )
+
+            self.assertEqual(
+                fixedint.UInt32(mulh.alu_compute(left, right)[1]), fixedint.UInt32(res)
             )
