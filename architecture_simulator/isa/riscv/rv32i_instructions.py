@@ -1582,7 +1582,47 @@ class DIVU(RTypeInstruction):
         return (None, result)
 
 
-# REM
+class REM(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="rem")
+
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
+        """
+        Remain
+            x[rd] = x[rs1] %s x[rs2]
+
+            signed remainder
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        if rs2 == 0:
+            architectural_state.register_file.registers[self.rd] = rs1
+        else:
+            architectural_state.register_file.registers[self.rd] = fixedint.UInt32(
+                (
+                    (int(rs1) | (-(int(rs1) & 0x80000000)))
+                    % (int(rs2) | (-(int(rs2) & 0x80000000)))
+                )
+            )
+        return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = int(alu_in_1) | (-(int(alu_in_1) & 0x80000000))
+        right = int(alu_in_2) | (-(int(alu_in_2) & 0x80000000))
+        result = left if right == 0 else left % right
+        return (None, result)
+
+
 # REMU
 
 # Used by the parser to instantiate instructions.
@@ -1639,4 +1679,5 @@ instruction_map: dict[str, Type[RiscvInstruction]] = {
     "mulhsu": MULHSU,
     "div": DIV,
     "divu": DIVU,
+    "rem": REM,
 }
