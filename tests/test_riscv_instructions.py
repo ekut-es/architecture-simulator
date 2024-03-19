@@ -2533,7 +2533,7 @@ csrrci x0, 0x40f, 16"""
             (100, -10, -10),
             (-100, 10, -10),
             (79, 11, 7),
-            (-2 ^ 31, -1, -2 ^ 31),
+            (-(2**31), -1, -(2**31)),
         ]
         div = DIV(rs1=0, rs2=1, rd=2)
         for left, right, res in left_right_res_values:
