@@ -54,6 +54,7 @@ from architecture_simulator.isa.riscv.rv32i_instructions import (
     DIV,
     DIVU,
     REM,
+    REMU,
 )
 from architecture_simulator.uarch.riscv.register_file import RegisterFile
 from architecture_simulator.uarch.riscv.riscv_architectural_state import (
@@ -2617,5 +2618,38 @@ csrrci x0, 0x40f, 16"""
 
             self.assertEqual(
                 fixedint.UInt32(rem.alu_compute(left, right)[1]),
+                fixedint.UInt32(res),
+            )
+
+    def test_remu(self):
+
+        left_right_res_values = [
+            (110, 0, 110),
+            (0, 0, 0),
+            (0xFFFFFFFE, 0xFFFFFFFF, 0xFFFFFFFE),
+            (10, -1, 10),
+            (-107, -1, -107),
+            (17, 20, 17),
+            (11, 5, 1),
+        ]
+        remu = REMU(rs1=0, rs2=1, rd=2)
+        for left, right, res in left_right_res_values:
+            state = RiscvArchitecturalState(
+                register_file=RegisterFile(
+                    registers=[
+                        fixedint.UInt32(left),
+                        fixedint.UInt32(right),
+                        fixedint.UInt32(0),
+                    ]
+                )
+            )
+            state = remu.behavior(state)
+            self.assertEqual(
+                state.register_file.registers,
+                [fixedint.UInt32(left), fixedint.UInt32(right), fixedint.UInt32(res)],
+            )
+
+            self.assertEqual(
+                fixedint.UInt32(remu.alu_compute(left, right)[1]),
                 fixedint.UInt32(res),
             )

@@ -52,6 +52,7 @@ class RiscvParser(Parser):
         "div",
         "divu",
         "rem",
+        "remu",
     ]
 
     _normal_i_type_mnemonics = [

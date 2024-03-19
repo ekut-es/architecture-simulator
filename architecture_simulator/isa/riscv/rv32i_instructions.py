@@ -1623,6 +1623,42 @@ class REM(RTypeInstruction):
         return (None, result)
 
 
+class REMU(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="remu")
+
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
+        """
+        Remain
+            x[rd] = x[rs1] %u x[rs2]
+
+            unsigned remainder
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        if rs2 == 0:
+            architectural_state.register_file.registers[self.rd] = rs1
+        else:
+            architectural_state.register_file.registers[self.rd] = rs1 % rs2
+        return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.UInt32(alu_in_1)
+        right = fixedint.UInt32(alu_in_2)
+        result = left if right == 0 else int(left % right)
+        return (None, result)
+
+
 # REMU
 
 # Used by the parser to instantiate instructions.
@@ -1680,4 +1716,5 @@ instruction_map: dict[str, Type[RiscvInstruction]] = {
     "div": DIV,
     "divu": DIVU,
     "rem": REM,
+    "remu": REMU,
 }
