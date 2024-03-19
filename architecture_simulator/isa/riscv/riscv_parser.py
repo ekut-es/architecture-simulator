@@ -45,6 +45,7 @@ class RiscvParser(Parser):
         "sra",
         "or",
         "and",
+        "mul",
     ]
 
     _normal_i_type_mnemonics = [

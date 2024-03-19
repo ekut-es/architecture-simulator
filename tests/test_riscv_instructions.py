@@ -47,6 +47,7 @@ from architecture_simulator.isa.riscv.rv32i_instructions import (
     SLLI,
     SRLI,
     InstructionNotImplemented,
+    MUL,
 )
 from architecture_simulator.uarch.riscv.register_file import RegisterFile
 from architecture_simulator.uarch.riscv.riscv_architectural_state import (
@@ -2387,3 +2388,37 @@ csrrci x0, 0x40f, 16"""
         instructions = list(state.instruction_memory.instructions.values())
         for instruction, line in zip(instructions, text.splitlines()):
             self.assertEqual(str(instruction), line)
+
+    def test_mul(self):
+
+        left_right_res_values = [
+            (2**16 - 1, 2**16 - 1, 4294836225),
+            (0, 101, 0),
+            (1, 1, 1),
+            (2**16, 2**16, 0),
+            (-1, -1, 1),
+            (-10, 1, -10),
+            (110, -7, -770),
+            (55, 11, 605),
+            (2**24 + 17, 2**23 + 81, 1501562209),
+        ]
+        mul = MUL(rs1=0, rs2=1, rd=2)
+        for left, right, res in left_right_res_values:
+            state = RiscvArchitecturalState(
+                register_file=RegisterFile(
+                    registers=[
+                        fixedint.UInt32(left),
+                        fixedint.UInt32(right),
+                        fixedint.UInt32(0),
+                    ]
+                )
+            )
+            state = mul.behavior(state)
+            self.assertEqual(
+                state.register_file.registers,
+                [fixedint.UInt32(left), fixedint.UInt32(right), fixedint.UInt32(res)],
+            )
+
+            self.assertEqual(
+                fixedint.UInt32(mul.alu_compute(left, right)[1]), fixedint.UInt32(res)
+            )

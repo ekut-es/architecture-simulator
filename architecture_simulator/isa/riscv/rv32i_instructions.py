@@ -1360,6 +1360,40 @@ class CSRRCI(CSRITypeInstruction):
         return architectural_state
 
 
+# 'M' Standard Extension for Integer Multiplication and Division
+
+
+class MUL(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="mul")
+
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
+        """
+        Multiplication:
+            rd = lower 32 bits of (rs1 * rs2)
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        architectural_state.register_file.registers[self.rd] = rs1 * rs2
+        return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.UInt32(alu_in_1)
+        right = fixedint.UInt32(alu_in_2)
+        result = int(left * right)
+        return (None, result)
+
+
 # Used by the parser to instantiate instructions.
 instruction_map: dict[str, Type[RiscvInstruction]] = {
     "add": ADD,
@@ -1408,4 +1442,5 @@ instruction_map: dict[str, Type[RiscvInstruction]] = {
     "andi": ANDI,
     "slli": SLLI,
     "srli": SRLI,
+    "mul": MUL,
 }
