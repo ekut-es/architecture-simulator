@@ -51,8 +51,8 @@ class LRU(ReplacementStrategy):
         return self.lru[0]
 
     def get_repr(self) -> list[int]:
-        """Returns the lru value for each block. The least recently used block has the value 0,
-        older blocks have higher values.
+        """Returns the lru value for each block. The block that gets replaced next has the value 0,
+        newer blocks have higher values.
 
         Returns:
             list[int]: A list of lru values.
