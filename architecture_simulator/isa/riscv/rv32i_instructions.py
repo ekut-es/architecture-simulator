@@ -1433,7 +1433,41 @@ class MULH(RTypeInstruction):
         return (None, result)
 
 
-# MULHU
+class MULHU(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="mul")
+
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
+        """
+        Multiplication:
+            rd = upper 32 bits of (rs1 * rs2)
+
+            rs1 and rs2 are treated as signed
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        architectural_state.register_file.registers[self.rd] = fixedint.UInt32(
+            (int(rs1) * int(rs2)) >> 32
+        )
+        return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = alu_in_1
+        right = alu_in_2
+        result = left * right >> 32
+        return (None, result)
+
+
 # MULHSU
 # DIV
 # DIVU
@@ -1490,4 +1524,5 @@ instruction_map: dict[str, Type[RiscvInstruction]] = {
     "srli": SRLI,
     "mul": MUL,
     "mulh": MULH,
+    "mulhu": MULHU,
 }
