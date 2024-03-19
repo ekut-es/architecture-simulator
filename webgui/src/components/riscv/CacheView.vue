@@ -173,7 +173,10 @@ onMounted(() => {
                     for (let i = 0; i < associativity; i++) {
                         const row = cacheTable.value.rows[i + rowOffset];
                         const currentCell = row.querySelector(".tag");
-                        const tag = Number(currentCell.innerText);
+                        const tag =
+                            currentCell.innerText === ""
+                                ? null
+                                : Number(currentCell.innerText);
                         if (targetTag === tag) {
                             tagCell = currentCell;
                             highlightTagCell(tagCell);
