@@ -1546,7 +1546,42 @@ class DIV(RTypeInstruction):
         return (None, result)
 
 
-# DIVU
+class DIVU(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="divu")
+
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
+        """
+        Division Unsigned
+            x[rd] = x[rs1] /u x[rs2]
+
+            unsigned integer division
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        if rs2 == 0:
+            architectural_state.register_file.registers[self.rd] = fixedint.UInt32(-1)
+        else:
+            architectural_state.register_file.registers[self.rd] = rs1 // rs2
+        return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.UInt32(alu_in_1)
+        right = fixedint.UInt32(alu_in_2)
+        result = -1 if right == 0 else int(left // right)
+        return (None, result)
+
+
 # REM
 # REMU
 
@@ -1603,4 +1638,5 @@ instruction_map: dict[str, Type[RiscvInstruction]] = {
     "mulhu": MULHU,
     "mulhsu": MULHSU,
     "div": DIV,
+    "divu": DIVU,
 }

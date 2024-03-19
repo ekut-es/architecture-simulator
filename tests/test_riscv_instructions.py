@@ -52,6 +52,7 @@ from architecture_simulator.isa.riscv.rv32i_instructions import (
     MULHU,
     MULHSU,
     DIV,
+    DIVU,
 )
 from architecture_simulator.uarch.riscv.register_file import RegisterFile
 from architecture_simulator.uarch.riscv.riscv_architectural_state import (
@@ -2530,6 +2531,7 @@ csrrci x0, 0x40f, 16"""
             (100, -10, -10),
             (-100, 10, -10),
             (79, 11, 7),
+            (-2 ^ 31, -1, -2 ^ 31),
         ]
         div = DIV(rs1=0, rs2=1, rd=2)
         for left, right, res in left_right_res_values:
@@ -2550,5 +2552,36 @@ csrrci x0, 0x40f, 16"""
 
             self.assertEqual(
                 fixedint.UInt32(div.alu_compute(left, right)[1]),
+                fixedint.UInt32(res),
+            )
+
+    def test_divu(self):
+
+        left_right_res_values = [
+            (10, 0, -1),
+            (0, 0, -1),
+            (2**16, 2, 2**15),
+            (0, 100, 0),
+            (2**32 - 1, 5, 858_993_459),
+        ]
+        divu = DIVU(rs1=0, rs2=1, rd=2)
+        for left, right, res in left_right_res_values:
+            state = RiscvArchitecturalState(
+                register_file=RegisterFile(
+                    registers=[
+                        fixedint.UInt32(left),
+                        fixedint.UInt32(right),
+                        fixedint.UInt32(0),
+                    ]
+                )
+            )
+            state = divu.behavior(state)
+            self.assertEqual(
+                state.register_file.registers,
+                [fixedint.UInt32(left), fixedint.UInt32(right), fixedint.UInt32(res)],
+            )
+
+            self.assertEqual(
+                fixedint.UInt32(divu.alu_compute(left, right)[1]),
                 fixedint.UInt32(res),
             )
