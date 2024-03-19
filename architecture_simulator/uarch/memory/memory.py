@@ -48,6 +48,7 @@ T = TypeVar("T", UInt8, UInt16, UInt32, UInt64)
 class Memory(Generic[T], MemorySystem):
     """
     A class representing data memory (using Little-Endian byte-ordering).
+    Implements MemorySystem.
 
     Parameters:
         - addressing_type (AddressingType): The addressing type for memory access (byte, half-word, word, double-word).
@@ -169,6 +170,7 @@ class Memory(Generic[T], MemorySystem):
 
         Parameters:
             address (int): The memory address from which to read.
+            update_statistics = False: No effect.
 
         Raises:
             UnsupportedFunctionError: If no byte-wise addressing is used.
@@ -191,6 +193,7 @@ class Memory(Generic[T], MemorySystem):
 
         Parameters:
             address (int): The memory address from which to read.
+            update_statistics = False: No effect.
 
         Raises:
             UnsupportedFunctionError: If no halfword-wise addressing or smaller is used.
@@ -213,6 +216,7 @@ class Memory(Generic[T], MemorySystem):
 
         Parameters:
             address (int): The memory address from which to read.
+            update_statistics = False: No effect.
 
         Raises:
             UnsupportedFunctionError: If no word-wise addressing or smaller is used.
@@ -235,6 +239,7 @@ class Memory(Generic[T], MemorySystem):
 
         Parameters:
             address (int): The memory address from which to read.
+            update_statistics = False: No effect.
 
         Raises:
             UnsupportedFunctionError: If no doubleword-wise addressing or smaller is used.
@@ -260,6 +265,7 @@ class Memory(Generic[T], MemorySystem):
         Parameters:
             address (int): The memory address to write to.
             value (UInt8): The value to write.
+            directly_write_to_lower_memory = False: No effect.
 
         Raises:
             UnsupportedFunctionError: If no byte-wise addressing is used.
@@ -282,6 +288,7 @@ class Memory(Generic[T], MemorySystem):
         Parameters:
             address (int): The memory address to write to.
             value (UInt16): The value to write.
+            directly_write_to_lower_memory = False: No effect.
 
         Raises:
             UnsupportedFunctionError: If no halfword-wise addressing or smaller is used.
@@ -304,6 +311,7 @@ class Memory(Generic[T], MemorySystem):
         Parameters:
             address (int): The memory address to write to.
             value (UInt32): The value to write.
+            directly_write_to_lower_memory = False: No effect.
 
         Raises:
             UnsupportedFunctionError: If no word-wise addressing or smaller is used.
@@ -326,6 +334,7 @@ class Memory(Generic[T], MemorySystem):
         Parameters:
             address (int): The memory address to write to.
             value (UInt64): The value to write.
+            directly_write_to_lower_memory = False: No effect.
 
         Raises:
             UnsupportedFunctionError: If no doubleword-wise addressing or smaller is used.

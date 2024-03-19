@@ -2,17 +2,19 @@ from typing import TypeVar, Generic, Optional, Type, Any
 from architecture_simulator.uarch.memory.decoded_address import DecodedAddress
 from architecture_simulator.uarch.memory.replacement_strategies import (
     ReplacementStrategy,
-    LRU,
 )
 from architecture_simulator.util.integer_representations import (
     to_hex_str,
-    get_32_bit_representations,
 )
 
 T = TypeVar("T")
 
 
 class CacheOptions:
+    """
+    Configuration object for caches.
+    """
+
     def __init__(
         self,
         enable: bool,
@@ -33,6 +35,10 @@ class CacheOptions:
 
 
 class CacheBlockRepr(Generic[T]):
+    """
+    Representation object of a single cache block.
+    """
+
     def __init__(
         self,
         valid_bit: bool,
@@ -97,6 +103,10 @@ class CacheBlock(Generic[T]):
 
 
 class CacheSetRepr:
+    """
+    Representation object of a single cache set.
+    """
+
     def __init__(
         self, index_str: str, blocks: list[CacheBlockRepr], replacement_status: Any
     ) -> None:
@@ -202,11 +212,19 @@ class CacheSet(Generic[T]):
 
 
 class CacheRepr:
+    """
+    Representation object of an entire cache.
+    """
+
     def __init__(self, sets: list[CacheSetRepr]) -> None:
         self.sets = sets
 
 
 class Cache(Generic[T]):
+    """
+    Generic cache object.
+    """
+
     def __init__(
         self,
         num_index_bits: int,
@@ -231,16 +249,39 @@ class Cache(Generic[T]):
         ]
 
     def read_block(self, decoded_address: DecodedAddress) -> Optional[list[T]]:
+        """
+        Reads block from cache.
+
+        Parameters:
+            decoded_address (DecodedAddress): Address to read from.
+
+        Returns:
+            Optional[list[T]]: cache block or None if not in cache.
+        """
         return self.sets[decoded_address.cache_set_index].read(decoded_address)
 
     def write_block(
         self, decoded_address: DecodedAddress, block_values: list[T]
     ) -> tuple[bool, Optional[tuple[DecodedAddress, list[T]]]]:
+        """
+        Writes block to cache.
+
+        Parameters:
+            decoded_address (DecodedAddress): Address to write to.
+            block_values (list[T]): Values to write.
+
+        Returns:
+            tuple[bool, Optional[tuple[DecodedAddress, list[T]]]]: hit, address and values of displaced cache block if necessary.
+        """
         return self.sets[decoded_address.cache_set_index].write(
             decoded_address, block_values
         )
 
     def contains(self, decoded_address: DecodedAddress) -> bool:
+        """
+        Returns:
+            bool: whether the block that belongs to the address is contained in the cache.
+        """
         return self.sets[decoded_address.cache_set_index].is_block_in_set(
             decoded_address
         )

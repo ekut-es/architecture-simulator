@@ -8,20 +8,18 @@ from architecture_simulator.util.integer_manipulation import (
     halfword_into_block,
     word_into_block,
 )
-
-from architecture_simulator.uarch.memory.cache import Cache, CacheRepr
 from architecture_simulator.uarch.memory.decoded_address import DecodedAddress
 from architecture_simulator.uarch.memory.memory import Memory
-from architecture_simulator.uarch.memory.replacement_strategies import (
-    ReplacementStrategy,
-    LRU,
-)
 from architecture_simulator.uarch.riscv.riscv_performance_metrics import (
     RiscvPerformanceMetrics,
 )
 
 
 class WriteThroughMemorySystem(BaseCacheMemorySystem):
+    """
+    Cache Memory System implementing write through with write no allocate.
+    """
+
     def __init__(
         self,
         memory: Memory,
@@ -32,6 +30,18 @@ class WriteThroughMemorySystem(BaseCacheMemorySystem):
         miss_penality: int = 0,
         replacement_strategy: str = "lru",
     ) -> None:
+        """
+        Initialize a WriteThroughMemorySystem object.
+
+        Args:
+            memory (Memory): Lower Memory.
+            num_index_bits (int): Number of bits used to form the index.
+            num_block_bits (int): Number of bits used to form a block. Block size is 2^N.
+            associativity (int): Associativity.
+            performance_metrics (RiscvPerformanceMetrics): Performance Metrics object to track cache performance.
+            miss_penalty (int, optional): Amount of cycles to add to performance metrics if a cache miss occurs. Defaults to 0.
+            replacement_strategy (str, optional): Cache replacement strategy. If 'lru', LRU will be used, otherwise PLRU will be used. Defaults to 'lru'.
+        """
         super().__init__(
             memory,
             num_index_bits,
@@ -45,6 +55,18 @@ class WriteThroughMemorySystem(BaseCacheMemorySystem):
     def write_byte(
         self, address: int, value: UInt8, directly_write_to_lower_memory: bool = False
     ) -> None:
+        """
+        Writes the byte to the specified memory address.
+        Uses write through, no allocate, so writes directly to lower memroy.
+
+        Parameters:
+            address (int): The memory address to write to.
+            value (UInt8): The value to write.
+            directly_write_to_lower_memory (bool, optional): If true skip cache and performance tracking. Defaults to false.
+
+        Raises:
+            MemoryAddressError: If the address is outside the valid memory range.
+        """
         decoded_address = self._decode_address(address)
 
         # Omit any cache related simulation
@@ -68,6 +90,18 @@ class WriteThroughMemorySystem(BaseCacheMemorySystem):
     def write_halfword(
         self, address: int, value: UInt16, directly_write_to_lower_memory: bool = False
     ) -> None:
+        """
+        Writes the halfword to the specified memory address.
+        Uses write through, no allocate, so writes directly to lower memroy.
+
+        Parameters:
+            address (int): The memory address to write to.
+            value (UInt16): The value to write.
+            directly_write_to_lower_memory (bool, optional): If true skip cache and performance tracking. Defaults to false.
+
+        Raises:
+            MemoryAddressError: If the address is outside the valid memory range.
+        """
         decoded_address = self._decode_address(address)
 
         # Omit any cache related simulation
@@ -91,6 +125,18 @@ class WriteThroughMemorySystem(BaseCacheMemorySystem):
     def write_word(
         self, address: int, value: UInt32, directly_write_to_lower_memory: bool = False
     ) -> None:
+        """
+        Writes the word to the specified memory address.
+        Uses write through, no allocate, so writes directly to lower memroy.
+
+        Parameters:
+            address (int): The memory address to write to.
+            value (UInt32): The value to write.
+            directly_write_to_lower_memory (bool, optional): If true skip cache and performance tracking. Defaults to false.
+
+        Raises:
+            MemoryAddressError: If the address is outside the valid memory range.
+        """
         decoded_address = self._decode_address(address)
 
         # Omit any cache related simulation
@@ -112,6 +158,15 @@ class WriteThroughMemorySystem(BaseCacheMemorySystem):
         self.memory.write_word(address, value)
 
     def _read_block(self, decoded_address: DecodedAddress) -> tuple[list[UInt32], bool]:
+        """
+        Reads block.
+        Will try to read from cache. If hit return, else read block from lower memory and allocate.
+
+        Parameters:
+            decoded_address (DecodedAddress): Decoded address that provides the address of the block.
+        Returns:
+            tuple[list[UInt32], bool]: Words of the block read from lower memory, and whether the read was a hit.
+        """
         block_values = self.cache.read_block(decoded_address)
         hit = block_values is not None
         if block_values is None:
