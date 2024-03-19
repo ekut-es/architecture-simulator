@@ -49,6 +49,7 @@ class RiscvParser(Parser):
         "mulh",
         "mulhu",
         "mulhsu",
+        "div",
     ]
 
     _normal_i_type_mnemonics = [

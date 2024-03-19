@@ -1398,7 +1398,7 @@ class MUL(RTypeInstruction):
 
 class MULH(RTypeInstruction):
     def __init__(self, rd: int, rs1: int, rs2: int):
-        super().__init__(rd, rs1, rs2, mnemonic="mul")
+        super().__init__(rd, rs1, rs2, mnemonic="mulh")
 
     def behavior(
         self, architectural_state: RiscvArchitecturalState
@@ -1437,7 +1437,7 @@ class MULH(RTypeInstruction):
 
 class MULHU(RTypeInstruction):
     def __init__(self, rd: int, rs1: int, rs2: int):
-        super().__init__(rd, rs1, rs2, mnemonic="mul")
+        super().__init__(rd, rs1, rs2, mnemonic="mulhu")
 
     def behavior(
         self, architectural_state: RiscvArchitecturalState
@@ -1472,7 +1472,7 @@ class MULHU(RTypeInstruction):
 
 class MULHSU(RTypeInstruction):
     def __init__(self, rd: int, rs1: int, rs2: int):
-        super().__init__(rd, rs1, rs2, mnemonic="mul")
+        super().__init__(rd, rs1, rs2, mnemonic="mulhsu")
 
     def behavior(
         self, architectural_state: RiscvArchitecturalState
@@ -1505,7 +1505,47 @@ class MULHSU(RTypeInstruction):
         return (None, result)
 
 
-# DIV
+class DIV(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="div")
+
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
+        """
+        Division
+            x[rd] = x[rs1] /s x[rs2]
+
+            signed integer division
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        if rs2 == 0:
+            architectural_state.register_file.registers[self.rd] = fixedint.UInt32(-1)
+        else:
+            architectural_state.register_file.registers[self.rd] = fixedint.UInt32(
+                (
+                    (int(rs1) | (-(int(rs1) & 0x80000000)))
+                    // (int(rs2) | (-(int(rs2) & 0x80000000)))
+                )
+            )
+        return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = int(alu_in_1) | (-(int(alu_in_1) & 0x80000000))
+        right = int(alu_in_2) | (-(int(alu_in_2) & 0x80000000))
+        result = -1 if right == 0 else left // right
+        return (None, result)
+
+
 # DIVU
 # REM
 # REMU
@@ -1562,4 +1602,5 @@ instruction_map: dict[str, Type[RiscvInstruction]] = {
     "mulh": MULH,
     "mulhu": MULHU,
     "mulhsu": MULHSU,
+    "div": DIV,
 }
