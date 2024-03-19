@@ -13,7 +13,7 @@ from architecture_simulator.isa.toy.toy_instructions import (
 )
 from .simulation import Simulation
 from .runtime_errors import StepSequenceError
-from fixedint import MutableUInt16
+from architecture_simulator.util.fixedint_12 import UInt12
 from architecture_simulator.uarch.toy.SvgVisValues import SvgVisValues
 from architecture_simulator.util.integer_representations import (
     get_12_bit_representations,
@@ -74,8 +74,7 @@ class ToySimulation(Simulation):
             )
         old_op_code = self.state.loaded_instruction.op_code_value()
         self.state.visualisation_values = SvgVisValues(
-            op_code_old=old_op_code,
-            pc_old=MutableUInt16(int(self.state.program_counter)),
+            op_code_old=old_op_code, pc_old=self.state.program_counter
         )
         self.state.visualisation_values.ram_out = self.state.memory.read_halfword(
             int(self.state.program_counter)
@@ -86,7 +85,7 @@ class ToySimulation(Simulation):
             )
         else:
             self.state.loaded_instruction = None
-        self.state.program_counter += MutableUInt16(1)
+        self.state.program_counter += UInt12(1)
         self.state.performance_metrics.instruction_count += 1
         self.state.performance_metrics.cycles += 1
         self.next_cycle = 1

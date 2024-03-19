@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING, Any
+import json
 
 from architecture_simulator.settings.settings import Settings
 from architecture_simulator.uarch.riscv.riscv_architectural_state import (
@@ -20,6 +21,7 @@ if TYPE_CHECKING:
     from architecture_simulator.uarch.riscv.riscv_performance_metrics import (
         RiscvPerformanceMetrics,
     )
+    from architecture_simulator.uarch.memory.cache import CacheOptions
 from architecture_simulator.gui.riscv_fiveStage_svg_directives import (
     RiscvFiveStageIFSvgDirectives,
     RiscvFiveStageIDSvgDirectives,
@@ -51,6 +53,8 @@ class RiscvSimulation(Simulation):
         state: Optional[RiscvArchitecturalState] = None,
         mode: str = Settings().get()["default_pipeline_mode"],
         detect_data_hazards: bool = Settings().get()["hazard_detection"],
+        data_cache: CacheOptions = Settings().get()["data_cache"],
+        instruction_cache: CacheOptions = Settings().get()["instruction_cache"],
     ) -> None:
         """Constructor for RISC-V simulations.
 
@@ -61,7 +65,10 @@ class RiscvSimulation(Simulation):
         """
         self.state = (
             RiscvArchitecturalState(
-                pipeline_mode=mode, detect_data_hazards=detect_data_hazards
+                pipeline_mode=mode,
+                detect_data_hazards=detect_data_hazards,
+                data_cache_options=data_cache,
+                instruction_cache_options=instruction_cache,
             )
             if state is None
             else state
@@ -100,7 +107,7 @@ class RiscvSimulation(Simulation):
         return self.state.pipeline.is_done()
 
     def has_instructions(self) -> bool:
-        return bool(self.state.instruction_memory.instructions)
+        return self.state.instruction_memory.has_instructions()
 
     def get_performance_metrics(self) -> RiscvPerformanceMetrics:
         return self.state.performance_metrics
@@ -148,6 +155,87 @@ class RiscvSimulation(Simulation):
         for key, values in sorted(memory_repr.items()):
             result.append(((key, "0x" + "{:08X}".format(key)), values))
         return result
+
+    def get_data_cache_entries(self):
+        return self.state.memory.cache_repr()
+
+    def get_data_cache_entries_dict(self) -> dict[str, Any]:
+        """Returns the data cache entries as a dict (deeply converted).
+
+        Returns:
+            dict[str, Any]: The data cache entries as dict.
+        """
+        return json.loads(
+            json.dumps(self.state.memory.cache_repr(), default=lambda o: vars(o))
+        )
+
+    def get_data_cache_stats(self):
+        """Returns the stats of the data cache (will be None if no cache is used).
+
+        Returns:
+            dict[str, Optional[str]] | None: The cache stats, plus the last address that was accessed under the key "address".
+        """
+        stats = self.state.memory.get_cache_stats()
+        if stats is None:
+            return None
+
+        if self.state.pipeline_mode == "five_stage_pipeline":
+            pipeline_register = self.state.pipeline.pipeline_registers[3]
+        else:
+            pipeline_register = self.state.pipeline.pipeline_registers[0]
+
+        if isinstance(pipeline_register, MemoryAccessPipelineRegister) or isinstance(
+            pipeline_register, SingleStagePipelineRegister
+        ):
+            address = pipeline_register.memory_address
+            if address is not None:
+                address = "{:032b}".format(
+                    address % (2**32)
+                )  # address might be negative
+        else:
+            address = None
+        stats = self.state.memory.get_cache_stats()
+        stats["address"] = address
+        return stats
+
+    def get_instruction_cache_entries(self):
+        """Returns the instruction cache entries as a dict (deeply converted).
+
+        Returns:
+            dict[str, Any]: The instruction cache entries as dict.
+        """
+        return self.state.instruction_memory.cache_repr()
+
+    def get_instruction_cache_entries_dict(self):
+        return json.loads(
+            json.dumps(
+                self.state.instruction_memory.cache_repr(), default=lambda o: vars(o)
+            )
+        )
+
+    def get_instruction_cache_stats(self):
+        """Returns the stats of the instruction cache (will be None if no cache is used).
+
+        Returns:
+            dict[str, Optional[str]] | None: The cache stats, plus the last address that was accessed under the key "address".
+        """
+        stats = self.state.instruction_memory.get_cache_stats()
+        if stats is None:
+            return None
+
+        pipeline_register = self.state.pipeline.pipeline_registers[0]
+        if isinstance(
+            pipeline_register, InstructionFetchPipelineRegister
+        ) or isinstance(pipeline_register, SingleStagePipelineRegister):
+            address = pipeline_register.address_of_instruction
+            if address is not None:
+                address = "{:032b}".format(
+                    address % (2**32)
+                )  # address shouldn't be negative, but lets check anyway
+        else:
+            address = None
+        stats["address"] = address
+        return stats
 
     def get_riscv_five_stage_svg_update_values(self) -> list[tuple[str, str, Any]]:
         """Returns all information needed to update the svg.

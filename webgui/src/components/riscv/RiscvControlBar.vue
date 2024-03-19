@@ -5,21 +5,17 @@ import RiscvControlButtons from "./RiscvControlButtons.vue";
 </script>
 
 <template>
-    <nav id="nav-bar" class="container-fluid py-1">
-        <div class="row">
-            <RiscvControlButtons class="col" />
-            <RiscvElementToggle class="col" />
-            <div class="d-flex justify-content-end col">
-                <button
-                    class="archsim-icon-button settings-button"
-                    title="settings"
-                    data-bs-toggle="modal"
-                    data-bs-target="#settings-modal"
-                >
-                    <i class="bi bi-gear-fill"></i>
-                </button>
-            </div>
-        </div>
+    <nav id="nav-bar" class="py-1 px-2">
+        <RiscvControlButtons />
+        <RiscvElementToggle />
+        <button
+            class="archsim-icon-button settings-button"
+            title="settings"
+            data-bs-toggle="modal"
+            data-bs-target="#settings-modal"
+        >
+            <i class="bi bi-gear-fill"></i>
+        </button>
     </nav>
 </template>
 
@@ -28,7 +24,9 @@ import RiscvControlButtons from "./RiscvControlButtons.vue";
     font-size: 1.5rem;
 }
 
-nav {
+#nav-bar {
     background-color: var(--bs-secondary-bg);
+    display: flex;
+    justify-content: space-between;
 }
 </style>

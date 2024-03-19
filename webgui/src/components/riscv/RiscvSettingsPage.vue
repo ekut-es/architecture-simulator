@@ -1,8 +1,9 @@
 <!-- RISCV settings page -->
 <script setup>
-import { ref, watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 import RadioSettingsRow from "../RadioSettingsRow.vue";
 import RepresentationSettingsRow from "../RepresentationSettingsRow.vue";
+import CacheParameters from "./CacheParameters.vue";
 
 import { useRiscvSimulationStore } from "@/js/riscv_simulation_store";
 import { useEditorStore } from "@/js/editor_store";
@@ -17,13 +18,26 @@ const dataHazardDetection = ref(riscvSettings.dataHazardDetection.value);
 
 // Reset the sim and parse the input if the pipeline or data hazard detection changes
 watch(
-    [pipelineMode, dataHazardDetection],
-    ([newPipelineMode, newDataHazardDetection]) => {
-        riscvSettings.pipelineMode.value = newPipelineMode;
-        riscvSettings.dataHazardDetection.value = newDataHazardDetection;
-        // FIXME: This is the same as the reset button does in RiscvControlBar.vue
-        simulationStore.resetSimulation();
-        editorStore.loadProgram();
+    () => [
+        pipelineMode.value,
+        dataHazardDetection.value,
+        riscvSettings.dataCache.value.enable,
+        riscvSettings.instructionCache.value.enable,
+    ],
+    ([
+        pipelineMode,
+        dataHazardDetection,
+        enableDataCache,
+        enableInstructionCache,
+    ]) => {
+        riscvSettings.pipelineMode.value = pipelineMode;
+        riscvSettings.dataHazardDetection.value = dataHazardDetection;
+        // Do this in the next tick because if the cache gets disabled,
+        // the CacheView needs time to disappear first
+        nextTick(() => {
+            simulationStore.resetSimulation();
+            editorStore.loadProgram();
+        });
     }
 );
 </script>
@@ -66,4 +80,24 @@ watch(
             </label>
         </div>
     </div>
+
+    <CacheParameters
+        v-model:cache-settings="riscvSettings.dataCache.value"
+        v-model:too-big-setting="riscvSettings.dataCacheTooBig.value"
+        :is-data-cache="true"
+        base-id="riscv-data-cache"
+    >
+        Data Cache
+    </CacheParameters>
+
+    <CacheParameters
+        v-model:cache-settings="riscvSettings.instructionCache.value"
+        v-model:too-big-setting="riscvSettings.instructionCacheTooBig.value"
+        :is-data-cache="false"
+        base-id="ricsv-instruction-cache"
+    >
+        Instruction Cache
+    </CacheParameters>
 </template>
+
+<style scoped></style>

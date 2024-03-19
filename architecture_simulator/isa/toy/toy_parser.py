@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import pyparsing as pp
-from fixedint import MutableUInt16
+from fixedint import UInt16
 
 from .toy_instructions import AddressTypeInstruction, instruction_map
 from ..parser_exceptions import (
@@ -110,7 +110,7 @@ class ToyParser(Parser):
                 )
                 for value in values_to_write:
                     self.state.memory.write_halfword(
-                        write_address, MutableUInt16(self._value_to_int(value))
+                        write_address, UInt16(self._value_to_int(value))
                     )
                     write_address += 1
 
@@ -145,11 +145,11 @@ class ToyParser(Parser):
             raise MemorySizeException(max(self.state.memory.address_range) + 1)
         self.state.max_pc = len(instructions) - 1
         for addr, instr in enumerate(instructions):
-            self.state.memory.write_halfword(addr, MutableUInt16(int(instr)))
+            self.state.memory.write_halfword(addr, UInt16(int(instr)))
         if len(instructions) >= 1:
             self.state.loaded_instruction = instructions[0]
             self.state.visualisation_values = SvgVisValues(
-                pc_old=MutableUInt16(0), ram_out=MutableUInt16(int(instructions[0]))
+                pc_old=UInt16(0), ram_out=UInt16(int(instructions[0]))
             )
 
     def _value_to_int(self, address: str) -> int:

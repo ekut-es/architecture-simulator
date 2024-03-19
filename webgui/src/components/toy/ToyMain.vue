@@ -95,6 +95,7 @@ onUnmounted(() => {
             />
         </div>
         <div
+            :class="{ 'flex-grow-1': !textContainerPopulated }"
             v-show="toySettings.showVisualization.value"
             ref="visualizationsContainer"
             id="toy-visualizations-container"

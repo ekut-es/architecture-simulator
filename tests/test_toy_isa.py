@@ -1,5 +1,5 @@
 import unittest
-from fixedint import MutableUInt16
+from fixedint import UInt16
 
 from architecture_simulator.uarch.toy.toy_architectural_state import (
     ToyArchitecturalState,
@@ -32,19 +32,19 @@ class TestToyInstructions(unittest.TestCase):
         self.assertEqual(state.memory.read_halfword(1024), 0)
         STO(1024).behavior(state)
         self.assertEqual(state.memory.read_halfword(1024), 0)
-        state.accu = MutableUInt16(1)
+        state.accu = UInt16(1)
         STO(1024).behavior(state)
         self.assertEqual(state.memory.read_halfword(1024), 1)
         self.assertEqual(state.visualisation_values.alu_out, state.accu)
-        state.accu = MutableUInt16(2**16 - 1)
+        state.accu = UInt16(2**16 - 1)
         STO(4095).behavior(state)
         self.assertEqual(state.memory.read_halfword(4095), 2**16 - 1)
 
     def test_lda(self):
         state = ToyArchitecturalState()
-        state.memory.write_halfword(1025, MutableUInt16(1))
-        state.memory.write_halfword(1026, MutableUInt16(25))
-        state.memory.write_halfword(4095, MutableUInt16(2**16 - 1))
+        state.memory.write_halfword(1025, UInt16(1))
+        state.memory.write_halfword(1026, UInt16(25))
+        state.memory.write_halfword(4095, UInt16(2**16 - 1))
         LDA(1024).behavior(state)
         self.assertEqual(state.accu, 0)
         LDA(1025).behavior(state)
@@ -58,20 +58,20 @@ class TestToyInstructions(unittest.TestCase):
     def test_brz(self):
         state = ToyArchitecturalState()
         self.assertEqual(state.program_counter, 1)
-        state.accu = MutableUInt16(1)
+        state.accu = UInt16(1)
         BRZ(2).behavior(state)
-        self.assertEqual(state.program_counter, MutableUInt16(1))
-        state.accu = MutableUInt16(0)
+        self.assertEqual(state.program_counter, UInt16(1))
+        state.accu = UInt16(0)
         BRZ(2).behavior(state)
         self.assertTrue(state.visualisation_values.jump)
-        self.assertEqual(state.program_counter, MutableUInt16(2))
+        self.assertEqual(state.program_counter, UInt16(2))
 
     def test_add(self):
         state = ToyArchitecturalState()
-        state.memory.write_halfword(1024, MutableUInt16(1))
-        state.memory.write_halfword(1025, MutableUInt16(2))
-        state.memory.write_halfword(1026, MutableUInt16(10))
-        state.memory.write_halfword(1027, MutableUInt16(2**16 - 1))
+        state.memory.write_halfword(1024, UInt16(1))
+        state.memory.write_halfword(1025, UInt16(2))
+        state.memory.write_halfword(1026, UInt16(10))
+        state.memory.write_halfword(1027, UInt16(2**16 - 1))
         ADD(1024).behavior(state=state)
         self.assertEqual(state.accu, 1)
         ADD(1024).behavior(state=state)
@@ -89,10 +89,10 @@ class TestToyInstructions(unittest.TestCase):
 
     def test_sub(self):
         state = ToyArchitecturalState()
-        state.memory.write_halfword(1024, MutableUInt16(1))
-        state.memory.write_halfword(1025, MutableUInt16(2))
-        state.memory.write_halfword(1026, MutableUInt16(10))
-        state.memory.write_halfword(1027, MutableUInt16(2**16 - 1))
+        state.memory.write_halfword(1024, UInt16(1))
+        state.memory.write_halfword(1025, UInt16(2))
+        state.memory.write_halfword(1026, UInt16(10))
+        state.memory.write_halfword(1027, UInt16(2**16 - 1))
         SUB(1024).behavior(state)
         self.assertEqual(state.accu, 2**16 - 1)
         SUB(1027).behavior(state)
@@ -108,10 +108,10 @@ class TestToyInstructions(unittest.TestCase):
 
     def test_or(self):
         state = ToyArchitecturalState()
-        state.memory.write_halfword(1024, MutableUInt16(0x000F))
-        state.memory.write_halfword(1025, MutableUInt16(0x0EF0))
-        state.memory.write_halfword(1026, MutableUInt16(0x0100))
-        state.memory.write_halfword(1027, MutableUInt16(0xFFFF))
+        state.memory.write_halfword(1024, UInt16(0x000F))
+        state.memory.write_halfword(1025, UInt16(0x0EF0))
+        state.memory.write_halfword(1026, UInt16(0x0100))
+        state.memory.write_halfword(1027, UInt16(0xFFFF))
         OR(1024).behavior(state)
         self.assertEqual(state.accu, 0x000F)
         OR(1025).behavior(state)
@@ -127,18 +127,18 @@ class TestToyInstructions(unittest.TestCase):
 
     def test_and(self):
         state = ToyArchitecturalState()
-        state.memory.write_halfword(1024, MutableUInt16(0x000F))
-        state.memory.write_halfword(1025, MutableUInt16(0x0EF0))
-        state.memory.write_halfword(1026, MutableUInt16(0x0100))
-        state.memory.write_halfword(1027, MutableUInt16(0xFFFF))
+        state.memory.write_halfword(1024, UInt16(0x000F))
+        state.memory.write_halfword(1025, UInt16(0x0EF0))
+        state.memory.write_halfword(1026, UInt16(0x0100))
+        state.memory.write_halfword(1027, UInt16(0xFFFF))
         AND(1024).behavior(state)
         self.assertEqual(state.accu, 0x0000)
-        state.accu = MutableUInt16(0x00FA)
+        state.accu = UInt16(0x00FA)
         AND(1024).behavior(state)
         self.assertEqual(state.accu, 0x000A)
         AND(1025).behavior(state)
         self.assertEqual(state.accu, 0x0000)
-        state.accu = MutableUInt16(0x0100)
+        state.accu = UInt16(0x0100)
         AND(1026).behavior(state)
         self.assertEqual(state.accu, 0x0100)
         self.assertEqual(state.accu, state.visualisation_values.alu_out)
@@ -150,10 +150,10 @@ class TestToyInstructions(unittest.TestCase):
 
     def test_xor(self):
         state = ToyArchitecturalState()
-        state.memory.write_halfword(1024, MutableUInt16(0b1101))
-        state.memory.write_halfword(1025, MutableUInt16(0b1111))
-        state.memory.write_halfword(1026, MutableUInt16(0xFFFF))
-        state.memory.write_halfword(1027, MutableUInt16(0x0F0F))
+        state.memory.write_halfword(1024, UInt16(0b1101))
+        state.memory.write_halfword(1025, UInt16(0b1111))
+        state.memory.write_halfword(1026, UInt16(0xFFFF))
+        state.memory.write_halfword(1027, UInt16(0x0F0F))
         XOR(1024).behavior(state)
         self.assertEqual(state.accu, 0b1101)
         XOR(1024).behavior(state)
@@ -176,7 +176,7 @@ class TestToyInstructions(unittest.TestCase):
         self.assertEqual(state.accu, 2**16 - 1)
         NOT().behavior(state)
         self.assertEqual(state.accu, 0)
-        state.accu = MutableUInt16(0xF0F0)
+        state.accu = UInt16(0xF0F0)
         NOT().behavior(state)
         self.assertEqual(state.accu, 0x0F0F)
         self.assertEqual(state.visualisation_values.alu_out, state.accu)
@@ -193,13 +193,13 @@ class TestToyInstructions(unittest.TestCase):
         INC().behavior(state)
         self.assertEqual(state.accu, 4)
         self.assertEqual(state.visualisation_values.alu_out, state.accu)
-        state.accu = MutableUInt16(2**16 - 1)
+        state.accu = UInt16(2**16 - 1)
         INC().behavior(state)
         self.assertEqual(state.accu, 0)
 
     def test_dec(self):
         state = ToyArchitecturalState()
-        state.accu = MutableUInt16(3)
+        state.accu = UInt16(3)
         DEC().behavior(state)
         self.assertEqual(state.accu, 2)
         DEC().behavior(state)
@@ -212,10 +212,10 @@ class TestToyInstructions(unittest.TestCase):
 
     def test_zro(self):
         state = ToyArchitecturalState()
-        state.accu = MutableUInt16(12415)
+        state.accu = UInt16(12415)
         self.assertEqual(state.visualisation_values.alu_out, None)
         ZRO().behavior(state)
-        self.assertEqual(state.visualisation_values.alu_out, MutableUInt16(0))
+        self.assertEqual(state.visualisation_values.alu_out, UInt16(0))
         self.assertEqual(state.accu, 0)
         ZRO().behavior(state)
         ZRO().behavior(state)
@@ -224,7 +224,7 @@ class TestToyInstructions(unittest.TestCase):
 
     def test_nop(self):
         state = ToyArchitecturalState()
-        state.accu = MutableUInt16(111)
+        state.accu = UInt16(111)
         NOP().behavior(state)
         NOP().behavior(state)
         NOP().behavior(state)

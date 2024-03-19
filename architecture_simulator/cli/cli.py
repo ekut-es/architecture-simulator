@@ -1,7 +1,8 @@
 from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 from architecture_simulator.simulation.toy_simulation import ToySimulation
 from typing import Optional, Union
-from architecture_simulator.uarch.memory import Memory
+from architecture_simulator.uarch.memory.memory_system import MemorySystem
+from architecture_simulator.uarch.memory.memory import Memory
 from architecture_simulator.uarch.riscv.register_file import RegisterFile
 
 from architecture_simulator.uarch.riscv.pipeline import (
@@ -291,7 +292,7 @@ def pad_num(num: Union[int, str], length: int) -> str:
     return " " * (length - len(str(num))) + str(num)
 
 
-def memory_repr(mem: Memory, display_mode: str) -> str:
+def memory_repr(mem: MemorySystem, display_mode: str) -> str:
     """
     Produces a representation of a Memory.
 

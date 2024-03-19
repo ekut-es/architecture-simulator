@@ -58,8 +58,8 @@ class ADD(RTypeInstruction):
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = fixedint.MutableUInt32(alu_in_1)
-        right = fixedint.MutableUInt32(alu_in_2)
+        left = fixedint.UInt32(alu_in_1)
+        right = fixedint.UInt32(alu_in_2)
         result = int(left + right)
         return (None, result)
 
@@ -83,17 +83,15 @@ class SUB(RTypeInstruction):
         """
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
-        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            int(fixedint.Int32(int(rs1)) - fixedint.Int32(int(rs2)))
-        )
+        architectural_state.register_file.registers[self.rd] = rs1 - rs2
         return architectural_state
 
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = fixedint.MutableUInt32(alu_in_1)
-        right = fixedint.MutableUInt32(alu_in_2)
-        result = int(fixedint.Int32(int(left)) - fixedint.Int32(int(right)))
+        left = fixedint.UInt32(alu_in_1)
+        right = fixedint.UInt32(alu_in_2)
+        result = int(left - right)
         return (None, result)
 
 
@@ -117,17 +115,17 @@ class SLL(RTypeInstruction):
             architectural_state
         """
         rs1 = architectural_state.register_file.registers[self.rs1]
-        rs2 = architectural_state.register_file.registers[
-            self.rs2
-        ] % fixedint.MutableUInt32(32)
+        rs2 = architectural_state.register_file.registers[self.rs2] % fixedint.UInt32(
+            32
+        )
         architectural_state.register_file.registers[self.rd] = rs1 << rs2
         return architectural_state
 
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = fixedint.MutableUInt32(alu_in_1)
-        right = fixedint.MutableUInt32(alu_in_2) % fixedint.MutableUInt32(32)
+        left = fixedint.UInt32(alu_in_1)
+        right = fixedint.UInt32(alu_in_2) % fixedint.UInt32(32)
         result = int(left << right)
         return (None, result)
 
@@ -154,7 +152,7 @@ class SLT(RTypeInstruction):
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         rs2 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs2]))
         architectural_state.register_file.registers[self.rd] = (
-            fixedint.MutableUInt32(1) if rs1 < rs2 else fixedint.MutableUInt32(0)
+            fixedint.UInt32(1) if rs1 < rs2 else fixedint.UInt32(0)
         )
         return architectural_state
 
@@ -189,7 +187,7 @@ class SLTU(RTypeInstruction):
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
         architectural_state.register_file.registers[self.rd] = (
-            fixedint.MutableUInt32(1) if rs1 < rs2 else fixedint.MutableUInt32(0)
+            fixedint.UInt32(1) if rs1 < rs2 else fixedint.UInt32(0)
         )
         return architectural_state
 
@@ -229,8 +227,8 @@ class XOR(RTypeInstruction):
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = fixedint.MutableUInt32(alu_in_1)
-        right = fixedint.MutableUInt32(alu_in_2)
+        left = fixedint.UInt32(alu_in_1)
+        right = fixedint.UInt32(alu_in_2)
         result = int(left ^ right)
         return (None, result)
 
@@ -255,17 +253,17 @@ class SRL(RTypeInstruction):
             architectural_state
         """
         rs1 = architectural_state.register_file.registers[self.rs1]
-        rs2 = architectural_state.register_file.registers[
-            self.rs2
-        ] % fixedint.MutableUInt32(32)
+        rs2 = architectural_state.register_file.registers[self.rs2] % fixedint.UInt32(
+            32
+        )
         architectural_state.register_file.registers[self.rd] = rs1 >> rs2
         return architectural_state
 
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = fixedint.MutableUInt32(alu_in_1)
-        right = fixedint.MutableUInt32(alu_in_2) % fixedint.MutableUInt32(32)
+        left = fixedint.UInt32(alu_in_1)
+        right = fixedint.UInt32(alu_in_2) % fixedint.UInt32(32)
         result = int(left >> right)
         return (None, result)
 
@@ -291,13 +289,10 @@ class SRA(RTypeInstruction):
         """
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         rs2 = fixedint.Int32(
-            int(
-                architectural_state.register_file.registers[self.rs2]
-                % fixedint.MutableUInt32(32)
-            )
+            architectural_state.register_file.registers[self.rs2] % fixedint.UInt32(32)
         )
-        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            int(rs1 >> rs2)
+        architectural_state.register_file.registers[self.rd] = fixedint.UInt32(
+            rs1 >> rs2
         )
         return architectural_state
 
@@ -305,9 +300,7 @@ class SRA(RTypeInstruction):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
         left = fixedint.Int32(alu_in_1)
-        right = fixedint.Int32(
-            int(fixedint.UInt32(alu_in_2) % fixedint.MutableUInt32(32))
-        )
+        right = fixedint.Int32(int(fixedint.UInt32(alu_in_2) % fixedint.UInt32(32)))
         result = int(left >> right)
         return (None, result)
 
@@ -339,8 +332,8 @@ class OR(RTypeInstruction):
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = fixedint.MutableUInt32(alu_in_1)
-        right = fixedint.MutableUInt32(alu_in_2)
+        left = fixedint.UInt32(alu_in_1)
+        right = fixedint.UInt32(alu_in_2)
         result = int(left | right)
         return (None, result)
 
@@ -372,8 +365,8 @@ class AND(RTypeInstruction):
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = fixedint.MutableUInt32(alu_in_1)
-        right = fixedint.MutableUInt32(alu_in_2)
+        left = fixedint.UInt32(alu_in_1)
+        right = fixedint.UInt32(alu_in_2)
         result = int(left & right)
         return (None, result)
 
@@ -387,16 +380,16 @@ class ADDI(ITypeInstruction):
     ) -> RiscvArchitecturalState:
         """x[rd] = x[rs1] + sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
-        architectural_state.register_file.registers[
-            self.rd
-        ] = rs1 + fixedint.MutableUInt32(self.imm)
+        architectural_state.register_file.registers[self.rd] = rs1 + fixedint.UInt32(
+            self.imm
+        )
         return architectural_state
 
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = fixedint.MutableUInt32(alu_in_1)
-        right = fixedint.MutableUInt32(alu_in_2)
+        left = fixedint.UInt32(alu_in_1)
+        right = fixedint.UInt32(alu_in_2)
         result = int(left + right)
         return (None, result)
 
@@ -411,9 +404,7 @@ class SLTI(ITypeInstruction):
         """x[rd] = x[rs1] <s sext(imm)"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
         architectural_state.register_file.registers[self.rd] = (
-            fixedint.MutableUInt32(1)
-            if rs1 < fixedint.Int32(self.imm)
-            else fixedint.MutableUInt32(0)
+            fixedint.UInt32(1) if rs1 < fixedint.Int32(self.imm) else fixedint.UInt32(0)
         )
         return architectural_state
 
@@ -436,9 +427,9 @@ class SLTIU(ITypeInstruction):
         """x[rd] = x[rs1] <u sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         architectural_state.register_file.registers[self.rd] = (
-            fixedint.MutableUInt32(1)
-            if rs1 < fixedint.MutableUInt32(self.imm)
-            else fixedint.MutableUInt32(0)
+            fixedint.UInt32(1)
+            if rs1 < fixedint.UInt32(self.imm)
+            else fixedint.UInt32(0)
         )
         return architectural_state
 
@@ -460,16 +451,16 @@ class XORI(ITypeInstruction):
     ) -> RiscvArchitecturalState:
         """x[rd] = x[rs1] ^ sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
-        architectural_state.register_file.registers[
-            self.rd
-        ] = rs1 ^ fixedint.MutableUInt32(self.imm)
+        architectural_state.register_file.registers[self.rd] = rs1 ^ fixedint.UInt32(
+            self.imm
+        )
         return architectural_state
 
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = fixedint.MutableUInt32(alu_in_1)
-        right = fixedint.MutableUInt32(alu_in_2)
+        left = fixedint.UInt32(alu_in_1)
+        right = fixedint.UInt32(alu_in_2)
         result = int(left ^ right)
         return (None, result)
 
@@ -483,16 +474,16 @@ class ORI(ITypeInstruction):
     ) -> RiscvArchitecturalState:
         """x[rd] = x[rs1] | sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
-        architectural_state.register_file.registers[
-            self.rd
-        ] = rs1 | fixedint.MutableUInt32(self.imm)
+        architectural_state.register_file.registers[self.rd] = rs1 | fixedint.UInt32(
+            self.imm
+        )
         return architectural_state
 
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = fixedint.MutableUInt32(alu_in_1)
-        right = fixedint.MutableUInt32(alu_in_2)
+        left = fixedint.UInt32(alu_in_1)
+        right = fixedint.UInt32(alu_in_2)
         result = int(left | right)
         return (None, result)
 
@@ -506,16 +497,16 @@ class ANDI(ITypeInstruction):
     ) -> RiscvArchitecturalState:
         """x[rd] = x[rs1] & sext(imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
-        architectural_state.register_file.registers[
-            self.rd
-        ] = rs1 & fixedint.MutableUInt32(self.imm)
+        architectural_state.register_file.registers[self.rd] = rs1 & fixedint.UInt32(
+            self.imm
+        )
         return architectural_state
 
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = fixedint.MutableUInt32(alu_in_1)
-        right = fixedint.MutableUInt32(alu_in_2)
+        left = fixedint.UInt32(alu_in_1)
+        right = fixedint.UInt32(alu_in_2)
         result = int(left & right)
         return (None, result)
 
@@ -529,16 +520,16 @@ class SLLI(ShiftITypeInstruction):
     ) -> RiscvArchitecturalState:
         """x[rd] = x[rs1] << shamt  (imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
-        architectural_state.register_file.registers[
-            self.rd
-        ] = rs1 << fixedint.MutableUInt32(self.imm)
+        architectural_state.register_file.registers[self.rd] = rs1 << fixedint.UInt32(
+            self.imm
+        )
         return architectural_state
 
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = fixedint.MutableUInt32(alu_in_1)
-        right = fixedint.MutableUInt32(alu_in_2)
+        left = fixedint.UInt32(alu_in_1)
+        right = fixedint.UInt32(alu_in_2)
         result = int(left << right)
         return (None, result)
 
@@ -552,16 +543,16 @@ class SRLI(ShiftITypeInstruction):
     ) -> RiscvArchitecturalState:
         """x[rd] = x[rs1] >>u shamt  (imm)"""
         rs1 = architectural_state.register_file.registers[self.rs1]
-        architectural_state.register_file.registers[
-            self.rd
-        ] = rs1 >> fixedint.MutableUInt32(self.imm)
+        architectural_state.register_file.registers[self.rd] = rs1 >> fixedint.UInt32(
+            self.imm
+        )
         return architectural_state
 
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = fixedint.MutableUInt32(alu_in_1)
-        right = fixedint.MutableUInt32(alu_in_2)
+        left = fixedint.UInt32(alu_in_1)
+        right = fixedint.UInt32(alu_in_2)
         result = int(left >> right)
         return (None, result)
 
@@ -575,8 +566,8 @@ class SRAI(ShiftITypeInstruction):
     ) -> RiscvArchitecturalState:
         """x[rd] = x[rs1] >>s shamt   (imm)"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
-        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            rs1 >> int(fixedint.UInt16(self.imm))
+        architectural_state.register_file.registers[self.rd] = fixedint.UInt32(
+            rs1 >> fixedint.UInt16(self.imm)
         )
         return architectural_state
 
@@ -599,19 +590,15 @@ class LB(MemoryITypeInstruction):
         """x[rd] = sext(M[x[rs1] + sext(imm)][7:0])"""
         rs1 = architectural_state.register_file.registers[self.rs1]
         # casting like this is necessary for sign extension
-        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            int(
-                fixedint.Int8(
-                    int(architectural_state.memory.read_byte(int(rs1) + self.imm))
-                )
-            )
+        architectural_state.register_file.registers[self.rd] = fixedint.UInt32(
+            fixedint.Int8(architectural_state.memory.read_byte(int(rs1) + self.imm))
         )
         return architectural_state
 
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = fixedint.MutableUInt32(alu_in_1)
+        left = fixedint.UInt32(alu_in_1)
         right = alu_in_2
         result = int(left) + right
         return (None, result)
@@ -621,10 +608,17 @@ class LB(MemoryITypeInstruction):
         memory_address: Optional[int],
         memory_write_data: Optional[int],
         architectural_state: RiscvArchitecturalState,
+        update_statistics: bool = True,
     ) -> Optional[int]:
         assert memory_address is not None
         return int(
-            fixedint.Int8(int(architectural_state.memory.read_byte(memory_address)))
+            fixedint.Int8(
+                int(
+                    architectural_state.memory.read_byte(
+                        memory_address, update_statistics=update_statistics
+                    )
+                )
+            )
         )
 
 
@@ -637,11 +631,9 @@ class LH(MemoryITypeInstruction):
     ) -> RiscvArchitecturalState:
         """x[rd] = sext(M[x[rs1] + sext(imm)][15:0])"""
         rs1 = architectural_state.register_file.registers[self.rs1]
-        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            int(
-                fixedint.Int16(
-                    int(architectural_state.memory.read_halfword(int(rs1) + self.imm))
-                )
+        architectural_state.register_file.registers[self.rd] = fixedint.UInt32(
+            fixedint.Int16(
+                architectural_state.memory.read_halfword(int(rs1) + self.imm)
             )
         )
         return architectural_state
@@ -649,7 +641,7 @@ class LH(MemoryITypeInstruction):
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = fixedint.MutableUInt32(alu_in_1)
+        left = fixedint.UInt32(alu_in_1)
         right = alu_in_2
         result = int(left) + right
         return (None, result)
@@ -659,11 +651,16 @@ class LH(MemoryITypeInstruction):
         memory_address: Optional[int],
         memory_write_data: Optional[int],
         architectural_state: RiscvArchitecturalState,
+        update_statistics: bool = True,
     ) -> Optional[int]:
         assert memory_address is not None
         return int(
             fixedint.Int16(
-                int(architectural_state.memory.read_halfword(memory_address))
+                int(
+                    architectural_state.memory.read_halfword(
+                        memory_address, update_statistics=update_statistics
+                    )
+                )
             )
         )
 
@@ -685,7 +682,7 @@ class LW(MemoryITypeInstruction):
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = fixedint.MutableUInt32(alu_in_1)
+        left = fixedint.UInt32(alu_in_1)
         right = alu_in_2
         result = int(left) + right
         return (None, result)
@@ -695,9 +692,14 @@ class LW(MemoryITypeInstruction):
         memory_address: Optional[int],
         memory_write_data: Optional[int],
         architectural_state: RiscvArchitecturalState,
+        update_statistics: bool = True,
     ) -> Optional[int]:
         assert memory_address is not None
-        return int(architectural_state.memory.read_word(memory_address))
+        return int(
+            architectural_state.memory.read_word(
+                memory_address, update_statistics=update_statistics
+            )
+        )
 
 
 class LBU(MemoryITypeInstruction):
@@ -708,16 +710,17 @@ class LBU(MemoryITypeInstruction):
         self, architectural_state: RiscvArchitecturalState
     ) -> RiscvArchitecturalState:
         """x[rd] = M[x[rs1] + sext(imm)][7:0]"""
-        rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
-        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            int(architectural_state.memory.read_byte(int(rs1) + self.imm))
+        rs1 = int(architectural_state.register_file.registers[self.rs1])
+        architectural_state.register_file.registers[self.rd] = fixedint.UInt32(
+            architectural_state.memory.read_byte(rs1 + self.imm)
         )
+
         return architectural_state
 
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = fixedint.MutableUInt32(alu_in_1)
+        left = fixedint.UInt32(alu_in_1)
         right = alu_in_2
         result = int(left) + right
         return (None, result)
@@ -727,9 +730,14 @@ class LBU(MemoryITypeInstruction):
         memory_address: Optional[int],
         memory_write_data: Optional[int],
         architectural_state: RiscvArchitecturalState,
+        update_statistics: bool = True,
     ) -> Optional[int]:
         assert memory_address is not None
-        return int(architectural_state.memory.read_byte(memory_address))
+        return int(
+            architectural_state.memory.read_byte(
+                memory_address, update_statistics=update_statistics
+            )
+        )
 
 
 class LHU(MemoryITypeInstruction):
@@ -740,16 +748,16 @@ class LHU(MemoryITypeInstruction):
         self, architectural_state: RiscvArchitecturalState
     ) -> RiscvArchitecturalState:
         """x[rd] = M[x[rs1] + sext(imm)][15:0]"""
-        rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
-        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            int(architectural_state.memory.read_halfword(int(rs1) + self.imm))
+        rs1 = int(architectural_state.register_file.registers[self.rs1])
+        architectural_state.register_file.registers[self.rd] = fixedint.UInt32(
+            architectural_state.memory.read_halfword(rs1 + self.imm)
         )
         return architectural_state
 
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = fixedint.MutableUInt32(alu_in_1)
+        left = fixedint.UInt32(alu_in_1)
         right = alu_in_2
         result = int(left) + right
         return (None, result)
@@ -759,9 +767,14 @@ class LHU(MemoryITypeInstruction):
         memory_address: Optional[int],
         memory_write_data: Optional[int],
         architectural_state: RiscvArchitecturalState,
+        update_statistics: bool = True,
     ) -> Optional[int]:
         assert memory_address is not None
-        return int(architectural_state.memory.read_halfword(memory_address))
+        return int(
+            architectural_state.memory.read_halfword(
+                memory_address, update_statistics=update_statistics
+            )
+        )
 
 
 class JALR(ITypeInstruction):
@@ -773,7 +786,7 @@ class JALR(ITypeInstruction):
     ) -> RiscvArchitecturalState:
         """t=pc+4; pc=(x[rs1]+sext(imm))&∼1; x[rd]=t"""
         rs1 = fixedint.Int32(int(architectural_state.register_file.registers[self.rs1]))
-        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
+        architectural_state.register_file.registers[self.rd] = fixedint.UInt32(
             architectural_state.program_counter + 4
         )
         architectural_state.program_counter = (
@@ -844,7 +857,7 @@ class SB(STypeInstruction):
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2][:8]
         architectural_state.memory.write_byte(
-            int(rs1 + fixedint.MutableUInt32(self.imm)), fixedint.MutableUInt8(int(rs2))
+            int(rs1 + fixedint.UInt32(self.imm)), fixedint.UInt8(rs2)
         )
         return architectural_state
 
@@ -853,10 +866,13 @@ class SB(STypeInstruction):
         memory_address: Optional[int],
         memory_write_data: Optional[int],
         architectural_state: RiscvArchitecturalState,
+        update_statistics: bool = True,
     ) -> Optional[int]:
         if memory_address is not None and memory_write_data is not None:
             architectural_state.memory.write_byte(
-                memory_address, fixedint.MutableUInt8(memory_write_data)
+                memory_address,
+                fixedint.UInt8(memory_write_data),
+                directly_write_to_lower_memory=not update_statistics,
             )
         return None
 
@@ -885,8 +901,8 @@ class SH(STypeInstruction):
         rs2 = architectural_state.register_file.registers[self.rs2][:16]
         rs1 = architectural_state.register_file.registers[self.rs1]
         architectural_state.memory.write_halfword(
-            int(rs1 + fixedint.MutableUInt32(self.imm)),
-            fixedint.MutableUInt16(int(rs2)),
+            int(rs1 + fixedint.UInt32(self.imm)),
+            fixedint.UInt16((rs2)),
         )
         return architectural_state
 
@@ -908,10 +924,13 @@ class SH(STypeInstruction):
         memory_address: Optional[int],
         memory_write_data: Optional[int],
         architectural_state: RiscvArchitecturalState,
+        update_statistics: bool = True,
     ) -> Optional[int]:
         if memory_address is not None and memory_write_data is not None:
             architectural_state.memory.write_halfword(
-                memory_address, fixedint.MutableUInt16(memory_write_data)
+                memory_address,
+                fixedint.UInt16(memory_write_data),
+                directly_write_to_lower_memory=not update_statistics,
             )
         return None
 
@@ -926,9 +945,7 @@ class SW(STypeInstruction):
         """M[x[rs1] + sext(imm)] = x[rs2][31:0]"""
         rs2 = architectural_state.register_file.registers[self.rs2]
         rs1 = architectural_state.register_file.registers[self.rs1]
-        architectural_state.memory.write_word(
-            int(rs1 + fixedint.MutableUInt32(self.imm)), rs2
-        )
+        architectural_state.memory.write_word(int(rs1 + fixedint.UInt32(self.imm)), rs2)
         return architectural_state
 
     def access_register_file(
@@ -949,10 +966,13 @@ class SW(STypeInstruction):
         memory_address: Optional[int],
         memory_write_data: Optional[int],
         architectural_state: RiscvArchitecturalState,
+        update_statistics: bool = True,
     ) -> Optional[int]:
         if memory_address is not None and memory_write_data is not None:
             architectural_state.memory.write_word(
-                memory_address, fixedint.MutableUInt32(memory_write_data)
+                memory_address,
+                fixedint.UInt32(memory_write_data),
+                directly_write_to_lower_memory=not update_statistics,
             )
         return None
 
@@ -1106,9 +1126,7 @@ class LUI(UTypeInstruction):
     ) -> RiscvArchitecturalState:
         """x[rd] = sext(imm[31:12] << 12)"""
         imm = self.imm << 12
-        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
-            imm
-        )
+        architectural_state.register_file.registers[self.rd] = fixedint.UInt32(imm)
         return architectural_state
 
     def control_unit_signals(self) -> ControlUnitSignals:
@@ -1135,7 +1153,7 @@ class AUIPC(UTypeInstruction):
     ) -> RiscvArchitecturalState:
         """x[rd] = pc + sext(imm[31:12] << 12)"""
         imm = self.imm << 12
-        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
+        architectural_state.register_file.registers[self.rd] = fixedint.UInt32(
             architectural_state.program_counter + imm
         )
         return architectural_state
@@ -1171,7 +1189,7 @@ class JAL(JTypeInstruction):
     ) -> RiscvArchitecturalState:
         # NOTE: Actually sets the pc to (pc+imm-4) because the simulation always increases the pc by 4 after execution
         """x[rd]=pc+4; pc+=sext(imm)"""
-        architectural_state.register_file.registers[self.rd] = fixedint.MutableUInt32(
+        architectural_state.register_file.registers[self.rd] = fixedint.UInt32(
             architectural_state.program_counter + 4
         )
         architectural_state.program_counter += self.imm - self.length
@@ -1284,7 +1302,7 @@ class CSRRWI(CSRITypeInstruction):
             self.rd
         ] = architectural_state.csr_registers.read_word(self.csr)
         architectural_state.csr_registers.write_word(
-            self.csr, fixedint.MutableUInt32(self.uimm)
+            self.csr, fixedint.UInt32(self.uimm)
         )
 
         return architectural_state
@@ -1308,9 +1326,9 @@ class CSRRSI(CSRITypeInstruction):
         architectural_state.register_file.registers[
             self.rd
         ] = architectural_state.csr_registers.read_word(self.csr)
-        temp = architectural_state.csr_registers.read_word(
-            self.csr
-        ) | fixedint.MutableUInt32(self.uimm)
+        temp = architectural_state.csr_registers.read_word(self.csr) | fixedint.UInt32(
+            self.uimm
+        )
         architectural_state.csr_registers.write_word(self.csr, temp)
 
         return architectural_state
@@ -1335,7 +1353,7 @@ class CSRRCI(CSRITypeInstruction):
             self.rd
         ] = architectural_state.csr_registers.read_word(self.csr)
         temp = architectural_state.csr_registers.read_word(self.csr) & (
-            ~(fixedint.MutableUInt32(self.uimm))
+            ~(fixedint.UInt32(self.uimm))
         )
         architectural_state.csr_registers.write_word(self.csr, temp)
 

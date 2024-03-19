@@ -7,6 +7,7 @@ import CodeEditor from "../CodeEditor.vue";
 import RiscvMemoryTable from "./RiscvMemoryTable.vue";
 import RiscvRegistersOutput from "./RiscvRegistersOutput.vue";
 import RiscvVisualization from "./RiscvVisualization.vue";
+import CacheView from "./CacheView.vue";
 // import SvgVisualization from '../SvgVisualization.vue';
 
 import { useRiscvSimulationStore } from "@/js/riscv_simulation_store";
@@ -33,8 +34,12 @@ const textContainerPopulated = computed(
         riscvSettings.showMemory.value ||
         riscvSettings.showRegistersOutput.value
 );
+
+const visualizationsContainerPopulated = computed(
+    () => riscvSettings.visContainerSelection.value !== "None"
+);
 const enableSplit = computed(
-    () => textContainerPopulated.value && riscvSettings.showVisualization.value
+    () => textContainerPopulated.value && visualizationsContainerPopulated.value
 );
 
 // Creates or disables the split when enableSplit changes.
@@ -97,24 +102,61 @@ onUnmounted(() => {
             />
         </div>
         <div
-            v-show="riscvSettings.showVisualization.value"
+            :class="{ 'flex-grow-1': !textContainerPopulated }"
             ref="visualizationsContainer"
             id="riscv-visualizations-container"
         >
-            <RiscvVisualization
+            <div
+                class="processor-view-wrapper"
+                v-if="riscvSettings.visContainerSelection.value == 'Processor'"
+            >
+                <RiscvVisualization
+                    v-if="
+                        riscvSettings.pipelineMode.value ===
+                        'five_stage_pipeline'
+                    "
+                    :path="fiveStageVisualizationPath"
+                    :simulation-store="simulationStore"
+                />
+                <RiscvVisualization
+                    v-if="
+                        riscvSettings.pipelineMode.value ===
+                        'single_stage_pipeline'
+                    "
+                    :path="singleStageVisualizationPath"
+                    :simulation-store="simulationStore"
+                />
+            </div>
+            <div
                 v-if="
-                    riscvSettings.pipelineMode.value === 'five_stage_pipeline'
+                    riscvSettings.visContainerSelection.value ===
+                        'Data Cache' ||
+                    riscvSettings.visContainerSelection.value ===
+                        'Instruction Cache'
                 "
-                :path="fiveStageVisualizationPath"
-                :simulation-store="simulationStore"
-            />
-            <RiscvVisualization
-                v-if="
-                    riscvSettings.pipelineMode.value === 'single_stage_pipeline'
-                "
-                :path="singleStageVisualizationPath"
-                :simulation-store="simulationStore"
-            />
+                class="cache-view-wrapper"
+            >
+                <CacheView
+                    v-if="
+                        riscvSettings.visContainerSelection.value ===
+                        'Data Cache'
+                    "
+                    :cache-entries="simulationStore.dataCacheEntries"
+                    :cache-settings="riscvSettings.dataCache.value"
+                    :is-data-cache="true"
+                    :cache-stats="simulationStore.dataCacheStats"
+                ></CacheView>
+                <CacheView
+                    v-if="
+                        riscvSettings.visContainerSelection.value ===
+                        'Instruction Cache'
+                    "
+                    :cache-entries="simulationStore.instructionCacheEntries"
+                    :cache-settings="riscvSettings.instructionCache.value"
+                    :is-data-cache="false"
+                    :cache-stats="simulationStore.instructionCacheStats"
+                ></CacheView>
+            </div>
         </div>
     </div>
 </template>
@@ -132,8 +174,17 @@ onUnmounted(() => {
 }
 
 #riscv-text-content-container {
-    overflow-x: auto;
     gap: 1em;
+    overflow: auto;
+}
+
+.processor-view-wrapper {
+    height: 100%;
+}
+
+.cache-view-wrapper {
+    height: 100%;
+    overflow: auto;
 }
 
 .editor {
