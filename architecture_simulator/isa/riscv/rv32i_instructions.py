@@ -1372,7 +1372,9 @@ class MUL(RTypeInstruction):
     ) -> RiscvArchitecturalState:
         """
         Multiplication:
-            rd = lower 32 bits of (rs1 * rs2)
+            x[rd] = x[rs1] * x[rs2]
+
+        Places lower 32 bits in destination register
 
         Args:
             architectural_state
@@ -1402,8 +1404,8 @@ class MULH(RTypeInstruction):
         self, architectural_state: RiscvArchitecturalState
     ) -> RiscvArchitecturalState:
         """
-        Multiplication:
-            rd = upper 32 bits of (rs1 * rs2)
+        Multiplication Higher:
+            x[rd] = (x[rs1] s*s x[rs2]) >>s 32
 
             rs1 and rs2 are treated as signed
 
@@ -1441,10 +1443,10 @@ class MULHU(RTypeInstruction):
         self, architectural_state: RiscvArchitecturalState
     ) -> RiscvArchitecturalState:
         """
-        Multiplication:
-            rd = upper 32 bits of (rs1 * rs2)
+        Multiplication Higher Unsigned:
+            rd = x[rd] = (x[rs1] u*u x[rs2]) >>u 32
 
-            rs1 and rs2 are treated as signed
+            rs1 and rs2 are treated as unsigned
 
         Args:
             architectural_state
@@ -1468,7 +1470,41 @@ class MULHU(RTypeInstruction):
         return (None, result)
 
 
-# MULHSU
+class MULHSU(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="mul")
+
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
+        """
+        Multiplication Higher Signed Unsigned
+            x[rd] = (x[rs1] s*u x[rs2]) >>s 32
+
+            rs1 treated as signed number, rs2 treated as unsigned number
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        architectural_state.register_file.registers[self.rd] = fixedint.UInt32(
+            ((int(rs1) | (-(int(rs1) & 0x80000000))) * int(rs2)) >> 32
+        )
+        return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = int(alu_in_1) | (-(int(alu_in_1) & 0x80000000))
+        right = alu_in_2
+        result = left * right >> 32
+        return (None, result)
+
+
 # DIV
 # DIVU
 # REM
@@ -1525,4 +1561,5 @@ instruction_map: dict[str, Type[RiscvInstruction]] = {
     "mul": MUL,
     "mulh": MULH,
     "mulhu": MULHU,
+    "mulhsu": MULHSU,
 }
