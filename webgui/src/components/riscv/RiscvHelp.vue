@@ -827,5 +827,30 @@ addi x3, x3, 1 # This line is never reached</pre
             There is no fixed segmentation order. However, declaring multiple
             segments of the same type will throw an error.
         </p>
+
+        <h2>Cache Simulation</h2>
+        <p>
+            You can activate separate caches for data and instructions in the
+            settings. These caches can be configured as Write-through with Write
+            no-allocate or Write-back with Write allocate. You can also choose
+            between LRU and PLRU for the replacement strategy. The number of
+            sets, block size and associativity are also configurable. Note that
+            when using PLRU, associativity must be a power of 2 since PLRU uses
+            a binary tree in its state.
+        </p>
+        <p>
+            You can also get a visualization of the cache by selecting it in the
+            drop down menu in the control bar. Note that for performance
+            reasons, this option becomes unavailabe if the cache gets too big.
+            Even with the visualization disabled, you should not make the cache
+            too big since the site may become unresponsive.
+        </p>
+        <p>
+            When using a data cache, misaligned access to the memory is not
+            allowed because it would be unclear what exactly should happen in
+            the cache. For example, the following piece of code would not work
+            since the accessed value crosses a word boundary:
+        </p>
+        <pre class="bg-light">lw x1, -5(x0)</pre>
     </div>
 </template>
