@@ -1659,8 +1659,6 @@ class REMU(RTypeInstruction):
         return (None, result)
 
 
-# REMU
-
 # Used by the parser to instantiate instructions.
 instruction_map: dict[str, Type[RiscvInstruction]] = {
     "add": ADD,
