@@ -179,21 +179,24 @@ class RiscvSimulation(Simulation):
         if stats is None:
             return None
 
+        address = None
         if self.state.pipeline_mode == "five_stage_pipeline":
             pipeline_register = self.state.pipeline.pipeline_registers[3]
+            if isinstance(pipeline_register, MemoryAccessPipelineRegister):
+                # there might be an address even if the instruction doesn't access the memory
+                if (
+                    pipeline_register.control_unit_signals.mem_write
+                    or pipeline_register.control_unit_signals.mem_read
+                ):
+                    address = pipeline_register.memory_address
         else:
             pipeline_register = self.state.pipeline.pipeline_registers[0]
+            if isinstance(pipeline_register, SingleStagePipelineRegister):
+                address = pipeline_register.memory_address
 
-        if isinstance(pipeline_register, MemoryAccessPipelineRegister) or isinstance(
-            pipeline_register, SingleStagePipelineRegister
-        ):
-            address = pipeline_register.memory_address
-            if address is not None:
-                address = "{:032b}".format(
-                    address % (2**32)
-                )  # address might be negative
-        else:
-            address = None
+        if address is not None:
+            address = "{:032b}".format(address % (2**32))  # address might be negative
+
         stats = self.state.memory.get_cache_stats()
         stats["address"] = address
         return stats
