@@ -75,15 +75,7 @@ function drawCanvas() {
             const rowCoordinates = rows.map((row) =>
                 computeOffset(row, 0, 0.5)
             );
-            for (let i = 0; i < rowCoordinates.length; i += 2) {
-                drawPlruBranch(
-                    ctx,
-                    rowCoordinates[i].x,
-                    rowCoordinates[i].y,
-                    rowCoordinates[i + 1].y,
-                    "1"
-                );
-            }
+            drawPlruTree(ctx, rowCoordinates);
         }
     }
 }
@@ -91,15 +83,37 @@ function drawCanvas() {
 const branchWidth = 25;
 const fontSize = 16;
 
-function drawPlruBranch(ctx, x, y1, y2, value) {
-    const xIntermediate = x - branchWidth;
-    const yIntermediate = (y1 + y2) / 2;
+function drawPlruTree(ctx, coordinates) {
+    let coords = structuredClone(coordinates);
+    let bitPositions = [];
+    while (coords.length > 1) {
+        let newCoords = [];
+        for (let i = 0; i < coords.length; i += 2) {
+            const branchOrigin = drawPlruBranch(
+                ctx,
+                coords[i].x,
+                coords[i].y,
+                coords[i + 1].y
+            );
+            newCoords.push(branchOrigin);
+        }
+        bitPositions = newCoords.concat(bitPositions);
+        coords = newCoords;
+    }
+
+    for (const bitPosition of bitPositions) {
+        drawPlruBit(ctx, bitPosition.x, bitPosition.y, "1");
+    }
+}
+
+function drawPlruBranch(ctx, x, y1, y2) {
+    const intermediate = { x: x - branchWidth, y: (y1 + y2) / 2 };
     ctx.beginPath();
     ctx.moveTo(x, y1);
-    ctx.lineTo(xIntermediate, yIntermediate);
+    ctx.lineTo(intermediate.x, intermediate.y);
     ctx.lineTo(x, y2);
     ctx.stroke();
-    drawPlruBit(ctx, xIntermediate, yIntermediate, value);
+    return intermediate;
 }
 
 function drawPlruBit(ctx, x, y, value) {
