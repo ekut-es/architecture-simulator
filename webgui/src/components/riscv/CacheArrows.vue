@@ -10,6 +10,7 @@ const props = defineProps([
     "blockOffsetStartCell",
     "blockOffsetEndCell",
     "cacheTable",
+    "cacheSettings",
 ]);
 const canvas = ref(null);
 
@@ -62,6 +63,52 @@ function drawCanvas() {
         ctx.closePath();
         ctx.fill();
     }
+
+    if (props.cacheSettings.replacement_strategy === "plru") {
+        const table = props.cacheTable;
+        const associativity = props.cacheSettings.associativity;
+        const sets = Math.pow(2, props.cacheSettings.num_index_bits);
+        for (let i = 0; i < sets; i++) {
+            const rowStartIdx = 1 + i * associativity;
+            const rowEndIdx = 1 + (i + 1) * associativity;
+            const rows = [...table.rows].slice(rowStartIdx, rowEndIdx);
+            const rowCoordinates = rows.map((row) =>
+                computeOffset(row, 0, 0.5)
+            );
+            for (let i = 0; i < rowCoordinates.length; i += 2) {
+                drawPlruBranch(
+                    ctx,
+                    rowCoordinates[i].x,
+                    rowCoordinates[i].y,
+                    rowCoordinates[i + 1].y,
+                    "1"
+                );
+            }
+        }
+    }
+}
+
+const branchWidth = 25;
+const fontSize = 16;
+
+function drawPlruBranch(ctx, x, y1, y2, value) {
+    const xIntermediate = x - branchWidth;
+    const yIntermediate = (y1 + y2) / 2;
+    ctx.beginPath();
+    ctx.moveTo(x, y1);
+    ctx.lineTo(xIntermediate, yIntermediate);
+    ctx.lineTo(x, y2);
+    ctx.stroke();
+    drawPlruBit(ctx, xIntermediate, yIntermediate, value);
+}
+
+function drawPlruBit(ctx, x, y, value) {
+    const topLeft = { x: x - fontSize / 2, y: y - fontSize / 2 };
+    ctx.clearRect(topLeft.x, topLeft.y, fontSize, fontSize);
+    ctx.font = `${fontSize}px monospace`;
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "center";
+    ctx.fillText(value, x, y);
 }
 
 function exists(x) {
