@@ -1418,19 +1418,15 @@ class MULH(RTypeInstruction):
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
         architectural_state.register_file.registers[self.rd] = fixedint.UInt32(
-            (
-                (int(rs1) | (-(int(rs1) & 0x80000000)))
-                * (int(rs2) | (-(int(rs2) & 0x80000000)))
-            )
-            >> 32
+            (int(fixedint.Int32(rs1)) * int(fixedint.Int32(rs2))) >> 32
         )
         return architectural_state
 
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = alu_in_1 | (-(alu_in_1 & 0x80000000))
-        right = alu_in_2 | (-(alu_in_2 & 0x80000000))
+        left = int(fixedint.Int32(alu_in_1))
+        right = int(fixedint.Int32(alu_in_2))
         result = left * right >> 32
         return (None, result)
 
@@ -1492,14 +1488,14 @@ class MULHSU(RTypeInstruction):
         rs1 = architectural_state.register_file.registers[self.rs1]
         rs2 = architectural_state.register_file.registers[self.rs2]
         architectural_state.register_file.registers[self.rd] = fixedint.UInt32(
-            ((int(rs1) | (-(int(rs1) & 0x80000000))) * int(rs2)) >> 32
+            (int(fixedint.Int32(rs1)) * int(rs2)) >> 32
         )
         return architectural_state
 
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = int(alu_in_1) | (-(int(alu_in_1) & 0x80000000))
+        left = int(fixedint.Int32(alu_in_1))
         right = alu_in_2
         result = left * right >> 32
         return (None, result)
@@ -1530,19 +1526,16 @@ class DIV(RTypeInstruction):
             architectural_state.register_file.registers[self.rd] = fixedint.UInt32(-1)
         else:
             architectural_state.register_file.registers[self.rd] = fixedint.UInt32(
-                (
-                    (int(rs1) | (-(int(rs1) & 0x80000000)))
-                    // (int(rs2) | (-(int(rs2) & 0x80000000)))
-                )
+                (int(int(fixedint.Int32(rs1)) / int(fixedint.Int32(rs2))))
             )
         return architectural_state
 
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = int(alu_in_1) | (-(int(alu_in_1) & 0x80000000))
-        right = int(alu_in_2) | (-(int(alu_in_2) & 0x80000000))
-        result = -1 if right == 0 else left // right
+        left = int(fixedint.Int32(alu_in_1))
+        right = int(fixedint.Int32(alu_in_2))
+        result = -1 if right == 0 else int(left / right)
         return (None, result)
 
 
@@ -1606,20 +1599,19 @@ class REM(RTypeInstruction):
         if rs2 == 0:
             architectural_state.register_file.registers[self.rd] = rs1
         else:
+            n = int(fixedint.Int32(rs1))
+            b = int(fixedint.Int32(rs2))
             architectural_state.register_file.registers[self.rd] = fixedint.UInt32(
-                (
-                    (int(rs1) | (-(int(rs1) & 0x80000000)))
-                    % (int(rs2) | (-(int(rs2) & 0x80000000)))
-                )
+                (n - int(n / b) * b)
             )
         return architectural_state
 
     def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
         assert alu_in_1 is not None
         assert alu_in_2 is not None
-        left = int(alu_in_1) | (-(int(alu_in_1) & 0x80000000))
-        right = int(alu_in_2) | (-(int(alu_in_2) & 0x80000000))
-        result = left if right == 0 else left % right
+        left = int(fixedint.Int32(alu_in_1))
+        right = int(fixedint.Int32(alu_in_2))
+        result = left if right == 0 else left - int(left / right) * right
         return (None, result)
 
 

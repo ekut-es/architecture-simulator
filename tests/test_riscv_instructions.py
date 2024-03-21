@@ -2534,6 +2534,7 @@ csrrci x0, 0x40f, 16"""
             (-100, 10, -10),
             (79, 11, 7),
             (-(2**31), -1, -(2**31)),
+            (121, -12, -10),
         ]
         div = DIV(rs1=0, rs2=1, rd=2)
         for left, right, res in left_right_res_values:
@@ -2596,8 +2597,9 @@ csrrci x0, 0x40f, 16"""
             (-(2**31), -1, 0),
             (7, 10, 7),
             (-10, -10, 0),
-            (-7, 3, 2),
-            (11, -3, -1),
+            (-7, 3, -1),
+            (11, -3, 2),
+            (121, -12, 1),
         ]
         rem = REM(rs1=0, rs2=1, rd=2)
         for left, right, res in left_right_res_values:
