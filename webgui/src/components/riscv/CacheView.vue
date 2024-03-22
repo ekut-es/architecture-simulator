@@ -140,6 +140,15 @@ onMounted(() => {
             const blockSize = Math.pow(2, props.cacheSettings.num_block_bits);
             const associativity = props.cacheSettings.associativity;
 
+            if (props.cacheSettings.replacement_strategy === "plru") {
+                const plruLayers = Math.log(associativity) / Math.log(2);
+                tablesWrapper.value.style.paddingLeft = `${
+                    plruLayers * 25 + 30 + 20
+                }px`;
+            } else {
+                tablesWrapper.value.style.paddingLeft = "64px";
+            }
+
             highlightTagCell(null);
             highlightWordCell(null, true);
 

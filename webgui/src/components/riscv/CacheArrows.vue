@@ -13,7 +13,13 @@ const props = defineProps([
     "cacheSettings",
     "replacementStatus",
 ]);
+
 const canvas = ref(null);
+
+const plruTreeGap = 30;
+const indexArrowGap = 20;
+const plruBranchWidth = 25;
+const fontSize = 16;
 
 watch(props, drawCanvas);
 
@@ -29,7 +35,7 @@ function drawCanvas() {
         const dest = computeOffset(props.indexEndCell, 0, 0.5);
         const table = computeOffset(props.cacheTable, 0, 0); // top left corner of the whole cache table
         const yIntermediate = Math.round(table.y * 0.4 + start.y * 0.6); // between address and cache tables
-        const xIntermediate = Math.round(table.x / 2); // between the start of the canvas and the cache table
+        const xIntermediate = table.x - indexArrowGap; // between the start of the canvas and the cache table
         ctx.moveTo(start.x, start.y);
         ctx.lineTo(start.x, yIntermediate); // move halfway down to the cache table
         ctx.lineTo(xIntermediate, yIntermediate); // go to the left
@@ -73,16 +79,14 @@ function drawCanvas() {
             const rowStartIdx = 1 + i * associativity;
             const rowEndIdx = 1 + (i + 1) * associativity;
             const rows = [...table.rows].slice(rowStartIdx, rowEndIdx);
-            const rowCoordinates = rows.map((row) =>
-                computeOffset(row, 0, 0.5)
-            );
+            const rowCoordinates = rows.map((row) => {
+                const cellStart = computeOffset(row, 0, 0.5);
+                return { x: cellStart.x - plruTreeGap, y: cellStart.y };
+            });
             drawPlruTree(ctx, rowCoordinates, i);
         }
     }
 }
-
-const branchWidth = 25;
-const fontSize = 16;
 
 function drawPlruTree(ctx, coordinates, setIdx) {
     let coords = structuredClone(coordinates);
@@ -109,7 +113,7 @@ function drawPlruTree(ctx, coordinates, setIdx) {
 }
 
 function drawPlruBranch(ctx, x, y1, y2) {
-    const intermediate = { x: x - branchWidth, y: (y1 + y2) / 2 };
+    const intermediate = { x: x - plruBranchWidth, y: (y1 + y2) / 2 };
     ctx.beginPath();
     ctx.moveTo(x, y1);
     ctx.lineTo(intermediate.x, intermediate.y);
