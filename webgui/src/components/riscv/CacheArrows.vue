@@ -71,7 +71,10 @@ function drawCanvas() {
         ctx.fill();
     }
 
-    if (props.cacheSettings.replacement_strategy === "plru") {
+    if (
+        props.cacheSettings.showPlruTree &&
+        props.cacheSettings.replacement_strategy === "plru"
+    ) {
         const table = props.cacheTable;
         const associativity = props.cacheSettings.associativity;
         const sets = Math.pow(2, props.cacheSettings.num_index_bits);

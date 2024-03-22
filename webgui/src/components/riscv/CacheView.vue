@@ -132,6 +132,18 @@ function highlightWordCell(cell, hit) {
     }
 }
 
+const leftPadding = computed(() => {
+    const plruLayers =
+        Math.log(props.cacheSettings.associativity) / Math.log(2);
+    const plruWidth =
+        Number(
+            props.cacheSettings.showPlruTree &&
+                props.cacheSettings.replacement_strategy === "plru"
+        ) *
+        (plruLayers * plruBranchWidth + 20);
+    return `${plruWidth + plruTreeGap}px`;
+});
+
 onMounted(() => {
     watch(
         address,
@@ -141,14 +153,6 @@ onMounted(() => {
             const targetBlockOffset = parseInt(addr.blockOffsetBits, 2);
             const blockSize = Math.pow(2, props.cacheSettings.num_block_bits);
             const associativity = props.cacheSettings.associativity;
-
-            const plruLayers = Math.log(associativity) / Math.log(2);
-            const plruWidth =
-                Number(props.cacheSettings.replacement_strategy === "plru") *
-                (plruLayers * plruBranchWidth + 20);
-            tablesWrapper.value.style.paddingLeft = `${
-                plruWidth + plruTreeGap
-            }px`;
 
             highlightTagCell(null);
             highlightWordCell(null, true);
@@ -257,7 +261,11 @@ onUnmounted(() => {
                 :plru-branch-width
                 :plru-tree-gap
             />
-            <div ref="tablesWrapper" class="tables-wrapper">
+            <div
+                ref="tablesWrapper"
+                class="tables-wrapper"
+                :style="{ paddingLeft: leftPadding }"
+            >
                 <div class="mb-1">
                     Address:
                     <template v-if="props.cacheStats.get('address')">

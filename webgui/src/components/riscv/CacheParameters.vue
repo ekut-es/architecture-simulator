@@ -157,6 +157,19 @@ function validateAssociativity(number, strategy) {
                     <option value="lru">LRU</option>
                     <option value="plru">PLRU</option>
                 </select>
+                <label
+                    v-if="cacheSettings.replacement_strategy === 'plru'"
+                    class="ms-2"
+                    :for="props.baseId + '-show-plru'"
+                >
+                    <input
+                        type="checkbox"
+                        :id="props.baseId + '-show-plru'"
+                        :checked="cacheSettings.showPlruTree"
+                        v-model="cacheSettings.showPlruTree"
+                    />
+                    Show PLRU Tree
+                </label>
             </p>
             <p>
                 2<sup>N</sup> sets:
