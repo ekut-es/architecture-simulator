@@ -2,12 +2,14 @@
 <script setup>
 import ToyElementToggle from "./ToyElementToggle.vue";
 import ToyControlButtons from "./ToyControlButtons.vue";
+import ToyVisToggle from "./ToyVisToggle.vue";
 </script>
 
 <template>
     <nav id="nav-bar" class="py-1 px-2">
         <ToyControlButtons />
-        <ToyElementToggle />
+        <ToyElementToggle class="ms-3" />
+        <ToyVisToggle class="ms-auto me-3" />
         <button
             class="archsim-icon-button settings-button"
             title="settings"
