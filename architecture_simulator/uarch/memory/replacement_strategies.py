@@ -74,7 +74,7 @@ class PLRU(ReplacementStrategy):
 
         i = index + self.associativity - 1
         for _ in range(self.tree_depth):
-            is_right_child = i % 2 == 0
+            is_right_child = i % 2 == 1
             i = (i - 1) // 2
             self.tree_array[i] = is_right_child
 
@@ -82,10 +82,10 @@ class PLRU(ReplacementStrategy):
         i = 0
         for _ in range(self.tree_depth):
             if self.tree_array[i]:
-                i = 2 * i + 1
-            else:
                 i = 2 * i + 2
+            else:
+                i = 2 * i + 1
         return i + 1 - self.associativity
 
     def get_repr(self) -> Any:
-        return None
+        return self.tree_array

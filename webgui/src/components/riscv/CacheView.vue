@@ -16,6 +16,9 @@ const indexStartCell = ref(null);
 const indexEndCell = ref(null);
 const blockOffsetStartCell = ref(null);
 const blockOffsetEndCell = ref(null);
+const replacementStatus = ref(null);
+const plruBranchWidth = 30;
+const plruTreeGap = 35;
 
 const canvasWidth = ref(0);
 const canvasHeight = ref(0);
@@ -129,6 +132,22 @@ function highlightWordCell(cell, hit) {
     }
 }
 
+/**
+ * Compute the padding to the left side of the tables that is needed so that
+ * the arrows and PLRU trees can be drawn.
+ */
+const leftPadding = computed(() => {
+    const plruLayers =
+        Math.log(props.cacheSettings.associativity) / Math.log(2);
+    const plruWidth =
+        Number(
+            props.cacheSettings.showPlruTree &&
+                props.cacheSettings.replacement_strategy === "plru"
+        ) *
+        (plruLayers * plruBranchWidth + 20);
+    return `${plruWidth + plruTreeGap}px`;
+});
+
 onMounted(() => {
     watch(
         address,
@@ -197,6 +216,12 @@ onMounted(() => {
                     }
                 });
             }
+
+            // Make an array of the replacement status for each set (for PLRU trees)
+            replacementStatus.value = [];
+            for (const set of props.cacheEntries.sets) {
+                replacementStatus.value.push(set.replacement_status);
+            }
         },
         { immediate: true }
     );
@@ -231,13 +256,21 @@ onUnmounted(() => {
                 :width="canvasWidth"
                 :height="canvasHeight"
                 base-id="riscv-cache-canvas"
-                :index-start-cell="indexStartCell"
-                :index-end-cell="indexEndCell"
-                :block-offset-start-cell="blockOffsetStartCell"
-                :block-offset-end-cell="blockOffsetEndCell"
-                :cache-table="cacheTable"
+                :index-start-cell
+                :index-end-cell
+                :block-offset-start-cell
+                :block-offset-end-cell
+                :cache-table
+                :cache-settings="props.cacheSettings"
+                :replacement-status
+                :plru-branch-width
+                :plru-tree-gap
             />
-            <div ref="tablesWrapper" class="tables-wrapper">
+            <div
+                ref="tablesWrapper"
+                class="tables-wrapper"
+                :style="{ paddingLeft: leftPadding }"
+            >
                 <div class="mb-1">
                     Address:
                     <template v-if="props.cacheStats.get('address')">
@@ -358,7 +391,6 @@ onUnmounted(() => {
 }
 
 .tables-wrapper {
-    padding-left: 4em;
     position: absolute;
     left: 0;
     top: 0;

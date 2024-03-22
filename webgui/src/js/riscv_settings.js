@@ -20,6 +20,7 @@ export const riscvSettings = {
         miss_penalty: 0,
         replacement_strategy: "lru",
         cache_type: "wt",
+        showPlruTree: ref(true), // not needed for python but for the gui
     }),
     instructionCache: ref({
         enable: false,
@@ -29,6 +30,7 @@ export const riscvSettings = {
         miss_penalty: 0,
         replacement_strategy: "lru",
         cache_type: "wt", // doesn't matter except dirty bit would be shown with wb
+        showPlruTree: ref(true), // not needed for python but for the gui
     }),
     visContainerSelection: ref("Processor"),
     dataCacheTooBig: ref(false),
