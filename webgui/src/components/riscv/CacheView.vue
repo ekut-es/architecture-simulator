@@ -132,6 +132,10 @@ function highlightWordCell(cell, hit) {
     }
 }
 
+/**
+ * Compute the padding to the left side of the tables that is needed so that
+ * the arrows and PLRU trees can be drawn.
+ */
 const leftPadding = computed(() => {
     const plruLayers =
         Math.log(props.cacheSettings.associativity) / Math.log(2);
@@ -213,6 +217,7 @@ onMounted(() => {
                 });
             }
 
+            // Make an array of the replacement status for each set (for PLRU trees)
             replacementStatus.value = [];
             for (const set of props.cacheEntries.sets) {
                 replacementStatus.value.push(set.replacement_status);
