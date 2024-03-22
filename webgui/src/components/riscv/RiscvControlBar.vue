@@ -2,12 +2,14 @@
 <script setup>
 import RiscvElementToggle from "./RiscvElementToggle.vue";
 import RiscvControlButtons from "./RiscvControlButtons.vue";
+import RiscvVisSelect from "./RiscvVisSelect.vue";
 </script>
 
 <template>
     <nav id="nav-bar" class="py-1 px-2">
         <RiscvControlButtons />
-        <RiscvElementToggle />
+        <RiscvElementToggle class="ms-3" />
+        <RiscvVisSelect class="ms-auto me-3" />
         <button
             class="archsim-icon-button settings-button"
             title="settings"
@@ -28,5 +30,6 @@ import RiscvControlButtons from "./RiscvControlButtons.vue";
     background-color: var(--bs-secondary-bg);
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 </style>
