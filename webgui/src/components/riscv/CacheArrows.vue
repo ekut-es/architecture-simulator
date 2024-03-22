@@ -12,13 +12,13 @@ const props = defineProps([
     "cacheTable",
     "cacheSettings",
     "replacementStatus",
+    "plruTreeGap",
+    "plruBranchWidth",
 ]);
 
 const canvas = ref(null);
 
-const plruTreeGap = 30;
 const indexArrowGap = 20;
-const plruBranchWidth = 25;
 const fontSize = 16;
 
 watch(props, drawCanvas);
@@ -81,7 +81,7 @@ function drawCanvas() {
             const rows = [...table.rows].slice(rowStartIdx, rowEndIdx);
             const rowCoordinates = rows.map((row) => {
                 const cellStart = computeOffset(row, 0, 0.5);
-                return { x: cellStart.x - plruTreeGap, y: cellStart.y };
+                return { x: cellStart.x - props.plruTreeGap, y: cellStart.y };
             });
             drawPlruTree(ctx, rowCoordinates, i);
         }
@@ -113,7 +113,7 @@ function drawPlruTree(ctx, coordinates, setIdx) {
 }
 
 function drawPlruBranch(ctx, x, y1, y2) {
-    const intermediate = { x: x - plruBranchWidth, y: (y1 + y2) / 2 };
+    const intermediate = { x: x - props.plruBranchWidth, y: (y1 + y2) / 2 };
     ctx.beginPath();
     ctx.moveTo(x, y1);
     ctx.lineTo(intermediate.x, intermediate.y);

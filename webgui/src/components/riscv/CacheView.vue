@@ -17,6 +17,8 @@ const indexEndCell = ref(null);
 const blockOffsetStartCell = ref(null);
 const blockOffsetEndCell = ref(null);
 const replacementStatus = ref(null);
+const plruBranchWidth = 30;
+const plruTreeGap = 35;
 
 const canvasWidth = ref(0);
 const canvasHeight = ref(0);
@@ -140,14 +142,13 @@ onMounted(() => {
             const blockSize = Math.pow(2, props.cacheSettings.num_block_bits);
             const associativity = props.cacheSettings.associativity;
 
-            if (props.cacheSettings.replacement_strategy === "plru") {
-                const plruLayers = Math.log(associativity) / Math.log(2);
-                tablesWrapper.value.style.paddingLeft = `${
-                    plruLayers * 25 + 30 + 20
-                }px`;
-            } else {
-                tablesWrapper.value.style.paddingLeft = "64px";
-            }
+            const plruLayers = Math.log(associativity) / Math.log(2);
+            const plruWidth =
+                Number(props.cacheSettings.replacement_strategy === "plru") *
+                (plruLayers * plruBranchWidth + 20);
+            tablesWrapper.value.style.paddingLeft = `${
+                plruWidth + plruTreeGap
+            }px`;
 
             highlightTagCell(null);
             highlightWordCell(null, true);
@@ -253,6 +254,8 @@ onUnmounted(() => {
                 :cache-table
                 :cache-settings="props.cacheSettings"
                 :replacement-status
+                :plru-branch-width
+                :plru-tree-gap
             />
             <div ref="tablesWrapper" class="tables-wrapper">
                 <div class="mb-1">
@@ -375,7 +378,6 @@ onUnmounted(() => {
 }
 
 .tables-wrapper {
-    padding-left: 4em;
     position: absolute;
     left: 0;
     top: 0;
