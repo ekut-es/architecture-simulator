@@ -98,11 +98,11 @@ class TestReplacementStrategies(TestCase):
         )
         memory_system.read_word(0)
         self.assertEqual(
-            memory_system.cache.sets[0].replacement_strategy.tree_array, [1, 0, 1]
+            memory_system.cache.sets[0].replacement_strategy.tree_array, [1, 1, 0]
         )
         memory_system.read_word(0)
         self.assertEqual(
-            memory_system.cache.sets[0].replacement_strategy.tree_array, [1, 0, 1]
+            memory_system.cache.sets[0].replacement_strategy.tree_array, [1, 1, 0]
         )
         memory_system.read_word(4)
         self.assertEqual(
@@ -110,7 +110,7 @@ class TestReplacementStrategies(TestCase):
         )
         memory_system.read_word(8)
         self.assertEqual(
-            memory_system.cache.sets[0].replacement_strategy.tree_array, [1, 1, 0]
+            memory_system.cache.sets[0].replacement_strategy.tree_array, [1, 0, 1]
         )
         memory_system.read_word(12)
         memory_system.read_word(12)
@@ -119,21 +119,21 @@ class TestReplacementStrategies(TestCase):
         )
 
         self.assertEqual(
-            memory_system.cache.sets[0].blocks[0].decoded_address.full_address, 12
+            memory_system.cache.sets[0].blocks[0].decoded_address.full_address, 0
         )
         self.assertEqual(
-            memory_system.cache.sets[0].blocks[1].decoded_address.full_address, 4
+            memory_system.cache.sets[0].blocks[1].decoded_address.full_address, 8
         )
         self.assertEqual(
-            memory_system.cache.sets[0].blocks[2].decoded_address.full_address, 8
+            memory_system.cache.sets[0].blocks[2].decoded_address.full_address, 4
         )
         self.assertEqual(
-            memory_system.cache.sets[0].blocks[3].decoded_address.full_address, 0
+            memory_system.cache.sets[0].blocks[3].decoded_address.full_address, 12
         )
 
         memory_system.read_word(0)
         self.assertEqual(
-            memory_system.cache.sets[0].replacement_strategy.tree_array, [1, 0, 1]
+            memory_system.cache.sets[0].replacement_strategy.tree_array, [1, 1, 0]
         )
 
         self.assertEqual(memory_system.get_cache_stats()["hits"], "3")
