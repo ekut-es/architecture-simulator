@@ -118,9 +118,100 @@
                         </td>
                         <td></td>
                     </tr>
+                    <tr>
+                        <td>
+                            <code>MUL rd, rs1, rs2</code>
+                        </td>
+                        <td>
+                            <code>rd = rs1 * rs2</code>
+                        </td>
+                        <td>
+                            (M), places the lower 32 bits of the result in the
+                            destination register
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <code>MULH rd, rs1, rs2</code>
+                        </td>
+                        <td>
+                            <code>rd = rs1 s*s rs2</code>
+                        </td>
+                        <td>
+                            (M), places the upper 32 bits of the result in the
+                            destination register, both rs1 and rs2 are treated
+                            as signed
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <code>MULHU rd, rs1, rs2</code>
+                        </td>
+                        <td>
+                            <code>rd = rs1 u*u rs2</code>
+                        </td>
+                        <td>
+                            (M), places the upper 32 bits of the result in the
+                            destination register, both rs1 and rs2 are treated
+                            as unsigned
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <code>MULHSU rd, rs1, rs2</code>
+                        </td>
+                        <td>
+                            <code>rd = rs1 s*u rs2</code>
+                        </td>
+                        <td>
+                            (M), places the upper 32 bits of the result in the
+                            destination register, rs1 treated as signed, rs2
+                            treated as unsigned
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <code>DIV rd, rs1, rs2</code>
+                        </td>
+                        <td>
+                            <code>rd = rs1 /s rs2</code>
+                        </td>
+                        <td>(M), signed integer division</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <code>DIVU rd, rs1, rs2</code>
+                        </td>
+                        <td>
+                            <code>rd = rs1 /u rs2</code>
+                        </td>
+                        <td>(M), unsigned integer division</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <code>REM rd, rs1, rs2</code>
+                        </td>
+                        <td>
+                            <code>rd = rs1 %s rs2</code>
+                        </td>
+                        <td>(M), remainder of signed integer division</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <code>REMU rd, rs1, rs2</code>
+                        </td>
+                        <td>
+                            <code>rd = rs1 %u rs2</code>
+                        </td>
+                        <td>(M), remainder of unsigned integer division</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
+        <p>
+            Note: Instructions marked with (M) are part of the "M” Standard
+            Extension for Integer Multiplication and Division.
+        </p>
 
         <h3 id="i-type">I-Type</h3>
         <p>

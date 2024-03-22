@@ -1360,6 +1360,297 @@ class CSRRCI(CSRITypeInstruction):
         return architectural_state
 
 
+# 'M' Standard Extension for Integer Multiplication and Division
+
+
+class MUL(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="mul")
+
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
+        """
+        Multiplication:
+            x[rd] = x[rs1] * x[rs2]
+
+        Places lower 32 bits in destination register
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        architectural_state.register_file.registers[self.rd] = rs1 * rs2
+        return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.UInt32(alu_in_1)
+        right = fixedint.UInt32(alu_in_2)
+        result = int(left * right)
+        return (None, result)
+
+
+class MULH(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="mulh")
+
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
+        """
+        Multiplication Higher:
+            x[rd] = (x[rs1] s*s x[rs2]) >>s 32
+
+            rs1 and rs2 are treated as signed
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        architectural_state.register_file.registers[self.rd] = fixedint.UInt32(
+            (int(fixedint.Int32(rs1)) * int(fixedint.Int32(rs2))) >> 32
+        )
+        return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = int(fixedint.Int32(alu_in_1))
+        right = int(fixedint.Int32(alu_in_2))
+        result = left * right >> 32
+        return (None, result)
+
+
+class MULHU(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="mulhu")
+
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
+        """
+        Multiplication Higher Unsigned:
+            rd = x[rd] = (x[rs1] u*u x[rs2]) >>u 32
+
+            rs1 and rs2 are treated as unsigned
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        architectural_state.register_file.registers[self.rd] = fixedint.UInt32(
+            (int(rs1) * int(rs2)) >> 32
+        )
+        return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = alu_in_1
+        right = alu_in_2
+        result = left * right >> 32
+        return (None, result)
+
+
+class MULHSU(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="mulhsu")
+
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
+        """
+        Multiplication Higher Signed Unsigned
+            x[rd] = (x[rs1] s*u x[rs2]) >>s 32
+
+            rs1 treated as signed number, rs2 treated as unsigned number
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        architectural_state.register_file.registers[self.rd] = fixedint.UInt32(
+            (int(fixedint.Int32(rs1)) * int(rs2)) >> 32
+        )
+        return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = int(fixedint.Int32(alu_in_1))
+        right = alu_in_2
+        result = left * right >> 32
+        return (None, result)
+
+
+class DIV(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="div")
+
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
+        """
+        Division
+            x[rd] = x[rs1] /s x[rs2]
+
+            signed integer division
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        if rs2 == 0:
+            architectural_state.register_file.registers[self.rd] = fixedint.UInt32(-1)
+        else:
+            architectural_state.register_file.registers[self.rd] = fixedint.UInt32(
+                (int(int(fixedint.Int32(rs1)) / int(fixedint.Int32(rs2))))
+            )
+        return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = int(fixedint.Int32(alu_in_1))
+        right = int(fixedint.Int32(alu_in_2))
+        result = -1 if right == 0 else int(left / right)
+        return (None, result)
+
+
+class DIVU(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="divu")
+
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
+        """
+        Division Unsigned
+            x[rd] = x[rs1] /u x[rs2]
+
+            unsigned integer division
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        if rs2 == 0:
+            architectural_state.register_file.registers[self.rd] = fixedint.UInt32(-1)
+        else:
+            architectural_state.register_file.registers[self.rd] = rs1 // rs2
+        return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.UInt32(alu_in_1)
+        right = fixedint.UInt32(alu_in_2)
+        result = -1 if right == 0 else int(left // right)
+        return (None, result)
+
+
+class REM(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="rem")
+
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
+        """
+        Remain
+            x[rd] = x[rs1] %s x[rs2]
+
+            signed remainder
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        if rs2 == 0:
+            architectural_state.register_file.registers[self.rd] = rs1
+        else:
+            n = int(fixedint.Int32(rs1))
+            b = int(fixedint.Int32(rs2))
+            architectural_state.register_file.registers[self.rd] = fixedint.UInt32(
+                (n - int(n / b) * b)
+            )
+        return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = int(fixedint.Int32(alu_in_1))
+        right = int(fixedint.Int32(alu_in_2))
+        result = left if right == 0 else left - int(left / right) * right
+        return (None, result)
+
+
+class REMU(RTypeInstruction):
+    def __init__(self, rd: int, rs1: int, rs2: int):
+        super().__init__(rd, rs1, rs2, mnemonic="remu")
+
+    def behavior(
+        self, architectural_state: RiscvArchitecturalState
+    ) -> RiscvArchitecturalState:
+        """
+        Remain
+            x[rd] = x[rs1] %u x[rs2]
+
+            unsigned remainder
+
+        Args:
+            architectural_state
+
+        Returns:
+            architectural_state
+        """
+        rs1 = architectural_state.register_file.registers[self.rs1]
+        rs2 = architectural_state.register_file.registers[self.rs2]
+        if rs2 == 0:
+            architectural_state.register_file.registers[self.rd] = rs1
+        else:
+            architectural_state.register_file.registers[self.rd] = rs1 % rs2
+        return architectural_state
+
+    def alu_compute(self, alu_in_1: Optional[int], alu_in_2: Optional[int]):
+        assert alu_in_1 is not None
+        assert alu_in_2 is not None
+        left = fixedint.UInt32(alu_in_1)
+        right = fixedint.UInt32(alu_in_2)
+        result = left if right == 0 else int(left % right)
+        return (None, result)
+
+
 # Used by the parser to instantiate instructions.
 instruction_map: dict[str, Type[RiscvInstruction]] = {
     "add": ADD,
@@ -1408,4 +1699,12 @@ instruction_map: dict[str, Type[RiscvInstruction]] = {
     "andi": ANDI,
     "slli": SLLI,
     "srli": SRLI,
+    "mul": MUL,
+    "mulh": MULH,
+    "mulhu": MULHU,
+    "mulhsu": MULHSU,
+    "div": DIV,
+    "divu": DIVU,
+    "rem": REM,
+    "remu": REMU,
 }

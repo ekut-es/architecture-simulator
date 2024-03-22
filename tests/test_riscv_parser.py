@@ -1437,3 +1437,57 @@ fibonacci:
         for _ in range(100):
             sim.step()
         self.assertEqual(sim.state.register_file.registers[2], 55)
+
+    def test_m_extension_instructions(self):
+        program = """
+        addi x1, x0, -10
+        addi x2, x0, 22
+        addi x3, x0, -1
+        addi x4, x0, 1
+        addi x5, x0, -1
+        addi x6, x0, 1
+        addi x7, x0, -1
+        addi x8, x0, 1
+        addi x9, x0, -100
+        addi x10, x0, -9
+        addi x11, x0, 101
+        addi x12, x0, -1
+        addi x13, x0, 12
+        addi x14, x0, -5
+        addi x15, x0, -1
+        addi x16, x0, 2
+        #
+        mul x20, x1, x2
+        mulh x21, x3, x4
+        mulhu x22, x5, x6
+        mulhsu x23, x7, x8
+        div x24, x9, x10
+        divu x25, x11, x12
+        rem x26, x13, x14
+        remu x27, x15, x16
+        """
+        sim = RiscvSimulation()
+        sim.load_program(program)
+        sim.run()
+
+        self.assertEqual(sim.state.register_file.registers[20], fixedint.UInt32(-220))
+        self.assertEqual(sim.state.register_file.registers[21], fixedint.UInt32(-1))
+        self.assertEqual(sim.state.register_file.registers[22], fixedint.UInt32(0))
+        self.assertEqual(sim.state.register_file.registers[23], fixedint.UInt32(-1))
+        self.assertEqual(sim.state.register_file.registers[24], fixedint.UInt32(11))
+        self.assertEqual(sim.state.register_file.registers[25], fixedint.UInt32(0))
+        self.assertEqual(sim.state.register_file.registers[26], fixedint.UInt32(2))
+        self.assertEqual(sim.state.register_file.registers[27], fixedint.UInt32(1))
+
+        sim = RiscvSimulation(mode="five_stage_pipeline")
+        sim.load_program(program)
+        sim.run()
+
+        self.assertEqual(sim.state.register_file.registers[20], fixedint.UInt32(-220))
+        self.assertEqual(sim.state.register_file.registers[21], fixedint.UInt32(-1))
+        self.assertEqual(sim.state.register_file.registers[22], fixedint.UInt32(0))
+        self.assertEqual(sim.state.register_file.registers[23], fixedint.UInt32(-1))
+        self.assertEqual(sim.state.register_file.registers[24], fixedint.UInt32(11))
+        self.assertEqual(sim.state.register_file.registers[25], fixedint.UInt32(0))
+        self.assertEqual(sim.state.register_file.registers[26], fixedint.UInt32(2))
+        self.assertEqual(sim.state.register_file.registers[27], fixedint.UInt32(1))

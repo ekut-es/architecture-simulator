@@ -47,6 +47,14 @@ from architecture_simulator.isa.riscv.rv32i_instructions import (
     SLLI,
     SRLI,
     InstructionNotImplemented,
+    MUL,
+    MULH,
+    MULHU,
+    MULHSU,
+    DIV,
+    DIVU,
+    REM,
+    REMU,
 )
 from architecture_simulator.uarch.riscv.register_file import RegisterFile
 from architecture_simulator.uarch.riscv.riscv_architectural_state import (
@@ -2387,3 +2395,263 @@ csrrci x0, 0x40f, 16"""
         instructions = list(state.instruction_memory.instructions.values())
         for instruction, line in zip(instructions, text.splitlines()):
             self.assertEqual(str(instruction), line)
+
+    def test_mul(self):
+
+        left_right_res_values = [
+            (2**16 - 1, 2**16 - 1, 4294836225),
+            (0, 101, 0),
+            (1, 1, 1),
+            (2**16, 2**16, 0),
+            (-1, -1, 1),
+            (-10, 1, -10),
+            (110, -7, -770),
+            (55, 11, 605),
+            (2**24 + 17, 2**23 + 81, 1501562209),
+        ]
+        mul = MUL(rs1=0, rs2=1, rd=2)
+        for left, right, res in left_right_res_values:
+            state = RiscvArchitecturalState(
+                register_file=RegisterFile(
+                    registers=[
+                        fixedint.UInt32(left),
+                        fixedint.UInt32(right),
+                        fixedint.UInt32(0),
+                    ]
+                )
+            )
+            state = mul.behavior(state)
+            self.assertEqual(
+                state.register_file.registers,
+                [fixedint.UInt32(left), fixedint.UInt32(right), fixedint.UInt32(res)],
+            )
+
+            self.assertEqual(
+                fixedint.UInt32(mul.alu_compute(left, right)[1]), fixedint.UInt32(res)
+            )
+
+    def test_mulh(self):
+
+        left_right_res_values = [
+            (0x80000000, 0x7FFFFFFF, 0xC0000000),
+            (0xFFFFFFFF, 0xFFFFFFFF, 0x0),
+            (0xFFFFFF9D, 0x6F, 0xFFFFFFFF),
+            (0, -1, 0),
+            (0xF000000E, 0xFFFFFF, 0xFFF00000),
+        ]
+        mulh = MULH(rs1=0, rs2=1, rd=2)
+        for left, right, res in left_right_res_values:
+            state = RiscvArchitecturalState(
+                register_file=RegisterFile(
+                    registers=[
+                        fixedint.UInt32(left),
+                        fixedint.UInt32(right),
+                        fixedint.UInt32(0),
+                    ]
+                )
+            )
+            state = mulh.behavior(state)
+            self.assertEqual(
+                state.register_file.registers,
+                [fixedint.UInt32(left), fixedint.UInt32(right), fixedint.UInt32(res)],
+            )
+
+            self.assertEqual(
+                fixedint.UInt32(mulh.alu_compute(left, right)[1]), fixedint.UInt32(res)
+            )
+
+    def test_mulhu(self):
+
+        left_right_res_values = [
+            (0x80000000, 0x7FFFFFFF, 0x3FFFFFFF),
+            (0xFFFFFFFF, 0xFFFFFFFF, 2**64 - 2**33 + 1 >> 32),
+            (0xFFFFFF9D, 0x6F, 0x6E),
+            (0x0, 0xFFFFFFFF, 0x0),
+            (0xF000000E, 0xFFFFFF, 0xEFFFFF),
+            (2**31, 2**31, 2**30),
+        ]
+        mulhu = MULHU(rs1=0, rs2=1, rd=2)
+        for left, right, res in left_right_res_values:
+            state = RiscvArchitecturalState(
+                register_file=RegisterFile(
+                    registers=[
+                        fixedint.UInt32(left),
+                        fixedint.UInt32(right),
+                        fixedint.UInt32(0),
+                    ]
+                )
+            )
+            state = mulhu.behavior(state)
+            self.assertEqual(
+                state.register_file.registers,
+                [fixedint.UInt32(left), fixedint.UInt32(right), fixedint.UInt32(res)],
+            )
+
+            self.assertEqual(
+                fixedint.UInt32(mulhu.alu_compute(left, right)[1]), fixedint.UInt32(res)
+            )
+
+    def test_mulhsu(self):
+
+        left_right_res_values = [
+            (0x80000000, 0x7FFFFFFF, 0xC0000000),
+            (0x7FFFFFFF, 0x80000000, 0x3FFFFFFF),
+            (0x0, 0x457, 0x0),
+            (0x457, 0x0, 0x0),
+            (0xFFFE72AC, 0x7, 0xFFFFFFFF),
+            (0x7, 0xFFFE72AC, 0x6),
+        ]
+        mulhsu = MULHSU(rs1=0, rs2=1, rd=2)
+        for left, right, res in left_right_res_values:
+            state = RiscvArchitecturalState(
+                register_file=RegisterFile(
+                    registers=[
+                        fixedint.UInt32(left),
+                        fixedint.UInt32(right),
+                        fixedint.UInt32(0),
+                    ]
+                )
+            )
+            state = mulhsu.behavior(state)
+            self.assertEqual(
+                state.register_file.registers,
+                [fixedint.UInt32(left), fixedint.UInt32(right), fixedint.UInt32(res)],
+            )
+
+            self.assertEqual(
+                fixedint.UInt32(mulhsu.alu_compute(left, right)[1]),
+                fixedint.UInt32(res),
+            )
+
+    def test_div(self):
+
+        left_right_res_values = [
+            (11, 0, -1),
+            (0, 11, 0),
+            (-1, -1, 1),
+            (2**31 - 1, 1, 2**31 - 1),
+            (100, -10, -10),
+            (-100, 10, -10),
+            (79, 11, 7),
+            (-(2**31), -1, -(2**31)),
+            (121, -12, -10),
+        ]
+        div = DIV(rs1=0, rs2=1, rd=2)
+        for left, right, res in left_right_res_values:
+            state = RiscvArchitecturalState(
+                register_file=RegisterFile(
+                    registers=[
+                        fixedint.UInt32(left),
+                        fixedint.UInt32(right),
+                        fixedint.UInt32(0),
+                    ]
+                )
+            )
+            state = div.behavior(state)
+            self.assertEqual(
+                state.register_file.registers,
+                [fixedint.UInt32(left), fixedint.UInt32(right), fixedint.UInt32(res)],
+            )
+
+            self.assertEqual(
+                fixedint.UInt32(div.alu_compute(left, right)[1]),
+                fixedint.UInt32(res),
+            )
+
+    def test_divu(self):
+
+        left_right_res_values = [
+            (10, 0, -1),
+            (0, 0, -1),
+            (2**16, 2, 2**15),
+            (0, 100, 0),
+            (2**32 - 1, 5, 858_993_459),
+        ]
+        divu = DIVU(rs1=0, rs2=1, rd=2)
+        for left, right, res in left_right_res_values:
+            state = RiscvArchitecturalState(
+                register_file=RegisterFile(
+                    registers=[
+                        fixedint.UInt32(left),
+                        fixedint.UInt32(right),
+                        fixedint.UInt32(0),
+                    ]
+                )
+            )
+            state = divu.behavior(state)
+            self.assertEqual(
+                state.register_file.registers,
+                [fixedint.UInt32(left), fixedint.UInt32(right), fixedint.UInt32(res)],
+            )
+
+            self.assertEqual(
+                fixedint.UInt32(divu.alu_compute(left, right)[1]),
+                fixedint.UInt32(res),
+            )
+
+    def test_rem(self):
+
+        left_right_res_values = [
+            (7, 2, 1),
+            (111, 0, 111),
+            (-(2**31), -1, 0),
+            (7, 10, 7),
+            (-10, -10, 0),
+            (-7, 3, -1),
+            (11, -3, 2),
+            (121, -12, 1),
+        ]
+        rem = REM(rs1=0, rs2=1, rd=2)
+        for left, right, res in left_right_res_values:
+            state = RiscvArchitecturalState(
+                register_file=RegisterFile(
+                    registers=[
+                        fixedint.UInt32(left),
+                        fixedint.UInt32(right),
+                        fixedint.UInt32(0),
+                    ]
+                )
+            )
+            state = rem.behavior(state)
+            self.assertEqual(
+                state.register_file.registers,
+                [fixedint.UInt32(left), fixedint.UInt32(right), fixedint.UInt32(res)],
+            )
+
+            self.assertEqual(
+                fixedint.UInt32(rem.alu_compute(left, right)[1]),
+                fixedint.UInt32(res),
+            )
+
+    def test_remu(self):
+
+        left_right_res_values = [
+            (110, 0, 110),
+            (0, 0, 0),
+            (0xFFFFFFFE, 0xFFFFFFFF, 0xFFFFFFFE),
+            (10, -1, 10),
+            (-107, -1, -107),
+            (17, 20, 17),
+            (11, 5, 1),
+        ]
+        remu = REMU(rs1=0, rs2=1, rd=2)
+        for left, right, res in left_right_res_values:
+            state = RiscvArchitecturalState(
+                register_file=RegisterFile(
+                    registers=[
+                        fixedint.UInt32(left),
+                        fixedint.UInt32(right),
+                        fixedint.UInt32(0),
+                    ]
+                )
+            )
+            state = remu.behavior(state)
+            self.assertEqual(
+                state.register_file.registers,
+                [fixedint.UInt32(left), fixedint.UInt32(right), fixedint.UInt32(res)],
+            )
+
+            self.assertEqual(
+                fixedint.UInt32(remu.alu_compute(left, right)[1]),
+                fixedint.UInt32(res),
+            )
