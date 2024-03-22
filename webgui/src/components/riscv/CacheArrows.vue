@@ -11,6 +11,7 @@ const props = defineProps([
     "blockOffsetEndCell",
     "cacheTable",
     "cacheSettings",
+    "replacementStatus",
 ]);
 const canvas = ref(null);
 
@@ -75,7 +76,7 @@ function drawCanvas() {
             const rowCoordinates = rows.map((row) =>
                 computeOffset(row, 0, 0.5)
             );
-            drawPlruTree(ctx, rowCoordinates);
+            drawPlruTree(ctx, rowCoordinates, i);
         }
     }
 }
@@ -83,7 +84,7 @@ function drawCanvas() {
 const branchWidth = 25;
 const fontSize = 16;
 
-function drawPlruTree(ctx, coordinates) {
+function drawPlruTree(ctx, coordinates, setIdx) {
     let coords = structuredClone(coordinates);
     let bitPositions = [];
     while (coords.length > 1) {
@@ -101,8 +102,9 @@ function drawPlruTree(ctx, coordinates) {
         coords = newCoords;
     }
 
-    for (const bitPosition of bitPositions) {
-        drawPlruBit(ctx, bitPosition.x, bitPosition.y, "1");
+    for (const [bitIndex, bitPosition] of bitPositions.entries()) {
+        const bit = props.replacementStatus[setIdx].get(bitIndex) ? "1" : "0";
+        drawPlruBit(ctx, bitPosition.x, bitPosition.y, bit);
     }
 }
 

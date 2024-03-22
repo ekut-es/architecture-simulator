@@ -16,6 +16,7 @@ const indexStartCell = ref(null);
 const indexEndCell = ref(null);
 const blockOffsetStartCell = ref(null);
 const blockOffsetEndCell = ref(null);
+const replacementStatus = ref(null);
 
 const canvasWidth = ref(0);
 const canvasHeight = ref(0);
@@ -197,6 +198,11 @@ onMounted(() => {
                     }
                 });
             }
+
+            replacementStatus.value = [];
+            for (const set of props.cacheEntries.sets) {
+                replacementStatus.value.push(set.replacement_status);
+            }
         },
         { immediate: true }
     );
@@ -231,12 +237,13 @@ onUnmounted(() => {
                 :width="canvasWidth"
                 :height="canvasHeight"
                 base-id="riscv-cache-canvas"
-                :index-start-cell="indexStartCell"
-                :index-end-cell="indexEndCell"
-                :block-offset-start-cell="blockOffsetStartCell"
-                :block-offset-end-cell="blockOffsetEndCell"
-                :cache-table="cacheTable"
+                :index-start-cell
+                :index-end-cell
+                :block-offset-start-cell
+                :block-offset-end-cell
+                :cache-table
                 :cache-settings="props.cacheSettings"
+                :replacement-status
             />
             <div ref="tablesWrapper" class="tables-wrapper">
                 <div class="mb-1">

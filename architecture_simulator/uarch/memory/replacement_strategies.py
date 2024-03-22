@@ -88,4 +88,4 @@ class PLRU(ReplacementStrategy):
         return i + 1 - self.associativity
 
     def get_repr(self) -> Any:
-        return None
+        return self.tree_array
