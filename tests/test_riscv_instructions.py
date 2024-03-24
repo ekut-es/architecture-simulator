@@ -63,6 +63,7 @@ from architecture_simulator.uarch.riscv.riscv_architectural_state import (
 from architecture_simulator.uarch.memory.memory import Memory, AddressingType
 from architecture_simulator.uarch.riscv.csr_registers import CSRError
 from architecture_simulator.isa.riscv.riscv_parser import RiscvParser
+from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 
 
 class TestRiscvInstructions(unittest.TestCase):
@@ -1584,11 +1585,26 @@ class TestRiscvInstructions(unittest.TestCase):
         self.assertEqual(state.program_counter, 10)
 
     def test_ecall(self):
-        state = RiscvArchitecturalState(register_file=RegisterFile(registers=()))
-        with self.assertRaises(InstructionNotImplemented) as cm:
-            instr = ECALL(imm=0, rs1=0, rd=0)
-            state = instr.behavior(state)
-        self.assertEqual(cm.exception, InstructionNotImplemented(mnemonic="ecall"))
+        simulation = RiscvSimulation()
+        simulation.state.instruction_memory.write_instructions(
+            [ADDI(17, 0, 10), ECALL(), ADD(0, 0, 0)]
+        )
+        simulation.step()
+        self.assertTrue(not simulation.is_done())
+        simulation.step()
+        self.assertTrue(simulation.is_done())
+        self.assertEqual(simulation.state.exit_code, 0)
+
+        simulation = RiscvSimulation()
+        simulation.state.instruction_memory.write_instructions(
+            [ADDI(17, 0, 93), ADDI(10, 0, 42), ECALL(), ADD(0, 0, 0)]
+        )
+        simulation.step()
+        simulation.step()
+        self.assertTrue(not simulation.is_done())
+        simulation.step()
+        self.assertTrue(simulation.is_done())
+        self.assertEqual(simulation.state.exit_code, 42)
 
     def test_ebreak(self):
         state = RiscvArchitecturalState(register_file=RegisterFile(registers=()))

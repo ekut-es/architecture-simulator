@@ -99,9 +99,13 @@ class Pipeline:
         )
 
     def is_done(self) -> bool:
-        """Return True if the pipeline is empty and there is no instruction at the program counter, so nothing will happen anymore
+        """Return True if the simulation was stopped with an ecall or if
+        the pipeline is empty and there is no instruction at the program counter,
+        so nothing would happen anymore
 
         Returns:
             bool: if the pipeline has finished
         """
-        return self.is_empty() and not self.state.instruction_at_pc()
+        return self.state.exit_code is not None or (
+            self.is_empty() and not self.state.instruction_at_pc()
+        )

@@ -817,14 +817,23 @@ class JALR(ITypeInstruction):
 
 
 class ECALL(ITypeInstruction):
-    def __init__(self, rd: int, rs1: int, imm: int):
-        super().__init__(rd, rs1, imm, mnemonic="ecall")
+    def __init__(self):
+        super().__init__(0, 0, 1, mnemonic="ecall")
 
     def behavior(
         self, architectural_state: RiscvArchitecturalState
     ) -> RiscvArchitecturalState:
         """RaiseException(EnvironmentCall)"""
-        raise InstructionNotImplemented(mnemonic=self.mnemonic)
+        code = int(architectural_state.register_file.registers[17])
+        arg = int(architectural_state.register_file.registers[10])
+
+        match code:
+            case 10:
+                architectural_state.exit_code = 0
+            case 93:
+                architectural_state.exit_code = arg
+            case _:
+                raise ValueError(f"{code} (register a7) is not a valid code for ECALL")
         return architectural_state
 
     def __repr__(self) -> str:

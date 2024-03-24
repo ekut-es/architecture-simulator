@@ -86,7 +86,7 @@ class RiscvSimulation(Simulation):
 
     def run(self):
         self.state.performance_metrics.resume_timer()
-        while not self.state.pipeline.is_done():
+        while not self.is_done():
             self.step()
         self.state.performance_metrics.stop_timer()
 
