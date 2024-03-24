@@ -1585,6 +1585,7 @@ class TestRiscvInstructions(unittest.TestCase):
         self.assertEqual(state.program_counter, 10)
 
     def test_ecall(self):
+        # test 10 (exit 0)
         simulation = RiscvSimulation()
         simulation.state.instruction_memory.write_instructions(
             [ADDI(17, 0, 10), ECALL(), ADD(0, 0, 0)]
@@ -1594,6 +1595,32 @@ class TestRiscvInstructions(unittest.TestCase):
         simulation.step()
         self.assertTrue(simulation.is_done())
         self.assertEqual(simulation.state.exit_code, 0)
+
+        # test 1, 11, 34, 35 (sint, char, hex, bin)
+        simulation = RiscvSimulation()
+        simulation.state.instruction_memory.write_instructions(
+            [
+                ADDI(17, 0, 1),
+                ADDI(10, 0, 65),
+                ECALL(),
+                ADDI(17, 0, 11),
+                ECALL(),
+                ADDI(17, 0, 34),
+                ECALL(),
+                ADDI(17, 0, 35),
+                ECALL(),
+            ]
+        )
+        simulation.run()
+        self.assertEqual(simulation.state.output, "65A0x410b1000001")
+
+        # test 1, 36 (sint, uint)
+        simulation = RiscvSimulation()
+        simulation.state.instruction_memory.write_instructions(
+            [ADDI(17, 0, 1), LUI(10, 0x80000), ECALL(), ADDI(17, 0, 36), ECALL()]
+        )
+        simulation.run()
+        self.assertEqual(simulation.state.output, "-21474836482147483648")
 
         simulation = RiscvSimulation()
         simulation.state.instruction_memory.write_instructions(
