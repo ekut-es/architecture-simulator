@@ -898,6 +898,28 @@ fibonacci:
             fixedint.UInt32(ord("a")),
         )
 
+    def test_zero(self):
+        program = """.data
+        d1: .zero 16
+        a1: .word 1, 2
+        d2: .zero 2
+        a2: .word 3
+        .text
+        nop
+        """
+
+        sim = RiscvSimulation()
+        sim.load_program(program)
+        sim.run()
+        base_addr = sim.state.memory.address_range.start
+        self.assertEqual(sim.state.memory.read_word(base_addr + 0), 0)
+        self.assertEqual(sim.state.memory.read_word(base_addr + 60), 0)
+        self.assertEqual(sim.state.memory.read_word(base_addr + 64), 1)
+        self.assertEqual(sim.state.memory.read_word(base_addr + 68), 2)
+        self.assertEqual(sim.state.memory.read_word(base_addr + 72), 0)
+        self.assertEqual(sim.state.memory.read_word(base_addr + 76), 0)
+        self.assertEqual(sim.state.memory.read_word(base_addr + 80), 3)
+
     def test_pseudo_instructions_variables(self):
         parser = RiscvParser()
         state = RiscvArchitecturalState()

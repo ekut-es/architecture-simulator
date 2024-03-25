@@ -138,6 +138,13 @@ class RiscvParser(Parser):
         + pp.quoted_string("string")
     )
 
+    _pattern_zero_initialization = pp.Group(
+        _pattern_label("name")
+        + _D_COL
+        + pp.Group(_DOT + pp.Literal("zero")("type"))("type")
+        + pp.Word(pp.nums)("value")
+    )
+
     # R-Types
     _pattern_r_type_instruction = pp.Group(
         pp.oneOf(_reg_reg_reg_mnemonics, caseless=True)("mnemonic")
@@ -287,6 +294,7 @@ class RiscvParser(Parser):
             _pattern_directive
             ^ _pattern_variable_declaration("variable_declaration")
             ^ _pattern_string_declaration("variable_declaration")
+            ^ _pattern_zero_initialization("variable_declaration")
             ^ _pattern_instruction
             ^ (_pattern_label + _D_COL)("label_declaration")
         )
@@ -412,6 +420,12 @@ class RiscvParser(Parser):
                         directly_write_to_lower_memory=True,
                     )
                     address_counter += 1
+                elif line_parsed.type.type == "zero":
+                    num_words = int(line_parsed.get("value"))
+                    self.variables.update(
+                        {line_parsed.get("name"): (address_counter, 4 * num_words)}
+                    )
+                    address_counter += 4 * num_words
 
     def _process_pseudo_instructions(self) -> None:
         """Converts pseudo instructions in self.text into regular instructions, and variables into addresses."""
