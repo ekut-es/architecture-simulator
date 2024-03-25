@@ -1622,6 +1622,15 @@ class TestRiscvInstructions(unittest.TestCase):
         simulation.run()
         self.assertEqual(simulation.state.output, "-21474836482147483648")
 
+        # test 2 (float)
+        simulation = RiscvSimulation()
+        simulation.state.instruction_memory.write_instructions(
+            [ADDI(17, 0, 2), LUI(10, 0xBF400), ECALL()]
+        )
+        simulation.run()
+        self.assertEqual(simulation.state.output, "-0.75")
+
+        # test 93 (exit with code)
         simulation = RiscvSimulation()
         simulation.state.instruction_memory.write_instructions(
             [ADDI(17, 0, 93), ADDI(10, 0, 42), ECALL(), ADD(0, 0, 0)]
