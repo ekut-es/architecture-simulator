@@ -77,3 +77,4 @@ ecall
         )
         simulation.run()
         self.assertEqual(simulation.get_output(), "Kaesekuchen ist toll.")
+        simulation.get_instruction_memory_entries()

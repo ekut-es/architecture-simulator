@@ -416,7 +416,6 @@ class SingleStage(Stage):
         CSRRWI,
         CSRRSI,
         CSRRCI,
-        ECALL,
         EBREAK,
         FENCE,
     }

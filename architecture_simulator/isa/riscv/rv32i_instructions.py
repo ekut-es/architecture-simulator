@@ -858,6 +858,11 @@ class ECALL(ITypeInstruction):
                 raise ValueError(f"{code} (register a7) is not a valid code for ECALL")
         return architectural_state
 
+    def alu_compute(
+        self, alu_in_1: int | None, alu_in_2: int | None
+    ) -> tuple[bool | None, int | None]:
+        return None, 0
+
     def __repr__(self) -> str:
         return self.mnemonic
 

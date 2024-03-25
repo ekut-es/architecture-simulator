@@ -7,6 +7,7 @@ import { useRiscvSimulationStore } from "@/js/riscv_simulation_store";
 const simulationStore = useRiscvSimulationStore();
 const additionalMessageGetter = () => {
     let messages = [];
+    messages.push(simulationStore.output);
     if (simulationStore.dataCacheStats !== null) {
         const hits = simulationStore.dataCacheStats.get("hits");
         const misses = simulationStore.dataCacheStats.get("accesses") - hits;
