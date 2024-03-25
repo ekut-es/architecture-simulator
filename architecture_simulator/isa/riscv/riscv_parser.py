@@ -341,6 +341,10 @@ class RiscvParser(Parser):
         self.variables: dict[str, tuple[int, int]] = {}
         address_counter = self.state.memory.get_address_range().start
 
+        # ensure address_counter is word alinged
+        if address_counter % 4 != 0:
+            address_counter += 4 - (address_counter % 4)
+
         for line_number, line, line_parsed in self.data:
             if isinstance(line_parsed, str) or (
                 line_parsed.get_name() != "variable_declaration"
@@ -351,6 +355,11 @@ class RiscvParser(Parser):
                     raise ParserDataDuplicateException(
                         name=line_parsed.name, line_number=line_number, line=line
                     )
+
+                # ensure address_counter is word alinged
+                if address_counter % 4 != 0:
+                    address_counter += 4 - (address_counter % 4)
+
                 if line_parsed.type.type == "byte":
                     self.variables.update(
                         {line_parsed.get("name"): (address_counter, 1)}
