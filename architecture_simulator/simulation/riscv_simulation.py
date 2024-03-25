@@ -111,6 +111,9 @@ class RiscvSimulation(Simulation):
     def get_performance_metrics(self) -> RiscvPerformanceMetrics:
         return self.state.performance_metrics
 
+    def get_output(self) -> str:
+        return self.state.output
+
     def get_register_entries(self) -> list[tuple[str, str, str, str]]:
         """Returns the contents of the register file as bin, udec, hex, sdec values.
 

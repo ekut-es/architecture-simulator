@@ -818,8 +818,8 @@ class JALR(ITypeInstruction):
 
 
 class ECALL(ITypeInstruction):
-    def __init__(self):
-        super().__init__(0, 0, 1, mnemonic="ecall")
+    def __init__(self, rd=0, rs1=0, imm=0):
+        super().__init__(0, 0, 0, mnemonic="ecall")
 
     def behavior(
         self, architectural_state: RiscvArchitecturalState
@@ -863,8 +863,8 @@ class ECALL(ITypeInstruction):
 
 
 class EBREAK(ITypeInstruction):
-    def __init__(self, rd: int, rs1: int, imm: int):
-        super().__init__(rd, rs1, imm, mnemonic="ebreak")
+    def __init__(self, rd=0, rs1=0, imm=1):
+        super().__init__(0, 0, 1, mnemonic="ebreak")
 
     def behavior(
         self, architectural_state: RiscvArchitecturalState
