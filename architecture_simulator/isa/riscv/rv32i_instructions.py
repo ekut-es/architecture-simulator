@@ -835,6 +835,13 @@ class ECALL(ITypeInstruction):
                 architectural_state.output += str(
                     unpack(">f", arg.to_bytes(4, "big"))[0]
                 )
+            case 4:  # print null-terminated string stored at address in arg
+                address = arg
+                while (
+                    byte := architectural_state.memory.read_byte(address, False)
+                ) != 0:
+                    architectural_state.output += chr(byte % 128)
+                    address += 1
             case 11:  # print arg as ascii char
                 architectural_state.output += chr(arg % 128)
             case 34:  # print arg as hex
