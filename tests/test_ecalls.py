@@ -78,3 +78,19 @@ ecall
         simulation.run()
         self.assertEqual(simulation.get_output(), "Kaesekuchen ist toll.")
         simulation.get_instruction_memory_entries()
+
+    def test_five_stage_ecalls(self):
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
+        simulation.load_program(
+            """
+.data
+    kaesekuchen: .string "Kaesekuchen ist toll."
+.text
+la a0, kaesekuchen
+li a7, 4
+ecall
+"""
+        )
+        simulation.run()
+        self.assertEqual(simulation.get_output(), "Kaesekuchen ist toll.")
+        self.assertEqual(simulation.get_performance_metrics().cycles, 13)

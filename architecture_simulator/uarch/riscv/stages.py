@@ -238,7 +238,22 @@ class ExecuteStage(Stage):
             else None
         )
 
+        # ECALL needs some special behavior (flush and print to output)
+        flush_signal = None
+        if isinstance(pipeline_register.instruction, ECALL):
+            # assume that all further stages need to be empty
+            for other_pr in pipeline_registers[index_of_own_input_register + 1 : -1]:
+                if not isinstance(other_pr.instruction, EmptyInstruction):
+                    assert pipeline_register.address_of_instruction is not None
+                    flush_signal = FlushSignal(
+                        True, pipeline_register.address_of_instruction
+                    )
+                    break
+            if flush_signal is None:
+                pipeline_register.instruction.behavior(state)
+
         return ExecutePipelineRegister(
+            flush_signal=flush_signal,
             instruction=pipeline_register.instruction,
             alu_in_1=alu_in_1,
             alu_in_2=alu_in_2,
