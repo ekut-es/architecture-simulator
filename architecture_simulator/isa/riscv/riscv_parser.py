@@ -55,6 +55,8 @@ class RiscvParser(Parser):
         "remu",
     ]
 
+    _reg_reg_mnemonics = ["mv"]
+
     _normal_i_type_mnemonics = [
         "addi",
         "slti",
@@ -272,6 +274,14 @@ class RiscvParser(Parser):
         + _pattern_imm("imm")
     )
 
+    # mnemonic rd, rs pseudoinstructions
+    _pattern_reg_reg_instruction = pp.Group(
+        pp.oneOf(_reg_reg_mnemonics, caseless=True)("mnemonic")
+        + _pattern_register("rd")
+        + _COMMA
+        + _pattern_register("rs")
+    )
+
     _pattern_instruction = pp.Optional(_pattern_label + _D_COL)("in_line_label") + (
         _pattern_r_type_instruction
         ^ _pattern_u_type_instruction
@@ -287,6 +297,7 @@ class RiscvParser(Parser):
         ^ _pattern_ecall_ebreak_instruction
         ^ _pattern_nop_instruction
         ^ _pattern_li_instruction
+        ^ _pattern_reg_reg_instruction
     )("instruction")
 
     _pattern_line = (
@@ -606,6 +617,24 @@ class RiscvParser(Parser):
                                 f"{mnemonic} {register_name}, 0({address_register_name})"
                             )[0],
                         ),
+                    )
+                elif mnemonic == "mv":
+                    register_name_rd = (
+                        line_parsed.rd[0]
+                        if type(line_parsed.rd[0]) == str
+                        else "x" + line_parsed.rd[0][1]
+                    )
+                    register_name_rs = (
+                        line_parsed.rs[0]
+                        if type(line_parsed.rs[0]) == str
+                        else "x" + line_parsed.rs[0][1]
+                    )
+                    self.text[index] = (
+                        line_number,
+                        line,
+                        self._pattern_line.parse_string(
+                            f"addi {register_name_rd}, {register_name_rs}, 0"
+                        )[0],
                     )
 
     def _process_labels(self) -> None:

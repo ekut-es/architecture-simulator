@@ -902,6 +902,7 @@ fibonacci:
         program = """.data
         d1: .zero 16
         a1: .word 1, 2
+        a3: .byte 11, 12
         d2: .zero 2
         a2: .word 3
         .text
@@ -916,9 +917,9 @@ fibonacci:
         self.assertEqual(sim.state.memory.read_word(base_addr + 60), 0)
         self.assertEqual(sim.state.memory.read_word(base_addr + 64), 1)
         self.assertEqual(sim.state.memory.read_word(base_addr + 68), 2)
-        self.assertEqual(sim.state.memory.read_word(base_addr + 72), 0)
         self.assertEqual(sim.state.memory.read_word(base_addr + 76), 0)
-        self.assertEqual(sim.state.memory.read_word(base_addr + 80), 3)
+        self.assertEqual(sim.state.memory.read_word(base_addr + 80), 0)
+        self.assertEqual(sim.state.memory.read_word(base_addr + 84), 3)
 
     def test_pseudo_instructions_variables(self):
         parser = RiscvParser()
@@ -1557,3 +1558,27 @@ fibonacci:
         self.assertEqual(
             sim.state.memory.read_byte(sim.state.memory.address_range.start + 28), 0
         )
+
+    def test_mv(self):
+        program = """
+        addi x1, x0, 1
+        addi x2, x0, 2
+        addi gp, zero, 3
+        addi t0, zero, 4
+        addi a0, zero, 5
+        ###
+        mv x31, x1
+        mv t5, x2
+        mv x22, t0
+        mv s11, a0
+        mv zero, gp
+        """
+        simulation = RiscvSimulation()
+        simulation.load_program(program)
+        simulation.run()
+
+        self.assertEqual(simulation.state.register_file.registers[31], 1)
+        self.assertEqual(simulation.state.register_file.registers[30], 2)
+        self.assertEqual(simulation.state.register_file.registers[22], 4)
+        self.assertEqual(simulation.state.register_file.registers[27], 5)
+        self.assertEqual(simulation.state.register_file.registers[0], 0)
