@@ -902,11 +902,13 @@ addi x3, x3, 1 # This line is never reached</pre
         </p>
         <p>
             The following example demonstrates how to declare and use variables
-            and arrays, employing all currently supported data types:
+            and arrays, employing all currently supported data types. Note that
+            all variables/arrays are word-aligned (addresses are multiples of
+            4), which is achieved by zero-padding preceding variables.
         </p>
         <pre class="bg-light">
 .data
-    my_space: .zero 64 # reserves space for 64 words (256 bytes)
+    empty_array: .zero 64 # reserves space for 64 words (256 bytes)
     # The following two declarations of 'my_var1' are equivalent,
     # since zero padding is used to ensure word alignment of new variables/arrays.
     my_var1: .byte -128
