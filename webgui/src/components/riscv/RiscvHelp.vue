@@ -823,6 +823,16 @@
                                 <code>rd</code>
                             </td>
                         </tr>
+                        <tr>
+                            <td>
+                                <code>MV rd, rs</code>
+                            </td>
+                            <td><code>rd = rs</code></td>
+                            <td>
+                                Translated to
+                                <code>ADDI rd, rs, 0</code>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -892,11 +902,17 @@ addi x3, x3, 1 # This line is never reached</pre
         </p>
         <p>
             The following example demonstrates how to declare and use variables
-            and arrays, employing all currently supported data types:
+            and arrays, employing all currently supported data types. Note that
+            all variables/arrays are word-aligned (addresses are multiples of
+            4), which is achieved by zero-padding preceding variables.
         </p>
         <pre class="bg-light">
 .data
+    empty_array: .zero 64 # reserves space for 64 words (256 bytes)
+    # The following two declarations of 'my_var1' are equivalent,
+    # since zero padding is used to ensure word alignment of new variables/arrays.
     my_var1: .byte -128
+    # my_var1: .byte -128, 0, 0, 0
     my_var2: .half 0x1234, 0b1010, 999
     my_var3: .word 0x12345678, 0b111
     text1:   .string "Hello, World!"  # ASCII byte array

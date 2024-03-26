@@ -32,19 +32,15 @@ def sections_simulation(data_cache_enable: bool) -> RiscvSimulation:
     return simulation
 
 
-def sections() -> UInt32:
-    simulation = sections_simulation()
+def sections() -> list[UInt32]:
+    simulation = sections_simulation(True)
     simulation.run()
     return simulation.state.register_file.registers
 
 
 if __name__ == "__main__":
-    # simulation = sections_simulation(22)
-    # simulation.run_simulation()
-    # print(simulation.state.register_file.registers[10])
-    # print(simulation.state.performance_metrics)
 
-    simulation = sections_simulation(20)
+    simulation = sections_simulation(True)
     simulation.run()
     print(simulation.state.register_file.registers[10])
     print(simulation.state.performance_metrics)

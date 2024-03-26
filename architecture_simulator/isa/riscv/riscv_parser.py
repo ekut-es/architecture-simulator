@@ -55,6 +55,8 @@ class RiscvParser(Parser):
         "remu",
     ]
 
+    _reg_reg_mnemonics = ["mv"]
+
     _normal_i_type_mnemonics = [
         "addi",
         "slti",
@@ -136,6 +138,13 @@ class RiscvParser(Parser):
         + _D_COL
         + pp.Group(_DOT + pp.Literal("string")("type"))("type")
         + pp.quoted_string("string")
+    )
+
+    _pattern_zero_initialization = pp.Group(
+        _pattern_label("name")
+        + _D_COL
+        + pp.Group(_DOT + pp.Literal("zero")("type"))("type")
+        + pp.Word(pp.nums)("value")
     )
 
     # R-Types
@@ -265,6 +274,14 @@ class RiscvParser(Parser):
         + _pattern_imm("imm")
     )
 
+    # mnemonic rd, rs pseudoinstructions
+    _pattern_reg_reg_instruction = pp.Group(
+        pp.oneOf(_reg_reg_mnemonics, caseless=True)("mnemonic")
+        + _pattern_register("rd")
+        + _COMMA
+        + _pattern_register("rs")
+    )
+
     _pattern_instruction = pp.Optional(_pattern_label + _D_COL)("in_line_label") + (
         _pattern_r_type_instruction
         ^ _pattern_u_type_instruction
@@ -280,6 +297,7 @@ class RiscvParser(Parser):
         ^ _pattern_ecall_ebreak_instruction
         ^ _pattern_nop_instruction
         ^ _pattern_li_instruction
+        ^ _pattern_reg_reg_instruction
     )("instruction")
 
     _pattern_line = (
@@ -287,6 +305,7 @@ class RiscvParser(Parser):
             _pattern_directive
             ^ _pattern_variable_declaration("variable_declaration")
             ^ _pattern_string_declaration("variable_declaration")
+            ^ _pattern_zero_initialization("variable_declaration")
             ^ _pattern_instruction
             ^ (_pattern_label + _D_COL)("label_declaration")
         )
@@ -341,6 +360,10 @@ class RiscvParser(Parser):
         self.variables: dict[str, tuple[int, int]] = {}
         address_counter = self.state.memory.get_address_range().start
 
+        # ensure address_counter is word alinged
+        if address_counter % 4 != 0:
+            address_counter += 4 - (address_counter % 4)
+
         for line_number, line, line_parsed in self.data:
             if isinstance(line_parsed, str) or (
                 line_parsed.get_name() != "variable_declaration"
@@ -351,6 +374,11 @@ class RiscvParser(Parser):
                     raise ParserDataDuplicateException(
                         name=line_parsed.name, line_number=line_number, line=line
                     )
+
+                # ensure address_counter is word alinged
+                if address_counter % 4 != 0:
+                    address_counter += 4 - (address_counter % 4)
+
                 if line_parsed.type.type == "byte":
                     self.variables.update(
                         {line_parsed.get("name"): (address_counter, 1)}
@@ -403,6 +431,12 @@ class RiscvParser(Parser):
                         directly_write_to_lower_memory=True,
                     )
                     address_counter += 1
+                elif line_parsed.type.type == "zero":
+                    num_words = int(line_parsed.get("value"))
+                    self.variables.update(
+                        {line_parsed.get("name"): (address_counter, 4 * num_words)}
+                    )
+                    address_counter += 4 * num_words
 
     def _process_pseudo_instructions(self) -> None:
         """Converts pseudo instructions in self.text into regular instructions, and variables into addresses."""
@@ -583,6 +617,24 @@ class RiscvParser(Parser):
                                 f"{mnemonic} {register_name}, 0({address_register_name})"
                             )[0],
                         ),
+                    )
+                elif mnemonic == "mv":
+                    register_name_rd = (
+                        line_parsed.rd[0]
+                        if type(line_parsed.rd[0]) == str
+                        else "x" + line_parsed.rd[0][1]
+                    )
+                    register_name_rs = (
+                        line_parsed.rs[0]
+                        if type(line_parsed.rs[0]) == str
+                        else "x" + line_parsed.rs[0][1]
+                    )
+                    self.text[index] = (
+                        line_number,
+                        line,
+                        self._pattern_line.parse_string(
+                            f"addi {register_name_rd}, {register_name_rs}, 0"
+                        )[0],
                     )
 
     def _process_labels(self) -> None:

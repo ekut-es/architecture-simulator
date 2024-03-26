@@ -898,11 +898,34 @@ fibonacci:
             fixedint.UInt32(ord("a")),
         )
 
+    def test_zero(self):
+        program = """.data
+        d1: .zero 16
+        a1: .word 1, 2
+        a3: .byte 11, 12
+        d2: .zero 2
+        a2: .word 3
+        .text
+        nop
+        """
+
+        sim = RiscvSimulation()
+        sim.load_program(program)
+        sim.run()
+        base_addr = sim.state.memory.address_range.start
+        self.assertEqual(sim.state.memory.read_word(base_addr + 0), 0)
+        self.assertEqual(sim.state.memory.read_word(base_addr + 60), 0)
+        self.assertEqual(sim.state.memory.read_word(base_addr + 64), 1)
+        self.assertEqual(sim.state.memory.read_word(base_addr + 68), 2)
+        self.assertEqual(sim.state.memory.read_word(base_addr + 76), 0)
+        self.assertEqual(sim.state.memory.read_word(base_addr + 80), 0)
+        self.assertEqual(sim.state.memory.read_word(base_addr + 84), 3)
+
     def test_pseudo_instructions_variables(self):
         parser = RiscvParser()
         state = RiscvArchitecturalState()
         program = """.data
-        test1: .byte 42
+        test1: .byte 42, 43, 44
         test2: .half 0x5
         test3: .word 0x2, 0b1011, -99
         .text
@@ -918,20 +941,20 @@ fibonacci:
             fixedint.UInt8(42),
         )
         self.assertEqual(
-            state.memory.read_halfword(state.memory.address_range.start + 1),
+            state.memory.read_halfword(state.memory.address_range.start + 4),
             fixedint.UInt16(5),
         )
         self.assertEqual(
-            state.memory.read_word(state.memory.address_range.start + 3),
+            state.memory.read_word(state.memory.address_range.start + 8),
             fixedint.UInt32(0x2),
         )
         self.assertEqual(
-            state.memory.read_word(state.memory.address_range.start + 3 + 2 * 4),
+            state.memory.read_word(state.memory.address_range.start + 4 * 4),
             fixedint.UInt32(-99),
         )
         # out of bounds
         self.assertEqual(
-            state.memory.read_word(state.memory.address_range.start + 3 + 2 * 4 + 4),
+            state.memory.read_word(state.memory.address_range.start + 5 * 4),
             fixedint.UInt32(0),
         )
 
@@ -961,27 +984,27 @@ fibonacci:
             fixedint.UInt32(42),
         )
         self.assertEqual(
-            state.memory.read_halfword(state.memory.address_range.start + 1),
+            state.memory.read_halfword(state.memory.address_range.start + 4),
             fixedint.UInt32(10),
         )
         self.assertEqual(
-            state.memory.read_word(state.memory.address_range.start + 3),
+            state.memory.read_word(state.memory.address_range.start + 8),
             fixedint.UInt32(2),
         )
         self.assertEqual(
-            state.memory.read_word(state.memory.address_range.start + 7),
+            state.memory.read_word(state.memory.address_range.start + 12),
             fixedint.UInt32(11),
         )
         self.assertEqual(
-            state.memory.read_word(state.memory.address_range.start + 11),
+            state.memory.read_word(state.memory.address_range.start + 16),
             fixedint.UInt32(0),
         )
         self.assertEqual(
-            state.memory.read_word(state.memory.address_range.start + 15),
+            state.memory.read_word(state.memory.address_range.start + 20),
             fixedint.UInt32(-555),
         )
         self.assertEqual(
-            state.memory.read_word(state.memory.address_range.start + 19),
+            state.memory.read_word(state.memory.address_range.start + 24),
             fixedint.UInt32(-1),
         )
 
@@ -1001,13 +1024,13 @@ fibonacci:
         self.assertEqual(state.instruction_memory.read_instruction(48).mnemonic, "lui")
         self.assertEqual(
             state.instruction_memory.read_instruction(48).imm,
-            (state.memory.address_range.start + 15) >> 12,
+            (state.memory.address_range.start + 20) >> 12,
         )
         self.assertEqual(state.instruction_memory.read_instruction(48).rd, 11)
         self.assertEqual(state.instruction_memory.read_instruction(52).mnemonic, "addi")
         self.assertEqual(
             state.instruction_memory.read_instruction(52).imm,
-            (state.memory.address_range.start + 15) & 0xFFF,
+            (state.memory.address_range.start + 20) & 0xFFF,
         )
         self.assertEqual(state.instruction_memory.read_instruction(52).rs1, 11)
 
@@ -1017,31 +1040,31 @@ fibonacci:
         )
         self.assertEqual(
             state.register_file.registers[6],
-            state.memory.address_range.start + 1,
+            state.memory.address_range.start + 4,
         )
         self.assertEqual(
             state.register_file.registers[7],
-            state.memory.address_range.start + 3,
+            state.memory.address_range.start + 8,
         )
         self.assertEqual(
             state.register_file.registers[8],
-            state.memory.address_range.start + 3,
+            state.memory.address_range.start + 8,
         )
         self.assertEqual(
             state.register_file.registers[9],
-            state.memory.address_range.start + 7,
+            state.memory.address_range.start + 12,
         )
         self.assertEqual(
             state.register_file.registers[10],
-            state.memory.address_range.start + 11,
+            state.memory.address_range.start + 16,
         )
         self.assertEqual(
             state.register_file.registers[12],
-            state.memory.address_range.start + 19,
+            state.memory.address_range.start + 24,
         )
         self.assertEqual(
             state.register_file.registers[13],
-            state.memory.address_range.start + 23,
+            state.memory.address_range.start + 28,
         )
 
         program3 = """.data
@@ -1138,7 +1161,7 @@ fibonacci:
         )
         self.assertEqual(
             state.instruction_memory.read_instruction(3 * length).imm,
-            (state.memory.address_range.start + 1) >> 12,
+            (state.memory.address_range.start + 4) >> 12,
         )
         self.assertEqual(state.instruction_memory.read_instruction(3 * length).rd, 6)
         self.assertEqual(
@@ -1146,7 +1169,7 @@ fibonacci:
         )
         self.assertEqual(
             state.instruction_memory.read_instruction(4 * length).imm,
-            (state.memory.address_range.start + 1) & 0xFFF,
+            (state.memory.address_range.start + 4) & 0xFFF,
         )
         self.assertEqual(state.instruction_memory.read_instruction(4 * length).rs1, 6)
         self.assertEqual(state.instruction_memory.read_instruction(4 * length).rd, 6)
@@ -1162,7 +1185,7 @@ fibonacci:
         )
         self.assertEqual(
             state.instruction_memory.read_instruction(6 * length).imm,
-            (state.memory.address_range.start + 3) >> 12,
+            (state.memory.address_range.start + 8) >> 12,
         )
         self.assertEqual(state.instruction_memory.read_instruction(6 * length).rd, 7)
         self.assertEqual(
@@ -1170,7 +1193,7 @@ fibonacci:
         )
         self.assertEqual(
             state.instruction_memory.read_instruction(7 * length).imm,
-            (state.memory.address_range.start + 3) & 0xFFF,
+            (state.memory.address_range.start + 8) & 0xFFF,
         )
         self.assertEqual(state.instruction_memory.read_instruction(7 * length).rs1, 7)
         self.assertEqual(state.instruction_memory.read_instruction(7 * length).rd, 7)
@@ -1187,7 +1210,7 @@ fibonacci:
         )
         self.assertEqual(
             state.instruction_memory.read_instruction(9 * length).imm,
-            (state.memory.address_range.start + 11) >> 12,
+            (state.memory.address_range.start + 8) >> 12,
         )
         self.assertEqual(state.instruction_memory.read_instruction(9 * length).rd, 8)
         self.assertEqual(
@@ -1195,7 +1218,7 @@ fibonacci:
         )
         self.assertEqual(
             state.instruction_memory.read_instruction(10 * length).imm,
-            (state.memory.address_range.start + 3) & 0xFFF,
+            (state.memory.address_range.start + 8) & 0xFFF,
         )
         self.assertEqual(state.instruction_memory.read_instruction(10 * length).rs1, 8)
         self.assertEqual(state.instruction_memory.read_instruction(10 * length).rd, 8)
@@ -1263,7 +1286,7 @@ fibonacci:
         )
         self.assertEqual(
             state.instruction_memory.read_instruction(6 * length).imm,
-            state.memory.address_range.start + 1 >> 12,
+            state.memory.address_range.start + 4 >> 12,
         )
         self.assertEqual(state.instruction_memory.read_instruction(6 * length).rd, 5)
         self.assertEqual(
@@ -1271,7 +1294,7 @@ fibonacci:
         )
         self.assertEqual(
             state.instruction_memory.read_instruction(7 * length).imm,
-            state.memory.address_range.start + 1 & 0xFFF,
+            state.memory.address_range.start + 4 & 0xFFF,
         )
         self.assertEqual(state.instruction_memory.read_instruction(7 * length).rs1, 5)
         self.assertEqual(state.instruction_memory.read_instruction(7 * length).rd, 5)
@@ -1287,7 +1310,7 @@ fibonacci:
         )
         self.assertEqual(
             state.instruction_memory.read_instruction(9 * length).imm,
-            state.memory.address_range.start + 11 >> 12,
+            state.memory.address_range.start + 16 >> 12,
         )
         self.assertEqual(state.instruction_memory.read_instruction(9 * length).rd, 5)
         self.assertEqual(
@@ -1295,7 +1318,7 @@ fibonacci:
         )
         self.assertEqual(
             state.instruction_memory.read_instruction(10 * length).imm,
-            state.memory.address_range.start + 11 & 0xFFF,
+            state.memory.address_range.start + 16 & 0xFFF,
         )
         self.assertEqual(state.instruction_memory.read_instruction(10 * length).rs1, 5)
         self.assertEqual(state.instruction_memory.read_instruction(10 * length).rd, 5)
@@ -1311,11 +1334,11 @@ fibonacci:
             fixedint.UInt32(42),
         )
         self.assertEqual(
-            state.memory.read_halfword(state.memory.address_range.start + 1),
+            state.memory.read_halfword(state.memory.address_range.start + 4),
             fixedint.UInt32(10),
         )
         self.assertEqual(
-            state.memory.read_word(state.memory.address_range.start + 11),
+            state.memory.read_word(state.memory.address_range.start + 16),
             fixedint.UInt32(0),
         )
 
@@ -1327,11 +1350,11 @@ fibonacci:
             fixedint.UInt32(47),
         )
         self.assertEqual(
-            state.memory.read_halfword(state.memory.address_range.start + 1),
+            state.memory.read_halfword(state.memory.address_range.start + 4),
             fixedint.UInt32(0xBB),
         )
         self.assertEqual(
-            state.memory.read_word(state.memory.address_range.start + 11),
+            state.memory.read_word(state.memory.address_range.start + 16),
             fixedint.UInt32(0x7FF),
         )
 
@@ -1491,3 +1514,71 @@ fibonacci:
         self.assertEqual(sim.state.register_file.registers[25], fixedint.UInt32(0))
         self.assertEqual(sim.state.register_file.registers[26], fixedint.UInt32(2))
         self.assertEqual(sim.state.register_file.registers[27], fixedint.UInt32(1))
+
+    def test_data_segment_padding(self):
+        program = """
+        .data
+        t1: .byte 1, 2, 3, 4
+        t2: .byte 1, 2, 3
+        t3: .byte 1, 2
+        t4: .byte 1
+        t5: .half 1, 2
+        t6: .half 1
+        t7: .word 0xFFFFFFFF
+        .text
+        nop
+        """
+
+        sim = RiscvSimulation()
+        sim.load_program(program)
+        sim.run()
+
+        for addr, val in enumerate([1, 2, 3, 4, 1, 2, 3, 0, 1, 2, 0, 0, 1, 0, 0, 0]):
+            self.assertEqual(
+                sim.state.memory.read_byte(sim.state.memory.address_range.start + addr),
+                val,
+            )
+
+        for addr, val in enumerate([1, 2, 1, 0]):
+            self.assertEqual(
+                sim.state.memory.read_halfword(
+                    sim.state.memory.address_range.start + addr * 2 + 16
+                ),
+                val,
+            )
+
+        self.assertEqual(
+            sim.state.memory.read_word(sim.state.memory.address_range.start + 24),
+            0xFFFFFFFF,
+        )
+
+        self.assertEqual(
+            sim.state.memory.read_byte(sim.state.memory.address_range.start + 27), 0xFF
+        )
+        self.assertEqual(
+            sim.state.memory.read_byte(sim.state.memory.address_range.start + 28), 0
+        )
+
+    def test_mv(self):
+        program = """
+        addi x1, x0, 1
+        addi x2, x0, 2
+        addi gp, zero, 3
+        addi t0, zero, 4
+        addi a0, zero, 5
+        ###
+        mv x31, x1
+        mv t5, x2
+        mv x22, t0
+        mv s11, a0
+        mv zero, gp
+        """
+        simulation = RiscvSimulation()
+        simulation.load_program(program)
+        simulation.run()
+
+        self.assertEqual(simulation.state.register_file.registers[31], 1)
+        self.assertEqual(simulation.state.register_file.registers[30], 2)
+        self.assertEqual(simulation.state.register_file.registers[22], 4)
+        self.assertEqual(simulation.state.register_file.registers[27], 5)
+        self.assertEqual(simulation.state.register_file.registers[0], 0)
