@@ -90,6 +90,9 @@ class RiscvSimulation(Simulation):
             self.step()
         self.state.performance_metrics.stop_timer()
 
+    def get_exit_code(self):
+        return self.state.exit_code
+
     def load_program(self, program: str):
         """Loads a text form program into the simulation.
         Resets the state before loading the new program.

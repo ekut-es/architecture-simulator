@@ -58,6 +58,11 @@ export class RiscvSimulationStore extends BaseSimulationStore {
         this.dataCacheEntries = null;
         this.dataCacheStats = null;
         this.output = "";
+        this.exitCode = null;
+    }
+
+    syncExitCode() {
+        this.exitCode = this.simulation.get_exit_code();
     }
 
     syncOutput() {
@@ -173,6 +178,7 @@ export class RiscvSimulationStore extends BaseSimulationStore {
         this.syncInstructionCache();
         this.syncDataCache();
         this.syncOutput();
+        this.syncExitCode();
         super.syncAll();
     }
 }

@@ -7,7 +7,6 @@ import { useRiscvSimulationStore } from "@/js/riscv_simulation_store";
 const simulationStore = useRiscvSimulationStore();
 const additionalMessageGetter = () => {
     let messages = [];
-    messages.push(simulationStore.output);
     if (simulationStore.dataCacheStats !== null) {
         const hits = simulationStore.dataCacheStats.get("hits");
         const misses = simulationStore.dataCacheStats.get("accesses") - hits;
@@ -23,6 +22,15 @@ const additionalMessageGetter = () => {
         messages.push(
             `Instruction Cache Hits: ${hits}`,
             `Instruction Cache Misses: ${misses}`
+        );
+    }
+    messages.push(simulationStore.output);
+    if (
+        typeof simulationStore.exitCode !== "undefined" &&
+        simulationStore.exitCode !== null
+    ) {
+        messages.push(
+            `The simulation has finished with code ${simulationStore.exitCode}.`
         );
     }
     return messages;
