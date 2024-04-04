@@ -57,6 +57,10 @@ body {
     background-color: var(--cache-miss-color) !important;
 }
 
+.archsim-performance-metrics-tooltip {
+    white-space: pre;
+}
+
 /* Overwrites */
 
 .cm-focused {

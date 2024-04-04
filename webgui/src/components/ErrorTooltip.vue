@@ -8,7 +8,7 @@ const props = defineProps(["message"]);
     <IconTooltip
         :message="message"
         icon-name="bi-exclamation-triangle-fill"
-        class="text-danger"
+        class="text-danger ms-2"
     >
         Error
     </IconTooltip>

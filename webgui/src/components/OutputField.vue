@@ -1,55 +1,60 @@
 <!-- An output field that works with any simulation store -->
 <script setup>
 import { computed } from "vue";
-const props = defineProps(["simulationStore", "additionalMessageGetter"]);
+const props = defineProps([
+    "simulationStore",
+    "exitCode",
+    "additionalMessageGetter",
+]);
 const simulationStore = props.simulationStore;
 
 /**
- * An array that holds one string for each line to display
- * in the output field.
- *
- * Contains unknown errors and runtime errors, or shows the
- * performance metrics in case there are no errors.
+ * Contains error messages, status information on the simulation
+ * as well as exit codes.
  */
 let output = computed(() => {
     if (simulationStore.error) {
         switch (simulationStore.error[0]) {
             case "ParserException":
-                break; // Will be shown in the editor
+                return "An error has occured during parsing."; // exact error will be shown in the editor
             case "InstructionExecutionException":
-                return [simulationStore.error[1]];
+                return simulationStore.error[1];
             default:
-                return [
-                    `An unknown error occured: ${simulationStore.error[1]}`,
-                ];
+                return `An unknown error occured: ${simulationStore.error[1]}`;
         }
     }
 
+    let message = "";
+
     if (!simulationStore.hasStarted) {
-        return ["Ready!"];
+        message = "Ready!";
+    } else if (simulationStore.hasStarted && !simulationStore.isDone) {
+        message = "The simulation has started.";
+    } else if (simulationStore.isDone) {
+        message = "The simulation has finished";
+        if (typeof props.exitCode !== "undefined" && props.exitCode !== null) {
+            message += ` with exit code ${props.exitCode}`;
+        }
+        message += ".";
     }
 
-    let messages = simulationStore.performanceMetricsStr.split(/\n/);
     if (typeof props.additionalMessageGetter !== "undefined") {
-        messages = messages.concat(props.additionalMessageGetter());
+        message += "<br/>" + props.additionalMessageGetter();
     }
-    return messages;
+
+    return message;
 });
 </script>
 
 <template>
-    <div class="archsim-default-border output-field">
-        <template v-for="line in output">
-            <template v-if="line"> {{ line }} <br /> </template>
-        </template>
-    </div>
+    <div class="archsim-default-border output-field" v-html="output"></div>
 </template>
 
 <style scoped>
 .output-field {
     background-color: #ffffff;
     padding: 0.5em;
-    min-width: 18em;
+    min-width: 15em;
     max-width: 20em;
 }
 </style>
