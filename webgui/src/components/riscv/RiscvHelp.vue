@@ -943,11 +943,30 @@ addi x3, x3, 1 # This line is never reached</pre
         <p>
             You can activate separate caches for data and instructions in the
             settings. These caches can be configured as Write-through with Write
-            no-allocate or Write-back with Write allocate. You can also choose
-            between LRU and PLRU for the replacement strategy. The number of
-            sets, block size and associativity are also configurable. Note that
-            when using PLRU, associativity must be a power of 2 since PLRU uses
-            a binary tree in its state.
+            no-allocate or Write-back with Write allocate. The number of sets,
+            block size and associativity are also configurable. You can also
+            choose between LRU and PLRU for the replacement strategy.
+        </p>
+        <p>
+            As the name implies, LRU (Least Recently Used) will always replace
+            the block that was used least recently. The LRU value in the cache
+            table shows the age of each block. Higher values indicate more
+            recently used blocks.
+        </p>
+        <p>
+            PLRU (Pseudo LRU) is an approximation of LRU which is easier to
+            implement in hardware. It uses a binary tree with the blocks at its
+            leaf nodes. On each non-leaf node is a single bit - a 0 indicates
+            that older blocks are in the upper child tree while a 1 indicates
+            that older blocks are in the lower child tree. <br />
+            When replacing a block, PLRU will choose the one which is oldest
+            according to those bits. Then all bits along the path are flipped to
+            mark it as the most recent. <br />
+            When accessing any block that is stored in the cache, PLRU will
+            update all bits along the path to the new block so they correctly
+            identify it as the newest block. <br />
+            Note that when using PLRU, associativity must be a power of 2 since
+            PLRU uses a binary tree in its state.
         </p>
         <p>
             You can also get a visualization of the cache by selecting it in the
