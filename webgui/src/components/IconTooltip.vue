@@ -23,6 +23,7 @@ onBeforeUnmount(() => {
     <span
         ref="tooltipElement"
         data-bs-toggle="tooltip"
+        data-bs-trigger="hover click focus"
         :data-bs-title="props.message"
         class="ms-2"
     >
