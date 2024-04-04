@@ -57,6 +57,16 @@ export class RiscvSimulationStore extends BaseSimulationStore {
         this.instructionCacheStats = null;
         this.dataCacheEntries = null;
         this.dataCacheStats = null;
+        this.output = "";
+        this.exitCode = null;
+    }
+
+    syncExitCode() {
+        this.exitCode = this.simulation.get_exit_code();
+    }
+
+    syncOutput() {
+        this.output = this.simulation.get_output(); // strings are immutable so there are no proxies
     }
 
     /**
@@ -167,6 +177,8 @@ export class RiscvSimulationStore extends BaseSimulationStore {
         this.syncSvgDirectives();
         this.syncInstructionCache();
         this.syncDataCache();
+        this.syncOutput();
+        this.syncExitCode();
         super.syncAll();
     }
 }

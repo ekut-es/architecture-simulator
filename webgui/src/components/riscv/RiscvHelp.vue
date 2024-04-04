@@ -435,6 +435,17 @@
                             with the least significant bit cleared.
                         </td>
                     </tr>
+                    <tr>
+                        <td>
+                            <code>ECALL</code>
+                        </td>
+                        <td>
+                            <code>environment call</code>
+                        </td>
+                        <td>
+                            See section <a href="#riscv-help-ecalls">ECALLs</a>.
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -850,13 +861,6 @@
                     <tbody>
                         <tr>
                             <td>
-                                <code>ECALL</code>
-                            </td>
-                            <td><code>-</code></td>
-                            <td>Recognized but currently not implemented</td>
-                        </tr>
-                        <tr>
-                            <td>
                                 <code>EBREAK</code>
                             </td>
                             <td><code>-</code></td>
@@ -959,5 +963,91 @@ addi x3, x3, 1 # This line is never reached</pre
             since the accessed value crosses a word boundary:
         </p>
         <pre class="bg-light">lw x1, -5(x0)</pre>
+
+        <h2 id="riscv-help-ecalls">ECALLs</h2>
+        <p>
+            Environment calls (ECALLs) can be used for interacting with the
+            environment - currently, ECALLs can be used for printing to the
+            console or stopping the simulation. Each ECALL has a different code
+            which must be loaded into register <code>a7</code>. Some ECALLs also
+            require an argument which must be loaded into register
+            <code>a0</code>. The supported ECALLs are identical to those of
+            Ripes.
+        </p>
+
+        <p>
+            Note that our visualization of the pipeline during an ECALL is not
+            fully correct. The pipeline might get flushed unnecessarily and we
+            also dont halt the pipeline until the ECALL has finished - instead,
+            the entire ecall is being executed in a single cycle (in the execute
+            stage).
+        </p>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>a7</th>
+                        <th>a0</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>integer to print</td>
+                        <td>Prints <code>a0</code> as signed integer.</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>float to print</td>
+                        <td>
+                            Prints <code>a0</code> as a floating point number.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>string to print</td>
+                        <td>
+                            Prints the null terminated string whose first
+                            character is stored at the address in
+                            <code>a0</code>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>-</td>
+                        <td>Stops the simulation with code 0.</td>
+                    </tr>
+                    <tr>
+                        <td>11</td>
+                        <td>char to print</td>
+                        <td>Prints <code>a0</code> as ASCII character</td>
+                    </tr>
+                    <tr>
+                        <td>34</td>
+                        <td>hex to print</td>
+                        <td>Prints <code>a0</code> as hexadecimal nuber</td>
+                    </tr>
+                    <tr>
+                        <td>35</td>
+                        <td>binary to print</td>
+                        <td>Prints <code>a0</code> as binary number.</td>
+                    </tr>
+                    <tr>
+                        <td>36</td>
+                        <td>integer to print</td>
+                        <td>Prints <code>a0</code> as unsigned integer.</td>
+                    </tr>
+                    <tr>
+                        <td>93</td>
+                        <td>exit code</td>
+                        <td>
+                            Stops the simulation with code in <code>a0</code>.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </template>

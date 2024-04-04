@@ -1,4 +1,5 @@
 from __future__ import annotations
+from struct import unpack
 from typing import Optional, Type, TYPE_CHECKING
 from dataclasses import dataclass
 import fixedint
@@ -817,23 +818,58 @@ class JALR(ITypeInstruction):
 
 
 class ECALL(ITypeInstruction):
-    def __init__(self, rd: int, rs1: int, imm: int):
-        super().__init__(rd, rs1, imm, mnemonic="ecall")
+    def __init__(self, rd=0, rs1=0, imm=0):
+        super().__init__(0, 0, 0, mnemonic="ecall")
 
     def behavior(
         self, architectural_state: RiscvArchitecturalState
     ) -> RiscvArchitecturalState:
         """RaiseException(EnvironmentCall)"""
-        raise InstructionNotImplemented(mnemonic=self.mnemonic)
+        code = int(architectural_state.register_file.registers[17])
+        arg = int(architectural_state.register_file.registers[10])
+
+        match code:
+            case 1:  # print arg as sint
+                architectural_state.output += str(fixedint.Int32(arg))
+            case 2:  # print arg as 32-bit float
+                architectural_state.output += str(
+                    unpack(">f", arg.to_bytes(4, "big"))[0]
+                )
+            case 4:  # print null-terminated string stored at address in arg
+                address = arg
+                while (
+                    byte := architectural_state.memory.read_byte(address, False)
+                ) != 0:
+                    architectural_state.output += chr(byte % 128)
+                    address += 1
+            case 11:  # print arg as ascii char
+                architectural_state.output += chr(arg % 128)
+            case 34:  # print arg as hex
+                architectural_state.output += "0x" + "{:X}".format(arg)
+            case 35:  # print arg as bin
+                architectural_state.output += bin(arg)
+            case 36:  # print arg as uint
+                architectural_state.output += str(arg)
+            case 10:  # exit with status 0
+                architectural_state.exit_code = 0
+            case 93:  # exit with arg as status
+                architectural_state.exit_code = arg
+            case _:
+                raise ValueError(f"{code} (register a7) is not a valid code for ECALL")
         return architectural_state
+
+    def alu_compute(
+        self, alu_in_1: int | None, alu_in_2: int | None
+    ) -> tuple[bool | None, int | None]:
+        return None, 0
 
     def __repr__(self) -> str:
         return self.mnemonic
 
 
 class EBREAK(ITypeInstruction):
-    def __init__(self, rd: int, rs1: int, imm: int):
-        super().__init__(rd, rs1, imm, mnemonic="ebreak")
+    def __init__(self, rd=0, rs1=0, imm=1):
+        super().__init__(0, 0, 1, mnemonic="ebreak")
 
     def behavior(
         self, architectural_state: RiscvArchitecturalState

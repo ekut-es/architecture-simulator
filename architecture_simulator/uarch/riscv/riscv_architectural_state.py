@@ -126,6 +126,8 @@ class RiscvArchitecturalState:
         self.csr_registers = CsrRegisterFile()
         self.program_counter = self.instruction_memory.get_address_range().start  # 0
         self.previous_program_counter = self.program_counter
+        self.exit_code: Optional[int] = None
+        self.output = ""
 
     def change_privilege_level(self, level: int):
         if not level < 0 and not level > 3:

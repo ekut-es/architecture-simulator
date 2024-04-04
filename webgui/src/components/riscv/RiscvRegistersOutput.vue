@@ -24,6 +24,15 @@ const additionalMessageGetter = () => {
             `Instruction Cache Misses: ${misses}`
         );
     }
+    messages.push(simulationStore.output);
+    if (
+        typeof simulationStore.exitCode !== "undefined" &&
+        simulationStore.exitCode !== null
+    ) {
+        messages.push(
+            `The simulation has finished with code ${simulationStore.exitCode}.`
+        );
+    }
     return messages;
 };
 </script>

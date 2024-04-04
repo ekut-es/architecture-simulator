@@ -63,6 +63,7 @@ from architecture_simulator.uarch.riscv.riscv_architectural_state import (
 from architecture_simulator.uarch.memory.memory import Memory, AddressingType
 from architecture_simulator.uarch.riscv.csr_registers import CSRError
 from architecture_simulator.isa.riscv.riscv_parser import RiscvParser
+from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 
 
 class TestRiscvInstructions(unittest.TestCase):
@@ -1584,11 +1585,80 @@ class TestRiscvInstructions(unittest.TestCase):
         self.assertEqual(state.program_counter, 10)
 
     def test_ecall(self):
-        state = RiscvArchitecturalState(register_file=RegisterFile(registers=()))
-        with self.assertRaises(InstructionNotImplemented) as cm:
-            instr = ECALL(imm=0, rs1=0, rd=0)
-            state = instr.behavior(state)
-        self.assertEqual(cm.exception, InstructionNotImplemented(mnemonic="ecall"))
+        # test 10 (exit 0)
+        simulation = RiscvSimulation()
+        simulation.state.instruction_memory.write_instructions(
+            [ADDI(17, 0, 10), ECALL(), ADD(0, 0, 0)]
+        )
+        simulation.step()
+        self.assertTrue(not simulation.is_done())
+        simulation.step()
+        self.assertTrue(simulation.is_done())
+        self.assertEqual(simulation.state.exit_code, 0)
+
+        # test 1, 11, 34, 35 (sint, char, hex, bin)
+        simulation = RiscvSimulation()
+        simulation.state.instruction_memory.write_instructions(
+            [
+                ADDI(17, 0, 1),
+                ADDI(10, 0, 65),
+                ECALL(),
+                ADDI(17, 0, 11),
+                ECALL(),
+                ADDI(17, 0, 34),
+                ECALL(),
+                ADDI(17, 0, 35),
+                ECALL(),
+            ]
+        )
+        simulation.run()
+        self.assertEqual(simulation.state.output, "65A0x410b1000001")
+
+        # test 1, 36 (sint, uint)
+        simulation = RiscvSimulation()
+        simulation.state.instruction_memory.write_instructions(
+            [ADDI(17, 0, 1), LUI(10, 0x80000), ECALL(), ADDI(17, 0, 36), ECALL()]
+        )
+        simulation.run()
+        self.assertEqual(simulation.state.output, "-21474836482147483648")
+
+        # test 2 (float)
+        simulation = RiscvSimulation()
+        simulation.state.instruction_memory.write_instructions(
+            [ADDI(17, 0, 2), LUI(10, 0xBF400), ECALL()]
+        )
+        simulation.run()
+        self.assertEqual(simulation.state.output, "-0.75")
+
+        # test 4 (string)
+        simulation = RiscvSimulation()
+        simulation.state.instruction_memory.write_instructions(
+            [
+                ADDI(17, 0, 4),
+                LUI(10, 0xF0000),
+                ADDI(5, 0, 65),
+                SB(10, 5, 0),
+                ADDI(5, 0, 66),
+                SB(10, 5, 1),
+                ADDI(5, 0, 67),
+                SB(10, 5, 2),
+                ECALL(),
+            ]
+        )
+        simulation.run()
+        self.assertEqual(simulation.state.output, "ABC")
+
+        # test 93 (exit with code)
+        simulation = RiscvSimulation()
+        simulation.state.instruction_memory.write_instructions(
+            [ADDI(17, 0, 93), ADDI(10, 0, 42), ECALL(), ADD(0, 0, 0)]
+        )
+        simulation.step()
+        simulation.step()
+        self.assertTrue(not simulation.is_done())
+        simulation.step()
+        self.assertTrue(simulation.is_done())
+        self.assertEqual(simulation.state.exit_code, 42)
 
     def test_ebreak(self):
         state = RiscvArchitecturalState(register_file=RegisterFile(registers=()))

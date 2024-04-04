@@ -86,9 +86,12 @@ class RiscvSimulation(Simulation):
 
     def run(self):
         self.state.performance_metrics.resume_timer()
-        while not self.state.pipeline.is_done():
+        while not self.is_done():
             self.step()
         self.state.performance_metrics.stop_timer()
+
+    def get_exit_code(self):
+        return self.state.exit_code
 
     def load_program(self, program: str):
         """Loads a text form program into the simulation.
@@ -110,6 +113,9 @@ class RiscvSimulation(Simulation):
 
     def get_performance_metrics(self) -> RiscvPerformanceMetrics:
         return self.state.performance_metrics
+
+    def get_output(self) -> str:
+        return self.state.output
 
     def get_register_entries(self) -> list[tuple[str, str, str, str]]:
         """Returns the contents of the register file as bin, udec, hex, sdec values.
