@@ -10,4 +10,5 @@ export const toySettings = {
     showMemory: ref(true),
     showRegistersOutput: ref(true),
     showVisualization: ref(true),
+    followCurrentInstruction: ref(true),
 };

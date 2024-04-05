@@ -1,9 +1,10 @@
 from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 from architecture_simulator.simulation.toy_simulation import ToySimulation
 from typing import Optional, Union
-from architecture_simulator.uarch.memory import Memory
+from architecture_simulator.uarch.memory.memory_system import MemorySystem
+from architecture_simulator.uarch.memory.memory import Memory
 from architecture_simulator.uarch.riscv.register_file import RegisterFile
-
+from architecture_simulator.isa.toy.toy_instructions import ToyInstruction
 from architecture_simulator.uarch.riscv.pipeline import (
     PipelineRegister,
     InstructionExecutionException,
@@ -174,20 +175,26 @@ def display(sim: Union[ToySimulation, RiscvSimulation], display_mode: str) -> st
             res += hline
         res += f"PC: {sim.state.program_counter} | Instruction at PC: {'#####' if not sim.state.instruction_at_pc() else str(sim.state.instruction_memory.read_instruction(sim.state.program_counter))}\n"
         res += hline
+        res += "Instruction Memory:\n"
+        res += instr_mem_repr(sim)
+        res += hline
         res += "Performance Metrics:\n"
         res += sim.state.performance_metrics.__repr__()
         res += hline
         return res
     else:
-        hline = "=" * 35 + "\n"
+        hline = "=" * 39 + "\n"
         res = "Architectural state:\n"
         res += hline
-        res += toy_memory_repr(sim.state.memory, display_mode)
-        res += hline
-        # TODO: Fix me
-        # res += f"PC: {sim.state.program_counter} | Instruction at PC: {'#####' if not sim.state.instruction_at_pc() else str(sim.state.instruction_memory.read_instruction(int(sim.state.program_counter)))}\n"
+        res += toy_memory_repr(sim.state.memory, display_mode, sim)
         res += hline
         res += f"Accu: {sim.state.accu}\n"
+        res += f"PC: {sim.state.program_counter}\n"
+        loaded_instr = sim.state.loaded_instruction
+        if loaded_instr is None:
+            res += f"IR: {'#####'}\n"
+        else:
+            res += f"IR: {loaded_instr.to_integer()} | {str(loaded_instr)}\n"
         res += hline
         res += "Performance Metrics:\n"
         res += sim.state.performance_metrics.__repr__()
@@ -291,7 +298,7 @@ def pad_num(num: Union[int, str], length: int) -> str:
     return " " * (length - len(str(num))) + str(num)
 
 
-def memory_repr(mem: Memory, display_mode: str) -> str:
+def memory_repr(mem: MemorySystem, display_mode: str) -> str:
     """
     Produces a representation of a Memory.
 
@@ -354,7 +361,7 @@ def five_stage_pipeline_repr(registers: list[PipelineRegister]) -> str:
     return res
 
 
-def toy_memory_repr(mem: Memory, display_mode: str) -> str:
+def toy_memory_repr(mem: Memory, display_mode: str, sim: ToySimulation) -> str:
     """
     Produces a representation of the toy processor memory
 
@@ -371,24 +378,32 @@ def toy_memory_repr(mem: Memory, display_mode: str) -> str:
     if display_mode not in display_modes:
         return ""
     if display_mode == "sdec" or display_mode == "udec":
-        res = "Memory:\nAddress   HalfWord\n" + "=" * 18 + "\n"
+        res = "Memory:\nAddress   HalfWord      Instr\n" + "=" * 29 + "\n"
     elif display_mode == "hex":
-        res = "Memory:\nAddress HalfWord\n" + "=" * 16 + "\n"
+        res = "Memory:\nAddress HalfWord      Instr\n" + "=" * 27 + "\n"
     else:
-        res = "Memory:\nAddress             HalfWord\n" + "=" * 28 + "\n"
+        res = "Memory:\nAddress             HalfWord      Instr\n" + "=" * 39 + "\n"
 
     for key, values in sorted(list(repr_list.items())):
         key_hex = (str(hex(key))[2:]).upper()
         key_repr = "0" * (8 - len(key_hex)) + key_hex
         if display_mode == "sdec":
-            res += f"{key_repr}    {pad_num(values[3], 6)}\n"
+            res += f"{key_repr}    {pad_num(values[3], 6)}  {sim._get_instruction_representation(key, int(values[1])):9}\n"
         elif display_mode == "udec":
-            res += f"{key_repr}    {pad_num(values[1], 6)}\n"
+            res += f"{key_repr}    {pad_num(values[1], 6)}  {sim._get_instruction_representation(key, int(values[1])):9}\n"
         elif display_mode == "hex":
-            res += f"{key_repr} | {values[2]}\n"
+            res += f"{key_repr} | {values[2]}  {sim._get_instruction_representation(key, int(values[1])):9}\n"
         else:  # "bin" case
-            res += f"{key_repr} | {values[0]}\n"
+            res += f"{key_repr} | {values[0]}  {sim._get_instruction_representation(key, int(values[1])):9}\n"
 
+    return res
+
+
+def instr_mem_repr(sim: RiscvSimulation) -> str:
+    res = "Address    Instruction\n"
+    res += "======================\n"
+    for addr, repr in sim.state.instruction_memory.get_representation():
+        res += f"{addr:08X}   {repr}\n"
     return res
 
 

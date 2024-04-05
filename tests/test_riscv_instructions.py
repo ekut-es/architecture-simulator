@@ -47,28 +47,37 @@ from architecture_simulator.isa.riscv.rv32i_instructions import (
     SLLI,
     SRLI,
     InstructionNotImplemented,
+    MUL,
+    MULH,
+    MULHU,
+    MULHSU,
+    DIV,
+    DIVU,
+    REM,
+    REMU,
 )
 from architecture_simulator.uarch.riscv.register_file import RegisterFile
 from architecture_simulator.uarch.riscv.riscv_architectural_state import (
     RiscvArchitecturalState,
 )
-from architecture_simulator.uarch.memory import Memory, AddressingType
+from architecture_simulator.uarch.memory.memory import Memory, AddressingType
 from architecture_simulator.uarch.riscv.csr_registers import CSRError
 from architecture_simulator.isa.riscv.riscv_parser import RiscvParser
+from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 
 
 class TestRiscvInstructions(unittest.TestCase):
     def test_add(self):
         # Number definitions
-        num_min = fixedint.MutableUInt32(2147483648)
-        num_minus_7 = fixedint.MutableUInt32(4294967289)
-        num_minus_2 = fixedint.MutableUInt32(4294967294)
-        num_minus_1 = fixedint.MutableUInt32(4294967295)
-        num_0 = fixedint.MutableUInt32(0)
-        num_1 = fixedint.MutableUInt32(1)
-        num_9 = fixedint.MutableUInt32(9)
-        num_16 = fixedint.MutableUInt32(16)
-        num_max = fixedint.MutableUInt32(2147483647)
+        num_min = fixedint.UInt32(2147483648)
+        num_minus_7 = fixedint.UInt32(4294967289)
+        num_minus_2 = fixedint.UInt32(4294967294)
+        num_minus_1 = fixedint.UInt32(4294967295)
+        num_0 = fixedint.UInt32(0)
+        num_1 = fixedint.UInt32(1)
+        num_9 = fixedint.UInt32(9)
+        num_16 = fixedint.UInt32(16)
+        num_max = fixedint.UInt32(2147483647)
 
         # smallest number + biggest number = -1
         add = ADD(rs1=1, rs2=0, rd=2)
@@ -128,14 +137,14 @@ class TestRiscvInstructions(unittest.TestCase):
 
     def test_sub(self):
         # Number definitions
-        num_min = fixedint.MutableUInt32(2147483648)
-        num_minus_1 = fixedint.MutableUInt32(4294967295)
-        num_0 = fixedint.MutableUInt32(0)
-        num_1 = fixedint.MutableUInt32(1)
-        num_8 = fixedint.MutableUInt32(8)
-        num_15 = fixedint.MutableUInt32(15)
-        num_23 = fixedint.MutableUInt32(23)
-        num_max = fixedint.MutableUInt32(2147483647)
+        num_min = fixedint.UInt32(2147483648)
+        num_minus_1 = fixedint.UInt32(4294967295)
+        num_0 = fixedint.UInt32(0)
+        num_1 = fixedint.UInt32(1)
+        num_8 = fixedint.UInt32(8)
+        num_15 = fixedint.UInt32(15)
+        num_23 = fixedint.UInt32(23)
+        num_max = fixedint.UInt32(2147483647)
 
         # smallest number - smallest number = 0
         sub = SUB(rs1=0, rs2=0, rd=1)
@@ -195,13 +204,13 @@ class TestRiscvInstructions(unittest.TestCase):
 
     def test_sll(self):
         # Number definitions
-        num_max = fixedint.MutableUInt32(4294967295)
-        num_msb = fixedint.MutableUInt32(2147483648)
-        num_0 = fixedint.MutableUInt32(0)
-        num_1 = fixedint.MutableUInt32(1)
-        num_16 = fixedint.MutableUInt32(16)
-        num_31 = fixedint.MutableUInt32(31)
-        num_612 = fixedint.MutableUInt32(612)
+        num_max = fixedint.UInt32(4294967295)
+        num_msb = fixedint.UInt32(2147483648)
+        num_0 = fixedint.UInt32(0)
+        num_1 = fixedint.UInt32(1)
+        num_16 = fixedint.UInt32(16)
+        num_31 = fixedint.UInt32(31)
+        num_612 = fixedint.UInt32(612)
 
         # only most significant bit set shifted by one = zero
         sll = SLL(rs1=1, rs2=2, rd=0)
@@ -245,11 +254,11 @@ class TestRiscvInstructions(unittest.TestCase):
 
     def test_slt(self):
         # Number definitions
-        num_min = fixedint.MutableUInt32(2147483648)
-        num_max = fixedint.MutableUInt32(2147483647)
-        num_0 = fixedint.MutableUInt32(0)
-        num_1 = fixedint.MutableUInt32(1)
-        num_77 = fixedint.MutableUInt32(77)
+        num_min = fixedint.UInt32(2147483648)
+        num_max = fixedint.UInt32(2147483647)
+        num_0 = fixedint.UInt32(0)
+        num_1 = fixedint.UInt32(1)
+        num_77 = fixedint.UInt32(77)
 
         # equivalenz leads to 0
         slt = SLT(rs1=1, rs2=0, rd=2)
@@ -285,10 +294,10 @@ class TestRiscvInstructions(unittest.TestCase):
 
     def test_sltu(self):
         # Number definitions
-        num_0 = fixedint.MutableUInt32(0)
-        num_max = fixedint.MutableUInt32(4294967295)
-        num_1 = fixedint.MutableUInt32(1)
-        num_77 = fixedint.MutableUInt32(77)
+        num_0 = fixedint.UInt32(0)
+        num_max = fixedint.UInt32(4294967295)
+        num_1 = fixedint.UInt32(1)
+        num_77 = fixedint.UInt32(77)
 
         # equivalenz leads to 0
         sltu = SLTU(rs1=1, rs2=0, rd=2)
@@ -324,14 +333,14 @@ class TestRiscvInstructions(unittest.TestCase):
 
     def test_xor(self):
         # Number defintions
-        num_all_but_msb = fixedint.MutableUInt32(2147483647)
-        num_msb = fixedint.MutableUInt32(2147483648)
-        num_all_bits = fixedint.MutableUInt32(4294967295)
-        num_0 = fixedint.MutableUInt32(0)
+        num_all_but_msb = fixedint.UInt32(2147483647)
+        num_msb = fixedint.UInt32(2147483648)
+        num_all_bits = fixedint.UInt32(4294967295)
+        num_0 = fixedint.UInt32(0)
 
-        num_a = fixedint.MutableUInt32(0x_FF_FF_00_FF)
-        num_b = fixedint.MutableUInt32(0x_FF_FF_0F_0F)
-        num_c = fixedint.MutableUInt32(0x_00_00_0F_F0)
+        num_a = fixedint.UInt32(0x_FF_FF_00_FF)
+        num_b = fixedint.UInt32(0x_FF_FF_0F_0F)
+        num_c = fixedint.UInt32(0x_00_00_0F_F0)
 
         # general test case
         xor = XOR(rs1=0, rs2=1, rd=2)
@@ -366,11 +375,11 @@ class TestRiscvInstructions(unittest.TestCase):
 
     def test_srl(self):
         # Number definitions
-        num_max = fixedint.MutableUInt32(4294967295)
-        num_0 = fixedint.MutableUInt32(0)
-        num_1 = fixedint.MutableUInt32(1)
-        num_31 = fixedint.MutableUInt32(31)
-        num_612 = fixedint.MutableUInt32(612)
+        num_max = fixedint.UInt32(4294967295)
+        num_0 = fixedint.UInt32(0)
+        num_1 = fixedint.UInt32(1)
+        num_31 = fixedint.UInt32(31)
+        num_612 = fixedint.UInt32(612)
 
         # one shifted by one = zero
         srl = SRL(rs1=1, rs2=2, rd=0)
@@ -406,16 +415,16 @@ class TestRiscvInstructions(unittest.TestCase):
 
     def test_sra(self):
         # Number definitions
-        num_all_set = fixedint.MutableUInt32(4294967295)
-        num_msb_set = fixedint.MutableUInt32(2147483648)
-        num_second_set = fixedint.MutableUInt32(1073741824)
-        num_0 = fixedint.MutableUInt32(0)
-        num_1 = fixedint.MutableUInt32(1)
-        num_30 = fixedint.MutableUInt32(30)
-        num_31 = fixedint.MutableUInt32(31)
-        num_38 = fixedint.MutableUInt32(38)
-        num_612 = fixedint.MutableUInt32(612)
-        num_2pow26 = fixedint.MutableUInt32(67108864)
+        num_all_set = fixedint.UInt32(4294967295)
+        num_msb_set = fixedint.UInt32(2147483648)
+        num_second_set = fixedint.UInt32(1073741824)
+        num_0 = fixedint.UInt32(0)
+        num_1 = fixedint.UInt32(1)
+        num_30 = fixedint.UInt32(30)
+        num_31 = fixedint.UInt32(31)
+        num_38 = fixedint.UInt32(38)
+        num_612 = fixedint.UInt32(612)
+        num_2pow26 = fixedint.UInt32(67108864)
 
         # negative numbers get extended with one´s
         sra = SRA(rs1=0, rs2=1, rd=2)
@@ -453,9 +462,9 @@ class TestRiscvInstructions(unittest.TestCase):
 
     def test_or(self):
         # Number definitions
-        num_a = fixedint.MutableUInt32(0x00_FF_00_12)
-        num_b = fixedint.MutableUInt32(0x0F_0F_00_00)
-        num_c = fixedint.MutableUInt32(0x0F_FF_00_12)
+        num_a = fixedint.UInt32(0x00_FF_00_12)
+        num_b = fixedint.UInt32(0x0F_0F_00_00)
+        num_c = fixedint.UInt32(0x0F_FF_00_12)
 
         # Test bit wise behavior
         or_inst = OR(rs1=0, rs2=1, rd=2)
@@ -475,9 +484,9 @@ class TestRiscvInstructions(unittest.TestCase):
 
     def test_and(self):
         # Number defintions
-        num_a = fixedint.MutableUInt32(0x00_FF_00_12)
-        num_b = fixedint.MutableUInt32(0x0F_0F_00_00)
-        num_c = fixedint.MutableUInt32(0x00_0F_00_00)
+        num_a = fixedint.UInt32(0x00_FF_00_12)
+        num_b = fixedint.UInt32(0x0F_0F_00_00)
+        num_c = fixedint.UInt32(0x00_0F_00_00)
 
         # Test bit wise behavior
         and_inst = AND(rs1=0, rs2=1, rd=2)
@@ -526,15 +535,15 @@ class TestRiscvInstructions(unittest.TestCase):
         self.assertEqual(shiftitype.imm, 30)
 
     def test_addi(self):
-        b0 = fixedint.MutableUInt32(0)
-        b1 = fixedint.MutableUInt32(1)
-        bmaxint = fixedint.MutableUInt32(pow(2, 31) - 1)
-        bminint = fixedint.MutableUInt32(-pow(2, 31))
-        bmaximm = fixedint.MutableUInt32(2047)
-        bminimm = fixedint.MutableUInt32(-2048)
-        bn1 = fixedint.MutableUInt32(-1)
-        brandom = fixedint.MutableUInt32(3320171255)
-        brandomx = fixedint.MutableUInt32(3320171260)
+        b0 = fixedint.UInt32(0)
+        b1 = fixedint.UInt32(1)
+        bmaxint = fixedint.UInt32(pow(2, 31) - 1)
+        bminint = fixedint.UInt32(-pow(2, 31))
+        bmaximm = fixedint.UInt32(2047)
+        bminimm = fixedint.UInt32(-2048)
+        bn1 = fixedint.UInt32(-1)
+        brandom = fixedint.UInt32(3320171255)
+        brandomx = fixedint.UInt32(3320171260)
 
         # 0 + 0    == 0
         # 0 + 1    == 1
@@ -601,11 +610,11 @@ class TestRiscvInstructions(unittest.TestCase):
         )
 
     def test_slti(self):
-        b0 = fixedint.MutableUInt32(0)
-        b1 = fixedint.MutableUInt32(1)
-        bn1 = fixedint.MutableUInt32(-1)
-        b5 = fixedint.MutableUInt32(5)
-        bn5 = fixedint.MutableUInt32(-5)
+        b0 = fixedint.UInt32(0)
+        b1 = fixedint.UInt32(1)
+        bn1 = fixedint.UInt32(-1)
+        b5 = fixedint.UInt32(5)
+        bn5 = fixedint.UInt32(-5)
 
         # 0 <s 0   == 0
         # 0 <s 1   == 1
@@ -672,11 +681,11 @@ class TestRiscvInstructions(unittest.TestCase):
         self.assertEqual(state.register_file.registers, [b1, b0, b0, b1])
 
     def test_sltiu(self):
-        b0 = fixedint.MutableUInt32(0)
-        b1 = fixedint.MutableUInt32(1)
-        bn1 = fixedint.MutableUInt32(-1)
-        b5 = fixedint.MutableUInt32(5)
-        bn5 = fixedint.MutableUInt32(-5)
+        b0 = fixedint.UInt32(0)
+        b1 = fixedint.UInt32(1)
+        bn1 = fixedint.UInt32(-1)
+        b5 = fixedint.UInt32(5)
+        bn5 = fixedint.UInt32(-5)
 
         # 0 <u 0   == 0
         # 0 <u 1   == 1
@@ -740,15 +749,15 @@ class TestRiscvInstructions(unittest.TestCase):
         self.assertEqual(state.register_file.registers, [b1, b1, b0, b1])
 
     def test_xori(self):
-        b0 = fixedint.MutableUInt32(0)
-        b1 = fixedint.MutableUInt32(1)
-        bmaxint = fixedint.MutableUInt32(pow(2, 31) - 1)
-        bminint = fixedint.MutableUInt32(-pow(2, 31))
-        bmaximm = fixedint.MutableUInt32(2047)
-        bminimm = fixedint.MutableUInt32(-2048)
-        bn1 = fixedint.MutableUInt32(-1)
-        brandom = fixedint.MutableUInt32(3320171255)
-        brandomx = fixedint.MutableUInt32(974796040)
+        b0 = fixedint.UInt32(0)
+        b1 = fixedint.UInt32(1)
+        bmaxint = fixedint.UInt32(pow(2, 31) - 1)
+        bminint = fixedint.UInt32(-pow(2, 31))
+        bmaximm = fixedint.UInt32(2047)
+        bminimm = fixedint.UInt32(-2048)
+        bn1 = fixedint.UInt32(-1)
+        brandom = fixedint.UInt32(3320171255)
+        brandomx = fixedint.UInt32(974796040)
 
         # 0 ^ 0  == 0
         # 0 ^ 1  == 1
@@ -803,12 +812,12 @@ class TestRiscvInstructions(unittest.TestCase):
         self.assertEqual(state.register_file.registers, [bminimm, bmaximm, bn1, b0])
 
     def test_ori(self):
-        b0 = fixedint.MutableUInt32(0)
-        b1 = fixedint.MutableUInt32(1)
-        bmaximm = fixedint.MutableUInt32(2047)
-        bminimm = fixedint.MutableUInt32(-2048)
-        bn1 = fixedint.MutableUInt32(-1)
-        brandom = fixedint.MutableUInt32(3320171255)
+        b0 = fixedint.UInt32(0)
+        b1 = fixedint.UInt32(1)
+        bmaximm = fixedint.UInt32(2047)
+        bminimm = fixedint.UInt32(-2048)
+        bn1 = fixedint.UInt32(-1)
+        brandom = fixedint.UInt32(3320171255)
 
         # 0 | 0  == 0
         # 0 | 1  == 1
@@ -863,14 +872,14 @@ class TestRiscvInstructions(unittest.TestCase):
         self.assertEqual(state.register_file.registers, [bminimm, bmaximm, bn1, b0])
 
     def test_andi(self):
-        b0 = fixedint.MutableUInt32(0)
-        b1 = fixedint.MutableUInt32(1)
-        b5 = fixedint.MutableUInt32(5)
-        bmaxint = fixedint.MutableUInt32(pow(2, 31) - 1)
-        bmaximm = fixedint.MutableUInt32(2047)
-        bminimm = fixedint.MutableUInt32(-2048)
-        bn1 = fixedint.MutableUInt32(-1)
-        brandom = fixedint.MutableUInt32(3320171255)
+        b0 = fixedint.UInt32(0)
+        b1 = fixedint.UInt32(1)
+        b5 = fixedint.UInt32(5)
+        bmaxint = fixedint.UInt32(pow(2, 31) - 1)
+        bmaximm = fixedint.UInt32(2047)
+        bminimm = fixedint.UInt32(-2048)
+        bn1 = fixedint.UInt32(-1)
+        brandom = fixedint.UInt32(3320171255)
 
         # 0 & 0    == 0
         # 0 & 1    == 0
@@ -928,15 +937,15 @@ class TestRiscvInstructions(unittest.TestCase):
         self.assertEqual(state.register_file.registers, [bminimm, bmaximm, bn1, b0])
 
     def test_slli(self):
-        b0 = fixedint.MutableUInt32(0)
-        b1 = fixedint.MutableUInt32(1)
-        b2 = fixedint.MutableUInt32(2)
-        b2_20 = fixedint.MutableUInt32(pow(2, 20))
-        b111 = fixedint.MutableUInt32(-1)  # 11111....
-        b110 = fixedint.MutableUInt32(pow(2, 32) - 2)  # 111...110
-        b100 = fixedint.MutableUInt32(pow(2, 31))  # 10000....
-        brandom = fixedint.MutableUInt32(3320171255)
-        brandomx = fixedint.MutableUInt32(395783132)
+        b0 = fixedint.UInt32(0)
+        b1 = fixedint.UInt32(1)
+        b2 = fixedint.UInt32(2)
+        b2_20 = fixedint.UInt32(pow(2, 20))
+        b111 = fixedint.UInt32(-1)  # 11111....
+        b110 = fixedint.UInt32(pow(2, 32) - 2)  # 111...110
+        b100 = fixedint.UInt32(pow(2, 31))  # 10000....
+        brandom = fixedint.UInt32(3320171255)
+        brandomx = fixedint.UInt32(395783132)
 
         # 0 << 0   == 0
         # 0 << 20  == 0
@@ -995,12 +1004,12 @@ class TestRiscvInstructions(unittest.TestCase):
         self.assertEqual(state.register_file.registers, [b100, b111, b110, b111])
 
     def test_srli(self):
-        b0 = fixedint.MutableUInt32(0)
-        b1 = fixedint.MutableUInt32(1)
-        b111 = fixedint.MutableUInt32(pow(2, 32) - 1)  # 11111....
-        b011 = fixedint.MutableUInt32(pow(2, 31) - 1)  # 01111....
-        brandom = fixedint.MutableUInt32(3320171255)
-        brandomx = fixedint.MutableUInt32(830042813)
+        b0 = fixedint.UInt32(0)
+        b1 = fixedint.UInt32(1)
+        b111 = fixedint.UInt32(pow(2, 32) - 1)  # 11111....
+        b011 = fixedint.UInt32(pow(2, 31) - 1)  # 01111....
+        brandom = fixedint.UInt32(3320171255)
+        brandomx = fixedint.UInt32(830042813)
 
         # 0 >> 0   == 0
         # 0 >> 20  == 0
@@ -1085,9 +1094,7 @@ class TestRiscvInstructions(unittest.TestCase):
         state.register_file.registers = [0, 1, -128]
         instr = SRAI(imm=1, rs1=2, rd=0)
         state = instr.behavior(state)
-        self.assertEqual(
-            state.register_file.registers, [fixedint.MutableUInt32(-64), 1, -128]
-        )
+        self.assertEqual(state.register_file.registers, [fixedint.UInt32(-64), 1, -128])
 
         # imm=95, rs1= 2^30 immediate is max 32
         state.register_file.registers = [0, 1, -128, pow(2, 30)]
@@ -1102,12 +1109,12 @@ class TestRiscvInstructions(unittest.TestCase):
         )
         state.memory.memory_file = dict(
             [
-                (0, fixedint.MutableUInt8(1)),
-                (1, fixedint.MutableUInt8(2)),
-                (2, fixedint.MutableUInt8(3)),
-                (3, fixedint.MutableUInt8(-1)),
-                (pow(2, 32) - 1, fixedint.MutableUInt8(4)),
-                (2047, fixedint.MutableUInt8(5)),
+                (0, fixedint.UInt8(1)),
+                (1, fixedint.UInt8(2)),
+                (2, fixedint.UInt8(3)),
+                (3, fixedint.UInt8(-1)),
+                (pow(2, 32) - 1, fixedint.UInt8(4)),
+                (2047, fixedint.UInt8(5)),
             ]
         )
         # imm=0, rs1=0 try with both values at 0
@@ -1165,7 +1172,7 @@ class TestRiscvInstructions(unittest.TestCase):
         state = instr.behavior(state)
         self.assertEqual(
             state.register_file.registers,
-            [fixedint.MutableUInt32(-1), 1, -1, pow(2, 32) - 1],
+            [fixedint.UInt32(-1), 1, -1, pow(2, 32) - 1],
         )
 
         # try memory acces to non existant address
@@ -1181,17 +1188,17 @@ class TestRiscvInstructions(unittest.TestCase):
         )
         state.memory.memory_file = dict(
             [
-                (0, fixedint.MutableUInt8(1)),
-                (1, fixedint.MutableUInt8(2)),
-                (2, fixedint.MutableUInt8(3)),
-                (3, fixedint.MutableUInt8(4)),
-                (4, fixedint.MutableUInt8(5)),
-                (5, fixedint.MutableUInt8(6)),
-                (6, fixedint.MutableUInt8(-1)),
-                (7, fixedint.MutableUInt8(-1)),
-                (pow(2, 32) - 2, fixedint.MutableUInt8(7)),
-                (pow(2, 32) - 1, fixedint.MutableUInt8(8)),
-                (2047, fixedint.MutableUInt8(5)),
+                (0, fixedint.UInt8(1)),
+                (1, fixedint.UInt8(2)),
+                (2, fixedint.UInt8(3)),
+                (3, fixedint.UInt8(4)),
+                (4, fixedint.UInt8(5)),
+                (5, fixedint.UInt8(6)),
+                (6, fixedint.UInt8(-1)),
+                (7, fixedint.UInt8(-1)),
+                (pow(2, 32) - 2, fixedint.UInt8(7)),
+                (pow(2, 32) - 1, fixedint.UInt8(8)),
+                (2047, fixedint.UInt8(5)),
             ]
         )
         # imm=0, rs1=0 try with both values at 0
@@ -1255,7 +1262,7 @@ class TestRiscvInstructions(unittest.TestCase):
         state = instr.behavior(state)
         self.assertEqual(
             state.register_file.registers,
-            [fixedint.MutableUInt32(-1), 2, -2, pow(2, 32) - 1],
+            [fixedint.UInt32(-1), 2, -2, pow(2, 32) - 1],
         )
 
         # try memory acces to non existant address
@@ -1271,27 +1278,27 @@ class TestRiscvInstructions(unittest.TestCase):
         )
         state.memory.memory_file = dict(
             [
-                (0, fixedint.MutableUInt8(1)),
-                (1, fixedint.MutableUInt8(1)),
-                (2, fixedint.MutableUInt8(1)),
-                (3, fixedint.MutableUInt8(1)),
-                (4, fixedint.MutableUInt8(2)),
-                (5, fixedint.MutableUInt8(2)),
-                (6, fixedint.MutableUInt8(2)),
-                (7, fixedint.MutableUInt8(2)),
-                (8, fixedint.MutableUInt8(3)),
-                (9, fixedint.MutableUInt8(3)),
-                (10, fixedint.MutableUInt8(3)),
-                (11, fixedint.MutableUInt8(3)),
-                (12, fixedint.MutableUInt8(-1)),
-                (13, fixedint.MutableUInt8(-1)),
-                (14, fixedint.MutableUInt8(-1)),
-                (15, fixedint.MutableUInt8(-1)),
-                (pow(2, 32) - 4, fixedint.MutableUInt8(4)),
-                (pow(2, 32) - 3, fixedint.MutableUInt8(4)),
-                (pow(2, 32) - 2, fixedint.MutableUInt8(4)),
-                (pow(2, 32) - 1, fixedint.MutableUInt8(4)),
-                (2047, fixedint.MutableUInt8(5)),
+                (0, fixedint.UInt8(1)),
+                (1, fixedint.UInt8(1)),
+                (2, fixedint.UInt8(1)),
+                (3, fixedint.UInt8(1)),
+                (4, fixedint.UInt8(2)),
+                (5, fixedint.UInt8(2)),
+                (6, fixedint.UInt8(2)),
+                (7, fixedint.UInt8(2)),
+                (8, fixedint.UInt8(3)),
+                (9, fixedint.UInt8(3)),
+                (10, fixedint.UInt8(3)),
+                (11, fixedint.UInt8(3)),
+                (12, fixedint.UInt8(-1)),
+                (13, fixedint.UInt8(-1)),
+                (14, fixedint.UInt8(-1)),
+                (15, fixedint.UInt8(-1)),
+                (pow(2, 32) - 4, fixedint.UInt8(4)),
+                (pow(2, 32) - 3, fixedint.UInt8(4)),
+                (pow(2, 32) - 2, fixedint.UInt8(4)),
+                (pow(2, 32) - 1, fixedint.UInt8(4)),
+                (2047, fixedint.UInt8(5)),
             ]
         )
         # imm=0, rs1=0 try with both values at 0
@@ -1371,7 +1378,7 @@ class TestRiscvInstructions(unittest.TestCase):
         state = instr.behavior(state)
         self.assertEqual(
             state.register_file.registers,
-            [fixedint.MutableUInt32(-1), 4, -4, pow(2, 32) - 1],
+            [fixedint.UInt32(-1), 4, -4, pow(2, 32) - 1],
         )
 
         # try memory acces to non existant address
@@ -1387,12 +1394,12 @@ class TestRiscvInstructions(unittest.TestCase):
         )
         state.memory.memory_file = dict(
             [
-                (0, fixedint.MutableUInt8(1)),
-                (1, fixedint.MutableUInt8(2)),
-                (2, fixedint.MutableUInt8(3)),
-                (3, fixedint.MutableUInt8(-1)),
-                (pow(2, 32) - 1, fixedint.MutableUInt8(4)),
-                (2047, fixedint.MutableUInt8(5)),
+                (0, fixedint.UInt8(1)),
+                (1, fixedint.UInt8(2)),
+                (2, fixedint.UInt8(3)),
+                (3, fixedint.UInt8(-1)),
+                (pow(2, 32) - 1, fixedint.UInt8(4)),
+                (2047, fixedint.UInt8(5)),
             ]
         )
         # imm=0, rs1=0 try with both values at 0
@@ -1463,17 +1470,17 @@ class TestRiscvInstructions(unittest.TestCase):
         )
         state.memory.memory_file = dict(
             [
-                (0, fixedint.MutableUInt8(1)),
-                (1, fixedint.MutableUInt8(2)),
-                (2, fixedint.MutableUInt8(3)),
-                (3, fixedint.MutableUInt8(4)),
-                (4, fixedint.MutableUInt8(5)),
-                (5, fixedint.MutableUInt8(6)),
-                (6, fixedint.MutableUInt8(-1)),
-                (7, fixedint.MutableUInt8(-1)),
-                (pow(2, 32) - 2, fixedint.MutableUInt8(7)),
-                (pow(2, 32) - 1, fixedint.MutableUInt8(8)),
-                (2047, fixedint.MutableUInt8(5)),
+                (0, fixedint.UInt8(1)),
+                (1, fixedint.UInt8(2)),
+                (2, fixedint.UInt8(3)),
+                (3, fixedint.UInt8(4)),
+                (4, fixedint.UInt8(5)),
+                (5, fixedint.UInt8(6)),
+                (6, fixedint.UInt8(-1)),
+                (7, fixedint.UInt8(-1)),
+                (pow(2, 32) - 2, fixedint.UInt8(7)),
+                (pow(2, 32) - 1, fixedint.UInt8(8)),
+                (2047, fixedint.UInt8(5)),
             ]
         )
         # imm=0, rs1=0 try with both values at 0
@@ -1578,11 +1585,80 @@ class TestRiscvInstructions(unittest.TestCase):
         self.assertEqual(state.program_counter, 10)
 
     def test_ecall(self):
-        state = RiscvArchitecturalState(register_file=RegisterFile(registers=()))
-        with self.assertRaises(InstructionNotImplemented) as cm:
-            instr = ECALL(imm=0, rs1=0, rd=0)
-            state = instr.behavior(state)
-        self.assertEqual(cm.exception, InstructionNotImplemented(mnemonic="ecall"))
+        # test 10 (exit 0)
+        simulation = RiscvSimulation()
+        simulation.state.instruction_memory.write_instructions(
+            [ADDI(17, 0, 10), ECALL(), ADD(0, 0, 0)]
+        )
+        simulation.step()
+        self.assertTrue(not simulation.is_done())
+        simulation.step()
+        self.assertTrue(simulation.is_done())
+        self.assertEqual(simulation.state.exit_code, 0)
+
+        # test 1, 11, 34, 35 (sint, char, hex, bin)
+        simulation = RiscvSimulation()
+        simulation.state.instruction_memory.write_instructions(
+            [
+                ADDI(17, 0, 1),
+                ADDI(10, 0, 65),
+                ECALL(),
+                ADDI(17, 0, 11),
+                ECALL(),
+                ADDI(17, 0, 34),
+                ECALL(),
+                ADDI(17, 0, 35),
+                ECALL(),
+            ]
+        )
+        simulation.run()
+        self.assertEqual(simulation.state.output, "65A0x410b1000001")
+
+        # test 1, 36 (sint, uint)
+        simulation = RiscvSimulation()
+        simulation.state.instruction_memory.write_instructions(
+            [ADDI(17, 0, 1), LUI(10, 0x80000), ECALL(), ADDI(17, 0, 36), ECALL()]
+        )
+        simulation.run()
+        self.assertEqual(simulation.state.output, "-21474836482147483648")
+
+        # test 2 (float)
+        simulation = RiscvSimulation()
+        simulation.state.instruction_memory.write_instructions(
+            [ADDI(17, 0, 2), LUI(10, 0xBF400), ECALL()]
+        )
+        simulation.run()
+        self.assertEqual(simulation.state.output, "-0.75")
+
+        # test 4 (string)
+        simulation = RiscvSimulation()
+        simulation.state.instruction_memory.write_instructions(
+            [
+                ADDI(17, 0, 4),
+                LUI(10, 0xF0000),
+                ADDI(5, 0, 65),
+                SB(10, 5, 0),
+                ADDI(5, 0, 66),
+                SB(10, 5, 1),
+                ADDI(5, 0, 67),
+                SB(10, 5, 2),
+                ECALL(),
+            ]
+        )
+        simulation.run()
+        self.assertEqual(simulation.state.output, "ABC")
+
+        # test 93 (exit with code)
+        simulation = RiscvSimulation()
+        simulation.state.instruction_memory.write_instructions(
+            [ADDI(17, 0, 93), ADDI(10, 0, 42), ECALL(), ADD(0, 0, 0)]
+        )
+        simulation.step()
+        simulation.step()
+        self.assertTrue(not simulation.is_done())
+        simulation.step()
+        self.assertTrue(simulation.is_done())
+        self.assertEqual(simulation.state.exit_code, 42)
 
     def test_ebreak(self):
         state = RiscvArchitecturalState(register_file=RegisterFile(registers=()))
@@ -1611,12 +1687,12 @@ class TestRiscvInstructions(unittest.TestCase):
         state = RiscvArchitecturalState(
             register_file=RegisterFile(
                 registers=[
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(261),
-                    fixedint.MutableUInt32(257),
-                    fixedint.MutableUInt32(256),
-                    fixedint.MutableUInt32(128),
-                    fixedint.MutableUInt32(1024),
+                    fixedint.UInt32(0),
+                    fixedint.UInt32(261),
+                    fixedint.UInt32(257),
+                    fixedint.UInt32(256),
+                    fixedint.UInt32(128),
+                    fixedint.UInt32(1024),
                 ]
             ),
             memory=Memory(AddressingType.BYTE, 32, True),
@@ -1653,15 +1729,15 @@ class TestRiscvInstructions(unittest.TestCase):
         state = RiscvArchitecturalState(
             register_file=RegisterFile(
                 registers=[
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(65536),
-                    fixedint.MutableUInt32(65537),
-                    fixedint.MutableUInt32(65538),
-                    fixedint.MutableUInt32(3),
-                    fixedint.MutableUInt32(2),
-                    fixedint.MutableUInt32(255),
-                    fixedint.MutableUInt32(256),
-                    fixedint.MutableUInt32(65535),
+                    fixedint.UInt32(0),
+                    fixedint.UInt32(65536),
+                    fixedint.UInt32(65537),
+                    fixedint.UInt32(65538),
+                    fixedint.UInt32(3),
+                    fixedint.UInt32(2),
+                    fixedint.UInt32(255),
+                    fixedint.UInt32(256),
+                    fixedint.UInt32(65535),
                 ]
             ),
             memory=Memory(AddressingType.BYTE, 32, True),
@@ -1703,14 +1779,14 @@ class TestRiscvInstructions(unittest.TestCase):
         state = RiscvArchitecturalState(
             register_file=RegisterFile(
                 registers=[
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(1),
-                    fixedint.MutableUInt32(2),
-                    fixedint.MutableUInt32(100),
-                    fixedint.MutableUInt32(10),
-                    fixedint.MutableUInt32(255),
-                    fixedint.MutableUInt32(256),
-                    fixedint.MutableUInt32(4294967295),
+                    fixedint.UInt32(0),
+                    fixedint.UInt32(1),
+                    fixedint.UInt32(2),
+                    fixedint.UInt32(100),
+                    fixedint.UInt32(10),
+                    fixedint.UInt32(255),
+                    fixedint.UInt32(256),
+                    fixedint.UInt32(4294967295),
                 ]
             ),
             memory=Memory(AddressingType.BYTE, 32, True),
@@ -1764,9 +1840,9 @@ class TestRiscvInstructions(unittest.TestCase):
         state = RiscvArchitecturalState(
             register_file=RegisterFile(
                 registers=[
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(1),
+                    fixedint.UInt32(0),
+                    fixedint.UInt32(0),
+                    fixedint.UInt32(1),
                 ]
             )
         )
@@ -1793,9 +1869,9 @@ class TestRiscvInstructions(unittest.TestCase):
         state = RiscvArchitecturalState(
             register_file=RegisterFile(
                 registers=[
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(1),
+                    fixedint.UInt32(0),
+                    fixedint.UInt32(0),
+                    fixedint.UInt32(1),
                 ]
             )
         )
@@ -1822,11 +1898,11 @@ class TestRiscvInstructions(unittest.TestCase):
         state = RiscvArchitecturalState(
             register_file=RegisterFile(
                 registers=[
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(1),
-                    fixedint.MutableUInt32(pow(2, 32) - 1),
-                    fixedint.MutableUInt32(pow(2, 31)),
+                    fixedint.UInt32(0),
+                    fixedint.UInt32(0),
+                    fixedint.UInt32(1),
+                    fixedint.UInt32(pow(2, 32) - 1),
+                    fixedint.UInt32(pow(2, 31)),
                 ]
             )
         )
@@ -1877,11 +1953,11 @@ class TestRiscvInstructions(unittest.TestCase):
         state = RiscvArchitecturalState(
             register_file=RegisterFile(
                 registers=[
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(1),
-                    fixedint.MutableUInt32(pow(2, 32) - 1),
-                    fixedint.MutableUInt32(pow(2, 31)),
+                    fixedint.UInt32(0),
+                    fixedint.UInt32(0),
+                    fixedint.UInt32(1),
+                    fixedint.UInt32(pow(2, 32) - 1),
+                    fixedint.UInt32(pow(2, 31)),
                 ]
             )
         )
@@ -1926,11 +2002,11 @@ class TestRiscvInstructions(unittest.TestCase):
         state = RiscvArchitecturalState(
             register_file=RegisterFile(
                 registers=[
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(1),
-                    fixedint.MutableUInt32(pow(2, 32) - 1),
-                    fixedint.MutableUInt32(pow(2, 31)),
+                    fixedint.UInt32(0),
+                    fixedint.UInt32(0),
+                    fixedint.UInt32(1),
+                    fixedint.UInt32(pow(2, 32) - 1),
+                    fixedint.UInt32(pow(2, 31)),
                 ]
             )
         )
@@ -1981,11 +2057,11 @@ class TestRiscvInstructions(unittest.TestCase):
         state = RiscvArchitecturalState(
             register_file=RegisterFile(
                 registers=[
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(0),
-                    fixedint.MutableUInt32(1),
-                    fixedint.MutableUInt32(pow(2, 32) - 1),
-                    fixedint.MutableUInt32(pow(2, 31)),
+                    fixedint.UInt32(0),
+                    fixedint.UInt32(0),
+                    fixedint.UInt32(1),
+                    fixedint.UInt32(pow(2, 32) - 1),
+                    fixedint.UInt32(pow(2, 31)),
                 ]
             )
         )
@@ -2068,19 +2144,13 @@ class TestRiscvInstructions(unittest.TestCase):
         )
         lui_1 = LUI(rd=0, imm=2097151)
         state = lui_1.behavior(state)
-        self.assertEqual(
-            int(state.register_file.registers[0]), fixedint.MutableUInt32(-4096)
-        )
+        self.assertEqual(int(state.register_file.registers[0]), fixedint.UInt32(-4096))
         lui_1 = LUI(rd=0, imm=2097152)
         state = lui_1.behavior(state)
-        self.assertEqual(
-            int(state.register_file.registers[0]), fixedint.MutableUInt32(0)
-        )
+        self.assertEqual(int(state.register_file.registers[0]), fixedint.UInt32(0))
         lui_1 = LUI(rd=0, imm=-1)
         state = lui_1.behavior(state)
-        self.assertEqual(
-            int(state.register_file.registers[0]), fixedint.MutableUInt32(-4096)
-        )
+        self.assertEqual(int(state.register_file.registers[0]), fixedint.UInt32(-4096))
 
     def test_auipc(self):
         state = RiscvArchitecturalState(
@@ -2113,25 +2183,17 @@ class TestRiscvInstructions(unittest.TestCase):
         state.program_counter = 0
         auipc_0 = AUIPC(rd=0, imm=2097151)
         state = auipc_0.behavior(state)
-        self.assertEqual(
-            int(state.register_file.registers[0]), fixedint.MutableUInt32(-4096)
-        )
+        self.assertEqual(int(state.register_file.registers[0]), fixedint.UInt32(-4096))
         auipc_0 = AUIPC(rd=0, imm=2097152)
         state = auipc_0.behavior(state)
-        self.assertEqual(
-            int(state.register_file.registers[0]), fixedint.MutableUInt32(0)
-        )
+        self.assertEqual(int(state.register_file.registers[0]), fixedint.UInt32(0))
         auipc_0 = AUIPC(rd=0, imm=-1)
         state = auipc_0.behavior(state)
-        self.assertEqual(
-            int(state.register_file.registers[0]), fixedint.MutableUInt32(-4096)
-        )
+        self.assertEqual(int(state.register_file.registers[0]), fixedint.UInt32(-4096))
         state.program_counter = 4
         auipc_0 = AUIPC(rd=0, imm=2097151)
         state = auipc_0.behavior(state)
-        self.assertEqual(
-            int(state.register_file.registers[0]), fixedint.MutableUInt32(-4092)
-        )
+        self.assertEqual(int(state.register_file.registers[0]), fixedint.UInt32(-4092))
 
     def test_jtype(self):
         jtype = JAL(rd=0, imm=0)
@@ -2185,7 +2247,7 @@ class TestRiscvInstructions(unittest.TestCase):
         state = RiscvArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
         state.csr_registers.privilege_level = 0
         with self.assertRaises(CSRError) as context:
-            state.csr_registers.write_word(3000, fixedint.MutableUInt32(3))
+            state.csr_registers.write_word(3000, fixedint.UInt32(3))
         self.assertTrue(
             "illegal action: privilege level too low to access this csr register"
             in str(context.exception)
@@ -2194,7 +2256,7 @@ class TestRiscvInstructions(unittest.TestCase):
     def test_csrrw_attempting_to_write_to_read_only(self):
         state = RiscvArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
         with self.assertRaises(CSRError) as context:
-            state.csr_registers.write_word(3072, fixedint.MutableUInt32(3))
+            state.csr_registers.write_word(3072, fixedint.UInt32(3))
         self.assertTrue(
             "illegal action: attempting to write into read-only csr register"
             in str(context.exception)
@@ -2204,26 +2266,26 @@ class TestRiscvInstructions(unittest.TestCase):
         state = RiscvArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
         state.csr_registers.privilege_level = 4
         with self.assertRaises(CSRError) as context:
-            state.csr_registers.write_word(7000, fixedint.MutableUInt32(3))
+            state.csr_registers.write_word(7000, fixedint.UInt32(3))
         self.assertTrue(
             "illegal action: csr register does not exist" in str(context.exception)
         )
 
     def test_csrrw(self):
-        fixedint.MutableUInt32(0)
-        fixedint.MutableUInt32(1)
+        fixedint.UInt32(0)
+        fixedint.UInt32(1)
         state = RiscvArchitecturalState(register_file=RegisterFile(registers=[0, 2]))
         cssrw_1 = CSRRW(csr=0, rs1=1, rd=0)
-        state.csr_registers.write_word(0, fixedint.MutableUInt32(3))
+        state.csr_registers.write_word(0, fixedint.UInt32(3))
         state.csr_registers.privilege_level = 4
         state = cssrw_1.behavior(state)
         self.assertEqual(state.register_file.registers, [3, 2])
         self.assertEqual(state.csr_registers.read_word(cssrw_1.csr), 2)
 
     def test_csrrs(self):
-        max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
-        test_number_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
-        test_mask_1 = fixedint.MutableUInt32(0x00_00_00_01)
+        max_number = fixedint.UInt32(0xFF_FF_FF_FF)
+        test_number_1 = fixedint.UInt32(0xFF_FF_FF_FE)
+        test_mask_1 = fixedint.UInt32(0x00_00_00_01)
         state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[0, test_mask_1])
         )
@@ -2234,9 +2296,9 @@ class TestRiscvInstructions(unittest.TestCase):
         self.assertEqual(state.csr_registers.read_word(cssrs_1.csr), max_number)
 
     def test_csrrc(self):
-        max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
-        test_result_1 = fixedint.MutableUInt32(0x00_00_00_01)
-        test_mask_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
+        max_number = fixedint.UInt32(0xFF_FF_FF_FF)
+        test_result_1 = fixedint.UInt32(0x00_00_00_01)
+        test_mask_1 = fixedint.UInt32(0xFF_FF_FF_FE)
         state = RiscvArchitecturalState(
             register_file=RegisterFile(registers=[0, test_mask_1])
         )
@@ -2267,8 +2329,8 @@ class TestRiscvInstructions(unittest.TestCase):
         self.assertEqual(state.csr_registers.read_word(cssrwi_1.csr), 4)
 
     def test_csrrsi(self):
-        max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
-        test_number_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
+        max_number = fixedint.UInt32(0xFF_FF_FF_FF)
+        test_number_1 = fixedint.UInt32(0xFF_FF_FF_FE)
         test_mask_1 = 1
         state = RiscvArchitecturalState(register_file=RegisterFile(registers=[0]))
         cssrsi_1 = CSRRSI(csr=0, uimm=test_mask_1, rd=0)
@@ -2278,8 +2340,8 @@ class TestRiscvInstructions(unittest.TestCase):
         self.assertEqual(state.csr_registers.read_word(cssrsi_1.csr), max_number)
 
     def test_csrrci(self):
-        max_number = fixedint.MutableUInt32(0xFF_FF_FF_FF)
-        test_result_1 = fixedint.MutableUInt32(0xFF_FF_FF_FE)
+        max_number = fixedint.UInt32(0xFF_FF_FF_FF)
+        test_result_1 = fixedint.UInt32(0xFF_FF_FF_FE)
         test_mask_1 = 1
         state = RiscvArchitecturalState(register_file=RegisterFile(registers=[0]))
         state.csr_registers.write_word(0, max_number)
@@ -2403,3 +2465,263 @@ csrrci x0, 0x40f, 16"""
         instructions = list(state.instruction_memory.instructions.values())
         for instruction, line in zip(instructions, text.splitlines()):
             self.assertEqual(str(instruction), line)
+
+    def test_mul(self):
+
+        left_right_res_values = [
+            (2**16 - 1, 2**16 - 1, 4294836225),
+            (0, 101, 0),
+            (1, 1, 1),
+            (2**16, 2**16, 0),
+            (-1, -1, 1),
+            (-10, 1, -10),
+            (110, -7, -770),
+            (55, 11, 605),
+            (2**24 + 17, 2**23 + 81, 1501562209),
+        ]
+        mul = MUL(rs1=0, rs2=1, rd=2)
+        for left, right, res in left_right_res_values:
+            state = RiscvArchitecturalState(
+                register_file=RegisterFile(
+                    registers=[
+                        fixedint.UInt32(left),
+                        fixedint.UInt32(right),
+                        fixedint.UInt32(0),
+                    ]
+                )
+            )
+            state = mul.behavior(state)
+            self.assertEqual(
+                state.register_file.registers,
+                [fixedint.UInt32(left), fixedint.UInt32(right), fixedint.UInt32(res)],
+            )
+
+            self.assertEqual(
+                fixedint.UInt32(mul.alu_compute(left, right)[1]), fixedint.UInt32(res)
+            )
+
+    def test_mulh(self):
+
+        left_right_res_values = [
+            (0x80000000, 0x7FFFFFFF, 0xC0000000),
+            (0xFFFFFFFF, 0xFFFFFFFF, 0x0),
+            (0xFFFFFF9D, 0x6F, 0xFFFFFFFF),
+            (0, -1, 0),
+            (0xF000000E, 0xFFFFFF, 0xFFF00000),
+        ]
+        mulh = MULH(rs1=0, rs2=1, rd=2)
+        for left, right, res in left_right_res_values:
+            state = RiscvArchitecturalState(
+                register_file=RegisterFile(
+                    registers=[
+                        fixedint.UInt32(left),
+                        fixedint.UInt32(right),
+                        fixedint.UInt32(0),
+                    ]
+                )
+            )
+            state = mulh.behavior(state)
+            self.assertEqual(
+                state.register_file.registers,
+                [fixedint.UInt32(left), fixedint.UInt32(right), fixedint.UInt32(res)],
+            )
+
+            self.assertEqual(
+                fixedint.UInt32(mulh.alu_compute(left, right)[1]), fixedint.UInt32(res)
+            )
+
+    def test_mulhu(self):
+
+        left_right_res_values = [
+            (0x80000000, 0x7FFFFFFF, 0x3FFFFFFF),
+            (0xFFFFFFFF, 0xFFFFFFFF, 2**64 - 2**33 + 1 >> 32),
+            (0xFFFFFF9D, 0x6F, 0x6E),
+            (0x0, 0xFFFFFFFF, 0x0),
+            (0xF000000E, 0xFFFFFF, 0xEFFFFF),
+            (2**31, 2**31, 2**30),
+        ]
+        mulhu = MULHU(rs1=0, rs2=1, rd=2)
+        for left, right, res in left_right_res_values:
+            state = RiscvArchitecturalState(
+                register_file=RegisterFile(
+                    registers=[
+                        fixedint.UInt32(left),
+                        fixedint.UInt32(right),
+                        fixedint.UInt32(0),
+                    ]
+                )
+            )
+            state = mulhu.behavior(state)
+            self.assertEqual(
+                state.register_file.registers,
+                [fixedint.UInt32(left), fixedint.UInt32(right), fixedint.UInt32(res)],
+            )
+
+            self.assertEqual(
+                fixedint.UInt32(mulhu.alu_compute(left, right)[1]), fixedint.UInt32(res)
+            )
+
+    def test_mulhsu(self):
+
+        left_right_res_values = [
+            (0x80000000, 0x7FFFFFFF, 0xC0000000),
+            (0x7FFFFFFF, 0x80000000, 0x3FFFFFFF),
+            (0x0, 0x457, 0x0),
+            (0x457, 0x0, 0x0),
+            (0xFFFE72AC, 0x7, 0xFFFFFFFF),
+            (0x7, 0xFFFE72AC, 0x6),
+        ]
+        mulhsu = MULHSU(rs1=0, rs2=1, rd=2)
+        for left, right, res in left_right_res_values:
+            state = RiscvArchitecturalState(
+                register_file=RegisterFile(
+                    registers=[
+                        fixedint.UInt32(left),
+                        fixedint.UInt32(right),
+                        fixedint.UInt32(0),
+                    ]
+                )
+            )
+            state = mulhsu.behavior(state)
+            self.assertEqual(
+                state.register_file.registers,
+                [fixedint.UInt32(left), fixedint.UInt32(right), fixedint.UInt32(res)],
+            )
+
+            self.assertEqual(
+                fixedint.UInt32(mulhsu.alu_compute(left, right)[1]),
+                fixedint.UInt32(res),
+            )
+
+    def test_div(self):
+
+        left_right_res_values = [
+            (11, 0, -1),
+            (0, 11, 0),
+            (-1, -1, 1),
+            (2**31 - 1, 1, 2**31 - 1),
+            (100, -10, -10),
+            (-100, 10, -10),
+            (79, 11, 7),
+            (-(2**31), -1, -(2**31)),
+            (121, -12, -10),
+        ]
+        div = DIV(rs1=0, rs2=1, rd=2)
+        for left, right, res in left_right_res_values:
+            state = RiscvArchitecturalState(
+                register_file=RegisterFile(
+                    registers=[
+                        fixedint.UInt32(left),
+                        fixedint.UInt32(right),
+                        fixedint.UInt32(0),
+                    ]
+                )
+            )
+            state = div.behavior(state)
+            self.assertEqual(
+                state.register_file.registers,
+                [fixedint.UInt32(left), fixedint.UInt32(right), fixedint.UInt32(res)],
+            )
+
+            self.assertEqual(
+                fixedint.UInt32(div.alu_compute(left, right)[1]),
+                fixedint.UInt32(res),
+            )
+
+    def test_divu(self):
+
+        left_right_res_values = [
+            (10, 0, -1),
+            (0, 0, -1),
+            (2**16, 2, 2**15),
+            (0, 100, 0),
+            (2**32 - 1, 5, 858_993_459),
+        ]
+        divu = DIVU(rs1=0, rs2=1, rd=2)
+        for left, right, res in left_right_res_values:
+            state = RiscvArchitecturalState(
+                register_file=RegisterFile(
+                    registers=[
+                        fixedint.UInt32(left),
+                        fixedint.UInt32(right),
+                        fixedint.UInt32(0),
+                    ]
+                )
+            )
+            state = divu.behavior(state)
+            self.assertEqual(
+                state.register_file.registers,
+                [fixedint.UInt32(left), fixedint.UInt32(right), fixedint.UInt32(res)],
+            )
+
+            self.assertEqual(
+                fixedint.UInt32(divu.alu_compute(left, right)[1]),
+                fixedint.UInt32(res),
+            )
+
+    def test_rem(self):
+
+        left_right_res_values = [
+            (7, 2, 1),
+            (111, 0, 111),
+            (-(2**31), -1, 0),
+            (7, 10, 7),
+            (-10, -10, 0),
+            (-7, 3, -1),
+            (11, -3, 2),
+            (121, -12, 1),
+        ]
+        rem = REM(rs1=0, rs2=1, rd=2)
+        for left, right, res in left_right_res_values:
+            state = RiscvArchitecturalState(
+                register_file=RegisterFile(
+                    registers=[
+                        fixedint.UInt32(left),
+                        fixedint.UInt32(right),
+                        fixedint.UInt32(0),
+                    ]
+                )
+            )
+            state = rem.behavior(state)
+            self.assertEqual(
+                state.register_file.registers,
+                [fixedint.UInt32(left), fixedint.UInt32(right), fixedint.UInt32(res)],
+            )
+
+            self.assertEqual(
+                fixedint.UInt32(rem.alu_compute(left, right)[1]),
+                fixedint.UInt32(res),
+            )
+
+    def test_remu(self):
+
+        left_right_res_values = [
+            (110, 0, 110),
+            (0, 0, 0),
+            (0xFFFFFFFE, 0xFFFFFFFF, 0xFFFFFFFE),
+            (10, -1, 10),
+            (-107, -1, -107),
+            (17, 20, 17),
+            (11, 5, 1),
+        ]
+        remu = REMU(rs1=0, rs2=1, rd=2)
+        for left, right, res in left_right_res_values:
+            state = RiscvArchitecturalState(
+                register_file=RegisterFile(
+                    registers=[
+                        fixedint.UInt32(left),
+                        fixedint.UInt32(right),
+                        fixedint.UInt32(0),
+                    ]
+                )
+            )
+            state = remu.behavior(state)
+            self.assertEqual(
+                state.register_file.registers,
+                [fixedint.UInt32(left), fixedint.UInt32(right), fixedint.UInt32(res)],
+            )
+
+            self.assertEqual(
+                fixedint.UInt32(remu.alu_compute(left, right)[1]),
+                fixedint.UInt32(res),
+            )

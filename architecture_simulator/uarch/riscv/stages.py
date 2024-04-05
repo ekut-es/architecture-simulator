@@ -238,7 +238,22 @@ class ExecuteStage(Stage):
             else None
         )
 
+        # ECALL needs some special behavior (flush and print to output)
+        flush_signal = None
+        if isinstance(pipeline_register.instruction, ECALL):
+            # assume that all further stages need to be empty
+            for other_pr in pipeline_registers[index_of_own_input_register + 1 : -1]:
+                if not isinstance(other_pr.instruction, EmptyInstruction):
+                    assert pipeline_register.address_of_instruction is not None
+                    flush_signal = FlushSignal(
+                        True, pipeline_register.address_of_instruction
+                    )
+                    break
+            if flush_signal is None:
+                pipeline_register.instruction.behavior(state)
+
         return ExecutePipelineRegister(
+            flush_signal=flush_signal,
             instruction=pipeline_register.instruction,
             alu_in_1=alu_in_1,
             alu_in_2=alu_in_2,
@@ -416,7 +431,6 @@ class SingleStage(Stage):
         CSRRWI,
         CSRRSI,
         CSRRCI,
-        ECALL,
         EBREAK,
         FENCE,
     }
@@ -508,25 +522,11 @@ class SingleStage(Stage):
                 else None
             )
 
-            try:
-                result_pr.memory_write_data = (
-                    result_pr.register_read_data_2
-                    if type(result_pr.instruction) in SingleStage.TYPE_STORE_INSTRUCTION
-                    else None
-                )
-                result_pr.memory_read_data = (
-                    result_pr.instruction.memory_access(
-                        result_pr.memory_address, None, state
-                    )
-                    if type(result_pr.instruction) in SingleStage.TYPE_LOAD_INSTRUCTION
-                    else None
-                )
-            except Exception as e:
-                raise InstructionExecutionException(
-                    address=result_pr.address_of_instruction,
-                    instruction_repr=result_pr.instruction.__repr__(),
-                    error_message=e.__repr__(),
-                )
+            result_pr.memory_write_data = (
+                result_pr.register_read_data_2
+                if type(result_pr.instruction) in SingleStage.TYPE_STORE_INSTRUCTION
+                else None
+            )
 
             result_pr.register_write_data = defaultdict(
                 lambda: None,
@@ -541,6 +541,13 @@ class SingleStage(Stage):
 
             try:
                 result_pr.instruction.behavior(state)
+                result_pr.memory_read_data = (
+                    result_pr.instruction.memory_access(
+                        result_pr.memory_address, None, state, update_statistics=False
+                    )
+                    if type(result_pr.instruction) in SingleStage.TYPE_LOAD_INSTRUCTION
+                    else None
+                )
                 state.program_counter += result_pr.instruction.length
                 if (
                     not type(result_pr.instruction)

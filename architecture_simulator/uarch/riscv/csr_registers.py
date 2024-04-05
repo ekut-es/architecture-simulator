@@ -1,7 +1,7 @@
 import fixedint
 from dataclasses import dataclass
 
-from architecture_simulator.uarch.memory import Memory, AddressingType
+from architecture_simulator.uarch.memory.memory import Memory, AddressingType
 
 
 class CsrRegisterFile(Memory):
@@ -12,34 +12,46 @@ class CsrRegisterFile(Memory):
         self.privilege_level = privilege_level
         self.min_bytes = min_bytes
 
-    def read_byte(self, address: int) -> fixedint.MutableUInt8:
+    def read_byte(
+        self, address: int, update_statistics: bool = False
+    ) -> fixedint.UInt8:
         self.check_for_legal_address(address)
         self.check_privilege_level(address)
         return super().read_byte(address)
 
-    def write_byte(self, address: int, value: fixedint.MutableUInt8):
+    def write_byte(
+        self, address: int, value: fixedint.UInt8, update_statistics: bool = False
+    ):
         self.check_for_legal_address(address)
         self.check_privilege_level(address)
         self.check_read_only(address)
         return super().write_byte(address, value)
 
-    def read_halfword(self, address: int) -> fixedint.MutableUInt16:
+    def read_halfword(
+        self, address: int, update_statistics: bool = False
+    ) -> fixedint.UInt16:
         self.check_for_legal_address(address)
         self.check_privilege_level(address)
         return super().read_halfword(address)
 
-    def write_halfword(self, address: int, value: fixedint.MutableUInt16):
+    def write_halfword(
+        self, address: int, value: fixedint.UInt16, update_statistics: bool = False
+    ):
         self.check_for_legal_address(address)
         self.check_privilege_level(address)
         self.check_read_only(address)
         return super().write_halfword(address, value)
 
-    def read_word(self, address: int) -> fixedint.MutableUInt32:
+    def read_word(
+        self, address: int, update_statistics: bool = False
+    ) -> fixedint.UInt32:
         self.check_for_legal_address(address)
         self.check_privilege_level(address)
         return super().read_word(address)
 
-    def write_word(self, address: int, value: fixedint.MutableUInt32):
+    def write_word(
+        self, address: int, value: fixedint.UInt32, update_statistics: bool = False
+    ):
         self.check_for_legal_address(address)
         self.check_privilege_level(address)
         self.check_read_only(address)

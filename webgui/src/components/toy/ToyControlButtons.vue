@@ -14,6 +14,7 @@ const cantStep = computed(
         simulationStore.isRunning ||
         !simulationStore.hasInstructions ||
         simulationStore.isDone ||
+        simulationStore.error ||
         editorStore.hasUnparsedChanges.value
 );
 

@@ -27,11 +27,11 @@ class RegisterFile:
 
     Args:
         registers:
-            list[fixedint.MutableUInt32] => provided list will be used to init registers, x0 can have any value (test mode). Default: 32 registers with x0 hard wired to zero.
+            list[fixedint.UInt32] => provided list will be used to init registers, x0 can have any value (test mode). Default: 32 registers with x0 hard wired to zero.
     """
 
-    registers: list[fixedint.MutableUInt32] = field(
-        default_factory=lambda: Registers([fixedint.MutableUInt32(0)] * 32)
+    registers: list[fixedint.UInt32] = field(
+        default_factory=lambda: Registers([fixedint.UInt32(0)] * 32)
     )
 
     def reg_repr(self) -> list[tuple[str, str, str, str]]:

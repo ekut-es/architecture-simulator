@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from architecture_simulator.uarch.riscv.riscv_performance_metrics import (
         RiscvPerformanceMetrics,
     )
+    from architecture_simulator.uarch.memory.cache import CacheOptions
 from architecture_simulator.gui.riscv_fiveStage_svg_directives import (
     RiscvFiveStageIFSvgDirectives,
     RiscvFiveStageIDSvgDirectives,
@@ -51,6 +52,8 @@ class RiscvSimulation(Simulation):
         state: Optional[RiscvArchitecturalState] = None,
         mode: str = Settings().get()["default_pipeline_mode"],
         detect_data_hazards: bool = Settings().get()["hazard_detection"],
+        data_cache: CacheOptions = Settings().get()["data_cache"],
+        instruction_cache: CacheOptions = Settings().get()["instruction_cache"],
     ) -> None:
         """Constructor for RISC-V simulations.
 
@@ -61,7 +64,10 @@ class RiscvSimulation(Simulation):
         """
         self.state = (
             RiscvArchitecturalState(
-                pipeline_mode=mode, detect_data_hazards=detect_data_hazards
+                pipeline_mode=mode,
+                detect_data_hazards=detect_data_hazards,
+                data_cache_options=data_cache,
+                instruction_cache_options=instruction_cache,
             )
             if state is None
             else state
@@ -80,9 +86,12 @@ class RiscvSimulation(Simulation):
 
     def run(self):
         self.state.performance_metrics.resume_timer()
-        while not self.state.pipeline.is_done():
+        while not self.is_done():
             self.step()
         self.state.performance_metrics.stop_timer()
+
+    def get_exit_code(self):
+        return self.state.exit_code
 
     def load_program(self, program: str):
         """Loads a text form program into the simulation.
@@ -100,10 +109,13 @@ class RiscvSimulation(Simulation):
         return self.state.pipeline.is_done()
 
     def has_instructions(self) -> bool:
-        return bool(self.state.instruction_memory.instructions)
+        return self.state.instruction_memory.has_instructions()
 
     def get_performance_metrics(self) -> RiscvPerformanceMetrics:
         return self.state.performance_metrics
+
+    def get_output(self) -> str:
+        return self.state.output
 
     def get_register_entries(self) -> list[tuple[str, str, str, str]]:
         """Returns the contents of the register file as bin, udec, hex, sdec values.
@@ -131,9 +143,11 @@ class RiscvSimulation(Simulation):
             (
                 (address, "0x" + "{:08X}".format(address)),
                 instruction,
-                pipeline_stages_addresses[address]
-                if address in pipeline_stages_addresses
-                else "",
+                (
+                    pipeline_stages_addresses[address]
+                    if address in pipeline_stages_addresses
+                    else ""
+                ),
             )
             for address, instruction in self.state.instruction_memory.get_representation()
         ]
@@ -146,6 +160,73 @@ class RiscvSimulation(Simulation):
         for key, values in sorted(memory_repr.items()):
             result.append(((key, "0x" + "{:08X}".format(key)), values))
         return result
+
+    def get_data_cache_entries(self):
+        return self.state.memory.cache_repr()
+
+    def get_data_cache_stats(self):
+        """Returns the stats of the data cache (will be None if no cache is used).
+
+        Returns:
+            dict[str, Optional[str]] | None: The cache stats, plus the last address that was accessed under the key "address".
+        """
+        stats = self.state.memory.get_cache_stats()
+        if stats is None:
+            return None
+
+        address = None
+        if self.state.pipeline_mode == "five_stage_pipeline":
+            pipeline_register = self.state.pipeline.pipeline_registers[3]
+            if isinstance(pipeline_register, MemoryAccessPipelineRegister):
+                # there might be an address even if the instruction doesn't access the memory
+                if (
+                    pipeline_register.control_unit_signals.mem_write
+                    or pipeline_register.control_unit_signals.mem_read
+                ):
+                    address = pipeline_register.memory_address
+        else:
+            pipeline_register = self.state.pipeline.pipeline_registers[0]
+            if isinstance(pipeline_register, SingleStagePipelineRegister):
+                address = pipeline_register.memory_address
+
+        if address is not None:
+            address = "{:032b}".format(address % (2**32))  # address might be negative
+
+        stats = self.state.memory.get_cache_stats()
+        stats["address"] = address
+        return stats
+
+    def get_instruction_cache_entries(self):
+        """Returns the instruction cache entries as a dict (deeply converted).
+
+        Returns:
+            dict[str, Any]: The instruction cache entries as dict.
+        """
+        return self.state.instruction_memory.cache_repr()
+
+    def get_instruction_cache_stats(self):
+        """Returns the stats of the instruction cache (will be None if no cache is used).
+
+        Returns:
+            dict[str, Optional[str]] | None: The cache stats, plus the last address that was accessed under the key "address".
+        """
+        stats = self.state.instruction_memory.get_cache_stats()
+        if stats is None:
+            return None
+
+        pipeline_register = self.state.pipeline.pipeline_registers[0]
+        if isinstance(
+            pipeline_register, InstructionFetchPipelineRegister
+        ) or isinstance(pipeline_register, SingleStagePipelineRegister):
+            address = pipeline_register.address_of_instruction
+            if address is not None:
+                address = "{:032b}".format(
+                    address % (2**32)
+                )  # address shouldn't be negative, but lets check anyway
+        else:
+            address = None
+        stats["address"] = address
+        return stats
 
     def get_riscv_five_stage_svg_update_values(self) -> list[tuple[str, str, Any]]:
         """Returns all information needed to update the svg.
@@ -268,7 +349,21 @@ class RiscvSimulation(Simulation):
             result.DecodeInstructionMemory.do_highlight = bool(
                 result.DecodeLowerFetchPCOutText.text
             )
-
+            result.ControlUnitLeftRight1_1.do_highlight = bool(
+                pipeline_register.control_unit_signals.jump
+            )
+            result.ControlUnitLeftRight2_1.do_highlight = bool(
+                pipeline_register.control_unit_signals.wb_src
+            )
+            result.ControlUnitLeftRight3_1.do_highlight = bool(
+                pipeline_register.control_unit_signals.alu_src_1
+            )
+            result.ControlUnitLeftRight4_1.do_highlight = bool(
+                pipeline_register.control_unit_signals.alu_src_2
+            )
+            result.ControlUnitLeft_1.do_highlight = bool(
+                pipeline_register.control_unit_signals.alu_to_pc
+            )
         return result.export()
 
     def _get_riscv_five_stage_EX_svg_update_values(self) -> list[tuple[str, str, Any]]:
@@ -336,11 +431,20 @@ class RiscvSimulation(Simulation):
 
             result.ALUComparison.do_highlight = bool(pipeline_register.comparison)
 
-            result.ControlUnitLeftRight3.do_highlight = bool(
+            result.ControlUnitLeftRight1_2.do_highlight = bool(
+                pipeline_register.control_unit_signals.jump
+            )
+            result.ControlUnitLeftRight2_2.do_highlight = bool(
+                pipeline_register.control_unit_signals.wb_src
+            )
+            result.ControlUnitLeftRight3_2.do_highlight = bool(
                 pipeline_register.control_unit_signals.alu_src_1
             )
-            result.ControlUnitLeftRight4.do_highlight = bool(
+            result.ControlUnitLeftRight4_2.do_highlight = bool(
                 pipeline_register.control_unit_signals.alu_src_2
+            )
+            result.ControlUnitLeft_2.do_highlight = bool(
+                pipeline_register.control_unit_signals.alu_to_pc
             )
 
             result.AluControl.do_highlight = bool(
@@ -416,11 +520,13 @@ class RiscvSimulation(Simulation):
             result.MemoryImmGenText.text = save_to_str(pipeline_register.imm)
             result.MemoryImmGen.do_highlight = bool(result.MemoryImmGenText.text)
 
-            result.ControlUnitLeftRight.do_highlight = bool(
+            result.ControlUnitLeftRight1_3.do_highlight = bool(
                 pipeline_register.control_unit_signals.jump
             )
-
-            result.ControlUnitLeft.do_highlight = bool(
+            result.ControlUnitLeftRight2_3.do_highlight = bool(
+                pipeline_register.control_unit_signals.wb_src
+            )
+            result.ControlUnitLeft_3.do_highlight = bool(
                 pipeline_register.control_unit_signals.alu_to_pc
             )
 
@@ -475,7 +581,9 @@ class RiscvSimulation(Simulation):
             result.wbsrc.text = save_to_str(
                 pipeline_register.control_unit_signals.wb_src
             )
-            result.ControlUnitLeftRight2.do_highlight = bool(result.wbsrc.text)
+            result.ControlUnitLeftRight2_4.do_highlight = bool(
+                pipeline_register.control_unit_signals.wb_src
+            )
         return result.export()
 
     def _get_riscv_five_stage_OTHER_svg_update_values(

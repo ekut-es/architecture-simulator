@@ -2,24 +2,22 @@
 <script setup>
 import ToyElementToggle from "./ToyElementToggle.vue";
 import ToyControlButtons from "./ToyControlButtons.vue";
+import ToyVisToggle from "./ToyVisToggle.vue";
 </script>
 
 <template>
-    <nav id="nav-bar" class="container-fluid py-1">
-        <div class="row">
-            <ToyControlButtons class="col" />
-            <ToyElementToggle class="col" />
-            <div class="d-flex justify-content-end col">
-                <button
-                    class="archsim-icon-button settings-button"
-                    title="settings"
-                    data-bs-toggle="modal"
-                    data-bs-target="#settings-modal"
-                >
-                    <i class="bi bi-gear-fill"></i>
-                </button>
-            </div>
-        </div>
+    <nav id="nav-bar" class="py-1 px-2">
+        <ToyControlButtons />
+        <ToyElementToggle class="ms-3" />
+        <ToyVisToggle class="ms-auto me-3" />
+        <button
+            class="archsim-icon-button settings-button"
+            title="settings"
+            data-bs-toggle="modal"
+            data-bs-target="#settings-modal"
+        >
+            <i class="bi bi-gear-fill"></i>
+        </button>
     </nav>
 </template>
 
@@ -28,7 +26,9 @@ import ToyControlButtons from "./ToyControlButtons.vue";
     font-size: 1.5rem;
 }
 
-nav {
+#nav-bar {
     background-color: var(--bs-secondary-bg);
+    display: flex;
+    justify-content: space-between;
 }
 </style>

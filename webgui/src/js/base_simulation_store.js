@@ -104,7 +104,7 @@ export class BaseSimulationStore {
          * @returns {bool} Whether to stop. Else the step loop shall be called again.
          */
         let stopCondition = () => {
-            return this.simulation.is_done() || this.doPause;
+            return this.simulation.is_done() || this.doPause || this.error;
         };
 
         /**
@@ -113,23 +113,18 @@ export class BaseSimulationStore {
          */
         let stepLoop = () => {
             setTimeout(() => {
-                try {
-                    for (let i = 0; i < 1000; i++) {
-                        this.stepSimulation();
-                    }
-                    if (!stopCondition()) {
-                        this.syncAll();
-                        stepLoop();
-                    } else {
-                        this.stopPerformanceTimer();
-                        this.doPause = false;
-                        this.isRunning = false;
-                        this.syncAll();
-                    }
-                } catch (error) {
-                    this.stopPerformanceTimer();
+                for (let i = 0; i < 1000; i++) {
+                    this.stepSimulation();
+                    if (this.error) break; // faster stop on error
+                }
+                if (!stopCondition()) {
                     this.syncAll();
-                    this.updateLastPythonError();
+                    stepLoop();
+                } else {
+                    this.stopPerformanceTimer();
+                    this.doPause = false;
+                    this.isRunning = false;
+                    this.syncAll();
                 }
             }, 25);
         };
@@ -197,6 +192,9 @@ export class BaseSimulationStore {
      * @returns {any} The converted proxy.
      */
     toJsSafe(proxy) {
+        if (proxy === null || typeof proxy === "undefined") {
+            return null;
+        }
         let pyproxies = [];
         const convertedProxy = proxy.toJs({ pyproxies });
         for (let px of pyproxies) {

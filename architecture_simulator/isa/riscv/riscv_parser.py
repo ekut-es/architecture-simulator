@@ -45,7 +45,17 @@ class RiscvParser(Parser):
         "sra",
         "or",
         "and",
+        "mul",
+        "mulh",
+        "mulhu",
+        "mulhsu",
+        "div",
+        "divu",
+        "rem",
+        "remu",
     ]
+
+    _reg_reg_mnemonics = ["mv"]
 
     _normal_i_type_mnemonics = [
         "addi",
@@ -128,6 +138,13 @@ class RiscvParser(Parser):
         + _D_COL
         + pp.Group(_DOT + pp.Literal("string")("type"))("type")
         + pp.quoted_string("string")
+    )
+
+    _pattern_zero_initialization = pp.Group(
+        _pattern_label("name")
+        + _D_COL
+        + pp.Group(_DOT + pp.Literal("zero")("type"))("type")
+        + pp.Word(pp.nums)("value")
     )
 
     # R-Types
@@ -257,6 +274,14 @@ class RiscvParser(Parser):
         + _pattern_imm("imm")
     )
 
+    # mnemonic rd, rs pseudoinstructions
+    _pattern_reg_reg_instruction = pp.Group(
+        pp.oneOf(_reg_reg_mnemonics, caseless=True)("mnemonic")
+        + _pattern_register("rd")
+        + _COMMA
+        + _pattern_register("rs")
+    )
+
     _pattern_instruction = pp.Optional(_pattern_label + _D_COL)("in_line_label") + (
         _pattern_r_type_instruction
         ^ _pattern_u_type_instruction
@@ -272,6 +297,7 @@ class RiscvParser(Parser):
         ^ _pattern_ecall_ebreak_instruction
         ^ _pattern_nop_instruction
         ^ _pattern_li_instruction
+        ^ _pattern_reg_reg_instruction
     )("instruction")
 
     _pattern_line = (
@@ -279,6 +305,7 @@ class RiscvParser(Parser):
             _pattern_directive
             ^ _pattern_variable_declaration("variable_declaration")
             ^ _pattern_string_declaration("variable_declaration")
+            ^ _pattern_zero_initialization("variable_declaration")
             ^ _pattern_instruction
             ^ (_pattern_label + _D_COL)("label_declaration")
         )
@@ -295,7 +322,7 @@ class RiscvParser(Parser):
         self.state: RiscvArchitecturalState = state
         self.program = program
         self.start_address = (
-            state.instruction_memory.address_range.start
+            state.instruction_memory.get_address_range().start
             if not "start_address" in kwargs
             else kwargs["start_address"]
         )
@@ -331,7 +358,11 @@ class RiscvParser(Parser):
 
         # variables are stored as (name: (address, byte_length))
         self.variables: dict[str, tuple[int, int]] = {}
-        address_counter = self.state.memory.address_range.start
+        address_counter = self.state.memory.get_address_range().start
+
+        # ensure address_counter is word alinged
+        if address_counter % 4 != 0:
+            address_counter += 4 - (address_counter % 4)
 
         for line_number, line, line_parsed in self.data:
             if isinstance(line_parsed, str) or (
@@ -343,13 +374,20 @@ class RiscvParser(Parser):
                     raise ParserDataDuplicateException(
                         name=line_parsed.name, line_number=line_number, line=line
                     )
+
+                # ensure address_counter is word alinged
+                if address_counter % 4 != 0:
+                    address_counter += 4 - (address_counter % 4)
+
                 if line_parsed.type.type == "byte":
                     self.variables.update(
                         {line_parsed.get("name"): (address_counter, 1)}
                     )
                     for val in line_parsed.get("values"):
                         self.state.memory.write_byte(
-                            address_counter, fixedint.MutableUInt8(int(val, base=0))
+                            address_counter,
+                            fixedint.UInt8(int(val, base=0)),
+                            directly_write_to_lower_memory=True,
                         )
                         address_counter += 1
                 elif line_parsed.type.type == "half":
@@ -358,7 +396,9 @@ class RiscvParser(Parser):
                     )
                     for val in line_parsed.get("values"):
                         self.state.memory.write_halfword(
-                            address_counter, fixedint.MutableUInt16(int(val, base=0))
+                            address_counter,
+                            fixedint.UInt16(int(val, base=0)),
+                            directly_write_to_lower_memory=True,
                         )
                         address_counter += 2
                 elif line_parsed.type.type == "word":
@@ -367,7 +407,9 @@ class RiscvParser(Parser):
                     )
                     for val in line_parsed.get("values"):
                         self.state.memory.write_word(
-                            address_counter, fixedint.MutableUInt32(int(val, base=0))
+                            address_counter,
+                            fixedint.UInt32(int(val, base=0)),
+                            directly_write_to_lower_memory=True,
                         )
                         address_counter += 4
                 # strings are saved as byte arrays
@@ -377,14 +419,24 @@ class RiscvParser(Parser):
                     )
                     for char in line_parsed.string[1:-1]:
                         self.state.memory.write_byte(
-                            address_counter, fixedint.MutableUInt8(ord(char))
+                            address_counter,
+                            fixedint.UInt8(ord(char)),
+                            directly_write_to_lower_memory=True,
                         )
                         address_counter += 1
                     # write null terminator
                     self.state.memory.write_byte(
-                        address_counter, fixedint.MutableUInt8(0)
+                        address_counter,
+                        fixedint.UInt8(0),
+                        directly_write_to_lower_memory=True,
                     )
                     address_counter += 1
+                elif line_parsed.type.type == "zero":
+                    num_words = int(line_parsed.get("value"))
+                    self.variables.update(
+                        {line_parsed.get("name"): (address_counter, 4 * num_words)}
+                    )
+                    address_counter += 4 * num_words
 
     def _process_pseudo_instructions(self) -> None:
         """Converts pseudo instructions in self.text into regular instructions, and variables into addresses."""
@@ -409,9 +461,9 @@ class RiscvParser(Parser):
                         else "x" + line_parsed.rd[0][1]
                     )
                     imm = int(line_parsed.imm, base=0)
-                    lui_imm = int(fixedint.MutableUInt32(imm)) >> 12
+                    lui_imm = int(fixedint.UInt32(imm)) >> 12
                     # get the 12 first bits
-                    addi_imm = int(fixedint.MutableUInt32(imm)) & 0xFFF
+                    addi_imm = int(fixedint.UInt32(imm)) & 0xFFF
                     # compensate addi sign extension
                     if addi_imm > 2047 or addi_imm < -2048:
                         lui_imm += 1
@@ -469,9 +521,9 @@ class RiscvParser(Parser):
                         address = (
                             self.variables[line_parsed.variable.name][0] + array_index
                         )
-                        lui_imm = int(fixedint.MutableUInt32(address)) >> 12
+                        lui_imm = int(fixedint.UInt32(address)) >> 12
                         # get the 12 first bits
-                        addi_imm = int(fixedint.MutableUInt32(address)) & 0xFFF
+                        addi_imm = int(fixedint.UInt32(address)) & 0xFFF
                         # compensate addi sign extension
                         if addi_imm > 2047 or addi_imm < -2048:
                             lui_imm += 1
@@ -531,9 +583,9 @@ class RiscvParser(Parser):
                     )
                     # address with array offset
                     address = self.variables[line_parsed.variable.name][0] + array_index
-                    lui_imm = int(fixedint.MutableUInt32(address)) >> 12
+                    lui_imm = int(fixedint.UInt32(address)) >> 12
                     # get the 12 first bits
-                    addi_imm = int(fixedint.MutableUInt32(address)) & 0xFFF
+                    addi_imm = int(fixedint.UInt32(address)) & 0xFFF
                     # compensate addi sign extension
                     if addi_imm > 2047 or addi_imm < -2048:
                         lui_imm += 1
@@ -565,6 +617,24 @@ class RiscvParser(Parser):
                                 f"{mnemonic} {register_name}, 0({address_register_name})"
                             )[0],
                         ),
+                    )
+                elif mnemonic == "mv":
+                    register_name_rd = (
+                        line_parsed.rd[0]
+                        if type(line_parsed.rd[0]) == str
+                        else "x" + line_parsed.rd[0][1]
+                    )
+                    register_name_rs = (
+                        line_parsed.rs[0]
+                        if type(line_parsed.rs[0]) == str
+                        else "x" + line_parsed.rs[0][1]
+                    )
+                    self.text[index] = (
+                        line_number,
+                        line,
+                        self._pattern_line.parse_string(
+                            f"addi {register_name_rd}, {register_name_rs}, 0"
+                        )[0],
                     )
 
     def _process_labels(self) -> None:

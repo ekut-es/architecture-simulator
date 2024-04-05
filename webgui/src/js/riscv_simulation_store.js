@@ -39,7 +39,9 @@ export class RiscvSimulationStore extends BaseSimulationStore {
         super(pyodide, () =>
             getRiscvSimulation(
                 riscvSettings.pipelineMode.value,
-                riscvSettings.dataHazardDetection.value
+                riscvSettings.dataHazardDetection.value,
+                riscvSettings.dataCache.value,
+                riscvSettings.instructionCache.value
             )
         );
         this.registerEntries = [];
@@ -51,7 +53,55 @@ export class RiscvSimulationStore extends BaseSimulationStore {
         this.previousDataMemoryEntries = [];
         this.instructionMemoryEntries = [];
         this.svgDirectives = [];
+        this.instructionCacheEntries = null;
+        this.instructionCacheStats = null;
+        this.dataCacheEntries = null;
+        this.dataCacheStats = null;
+        this.output = "";
+        this.exitCode = null;
     }
+
+    syncExitCode() {
+        this.exitCode = this.simulation.get_exit_code();
+    }
+
+    syncOutput() {
+        this.output = this.simulation.get_output(); // strings are immutable so there are no proxies
+    }
+
+    /**
+     * Syncs the instruction cache entries and stats.
+     *
+     * Entries are kept as proxy because syncing them could take a lot of time.
+     */
+    syncInstructionCache() {
+        const temp = this.instructionCacheEntries;
+        this.instructionCacheEntries =
+            this.simulation.get_instruction_cache_entries();
+        if (typeof temp !== "undefined" && temp !== null) {
+            temp.destroy();
+        }
+        this.instructionCacheStats = this.toJsSafe(
+            this.simulation.get_instruction_cache_stats()
+        );
+    }
+
+    /**
+     * Syncs the data cache entries and stats.
+     *
+     * Entries are kept as proxy because syncing them could take a lot of time.
+     */
+    syncDataCache() {
+        const temp = this.dataCacheEntries;
+        this.dataCacheEntries = this.simulation.get_data_cache_entries();
+        if (typeof temp !== "undefined" && temp !== null) {
+            temp.destroy();
+        }
+        this.dataCacheStats = this.toJsSafe(
+            this.simulation.get_data_cache_stats()
+        );
+    }
+
     /**
      * Syncs the memory table entries.
      * Also keeps track of which entries have changed.
@@ -125,6 +175,10 @@ export class RiscvSimulationStore extends BaseSimulationStore {
         this.syncDataMemoryEntries();
         this.syncInstructionMemoryEntries();
         this.syncSvgDirectives();
+        this.syncInstructionCache();
+        this.syncDataCache();
+        this.syncOutput();
+        this.syncExitCode();
         super.syncAll();
     }
 }

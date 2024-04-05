@@ -57,6 +57,11 @@ class RiscvFiveStageIDSvgDirectives(RiscvSvgDirectivesBase):
         self.DecodeUpperFetchPCOut = SvgFillDirectiveBlue()
         self.DecodeLowerFetchPCOut = SvgFillDirectiveBlue()
         self.DecodeInstructionMemory = SvgFillDirectiveBlue()
+        self.ControlUnitLeftRight1_1 = SvgFillDirectiveGreen()
+        self.ControlUnitLeftRight2_1 = SvgFillDirectiveBlue()
+        self.ControlUnitLeftRight3_1 = SvgFillDirectiveGreen()
+        self.ControlUnitLeftRight4_1 = SvgFillDirectiveGreen()
+        self.ControlUnitLeft_1 = SvgFillDirectiveGreen()
 
 
 class RiscvFiveStageEXSvgDirectives(RiscvSvgDirectivesBase):
@@ -84,8 +89,11 @@ class RiscvFiveStageEXSvgDirectives(RiscvSvgDirectivesBase):
         self.ExecuteUpperFetchPCOut = SvgFillDirectiveBlue()
         self.ExecuteLowerFetchPCOut = SvgFillDirectiveBlue()
         self.ALUComparison = SvgFillDirectiveGreen()
-        self.ControlUnitLeftRight3 = SvgFillDirectiveGreen()
-        self.ControlUnitLeftRight4 = SvgFillDirectiveGreen()
+        self.ControlUnitLeftRight1_2 = SvgFillDirectiveGreen()
+        self.ControlUnitLeftRight2_2 = SvgFillDirectiveBlue()
+        self.ControlUnitLeftRight3_2 = SvgFillDirectiveGreen()
+        self.ControlUnitLeftRight4_2 = SvgFillDirectiveGreen()
+        self.ControlUnitLeft_2 = SvgFillDirectiveGreen()
         self.AluControl = SvgFillDirectiveBlue()
 
 
@@ -110,8 +118,9 @@ class RiscvFiveStageMEMSvgDirectives(RiscvSvgDirectivesBase):
         self.MemoryFetchAddOut = SvgFillDirectiveBlue()
         self.MemoryImmGenText = SvgWriteCenterDirective()
         self.MemoryImmGen = SvgFillDirectiveBlue()
-        self.ControlUnitLeftRight = SvgFillDirectiveGreen()
-        self.ControlUnitLeft = SvgFillDirectiveGreen()
+        self.ControlUnitLeftRight1_3 = SvgFillDirectiveGreen()
+        self.ControlUnitLeftRight2_3 = SvgFillDirectiveBlue()
+        self.ControlUnitLeft_3 = SvgFillDirectiveGreen()
 
 
 class RiscvFiveStageWBSvgDirectives(RiscvSvgDirectivesBase):
@@ -130,7 +139,7 @@ class RiscvFiveStageWBSvgDirectives(RiscvSvgDirectivesBase):
         self.WriteBackImmGenText = SvgWriteCenterDirective()
         self.WriteBackImmGen = SvgFillDirectiveBlue()
         self.wbsrc = SvgWriteCenterDirective()
-        self.ControlUnitLeftRight2 = SvgFillDirectiveBlue()
+        self.ControlUnitLeftRight2_4 = SvgFillDirectiveBlue()
 
 
 class RiscvFiveStageOTHERSvgDirectives(RiscvSvgDirectivesBase):
