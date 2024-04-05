@@ -3,7 +3,7 @@
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { Tooltip } from "bootstrap";
 
-const props = defineProps(["message", "iconName"]);
+const props = defineProps(["message", "iconName", "options"]);
 
 // dynamically change the content of the tooltip
 watch(
@@ -18,7 +18,13 @@ const initialMessage = props.message;
 const tooltipElement = ref(null);
 let tooltipObject = null;
 onMounted(() => {
-    tooltipObject = new Tooltip(tooltipElement.value);
+    let options = {
+        trigger: "hover click focus",
+    };
+    if (props.options) {
+        options = { ...options, ...props.options };
+    }
+    tooltipObject = new Tooltip(tooltipElement.value, options);
 });
 
 onBeforeUnmount(() => {
@@ -30,8 +36,6 @@ onBeforeUnmount(() => {
     <span
         ref="tooltipElement"
         data-bs-toggle="tooltip"
-        data-bs-trigger="hover click focus"
-        data-bs-animation="false"
         :data-bs-title="initialMessage"
     >
         <i :class="'bi ' + props.iconName"></i>

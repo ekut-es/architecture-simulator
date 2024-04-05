@@ -6,6 +6,13 @@ import IconTooltip from "./IconTooltip.vue";
 
 const props = defineProps(["simulationStore", "additionalMessageGetter"]);
 
+const options = {
+    animation: false, // prevents flickering when updating the content
+    placement: "bottom",
+    fallbackPlacements: ["bottom"],
+    customClass: "archsim-performance-metrics-tooltip",
+};
+
 let output = computed(() => {
     let message = props.simulationStore.performanceMetricsStr;
     if (typeof props.additionalMessageGetter !== "undefined") {
@@ -16,10 +23,5 @@ let output = computed(() => {
 </script>
 
 <template>
-    <IconTooltip
-        data-bs-custom-class="archsim-performance-metrics-tooltip"
-        data-bs-placement="bottom"
-        :message="output"
-        icon-name="bi-speedometer"
-    />
+    <IconTooltip :options :message="output" icon-name="bi-speedometer" />
 </template>
