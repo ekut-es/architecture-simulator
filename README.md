@@ -12,10 +12,11 @@ The original implementation was developed as part of the team project course in 
 - Structure diagrams of the processor that show current signals and values
 - Help page containing information about all supported instructions and special assembly syntax (like labels and pseudo instructions)
 - Support for data section to preload values into the memory
+- L1 data and instruction cache simulation and visualization for RISC-V
 - The default ISA can be selected with the GET parameter `isa` which can be one of `riscv` or `toy`.
 
 ## Supported Architectures
-  - RISC-V RV32I ISA
+  - RISC-V RV32IM ISA
     - Single cycle execution
     - 5-staged pipeline with hazard detection
   - Simple toy architecture, based on *Microcoded vs. hard-wired control* by Philip Koopman, 1997.
@@ -70,13 +71,13 @@ Use the script `build.sh` to build the packages.
 
 #### GUI dev environment
 
-Use the script `build.sh` to build the python package and start a development server.
+We use the js framework Vue.js with Vite as build tool. Use the script `build.sh` to build the python package and start a development server.
 
 ```
 ./build.sh dev
 ```
 
-Additionally you can use the *Debugger for Firefox* Extension and start a session with the given vscode launch configuration.
+For debugging we recommend using chrome/chromium. You can use the given vscode launch configuration.
 
 ## Branch Naming Convention
 

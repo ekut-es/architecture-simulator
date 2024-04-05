@@ -19,7 +19,7 @@ export const riscvSettings = {
         associativity: 4,
         miss_penalty: 0,
         replacement_strategy: "lru",
-        cache_type: "wt",
+        cache_type: "wb",
         showPlruTree: ref(true), // not needed for python but for the gui
     }),
     instructionCache: ref({

@@ -5,36 +5,7 @@ import RiscvRegisterTable from "./RiscvRegisterTable.vue";
 import { useRiscvSimulationStore } from "@/js/riscv_simulation_store";
 
 const simulationStore = useRiscvSimulationStore();
-const additionalMessageGetter = () => {
-    let messages = [];
-    if (simulationStore.dataCacheStats !== null) {
-        const hits = simulationStore.dataCacheStats.get("hits");
-        const misses = simulationStore.dataCacheStats.get("accesses") - hits;
-        messages.push(
-            `Data Cache Hits: ${hits}`,
-            `Data Cache Misses: ${misses}`
-        );
-    }
-    if (simulationStore.instructionCacheStats !== null) {
-        const hits = simulationStore.instructionCacheStats.get("hits");
-        const misses =
-            simulationStore.instructionCacheStats.get("accesses") - hits;
-        messages.push(
-            `Instruction Cache Hits: ${hits}`,
-            `Instruction Cache Misses: ${misses}`
-        );
-    }
-    messages.push(simulationStore.output);
-    if (
-        typeof simulationStore.exitCode !== "undefined" &&
-        simulationStore.exitCode !== null
-    ) {
-        messages.push(
-            `The simulation has finished with code ${simulationStore.exitCode}.`
-        );
-    }
-    return messages;
-};
+const additionalMessageGetter = () => simulationStore.output;
 </script>
 
 <template>
