@@ -93,4 +93,26 @@ ecall
         )
         simulation.run()
         self.assertEqual(simulation.get_output(), "Kaesekuchen ist toll.")
-        self.assertEqual(simulation.get_performance_metrics().cycles, 13)
+        self.assertEqual(simulation.get_performance_metrics().cycles, 12)
+
+    def test_five_stage_ecalls_2(self):
+        simulation = RiscvSimulation(mode="five_stage_pipeline")
+        simulation.load_program(
+            """
+.data
+    kaesekuchen: .string "Kaesekuchen ist toll."
+.text
+la a0, kaesekuchen
+li a7, 2
+beq zero, zero, label
+nop
+nop
+nop
+label:
+add a7, a7, a7
+ecall
+"""
+        )
+        simulation.run()
+        self.assertEqual(simulation.get_output(), "Kaesekuchen ist toll.")
+        # NOTE: This works, because the ecall reads the register values directly and not out of the pipeline registers

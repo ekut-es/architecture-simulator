@@ -45,7 +45,7 @@ class Pipeline:
         # if != None: [stage to cause stall, remaining duration]
         self.stalled: list[int] | None = None
         # holds the old content of the first stage, since the first stage must not be rerun
-        self.stalled_pipeline_reg: PipelineRegister | None = None
+        self.stalled_pipeline_regs: list[PipelineRegister] | None = None
 
     def step(self):
         """the pipeline step method, this is the central part of the pipeline! Every time it is called, it does one
@@ -60,20 +60,8 @@ class Pipeline:
                         next_pipeline_registers[0] = self.pipeline_registers[0]
                         continue
                     elif (
-                        index == 1
-                    ):  # second stage must get the old content of the pipelineregister of the first stage when stalling
-                        tmp = self.pipeline_registers[0]
-                        self.pipeline_registers[0] = self.stalled_pipeline_reg
-                        next_pipeline_registers[index] = self.stages[index].behavior(
-                            pipeline_registers=self.pipeline_registers,
-                            index_of_own_input_register=(index - 1),
-                            state=self.state,
-                        )
-                        self.pipeline_registers[0] = tmp
-                        continue
-                    elif (
                         index == self.stalled[0] + 1
-                    ):  # first stage after the stalled stages must get and empty PipelineRegister while stalling
+                    ):  # first stage after the stalled stages must get an empty PipelineRegister while stalling
                         tmp = self.pipeline_registers[self.stalled[0]]
                         self.pipeline_registers[self.stalled[0]] = PipelineRegister()
                         next_pipeline_registers[index] = self.stages[index].behavior(
@@ -82,6 +70,20 @@ class Pipeline:
                             state=self.state,
                         )
                         self.pipeline_registers[self.stalled[0]] = tmp
+                        continue
+                    elif (
+                        index <= self.stalled[0]
+                    ):  # Other stalled stages should get the old PipelineRegister values NOTE: This is fine, because the only instruction that stalls in EX is ecall and ecall does not get it´s register values from the previous PipelineRegister
+                        tmp = self.pipeline_registers[index - 1]
+                        self.pipeline_registers[index - 1] = self.stalled_pipeline_regs[
+                            index - 1
+                        ]
+                        next_pipeline_registers[index] = self.stages[index].behavior(
+                            pipeline_registers=self.pipeline_registers,
+                            index_of_own_input_register=(index - 1),
+                            state=self.state,
+                        )
+                        self.pipeline_registers[index - 1] = tmp
                         continue
                 next_pipeline_registers[index] = self.stages[index].behavior(
                     pipeline_registers=self.pipeline_registers,
@@ -116,8 +118,11 @@ class Pipeline:
                 break
 
         # Keep the old value of the first pipeline register
-        if self.stalled and self.stalled_pipeline_reg is None:
-            self.stalled_pipeline_reg = self.pipeline_registers[0]
+        if self.stalled and self.stalled_pipeline_regs is None:
+            self.stalled_pipeline_regs = self.pipeline_registers[: self.stalled[0]]
+
+            for reg in self.stalled_pipeline_regs:
+                reg.is_of_stalled_value = True
 
         self.pipeline_registers = next_pipeline_registers
 
@@ -126,7 +131,7 @@ class Pipeline:
             self.stalled[1] -= 1
             if self.stalled[1] == 0:
                 self.stalled = None
-                self.stalled_pipeline_reg = None
+                self.stalled_pipeline_regs = None
 
         # if one of the stages wants to flush, do so (starting from the back makes sense)
         for index, pipeline_register in reversed(
@@ -146,7 +151,7 @@ class Pipeline:
                 # Unstall stages that have been flushed
                 if self.stalled is not None and self.stalled[0] < num_to_flush:
                     self.stalled = None
-                    self.stalled_pipeline_reg = None
+                    self.stalled_pipeline_regs = None
 
                 break  # break since we don't care about the previous stages
 

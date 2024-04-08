@@ -22,6 +22,9 @@ class PipelineRegister:
     stall_signal: Optional[StallSignal] = None
     abbreviation = "Single"
 
+    # True, if the register is being separately preserved by the pipeline for stalling
+    is_of_stalled_value: bool = False
+
 
 @dataclass
 class InstructionFetchPipelineRegister(PipelineRegister):
