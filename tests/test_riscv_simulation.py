@@ -269,7 +269,8 @@ class TestRiscvSimulation(unittest.TestCase):
         """
         simulation.load_program(program=programm)
         simulation.run()
-        self.assertEqual(simulation.state.performance_metrics.flushes, 2)
+        self.assertEqual(simulation.state.performance_metrics.flushes, 1)
+        self.assertEqual(simulation.state.performance_metrics.stalls, 1)
         self.assertEqual(simulation.state.performance_metrics.cycles, 12)
 
     def test_off_by_one_fix(self):
@@ -332,7 +333,8 @@ class TestRiscvSimulation(unittest.TestCase):
         self.assertEqual(simulation.state.register_file.registers[3], 160)
         self.assertEqual(simulation.state.performance_metrics.instruction_count, 32)
         self.assertEqual(simulation.state.performance_metrics.branch_count, 9)
-        self.assertEqual(simulation.state.performance_metrics.flushes, 20)
+        self.assertEqual(simulation.state.performance_metrics.flushes, 9)
+        self.assertEqual(simulation.state.performance_metrics.stalls, 11)
 
     def test_has_started(self):
         sim = RiscvSimulation()
