@@ -7,7 +7,7 @@ from architecture_simulator.isa.riscv.instruction_types import EmptyInstruction
 
 if TYPE_CHECKING:
     from architecture_simulator.isa.riscv.instruction_types import RiscvInstruction
-    from .stages import FlushSignal
+    from .stages import FlushSignal, StallSignal
 
 
 @dataclass
@@ -19,6 +19,7 @@ class PipelineRegister:
     instruction: RiscvInstruction = field(default_factory=EmptyInstruction)
     address_of_instruction: Optional[int] = None
     flush_signal: Optional[FlushSignal] = None
+    stall_signal: Optional[StallSignal] = None
     abbreviation = "Single"
 
 

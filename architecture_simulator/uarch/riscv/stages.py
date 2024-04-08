@@ -153,7 +153,7 @@ class InstructionDecodeStage(Stage):
         write_register = pipeline_register.instruction.get_write_register()
 
         # Data Hazard Detection
-        flush_signal = None
+        stall_signal = None
         if self.detect_data_hazards:
             # Put all the write registers of later stages, that are not done ahead of this stage into a list
             write_registers_of_later_stages = [
@@ -168,10 +168,7 @@ class InstructionDecodeStage(Stage):
                     continue
                 if register_read_addr_1 == register or register_read_addr_2 == register:
                     assert pipeline_register.address_of_instruction is not None
-                    flush_signal = FlushSignal(
-                        inclusive=True,
-                        address=pipeline_register.address_of_instruction,
-                    )
+                    stall_signal = StallSignal(2)
                     break
 
         # gets the control unit signals that are generated in the ID stage
@@ -186,7 +183,7 @@ class InstructionDecodeStage(Stage):
             write_register=write_register,
             control_unit_signals=control_unit_signals,
             branch_prediction=pipeline_register.branch_prediction,
-            flush_signal=flush_signal,
+            stall_signal=stall_signal,
             pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
             address_of_instruction=pipeline_register.address_of_instruction,
         )
@@ -571,3 +568,11 @@ class FlushSignal:
     inclusive: bool
     # address to return to
     address: int
+
+
+@dataclass
+class StallSignal:
+    """A signal that this stage and all previous stages should be stalled for a duration of cycles"""
+
+    # how many cycles to stall
+    duration: int

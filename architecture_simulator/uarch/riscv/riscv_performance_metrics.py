@@ -8,6 +8,7 @@ class RiscvPerformanceMetrics(PerformanceMetrics):
     branch_count: int = 0
     procedure_count: int = 0
     flushes: int = 0
+    stalls: int = 0
     cycles: int = 0
 
     def __repr__(self) -> str:
@@ -25,6 +26,7 @@ class RiscvPerformanceMetrics(PerformanceMetrics):
         representation += f"branches: {self.branch_count}\n"
         representation += f"procedures: {self.procedure_count}\n"
         representation += f"cycles: {self.cycles}\n"
+        representation += f"stalls: {self.stalls}\n"
         representation += f"flushes: {self.flushes}\n"
         if not self.instruction_count == 0:
             representation += f"cycles per instruction: {(self.cycles / self.instruction_count):.2f}\n"
