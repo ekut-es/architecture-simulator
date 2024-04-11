@@ -42,9 +42,9 @@ class Pipeline:
             PipelineRegister()
         ] * self.num_stages
 
-        # if != None: [stage to cause stall, remaining duration]
+        # if != None: [index of stage to cause stall, remaining duration of stall]
         self.stalled: list[int] | None = None
-        # holds the old content of the first stage, since the first stage must not be rerun
+        # holds the old contents of pipeline registers that are used as input for stalled stages
         self.stalled_pipeline_regs: list[PipelineRegister] | None = None
 
     def step(self):
@@ -73,7 +73,7 @@ class Pipeline:
                         continue
                     elif (
                         index <= self.stalled[0]
-                    ):  # Other stalled stages should get the old PipelineRegister values NOTE: This is fine, because the only instruction that stalls in EX is ecall and ecall does not get it´s register values from the previous PipelineRegister
+                    ):  # other stalled stages should get the old PipelineRegister values stored in stalled_pipeline_regs
                         tmp = self.pipeline_registers[index - 1]
                         self.pipeline_registers[index - 1] = self.stalled_pipeline_regs[
                             index - 1
@@ -85,11 +85,13 @@ class Pipeline:
                         )
                         self.pipeline_registers[index - 1] = tmp
                         continue
+
                 next_pipeline_registers[index] = self.stages[index].behavior(
                     pipeline_registers=self.pipeline_registers,
                     index_of_own_input_register=(index - 1),
                     state=self.state,
                 )
+
             except Exception as e:
                 if index - 1 >= 0:
                     raise InstructionExecutionException(
@@ -104,7 +106,7 @@ class Pipeline:
                 else:
                     raise
 
-        # Check if a stage has produced a stall signal
+        # Check if a stage has produced a meaningfull stall signal
         for index, pipeline_register in reversed(
             list(enumerate(next_pipeline_registers))
         ):
@@ -117,7 +119,7 @@ class Pipeline:
                 self.state.performance_metrics.stalls += 1
                 break
 
-        # Keep the old value of the first pipeline register
+        # keep PipelineRegister values in stalled_pipeline_regs
         if self.stalled and self.stalled_pipeline_regs is None:
             self.stalled_pipeline_regs = self.pipeline_registers[: self.stalled[0]]
 
