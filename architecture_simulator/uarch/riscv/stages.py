@@ -513,6 +513,15 @@ class SingleStage(Stage):
             result_pr.control_unit_signals.pc_from_alu_res = (
                 result_pr.instruction.mnemonic == "jalr"
             )
+            result_pr.control_unit_signals.reg_write = (
+                five_stage_control_unit_signals.reg_write
+            )
+            result_pr.control_unit_signals.mem_read = (
+                five_stage_control_unit_signals.mem_read
+            )
+            result_pr.control_unit_signals.mem_write = (
+                five_stage_control_unit_signals.mem_write
+            )
 
             (
                 result_pr.register_read_addr_1,

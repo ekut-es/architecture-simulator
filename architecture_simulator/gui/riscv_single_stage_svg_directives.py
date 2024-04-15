@@ -45,6 +45,15 @@ class RiscvSingleStageSvgDirectives:
         self.alu_control_to_read_data_1_mux_path: SvgFillDirectiveGreen = (
             SvgFillDirectiveGreen()
         )
+        self.control_unit_write_data_path: SvgFillDirectiveGreen = (
+            SvgFillDirectiveGreen()
+        )
+        self.control_unit_read_data_path: SvgFillDirectiveGreen = (
+            SvgFillDirectiveGreen()
+        )
+        self.control_unit_to_reg_file_path: SvgFillDirectiveGreen = (
+            SvgFillDirectiveGreen()
+        )
 
         # Non Binary signals
         self.control_unit_to_4mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
@@ -68,7 +77,8 @@ class RiscvSingleStageSvgDirectives:
         self.imm_gen_out_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
         self.imm_gen_to_add_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
         self.imm_gen_to_4mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
-        self.imm_gen_to_2mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.imm_gen_joint_to_2mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.imm_gen_to_joint_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
 
         self.read_data2_to_mem_write_data_path: SvgFillDirectiveBlue = (
             SvgFillDirectiveBlue()
@@ -76,7 +86,10 @@ class RiscvSingleStageSvgDirectives:
         self.read_data_1_mux_to_alu_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
         self.read_data_1_to_2mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
         self.read_data_2_2mux_to_alu_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
-        self.read_data_2_to_2mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.read_data_2_joint_to_2mux_path: SvgFillDirectiveBlue = (
+            SvgFillDirectiveBlue()
+        )
+        self.read_data_2_to_joint_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
 
         self.alu_out_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
         self.alu_out_to_4mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()

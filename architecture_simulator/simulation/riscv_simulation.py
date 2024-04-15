@@ -688,6 +688,15 @@ class RiscvSimulation(Simulation):
         result.alu_control_to_read_data_1_mux_path.do_highlight = (
             p_reg.control_unit_signals.alu_src_1 is not None
         ) and (not p_reg.control_unit_signals.alu_src_1)
+        result.control_unit_write_data_path.do_highlight = bool(
+            p_reg.control_unit_signals.mem_write
+        )
+        result.control_unit_read_data_path.do_highlight = bool(
+            p_reg.control_unit_signals.mem_read
+        )
+        result.control_unit_to_reg_file_path.do_highlight = bool(
+            p_reg.control_unit_signals.reg_write
+        )
 
         # Non Binary signals
 
@@ -729,9 +738,12 @@ class RiscvSimulation(Simulation):
         result.imm_gen_to_4mux_path.do_highlight = (
             p_reg.control_unit_signals.wb_src_int == 3
         )
-        result.imm_gen_to_2mux_path.do_highlight = (
+        result.imm_gen_joint_to_2mux_path.do_highlight = (
             p_reg.control_unit_signals.alu_src_2
-            or result.pc_to_add_imm_path.do_highlight
+        )
+        result.imm_gen_to_joint_path.do_highlight = (
+            result.imm_gen_joint_to_2mux_path.do_highlight
+            or result.imm_gen_to_add_path.do_highlight
         )
 
         result.read_data2_to_mem_write_data_path.do_highlight = bool(
@@ -746,7 +758,11 @@ class RiscvSimulation(Simulation):
         result.read_data_2_2mux_to_alu_path.do_highlight = not (
             p_reg.control_unit_signals.alu_src_2 is None
         )
-        result.read_data_2_to_2mux_path.do_highlight = bool(
+        result.read_data_2_joint_to_2mux_path.do_highlight = bool(
+            result.reg_file_read_data_2_text.text
+            and (not result.alu_control_to_read_data_2mux_path.do_highlight)
+        )
+        result.read_data_2_to_joint_path.do_highlight = bool(
             result.reg_file_read_data_2_text.text
         )
 
