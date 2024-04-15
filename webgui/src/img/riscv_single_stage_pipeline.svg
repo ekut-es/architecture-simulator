@@ -52,7 +52,7 @@
        visible="true" /></sodipodi:namedview><defs
      id="defs2">
      <!--CUSTOM MARKERS START-->
-    <marker
+<marker
    style="overflow:visible"
    id="000000_ArchsimMarker_Dot"
    refX="0"
@@ -69,10 +69,51 @@
      style="fill:#000000;fill-rule:evenodd;stroke:none"
      d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
      sodipodi:nodetypes="sssss"
-     id="path78" /></marker>
+     id="path78" />
+</marker>
+
+<marker
+   style="overflow:visible"
+   id="008000_ArchsimMarker_Dot"
+   refX="0"
+   refY="0"
+   orient="auto"
+   inkscape:stockid="Dot"
+   markerWidth="0.40000001"
+   markerHeight="0.40000001"
+   viewBox="0 0 1 1"
+   inkscape:isstock="true"
+   inkscape:collect="always"
+   preserveAspectRatio="xMidYMid"><path
+     transform="scale(0.5)"
+     style="fill:#008000;fill-rule:evenodd;stroke:none"
+     d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
+     sodipodi:nodetypes="sssss"
+     id="path78" />
+</marker>
+
+<marker
+   style="overflow:visible"
+   id="0000FF_ArchsimMarker_Dot"
+   refX="0"
+   refY="0"
+   orient="auto"
+   inkscape:stockid="Dot"
+   markerWidth="0.40000001"
+   markerHeight="0.40000001"
+   viewBox="0 0 1 1"
+   inkscape:isstock="true"
+   inkscape:collect="always"
+   preserveAspectRatio="xMidYMid"><path
+     transform="scale(0.5)"
+     style="fill:#0000FF;fill-rule:evenodd;stroke:none"
+     d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
+     sodipodi:nodetypes="sssss"
+     id="path78" />
+</marker>
 
 
-        <marker
+<marker
    style="overflow:visible"
    id="000000_ArchsimMarker_Triangle_Reversed"
    refX="0"
@@ -88,10 +129,47 @@
      transform="scale(0.5)"
      style="fill:#000000;fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
      d="M 5.77,0 -2.88,5 V -5 Z"
-     id="path135" /></marker>
+     id="path135" />
+</marker>
 
+<marker
+   style="overflow:visible"
+   id="008000_ArchsimMarker_Triangle_Reversed"
+   refX="0"
+   refY="0"
+   orient="auto-start-reverse"
+   inkscape:stockid="Triangle arrow"
+   markerWidth="0.40000001"
+   markerHeight="0.40000001"
+   viewBox="0 0 1 1"
+   inkscape:isstock="true"
+   inkscape:collect="always"
+   preserveAspectRatio="xMidYMid"><path
+     transform="scale(0.5)"
+     style="fill:#008000;fill-rule:evenodd;stroke:#008000;stroke-width:1pt"
+     d="M 5.77,0 -2.88,5 V -5 Z"
+     id="path135" />
+</marker>
 
-         <!--CUSTOM MARKERS END-->
+<marker
+   style="overflow:visible"
+   id="0000FF_ArchsimMarker_Triangle_Reversed"
+   refX="0"
+   refY="0"
+   orient="auto-start-reverse"
+   inkscape:stockid="Triangle arrow"
+   markerWidth="0.40000001"
+   markerHeight="0.40000001"
+   viewBox="0 0 1 1"
+   inkscape:isstock="true"
+   inkscape:collect="always"
+   preserveAspectRatio="xMidYMid"><path
+     transform="scale(0.5)"
+     style="fill:#0000FF;fill-rule:evenodd;stroke:#0000FF;stroke-width:1pt"
+     d="M 5.77,0 -2.88,5 V -5 Z"
+     id="path135" />
+</marker>
+<!--CUSTOM MARKERS END-->
          <rect
    x="1741.604"
    y="2720.947"
@@ -112,39 +190,7 @@
    inkscape:swatch="solid"><stop
      style="stop-color:#000000;stop-opacity:1;"
      offset="0"
-     id="stop2455" /></linearGradient><marker
-   style="overflow:visible"
-   id="000000_ArchsimMarker_Triangle_Reversed-3"
-   refX="0"
-   refY="0"
-   orient="auto-start-reverse"
-   inkscape:stockid="Triangle arrow"
-   markerWidth="0.40000001"
-   markerHeight="0.40000001"
-   viewBox="0 0 1 1"
-   inkscape:isstock="true"
-   inkscape:collect="always"
-   preserveAspectRatio="xMidYMid"><path
-     transform="scale(0.5)"
-     style="fill:#000000;fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
-     d="M 5.77,0 -2.88,5 V -5 Z"
-     id="path135-4" /></marker><marker
-   style="overflow:visible"
-   id="000000_ArchsimMarker_Triangle_Reversed-3-4"
-   refX="0"
-   refY="0"
-   orient="auto-start-reverse"
-   inkscape:stockid="Triangle arrow"
-   markerWidth="0.40000001"
-   markerHeight="0.40000001"
-   viewBox="0 0 1 1"
-   inkscape:isstock="true"
-   inkscape:collect="always"
-   preserveAspectRatio="xMidYMid"><path
-     transform="scale(0.5)"
-     style="fill:#000000;fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
-     d="M 5.77,0 -2.88,5 V -5 Z"
-     id="path135-4-8" /></marker></defs><g
+     id="stop2455" /></linearGradient></defs><g
      inkscape:groupmode="layer"
      id="layer6"
      inkscape:label="canvas"
@@ -265,7 +311,7 @@
        id="read-data-2-to-2mux-path"
        sodipodi:nodetypes="cc"
        inkscape:label="read-data-2-to-joint-path" /><path
-       style="display:inline;fill:none;stroke:#000000;stroke-width:4.99999;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;marker-end:url(#000000_ArchsimMarker_Triangle_Reversed-3)"
+       style="display:inline;fill:none;stroke:#000000;stroke-width:4.99999;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;marker-end:url(#000000_ArchsimMarker_Triangle_Reversed)"
        d="m 909.99999,747.62354 46.34016,10e-6"
        id="read-data-2-to-2mux-path-7"
        sodipodi:nodetypes="cc"
@@ -349,7 +395,7 @@
        id="read-data2-to-mem-write-data-path"
        sodipodi:nodetypes="ccccc"
        inkscape:label="read-data2-to-mem-write-data-path" /><path
-       style="display:inline;fill:none;stroke:#000000;stroke-width:4.99999;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;marker-start:url(#000000_ArchsimMarker_Dot);marker-end:url(#000000_ArchsimMarker_Triangle_Reversed-3-4)"
+       style="display:inline;fill:none;stroke:#000000;stroke-width:4.99999;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;marker-start:url(#000000_ArchsimMarker_Dot);marker-end:url(#000000_ArchsimMarker_Triangle_Reversed)"
        d="m 889.99998,802.25076 66.36381,2e-5"
        id="read-data-2-to-2mux-path-7-6"
        sodipodi:nodetypes="cc"
