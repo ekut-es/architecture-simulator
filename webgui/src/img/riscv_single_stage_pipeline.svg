@@ -25,8 +25,8 @@
      inkscape:document-units="mm"
      showgrid="true"
      inkscape:zoom="1"
-     inkscape:cx="3177"
-     inkscape:cy="2858.5"
+     inkscape:cx="3497"
+     inkscape:cy="1498.5"
      inkscape:window-width="2560"
      inkscape:window-height="1377"
      inkscape:window-x="1912"
@@ -196,6 +196,11 @@
      inkscape:label="canvas"
      style="display:inline"
      transform="translate(-67.500005,27.499998)"><path
+       style="fill:none;stroke:#000000;stroke-width:4.99999;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;marker-start:url(#000000_ArchsimMarker_Triangle_Reversed);marker-end:"
+       d="m 1059.4041,480.00002 -169.40412,-3e-5 v 322.25077"
+       id="imm-gen-to-add-path"
+       sodipodi:nodetypes="ccc"
+       inkscape:label="imm-gen-to-add-path" /><path
        style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#000000_ArchsimMarker_Triangle_Reversed)"
        d="M 689.99999,484.99998 H 130 l 0,-223.99997"
        id="control-unit-2mux-pc-path"
@@ -405,11 +410,6 @@
        id="imm-gen-out-path"
        inkscape:label="imm-gen-out-path"
        sodipodi:nodetypes="cc" /><path
-       style="fill:none;stroke:#000000;stroke-width:4.99999;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;marker-start:url(#000000_ArchsimMarker_Triangle_Reversed);marker-end:"
-       d="m 1059.4041,480.00002 -169.40412,-3e-5 v 322.25077"
-       id="imm-gen-to-add-path"
-       sodipodi:nodetypes="ccc"
-       inkscape:label="imm-gen-to-add-path" /><path
        style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:4.99999;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#000000_ArchsimMarker_Triangle_Reversed);marker-end:url(#000000_ArchsimMarker_Dot)"
        d="m 1059.5036,399.99999 -549.50362,0 V 579.99997 L 260,579.39616"
        id="pc-to-add-imm-path"

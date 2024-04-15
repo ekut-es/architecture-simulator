@@ -572,17 +572,6 @@ class SingleStage(Stage):
                 else None
             )
 
-            result_pr.register_write_data = defaultdict(
-                lambda: None,
-                {
-                    None: None,  # to stop mypy complaining
-                    0: result_pr.pc_plus_instruction_length,
-                    1: result_pr.memory_read_data,
-                    2: result_pr.alu_result,
-                    3: result_pr.imm,
-                },
-            )[five_stage_control_unit_signals.wb_src]
-
             try:
                 result_pr.instruction.behavior(state)
                 result_pr.memory_read_data = (
@@ -592,6 +581,18 @@ class SingleStage(Stage):
                     if type(result_pr.instruction) in SingleStage.TYPE_LOAD_INSTRUCTION
                     else None
                 )
+
+                result_pr.register_write_data = defaultdict(
+                    lambda: None,
+                    {
+                        None: None,  # to stop mypy complaining
+                        0: result_pr.pc_plus_instruction_length,
+                        1: result_pr.memory_read_data,
+                        2: result_pr.alu_result,
+                        3: result_pr.imm,
+                    },
+                )[five_stage_control_unit_signals.wb_src]
+
                 state.program_counter += result_pr.instruction.length
                 if (
                     not type(result_pr.instruction)
