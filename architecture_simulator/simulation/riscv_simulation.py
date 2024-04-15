@@ -738,7 +738,7 @@ class RiscvSimulation(Simulation):
         result.imm_gen_to_4mux_path.do_highlight = (
             p_reg.control_unit_signals.wb_src_int == 3
         )
-        result.imm_gen_joint_to_2mux_path.do_highlight = (
+        result.imm_gen_joint_to_2mux_path.do_highlight = bool(
             p_reg.control_unit_signals.alu_src_2
         )
         result.imm_gen_to_joint_path.do_highlight = (
