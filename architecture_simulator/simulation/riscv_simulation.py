@@ -618,13 +618,7 @@ class RiscvSimulation(Simulation):
 
         result.FetchRightMuxOut.do_highlight = bool(result.FetchRightMuxOutText.text)
 
-        result.path2453_0_7_7_9.do_highlight = bool(result.FetchLeftMuxOutText.text)
-        result.path2453_2_5_7_0_7_5_1_0_4.do_highlight = bool(
-            result.FetchLeftMuxOutText.text
-        )
-        result.path2453_2_5_7_0_7_6_2_29.do_highlight = bool(
-            result.FetchLeftMuxOutText.text
-        )
+        result.FetchPCIn.do_highlight = bool(result.FetchLeftMuxOutText.text)
 
         return result.export()
 
