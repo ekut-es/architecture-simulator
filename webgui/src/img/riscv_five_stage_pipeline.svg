@@ -25,9 +25,9 @@
      inkscape:deskcolor="#505050"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="1.4142136"
-     inkscape:cx="4923.2309"
-     inkscape:cy="2766.9088"
+     inkscape:zoom="0.7071068"
+     inkscape:cx="3789.3851"
+     inkscape:cy="3027.8312"
      inkscape:window-width="1920"
      inkscape:window-height="1007"
      inkscape:window-x="0"
@@ -213,7 +213,7 @@
        inkscape:label="ExecuteRightMuxOut" /><path
        id="ExecuteRegisterFileReadData1"
        style="display:inline;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:5;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#000000_ArchsimMarker_Triangle_Reversed)"
-       d="m 1016.0683,749.45731 -123.3001,1.6e-4"
+       d="m 1016.0683,749.45731 -135.55116,1.6e-4"
        inkscape:label="ExecuteRegisterFileReadData1"
        sodipodi:nodetypes="cc" /><path
        id="ExecuteUpperFetchPCOut"
