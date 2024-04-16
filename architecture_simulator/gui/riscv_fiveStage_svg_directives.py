@@ -147,9 +147,7 @@ class RiscvFiveStageOTHERSvgDirectives(RiscvSvgDirectivesBase):
         self.FetchRightMuxOutText = SvgWriteCenterDirective()
         self.FetchLeftMuxOutText = SvgWriteCenterDirective()
         self.FetchRightMuxOut = SvgFillDirectiveBlue()
-        self.path2453_0_7_7_9 = SvgFillDirectiveBlue()
-        self.path2453_2_5_7_0_7_5_1_0_4 = SvgFillDirectiveBlue()
-        self.path2453_2_5_7_0_7_6_2_29 = SvgFillDirectiveBlue()
+        self.FetchPCIn = SvgFillDirectiveBlue()
 
 
 class SvgFillDirectiveBlue(SvgFillDirective):
