@@ -25,9 +25,9 @@
      inkscape:deskcolor="#505050"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="0.7071068"
-     inkscape:cx="1683.6212"
-     inkscape:cy="992.77789"
+     inkscape:zoom="0.50000001"
+     inkscape:cx="2023.9999"
+     inkscape:cy="2647.9999"
      inkscape:window-width="1920"
      inkscape:window-height="1007"
      inkscape:window-x="0"
@@ -2492,7 +2492,7 @@
        d="M 651.31823,696.53138 H 554.61824"
        inkscape:label="DecodeInstructionMemory1"
        sodipodi:nodetypes="cc"
-       id="path82875" /><g
+       id="DecodeInstructionMemory1" /><g
        id="g24769"><path
          style="fill:none;stroke:#000000;stroke-width:5;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#000000_ArchsimMarker_Dot)"
          d="m 554.61824,760.40509 v 191.1133"
