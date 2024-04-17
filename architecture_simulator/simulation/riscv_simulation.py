@@ -428,9 +428,7 @@ class RiscvSimulation(Simulation):
                 result.ExecuteRegisterFileReadData2Text2.text
             )
 
-            result.ExecuteImmGenText1.text = save_to_str(pipeline_register.imm)
-            result.ExecuteImmGenText3.text = save_to_str(pipeline_register.imm)
-            result.ExecuteImmGen.do_highlight = bool(result.ExecuteImmGenText3.text)
+            result.ExecuteImmGen.do_highlight = pipeline_register.imm is not None
 
             result.ALUResultText.text = save_to_str(pipeline_register.result)
             result.ExecuteAluResult.do_highlight = bool(result.ALUResultText.text)
@@ -445,21 +443,13 @@ class RiscvSimulation(Simulation):
             result.ExecuteAddText.text = save_to_str(pipeline_register.pc_plus_imm)
             result.ExecuteAdd.do_highlight = bool(result.ExecuteAddText.text)
 
-            result.ExecuteFetchAddOutText.text = save_to_str(
-                pipeline_register.pc_plus_instruction_length
+            result.ExecuteFetchAddOut.do_highlight = (
+                pipeline_register.control_unit_signals.wb_src == 0
             )
-            result.ExecuteFetchAddOut.do_highlight = bool(
-                result.ExecuteFetchAddOutText.text
-            )
-
-            result.ExecuteUpperFetchPCOutText.text = save_to_str(
-                pipeline_register.address_of_instruction
-            )
-            result.ExecuteUpperFetchPCOut.do_highlight = bool(
-                result.ExecuteUpperFetchPCOutText.text
-            )
-            result.ExecuteLowerFetchPCOut.do_highlight = bool(
-                result.ExecuteUpperFetchPCOutText.text
+            result.ExecuteFetchAddOutText.text = (
+                save_to_str(pipeline_register.pc_plus_instruction_length)
+                if result.ExecuteFetchAddOut.do_highlight
+                else ""
             )
 
             result.ALUComparison.do_highlight = bool(pipeline_register.comparison)
@@ -482,6 +472,63 @@ class RiscvSimulation(Simulation):
 
             result.AluControl.do_highlight = bool(
                 save_to_str(pipeline_register.control_unit_signals.alu_op)
+            )
+
+            result.ExecuteImmediateToAdder.do_highlight = bool(
+                pipeline_register.control_unit_signals.jump
+            ) | bool(pipeline_register.control_unit_signals.branch)
+            result.ExecuteImmGenText1.text = (
+                save_to_str(pipeline_register.imm)
+                if result.ExecuteImmediateToAdder.do_highlight
+                else ""
+            )
+
+            result.ExecuteUpperFetchPCOut.do_highlight = (
+                result.ExecuteImmediateToAdder.do_highlight
+            )
+            result.ExecuteUpperFetchPCOutText.text = (
+                save_to_str(pipeline_register.address_of_instruction)
+                if result.ExecuteUpperFetchPCOut.do_highlight
+                else ""
+            )
+
+            result.ExecuteLowerFetchPCOut.do_highlight = (
+                pipeline_register.control_unit_signals.alu_src_1 is False
+            )
+
+            result.ExecuteImmediateToMux.do_highlight = (
+                pipeline_register.control_unit_signals.alu_src_2
+            )
+
+            result.ExecuteImmediateToWbMux.do_highlight = (
+                pipeline_register.control_unit_signals.wb_src == 3
+            )
+            result.ExecuteImmGenText3.text = (
+                save_to_str(pipeline_register.imm)
+                if result.ExecuteImmediateToWbMux.do_highlight
+                else ""
+            )
+
+            result.ExecuteImmediateInterediate.do_highlight = (
+                bool(pipeline_register.control_unit_signals.alu_src_2)
+                or result.ExecuteImmediateToAdder.do_highlight
+            )
+
+            result.ExecuteRegisterFileReadData2ToMux.do_highlight = (
+                pipeline_register.control_unit_signals.alu_src_2 is False
+            )
+            result.ExecuteRegisterFileReadData2ToMemory.do_highlight = bool(
+                pipeline_register.control_unit_signals.mem_write
+            )
+
+            result.ControlUnitRegWriteEnable_2.do_highlight = bool(
+                pipeline_register.control_unit_signals.reg_write
+            )
+            result.ControlUnitMemWriteEnable_2.do_highlight = bool(
+                pipeline_register.control_unit_signals.mem_write
+            )
+            result.ControlUnitMemReadEnable_2.do_highlight = bool(
+                pipeline_register.control_unit_signals.mem_read
             )
 
         return result.export()
