@@ -5,6 +5,7 @@ from architecture_simulator.settings.settings import Settings
 from architecture_simulator.uarch.riscv.riscv_architectural_state import (
     RiscvArchitecturalState,
 )
+from architecture_simulator.isa.riscv.instruction_types import EmptyInstruction
 from architecture_simulator.isa.riscv.riscv_parser import RiscvParser
 from .simulation import Simulation
 from architecture_simulator.uarch.riscv.pipeline_registers import (
@@ -337,28 +338,35 @@ class RiscvSimulation(Simulation):
                 result.DecodeInstructionMemory4Text.text
             )
 
-            result.DecodeFetchAddOutText.text = save_to_str(
-                pipeline_register.pc_plus_instruction_length
+            result.DecodeFetchAddOut.do_highlight = (
+                pipeline_register.control_unit_signals.wb_src == 0
             )
-            result.DecodeFetchAddOut.do_highlight = bool(
-                result.DecodeFetchAddOutText.text
-            )
-
-            result.DecodeUpperFetchPCOutText.text = save_to_str(
-                pipeline_register.address_of_instruction
-            )
-            result.DecodeLowerFetchPCOutText.text = save_to_str(
-                pipeline_register.address_of_instruction
+            result.DecodeFetchAddOutText.text = (
+                save_to_str(pipeline_register.pc_plus_instruction_length)
+                if result.DecodeFetchAddOut.do_highlight
+                else ""
             )
 
             result.DecodeUpperFetchPCOut.do_highlight = bool(
-                result.DecodeLowerFetchPCOutText.text
+                pipeline_register.control_unit_signals.jump
+            ) | bool(pipeline_register.control_unit_signals.branch)
+            result.DecodeUpperFetchPCOutText.text = (
+                save_to_str(pipeline_register.address_of_instruction)
+                if result.DecodeUpperFetchPCOut.do_highlight
+                else ""
             )
-            result.DecodeLowerFetchPCOut.do_highlight = bool(
-                result.DecodeLowerFetchPCOutText.text
+
+            result.DecodeLowerFetchPCOut.do_highlight = (
+                pipeline_register.control_unit_signals.alu_src_1 == 0
             )
-            result.DecodeInstructionMemory.do_highlight = bool(
-                result.DecodeLowerFetchPCOutText.text
+            result.DecodeLowerFetchPCOutText.text = (
+                save_to_str(pipeline_register.address_of_instruction)
+                if result.DecodeLowerFetchPCOut.do_highlight
+                else ""
+            )
+
+            result.DecodeInstructionMemory.do_highlight = not isinstance(
+                pipeline_register.instruction, EmptyInstruction
             )
             result.ControlUnitLeftRight1_1.do_highlight = bool(
                 pipeline_register.control_unit_signals.jump
@@ -375,6 +383,20 @@ class RiscvSimulation(Simulation):
             result.ControlUnitLeft_1.do_highlight = bool(
                 pipeline_register.control_unit_signals.alu_to_pc
             )
+            result.ControlUnitRegWriteEnable_1.do_highlight = bool(
+                pipeline_register.control_unit_signals.reg_write
+            )
+            result.ControlUnitMemWriteEnable_1.do_highlight = bool(
+                pipeline_register.control_unit_signals.mem_write
+            )
+            result.ControlUnitMemReadEnable_1.do_highlight = bool(
+                pipeline_register.control_unit_signals.mem_read
+            )
+
+            result.DecodeInstructionMemoryIntermediate.do_highlight = bool(
+                pipeline_register.control_unit_signals.reg_write
+            ) | (pipeline_register.imm is not None)
+
         return result.export()
 
     def _get_riscv_five_stage_EX_svg_update_values(self) -> list[tuple[str, str, Any]]:
