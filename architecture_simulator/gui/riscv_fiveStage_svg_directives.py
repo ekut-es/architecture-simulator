@@ -107,9 +107,11 @@ class RiscvFiveStageEXSvgDirectives(RiscvSvgDirectivesBase):
         self.ExecuteImmediateToMux = SvgFillDirectiveBlue()
         self.ExecuteImmediateInterediate = SvgFillDirectiveBlue()
         self.ExecuteRegisterFileReadData2ToMux = SvgFillDirectiveBlue()
+        self.ExecuteRegisterFileReadData2ToMemory = SvgFillDirectiveBlue()
         self.ControlUnitRegWriteEnable_2 = SvgFillDirectiveGreen()
         self.ControlUnitMemWriteEnable_2 = SvgFillDirectiveGreen()
         self.ControlUnitMemReadEnable_2 = SvgFillDirectiveGreen()
+        self.ExecuteImmediateToWbMux = SvgFillDirectiveBlue()
 
 
 class RiscvFiveStageMEMSvgDirectives(RiscvSvgDirectivesBase):
