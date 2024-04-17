@@ -52,6 +52,42 @@ riscv_five_stage_markers = """
      style="fill:#0000FF;fill-rule:evenodd;stroke:#0000FF;stroke-width:1pt"
      d="M 5.77,0 -2.88,5 V -5 Z"
      id="0000FF_ArchsimMarker_Triangle_Path" /></marker>
+<marker
+   style="overflow:visible"
+   id="000000_ArchsimMarker_Dot"
+   refX="0"
+   refY="0"
+   orient="auto"
+   inkscape:stockid="Dot"
+   markerWidth="2"
+   markerHeight="2"
+   viewBox="0 0 5.6666667 5.6666667"
+   inkscape:isstock="true"
+   inkscape:collect="always"
+   preserveAspectRatio="xMidYMid"><path
+     transform="scale(0.5)"
+     style="fill:#000000;fill-rule:evenodd;stroke:none"
+     d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
+     id="Dot1"
+     sodipodi:nodetypes="sssss" /></marker>
+<marker
+   style="overflow:visible"
+   id="0000FF_ArchsimMarker_Dot"
+   refX="0"
+   refY="0"
+   orient="auto"
+   inkscape:stockid="Dot"
+   markerWidth="2"
+   markerHeight="2"
+   viewBox="0 0 5.6666667 5.6666667"
+   inkscape:isstock="true"
+   inkscape:collect="always"
+   preserveAspectRatio="xMidYMid"><path
+     transform="scale(0.5)"
+     style="fill:#0000FF;fill-rule:evenodd;stroke:none"
+     d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
+     id="Dot1"
+     sodipodi:nodetypes="sssss" /></marker>
 """
 
 riscv_single_stage_markers = """
