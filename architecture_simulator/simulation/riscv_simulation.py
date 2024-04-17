@@ -272,10 +272,21 @@ class RiscvSimulation(Simulation):
             result.FetchAddOutText.text = save_to_str(
                 pipeline_register.pc_plus_instruction_length
             )
+            result.FetchAddOutToMux.do_highlight = bool(result.FetchAddOutText.text)
             result.FetchAddOut.do_highlight = bool(result.FetchAddOutText.text)
 
             result.I_LengthText.text = save_to_str(pipeline_register.instruction.length)
             result.FetchI_Length.do_highlight = bool(result.I_LengthText.text)
+            result.PCFetchOutToExAdder.do_highlight = bool(
+                pipeline_register.control_unit_signals.jump
+            ) | bool(pipeline_register.control_unit_signals.branch)
+            result.PCFetchOutToExMux.do_highlight = (
+                pipeline_register.control_unit_signals.alu_src_1 is not None
+                and not bool(pipeline_register.control_unit_signals.alu_src_1)
+            )
+            result.FetchAddOutToPReg.do_highlight = (
+                pipeline_register.control_unit_signals.wb_src == 0
+            )
 
         return result.export()
 
