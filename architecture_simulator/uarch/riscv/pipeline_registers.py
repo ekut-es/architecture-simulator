@@ -28,6 +28,7 @@ class PipelineRegister:
 
 @dataclass
 class InstructionFetchPipelineRegister(PipelineRegister):
+    control_unit_signals: ControlUnitSignals = field(default_factory=ControlUnitSignals)
     branch_prediction: Optional[bool] = None
     pc_plus_instruction_length: Optional[int] = None
     abbreviation = "IF"

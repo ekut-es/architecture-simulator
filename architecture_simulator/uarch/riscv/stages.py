@@ -98,12 +98,14 @@ class InstructionFetchStage(Stage):
         instruction = state.instruction_memory.read_instruction(address_of_instruction)
         state.program_counter += instruction.length
         pc_plus_instruction_length = address_of_instruction + instruction.length
+        control_unit_signals = instruction.control_unit_signals()
 
         return InstructionFetchPipelineRegister(
             instruction=instruction,
             address_of_instruction=address_of_instruction,
             branch_prediction=False,
             pc_plus_instruction_length=pc_plus_instruction_length,
+            control_unit_signals=control_unit_signals,
         )
 
 
@@ -171,8 +173,6 @@ class InstructionDecodeStage(Stage):
                     stall_signal = StallSignal(2)
                     break
 
-        # gets the control unit signals that are generated in the ID stage
-        control_unit_signals = pipeline_register.instruction.control_unit_signals()
         return InstructionDecodePipelineRegister(
             instruction=pipeline_register.instruction,
             register_read_addr_1=register_read_addr_1,
@@ -181,7 +181,7 @@ class InstructionDecodeStage(Stage):
             register_read_data_2=register_read_data_2,
             imm=imm,
             write_register=write_register,
-            control_unit_signals=control_unit_signals,
+            control_unit_signals=pipeline_register.control_unit_signals,
             branch_prediction=pipeline_register.branch_prediction,
             stall_signal=stall_signal,
             pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
@@ -504,12 +504,16 @@ class SingleStage(Stage):
                 result_pr.pc_plus_imm = state.program_counter + result_pr.imm
 
             a_comparison, a_result = result_pr.instruction.alu_compute(
-                state.program_counter
-                if result_pr.control_unit_signals.alu_src_1
-                else result_pr.register_read_data_1,
-                result_pr.imm
-                if result_pr.control_unit_signals.alu_src_2
-                else result_pr.register_read_data_2,
+                (
+                    state.program_counter
+                    if result_pr.control_unit_signals.alu_src_1
+                    else result_pr.register_read_data_1
+                ),
+                (
+                    result_pr.imm
+                    if result_pr.control_unit_signals.alu_src_2
+                    else result_pr.register_read_data_2
+                ),
             )
 
             result_pr.alu_comparison = bool(a_comparison)
