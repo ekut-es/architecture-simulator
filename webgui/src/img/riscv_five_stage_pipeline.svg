@@ -25,9 +25,9 @@
      inkscape:deskcolor="#505050"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="0.50000001"
-     inkscape:cx="2023.9999"
-     inkscape:cy="2647.9999"
+     inkscape:zoom="0.3535534"
+     inkscape:cx="3396.9409"
+     inkscape:cy="2525.7854"
      inkscape:window-width="1920"
      inkscape:window-height="1007"
      inkscape:window-x="0"
@@ -2493,7 +2493,7 @@
        inkscape:label="DecodeInstructionMemory1"
        sodipodi:nodetypes="cc"
        id="DecodeInstructionMemory1" /><g
-       id="g24769"><path
+       id="DecodeInstructionMemoryIntermediate"><path
          style="fill:none;stroke:#000000;stroke-width:5;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#000000_ArchsimMarker_Dot)"
          d="m 554.61824,760.40509 v 191.1133"
          id="path27988" /></g><g
@@ -2551,7 +2551,7 @@
        sodipodi:nodetypes="cccc" /><path
        style="fill:none;stroke:#000000;stroke-width:2.5;stroke-dasharray:none;stroke-opacity:1"
        d="m 815.38035,542.46539 50.29878,0"
-       id="path20080"
+       id="ControlUnitMemWriteEnable-1"
        sodipodi:nodetypes="cc" /><path
        style="fill:none;stroke:#000000;stroke-width:2.5;stroke-dasharray:none;stroke-opacity:1"
        d="m 880.51712,542.46539 347.82008,1e-5"
