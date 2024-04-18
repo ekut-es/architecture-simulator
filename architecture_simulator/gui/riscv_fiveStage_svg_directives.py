@@ -28,7 +28,6 @@ class RiscvFiveStageIFSvgDirectives(RiscvSvgDirectivesBase):
         self.InstructionReadAddressText = SvgWriteLeftDirective()
         self.PC = SvgWriteCenterDirective()
         self.FetchPCOut = SvgFillDirectiveBlue()
-        self.FetchAddOutText = SvgWriteCenterDirective()
         self.FetchAddOut = SvgFillDirectiveBlue()
         self.I_LengthText = SvgWriteCenterDirective()
         self.FetchI_Length = SvgFillDirectiveBlue()
@@ -118,7 +117,6 @@ class RiscvFiveStageMEMSvgDirectives(RiscvSvgDirectivesBase):
     def __init__(self):
         self.Memory = SvgWriteCenterDirective()
         self.DataMemoryAddressText = SvgWriteLeftDirective()
-        self.MemoryExecuteAluResultText = SvgWriteCenterDirective()
         self.MemoryExecuteAluResultText2 = SvgWriteCenterDirective()
         self.MemoryExecuteAluResult = SvgFillDirectiveBlue()
         self.DataMemoryWriteDataText = SvgWriteLeftDirective()
@@ -129,7 +127,6 @@ class RiscvFiveStageMEMSvgDirectives(RiscvSvgDirectivesBase):
         self.MemoryInstructionMemory4 = SvgFillDirectiveBlue()
         self.MemoryALUComparison = SvgFillDirectiveGreen()
         self.MemoryJumpOut = SvgFillDirectiveGreen()
-        self.MemoryExecuteAddOutText = SvgWriteCenterDirective()
         self.MemoryExecuteAddOut = SvgFillDirectiveBlue()
         self.MemoryFetchAddOutText = SvgWriteCenterDirective()
         self.MemoryFetchAddOut = SvgFillDirectiveBlue()
@@ -154,13 +151,9 @@ class RiscvFiveStageWBSvgDirectives(RiscvSvgDirectivesBase):
         self.WriteBackMuxOut = SvgFillDirectiveBlue()
         self.RegisterFileWriteRegisterText = SvgWriteLeftDirective()
         self.WriteBackInstructionMemory4 = SvgFillDirectiveBlue()
-        self.WriteBackDataMemoryReadDataText = SvgWriteCenterDirective()
         self.WriteBackDataMemoryReadData = SvgFillDirectiveBlue()
-        self.WriteBackExecuteAluResultText = SvgWriteCenterDirective()
         self.WriteBackExecuteAluResult = SvgFillDirectiveBlue()
-        self.WriteBackFetchAddOutText = SvgWriteCenterDirective()
         self.WriteBackFetchAddOut = SvgFillDirectiveBlue()
-        self.WriteBackImmGenText = SvgWriteCenterDirective()
         self.WriteBackImmGen = SvgFillDirectiveBlue()
         self.wbsrc = SvgWriteCenterDirective()
         self.ControlUnitLeftRight2_4 = SvgFillDirectiveBlue()
@@ -169,7 +162,6 @@ class RiscvFiveStageWBSvgDirectives(RiscvSvgDirectivesBase):
 
 class RiscvFiveStageOTHERSvgDirectives(RiscvSvgDirectivesBase):
     def __init__(self):
-        self.FetchRightMuxOutText = SvgWriteCenterDirective()
         self.FetchLeftMuxOutText = SvgWriteCenterDirective()
         self.FetchRightMuxOut = SvgFillDirectiveBlue()
         self.FetchPCIn = SvgFillDirectiveBlue()

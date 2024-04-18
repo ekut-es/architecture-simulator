@@ -270,11 +270,12 @@ class RiscvSimulation(Simulation):
                 result.InstructionReadAddressText.text
             )
 
-            result.FetchAddOutText.text = save_to_str(
-                pipeline_register.pc_plus_instruction_length
+            result.FetchAddOutToMux.do_highlight = (
+                pipeline_register.pc_plus_instruction_length is not None
             )
-            result.FetchAddOutToMux.do_highlight = bool(result.FetchAddOutText.text)
-            result.FetchAddOut.do_highlight = bool(result.FetchAddOutText.text)
+            result.FetchAddOut.do_highlight = (
+                pipeline_register.pc_plus_instruction_length is not None
+            )
 
             result.FetchI_Length.do_highlight = not isinstance(
                 pipeline_register.instruction, EmptyInstruction
@@ -589,11 +590,6 @@ class RiscvSimulation(Simulation):
             )
 
             result.MemoryExecuteAddOut.do_highlight = result.MemoryJumpOut.do_highlight
-            result.MemoryExecuteAddOutText.text = (
-                save_to_str(pipeline_register.pc_plus_imm)
-                if result.MemoryExecuteAddOut.do_highlight
-                else ""
-            )
 
             result.MemoryFetchAddOut.do_highlight = (
                 pipeline_register.control_unit_signals.wb_src == 0
@@ -632,11 +628,6 @@ class RiscvSimulation(Simulation):
             result.MemoryExecuteAluResultIntermediate.do_highlight = (
                 result.MemoryExecuteAluResultToMemory.do_highlight
                 or result.MemoryExecuteAluResultToFetchMux.do_highlight
-            )
-            result.MemoryExecuteAluResultText.text = (
-                save_to_str(pipeline_register.result)
-                if result.MemoryExecuteAluResultToFetchMux.do_highlight
-                else ""
             )
             result.MemoryExecuteAluResultToWbMux.do_highlight = (
                 pipeline_register.control_unit_signals.wb_src == 2
@@ -680,30 +671,18 @@ class RiscvSimulation(Simulation):
                 result.RegisterFileWriteRegisterText.text
             )
 
-            result.WriteBackDataMemoryReadDataText.text = save_to_str(
-                pipeline_register.memory_read_data
-            )  # DELETE
             result.WriteBackDataMemoryReadData.do_highlight = (
                 pipeline_register.control_unit_signals.wb_src == 1
             )
 
-            result.WriteBackExecuteAluResultText.text = save_to_str(
-                pipeline_register.alu_result
-            )  # DELETE
             result.WriteBackExecuteAluResult.do_highlight = (
                 pipeline_register.control_unit_signals.wb_src == 2
             )
 
-            result.WriteBackFetchAddOutText.text = save_to_str(
-                pipeline_register.pc_plus_instruction_length
-            )  # DELETE
             result.WriteBackFetchAddOut.do_highlight = (
                 pipeline_register.control_unit_signals.wb_src == 0
             )
 
-            result.WriteBackImmGenText.text = save_to_str(
-                pipeline_register.imm
-            )  # DELETE
             result.WriteBackImmGen.do_highlight = (
                 pipeline_register.control_unit_signals.wb_src == 3
             )
@@ -747,10 +726,9 @@ class RiscvSimulation(Simulation):
             else:
                 pc_pl_imm_or_il_or_alures = pc_pl_imm_or_il
 
-        result.FetchRightMuxOutText.text = save_to_str(pc_pl_imm_or_il)
         result.FetchLeftMuxOutText.text = save_to_str(pc_pl_imm_or_il_or_alures)
 
-        result.FetchRightMuxOut.do_highlight = bool(result.FetchRightMuxOutText.text)
+        result.FetchRightMuxOut.do_highlight = pc_pl_imm_or_il is not None
 
         result.FetchPCIn.do_highlight = bool(result.FetchLeftMuxOutText.text)
 
