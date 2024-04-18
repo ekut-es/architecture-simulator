@@ -276,8 +276,14 @@ class RiscvSimulation(Simulation):
             result.FetchAddOutToMux.do_highlight = bool(result.FetchAddOutText.text)
             result.FetchAddOut.do_highlight = bool(result.FetchAddOutText.text)
 
-            result.I_LengthText.text = save_to_str(pipeline_register.instruction.length)
-            result.FetchI_Length.do_highlight = bool(result.I_LengthText.text)
+            result.FetchI_Length.do_highlight = not isinstance(
+                pipeline_register.instruction, EmptyInstruction
+            )
+            result.I_LengthText.text = (
+                save_to_str(pipeline_register.instruction.length)
+                if result.FetchI_Length.do_highlight
+                else ""
+            )
             result.PCFetchOutToExAdder.do_highlight = bool(
                 pipeline_register.control_unit_signals.jump
             ) | bool(pipeline_register.control_unit_signals.branch)
@@ -440,9 +446,6 @@ class RiscvSimulation(Simulation):
                 result.ExecuteInstructionMemory4Text.text
             )
 
-            result.ExecuteAddText.text = save_to_str(pipeline_register.pc_plus_imm)
-            result.ExecuteAdd.do_highlight = bool(result.ExecuteAddText.text)
-
             result.ExecuteFetchAddOut.do_highlight = (
                 pipeline_register.control_unit_signals.wb_src == 0
             )
@@ -489,6 +492,13 @@ class RiscvSimulation(Simulation):
             result.ExecuteUpperFetchPCOutText.text = (
                 save_to_str(pipeline_register.address_of_instruction)
                 if result.ExecuteUpperFetchPCOut.do_highlight
+                else ""
+            )
+
+            result.ExecuteAdd.do_highlight = result.ExecuteUpperFetchPCOut.do_highlight
+            result.ExecuteAddText.text = (
+                save_to_str(pipeline_register.pc_plus_imm)
+                if result.ExecuteAdd.do_highlight
                 else ""
             )
 
