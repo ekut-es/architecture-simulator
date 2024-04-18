@@ -36,8 +36,17 @@ from architecture_simulator.gui.riscv_single_stage_svg_directives import (
 )
 
 
-def save_to_str(input: Any) -> str:
-    return str(input) if input is not None else ""
+def save_to_str(input: Any, input_valid=True) -> str:
+    """Turns the input into a string. Will result in an empty string if the input is None or if the optional input_valid flag is False.
+
+    Args:
+        input (Any): Thing to be turned into a string.
+        input_valid (bool, optional): Flag to indicate if the input is valid. The result will be an empty string if this is False. Defaults to True.
+
+    Returns:
+        str: The requested string.
+    """
+    return str(input) if input is not None and input_valid else ""
 
 
 class RiscvSimulation(Simulation):
@@ -277,10 +286,8 @@ class RiscvSimulation(Simulation):
             result.FetchI_Length.do_highlight = not isinstance(
                 pr.instruction, EmptyInstruction
             )
-            result.I_LengthText.text = (
-                save_to_str(pr.instruction.length)
-                if result.FetchI_Length.do_highlight
-                else ""
+            result.I_LengthText.text = save_to_str(
+                pr.instruction.length, result.FetchI_Length.do_highlight
             )
             result.PCFetchOutToExAdder.do_highlight = bool(csignals.jump) | bool(
                 csignals.branch
@@ -335,26 +342,20 @@ class RiscvSimulation(Simulation):
             )
 
             result.DecodeFetchAddOut.do_highlight = csignals.wb_src == 0
-            result.DecodeFetchAddOutText.text = (
-                save_to_str(pr.pc_plus_instruction_length)
-                if result.DecodeFetchAddOut.do_highlight
-                else ""
+            result.DecodeFetchAddOutText.text = save_to_str(
+                pr.pc_plus_instruction_length, result.DecodeFetchAddOut.do_highlight
             )
 
             result.DecodeUpperFetchPCOut.do_highlight = bool(csignals.jump) | bool(
                 csignals.branch
             )
-            result.DecodeUpperFetchPCOutText.text = (
-                save_to_str(pr.address_of_instruction)
-                if result.DecodeUpperFetchPCOut.do_highlight
-                else ""
+            result.DecodeUpperFetchPCOutText.text = save_to_str(
+                pr.address_of_instruction, result.DecodeUpperFetchPCOut.do_highlight
             )
 
             result.DecodeLowerFetchPCOut.do_highlight = csignals.alu_src_1 == 0
-            result.DecodeLowerFetchPCOutText.text = (
-                save_to_str(pr.address_of_instruction)
-                if result.DecodeLowerFetchPCOut.do_highlight
-                else ""
+            result.DecodeLowerFetchPCOutText.text = save_to_str(
+                pr.address_of_instruction, result.DecodeLowerFetchPCOut.do_highlight
             )
 
             result.DecodeInstructionMemory.do_highlight = not isinstance(
@@ -416,10 +417,8 @@ class RiscvSimulation(Simulation):
             )
 
             result.ExecuteFetchAddOut.do_highlight = csignals.wb_src == 0
-            result.ExecuteFetchAddOutText.text = (
-                save_to_str(pr.pc_plus_instruction_length)
-                if result.ExecuteFetchAddOut.do_highlight
-                else ""
+            result.ExecuteFetchAddOutText.text = save_to_str(
+                pr.pc_plus_instruction_length, result.ExecuteFetchAddOut.do_highlight
             )
 
             result.ALUComparison.do_highlight = bool(pr.comparison)
@@ -435,24 +434,20 @@ class RiscvSimulation(Simulation):
             result.ExecuteImmediateToAdder.do_highlight = bool(csignals.jump) | bool(
                 csignals.branch
             )
-            result.ExecuteImmGenText1.text = (
-                save_to_str(pr.imm)
-                if result.ExecuteImmediateToAdder.do_highlight
-                else ""
+            result.ExecuteImmGenText1.text = save_to_str(
+                pr.imm, result.ExecuteImmediateToAdder.do_highlight
             )
 
             result.ExecuteUpperFetchPCOut.do_highlight = (
                 result.ExecuteImmediateToAdder.do_highlight
             )
-            result.ExecuteUpperFetchPCOutText.text = (
-                save_to_str(pr.address_of_instruction)
-                if result.ExecuteUpperFetchPCOut.do_highlight
-                else ""
+            result.ExecuteUpperFetchPCOutText.text = save_to_str(
+                pr.address_of_instruction, result.ExecuteUpperFetchPCOut.do_highlight
             )
 
             result.ExecuteAdd.do_highlight = result.ExecuteUpperFetchPCOut.do_highlight
-            result.ExecuteAddText.text = (
-                save_to_str(pr.pc_plus_imm) if result.ExecuteAdd.do_highlight else ""
+            result.ExecuteAddText.text = save_to_str(
+                pr.pc_plus_imm, result.ExecuteAdd.do_highlight
             )
 
             result.ExecuteLowerFetchPCOut.do_highlight = csignals.alu_src_1 is False
@@ -460,10 +455,8 @@ class RiscvSimulation(Simulation):
             result.ExecuteImmediateToMux.do_highlight = csignals.alu_src_2
 
             result.ExecuteImmediateToWbMux.do_highlight = csignals.wb_src == 3
-            result.ExecuteImmGenText3.text = (
-                save_to_str(pr.imm)
-                if result.ExecuteImmediateToWbMux.do_highlight
-                else ""
+            result.ExecuteImmGenText3.text = save_to_str(
+                pr.imm, result.ExecuteImmediateToWbMux.do_highlight
             )
 
             result.ExecuteImmediateInterediate.do_highlight = (
@@ -497,10 +490,8 @@ class RiscvSimulation(Simulation):
             result.MemoryExecuteAluResult.do_highlight = pr.result is not None
 
             result.MemoryRegisterFileReadData2.do_highlight = bool(csignals.mem_write)
-            result.DataMemoryWriteDataText.text = (
-                save_to_str(pr.memory_write_data)
-                if result.MemoryRegisterFileReadData2.do_highlight
-                else ""
+            result.DataMemoryWriteDataText.text = save_to_str(
+                pr.memory_write_data, result.MemoryRegisterFileReadData2.do_highlight
             )
 
             result.DataMemoryReadDataText.text = save_to_str(pr.memory_read_data)
@@ -520,15 +511,13 @@ class RiscvSimulation(Simulation):
             result.MemoryExecuteAddOut.do_highlight = result.MemoryJumpOut.do_highlight
 
             result.MemoryFetchAddOut.do_highlight = csignals.wb_src == 0
-            result.MemoryFetchAddOutText.text = (
-                save_to_str(pr.pc_plus_instruction_length)
-                if result.MemoryFetchAddOut.do_highlight
-                else ""
+            result.MemoryFetchAddOutText.text = save_to_str(
+                pr.pc_plus_instruction_length, result.MemoryFetchAddOut.do_highlight
             )
 
             result.MemoryImmGen.do_highlight = csignals.wb_src == 3
-            result.MemoryImmGenText.text = (
-                save_to_str(pr.imm) if result.MemoryImmGen.do_highlight else ""
+            result.MemoryImmGenText.text = save_to_str(
+                pr.imm, result.MemoryImmGen.do_highlight
             )
 
             result.ControlUnitLeftRight1_3.do_highlight = bool(csignals.jump)
@@ -546,10 +535,8 @@ class RiscvSimulation(Simulation):
                 or result.MemoryExecuteAluResultToFetchMux.do_highlight
             )
             result.MemoryExecuteAluResultToWbMux.do_highlight = csignals.wb_src == 2
-            result.MemoryExecuteAluResultText2.text = (
-                save_to_str(pr.result)
-                if result.MemoryExecuteAluResultToWbMux.do_highlight
-                else ""
+            result.MemoryExecuteAluResultText2.text = save_to_str(
+                pr.result, result.MemoryExecuteAluResultToWbMux.do_highlight
             )
 
             result.ControlUnitRegWriteEnable_3 = bool(csignals.reg_write)
