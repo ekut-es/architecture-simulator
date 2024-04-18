@@ -682,33 +682,41 @@ class RiscvSimulation(Simulation):
 
             result.WriteBackDataMemoryReadDataText.text = save_to_str(
                 pipeline_register.memory_read_data
-            )
-            result.WriteBackDataMemoryReadData.do_highlight = bool(
-                result.WriteBackDataMemoryReadDataText.text
+            )  # DELETE
+            result.WriteBackDataMemoryReadData.do_highlight = (
+                pipeline_register.control_unit_signals.wb_src == 1
             )
 
             result.WriteBackExecuteAluResultText.text = save_to_str(
                 pipeline_register.alu_result
-            )
-            result.WriteBackExecuteAluResult.do_highlight = bool(
-                result.WriteBackExecuteAluResultText.text
+            )  # DELETE
+            result.WriteBackExecuteAluResult.do_highlight = (
+                pipeline_register.control_unit_signals.wb_src == 2
             )
 
             result.WriteBackFetchAddOutText.text = save_to_str(
                 pipeline_register.pc_plus_instruction_length
-            )
-            result.WriteBackFetchAddOut.do_highlight = bool(
-                result.WriteBackFetchAddOutText.text
+            )  # DELETE
+            result.WriteBackFetchAddOut.do_highlight = (
+                pipeline_register.control_unit_signals.wb_src == 0
             )
 
-            result.WriteBackImmGenText.text = save_to_str(pipeline_register.imm)
-            result.WriteBackImmGen.do_highlight = bool(result.WriteBackImmGenText.text)
+            result.WriteBackImmGenText.text = save_to_str(
+                pipeline_register.imm
+            )  # DELETE
+            result.WriteBackImmGen.do_highlight = (
+                pipeline_register.control_unit_signals.wb_src == 3
+            )
 
             result.wbsrc.text = save_to_str(
                 pipeline_register.control_unit_signals.wb_src
             )
             result.ControlUnitLeftRight2_4.do_highlight = bool(
                 pipeline_register.control_unit_signals.wb_src
+            )
+
+            result.ControlUnitRegWriteEnable_4.do_highlight = (
+                pipeline_register.control_unit_signals.reg_write is True
             )
         return result.export()
 
