@@ -250,239 +250,193 @@ class RiscvSimulation(Simulation):
     def _get_riscv_five_stage_IF_svg_update_values(self) -> list[tuple[str, str, Any]]:
         """Returns all information needed to update IF stage part of svg."""
         result = RiscvFiveStageIFSvgDirectives()
-        pipeline_register = self.state.pipeline.pipeline_registers[0]
+        pr = self.state.pipeline.pipeline_registers[0]
 
-        result.Fetch.text = pipeline_register.instruction.mnemonic
+        result.Fetch.text = pr.instruction.mnemonic
         result.PC.text = self.state.previous_program_counter
 
-        if isinstance(pipeline_register, InstructionFetchPipelineRegister):
-            result.InstructionMemoryInstrText.text = (
-                pipeline_register.instruction.__repr__()
-            )
+        if isinstance(pr, InstructionFetchPipelineRegister):
+            csignals = pr.control_unit_signals
+            result.InstructionMemoryInstrText.text = pr.instruction.__repr__()
             result.InstructionMemory.do_highlight = bool(
                 result.InstructionMemoryInstrText.text
             )
 
             result.InstructionReadAddressText.text = save_to_str(
-                pipeline_register.address_of_instruction
+                pr.address_of_instruction
             )
             result.FetchPCOut.do_highlight = bool(
                 result.InstructionReadAddressText.text
             )
 
             result.FetchAddOutToMux.do_highlight = (
-                pipeline_register.pc_plus_instruction_length is not None
+                pr.pc_plus_instruction_length is not None
             )
-            result.FetchAddOut.do_highlight = (
-                pipeline_register.pc_plus_instruction_length is not None
-            )
+            result.FetchAddOut.do_highlight = pr.pc_plus_instruction_length is not None
 
             result.FetchI_Length.do_highlight = not isinstance(
-                pipeline_register.instruction, EmptyInstruction
+                pr.instruction, EmptyInstruction
             )
             result.I_LengthText.text = (
-                save_to_str(pipeline_register.instruction.length)
+                save_to_str(pr.instruction.length)
                 if result.FetchI_Length.do_highlight
                 else ""
             )
-            result.PCFetchOutToExAdder.do_highlight = bool(
-                pipeline_register.control_unit_signals.jump
-            ) | bool(pipeline_register.control_unit_signals.branch)
+            result.PCFetchOutToExAdder.do_highlight = bool(csignals.jump) | bool(
+                csignals.branch
+            )
             result.PCFetchOutToExMux.do_highlight = (
-                pipeline_register.control_unit_signals.alu_src_1 is not None
-                and not bool(pipeline_register.control_unit_signals.alu_src_1)
+                csignals.alu_src_1 is not None and not bool(csignals.alu_src_1)
             )
-            result.FetchAddOutToPReg.do_highlight = (
-                pipeline_register.control_unit_signals.wb_src == 0
-            )
+            result.FetchAddOutToPReg.do_highlight = csignals.wb_src == 0
 
         return result.export()
 
     def _get_riscv_five_stage_ID_svg_update_values(self) -> list[tuple[str, str, Any]]:
         """Returns all information needed to update ID stage part of svg."""
         result = RiscvFiveStageIDSvgDirectives()
-        pipeline_register = self.state.pipeline.pipeline_registers[1]
+        pr = self.state.pipeline.pipeline_registers[1]
 
-        result.Decode.text = pipeline_register.instruction.mnemonic
+        result.Decode.text = pr.instruction.mnemonic
 
-        if isinstance(pipeline_register, InstructionDecodePipelineRegister):
+        if isinstance(pr, InstructionDecodePipelineRegister):
+            csignals = pr.control_unit_signals
             result.RegisterFileReadAddress1Text.text = save_to_str(
-                pipeline_register.register_read_addr_1
+                pr.register_read_addr_1
             )
             result.DecodeInstructionMemory1.do_highlight = bool(
                 result.RegisterFileReadAddress1Text.text
             )
 
             result.RegisterFileReadAddress2Text.text = save_to_str(
-                pipeline_register.register_read_addr_2
+                pr.register_read_addr_2
             )
             result.DecodeInstructionMemory2.do_highlight = bool(
                 result.RegisterFileReadAddress2Text.text
             )
 
-            result.RegisterFileReadData1Text.text = save_to_str(
-                pipeline_register.register_read_data_1
-            )
+            result.RegisterFileReadData1Text.text = save_to_str(pr.register_read_data_1)
             result.RegisterFileReadData1.do_highlight = bool(
                 result.RegisterFileReadData1Text.text
             )
 
-            result.RegisterFileReadData2Text.text = save_to_str(
-                pipeline_register.register_read_data_2
-            )
+            result.RegisterFileReadData2Text.text = save_to_str(pr.register_read_data_2)
             result.RegisterFileReadData2.do_highlight = bool(
                 result.RegisterFileReadData2Text.text
             )
 
-            result.ImmGenText.text = save_to_str(pipeline_register.imm)
+            result.ImmGenText.text = save_to_str(pr.imm)
             result.ImmGenOut.do_highlight = bool(result.ImmGenText.text)
             result.DecodeInstructionMemory3.do_highlight = bool(result.ImmGenText.text)
 
-            result.DecodeInstructionMemory4Text.text = save_to_str(
-                pipeline_register.write_register
-            )
+            result.DecodeInstructionMemory4Text.text = save_to_str(pr.write_register)
             result.DecodeInstructionMemory4.do_highlight = bool(
                 result.DecodeInstructionMemory4Text.text
             )
 
-            result.DecodeFetchAddOut.do_highlight = (
-                pipeline_register.control_unit_signals.wb_src == 0
-            )
+            result.DecodeFetchAddOut.do_highlight = csignals.wb_src == 0
             result.DecodeFetchAddOutText.text = (
-                save_to_str(pipeline_register.pc_plus_instruction_length)
+                save_to_str(pr.pc_plus_instruction_length)
                 if result.DecodeFetchAddOut.do_highlight
                 else ""
             )
 
-            result.DecodeUpperFetchPCOut.do_highlight = bool(
-                pipeline_register.control_unit_signals.jump
-            ) | bool(pipeline_register.control_unit_signals.branch)
+            result.DecodeUpperFetchPCOut.do_highlight = bool(csignals.jump) | bool(
+                csignals.branch
+            )
             result.DecodeUpperFetchPCOutText.text = (
-                save_to_str(pipeline_register.address_of_instruction)
+                save_to_str(pr.address_of_instruction)
                 if result.DecodeUpperFetchPCOut.do_highlight
                 else ""
             )
 
-            result.DecodeLowerFetchPCOut.do_highlight = (
-                pipeline_register.control_unit_signals.alu_src_1 == 0
-            )
+            result.DecodeLowerFetchPCOut.do_highlight = csignals.alu_src_1 == 0
             result.DecodeLowerFetchPCOutText.text = (
-                save_to_str(pipeline_register.address_of_instruction)
+                save_to_str(pr.address_of_instruction)
                 if result.DecodeLowerFetchPCOut.do_highlight
                 else ""
             )
 
             result.DecodeInstructionMemory.do_highlight = not isinstance(
-                pipeline_register.instruction, EmptyInstruction
+                pr.instruction, EmptyInstruction
             )
-            result.ControlUnitLeftRight1_1.do_highlight = bool(
-                pipeline_register.control_unit_signals.jump
-            )
-            result.ControlUnitLeftRight2_1.do_highlight = bool(
-                pipeline_register.control_unit_signals.wb_src
-            )
-            result.ControlUnitLeftRight3_1.do_highlight = bool(
-                pipeline_register.control_unit_signals.alu_src_1
-            )
-            result.ControlUnitLeftRight4_1.do_highlight = bool(
-                pipeline_register.control_unit_signals.alu_src_2
-            )
-            result.ControlUnitLeft_1.do_highlight = bool(
-                pipeline_register.control_unit_signals.alu_to_pc
-            )
-            result.ControlUnitRegWriteEnable_1.do_highlight = bool(
-                pipeline_register.control_unit_signals.reg_write
-            )
-            result.ControlUnitMemWriteEnable_1.do_highlight = bool(
-                pipeline_register.control_unit_signals.mem_write
-            )
-            result.ControlUnitMemReadEnable_1.do_highlight = bool(
-                pipeline_register.control_unit_signals.mem_read
-            )
+            result.ControlUnitLeftRight1_1.do_highlight = bool(csignals.jump)
+            result.ControlUnitLeftRight2_1.do_highlight = bool(csignals.wb_src)
+            result.ControlUnitLeftRight3_1.do_highlight = bool(csignals.alu_src_1)
+            result.ControlUnitLeftRight4_1.do_highlight = bool(csignals.alu_src_2)
+            result.ControlUnitLeft_1.do_highlight = bool(csignals.alu_to_pc)
+            result.ControlUnitRegWriteEnable_1.do_highlight = bool(csignals.reg_write)
+            result.ControlUnitMemWriteEnable_1.do_highlight = bool(csignals.mem_write)
+            result.ControlUnitMemReadEnable_1.do_highlight = bool(csignals.mem_read)
 
             result.DecodeInstructionMemoryIntermediate.do_highlight = bool(
-                pipeline_register.control_unit_signals.reg_write
-            ) | (pipeline_register.imm is not None)
+                csignals.reg_write
+            ) | (pr.imm is not None)
 
         return result.export()
 
     def _get_riscv_five_stage_EX_svg_update_values(self) -> list[tuple[str, str, Any]]:
         """Returns all information needed to update EX stage part of svg."""
         result = RiscvFiveStageEXSvgDirectives()
-        pipeline_register = self.state.pipeline.pipeline_registers[2]
+        pr = self.state.pipeline.pipeline_registers[2]
 
-        result.Execute.text = pipeline_register.instruction.mnemonic
+        result.Execute.text = pr.instruction.mnemonic
 
-        if isinstance(pipeline_register, ExecutePipelineRegister):
-            result.ExecuteRightMuxOutText.text = save_to_str(pipeline_register.alu_in_1)
+        if isinstance(pr, ExecutePipelineRegister):
+            csignals = pr.control_unit_signals
+            result.ExecuteRightMuxOutText.text = save_to_str(pr.alu_in_1)
             result.ExecuteRightMuxOut.do_highlight = bool(
                 result.ExecuteRightMuxOutText.text
             )
 
-            result.ExecuteLeftMuxOutText.text = save_to_str(pipeline_register.alu_in_2)
+            result.ExecuteLeftMuxOutText.text = save_to_str(pr.alu_in_2)
             result.ExecuteLeftMuxOut.do_highlight = bool(
                 result.ExecuteLeftMuxOutText.text
             )
 
             result.ExecuteRegisterFileReadData1.do_highlight = bool(
-                save_to_str(pipeline_register.register_read_data_1)
+                save_to_str(pr.register_read_data_1)
             )
 
             result.ExecuteRegisterFileReadData2Text2.text = save_to_str(
-                pipeline_register.register_read_data_2
+                pr.register_read_data_2
             )
             result.ExecuteRegisterFileReadData2.do_highlight = bool(
                 result.ExecuteRegisterFileReadData2Text2.text
             )
 
-            result.ExecuteImmGen.do_highlight = pipeline_register.imm is not None
+            result.ExecuteImmGen.do_highlight = pr.imm is not None
 
-            result.ALUResultText.text = save_to_str(pipeline_register.result)
+            result.ALUResultText.text = save_to_str(pr.result)
             result.ExecuteAluResult.do_highlight = bool(result.ALUResultText.text)
 
-            result.ExecuteInstructionMemory4Text.text = save_to_str(
-                pipeline_register.write_register
-            )
+            result.ExecuteInstructionMemory4Text.text = save_to_str(pr.write_register)
             result.ExecuteInstructionMemory4.do_highlight = bool(
                 result.ExecuteInstructionMemory4Text.text
             )
 
-            result.ExecuteFetchAddOut.do_highlight = (
-                pipeline_register.control_unit_signals.wb_src == 0
-            )
+            result.ExecuteFetchAddOut.do_highlight = csignals.wb_src == 0
             result.ExecuteFetchAddOutText.text = (
-                save_to_str(pipeline_register.pc_plus_instruction_length)
+                save_to_str(pr.pc_plus_instruction_length)
                 if result.ExecuteFetchAddOut.do_highlight
                 else ""
             )
 
-            result.ALUComparison.do_highlight = bool(pipeline_register.comparison)
+            result.ALUComparison.do_highlight = bool(pr.comparison)
 
-            result.ControlUnitLeftRight1_2.do_highlight = bool(
-                pipeline_register.control_unit_signals.jump
-            )
-            result.ControlUnitLeftRight2_2.do_highlight = bool(
-                pipeline_register.control_unit_signals.wb_src
-            )
-            result.ControlUnitLeftRight3_2.do_highlight = bool(
-                pipeline_register.control_unit_signals.alu_src_1
-            )
-            result.ControlUnitLeftRight4_2.do_highlight = bool(
-                pipeline_register.control_unit_signals.alu_src_2
-            )
-            result.ControlUnitLeft_2.do_highlight = bool(
-                pipeline_register.control_unit_signals.alu_to_pc
-            )
+            result.ControlUnitLeftRight1_2.do_highlight = bool(csignals.jump)
+            result.ControlUnitLeftRight2_2.do_highlight = bool(csignals.wb_src)
+            result.ControlUnitLeftRight3_2.do_highlight = bool(csignals.alu_src_1)
+            result.ControlUnitLeftRight4_2.do_highlight = bool(csignals.alu_src_2)
+            result.ControlUnitLeft_2.do_highlight = bool(csignals.alu_to_pc)
 
-            result.AluControl.do_highlight = bool(
-                save_to_str(pipeline_register.control_unit_signals.alu_op)
-            )
+            result.AluControl.do_highlight = bool(save_to_str(csignals.alu_op))
 
-            result.ExecuteImmediateToAdder.do_highlight = bool(
-                pipeline_register.control_unit_signals.jump
-            ) | bool(pipeline_register.control_unit_signals.branch)
+            result.ExecuteImmediateToAdder.do_highlight = bool(csignals.jump) | bool(
+                csignals.branch
+            )
             result.ExecuteImmGenText1.text = (
-                save_to_str(pipeline_register.imm)
+                save_to_str(pr.imm)
                 if result.ExecuteImmediateToAdder.do_highlight
                 else ""
             )
@@ -491,211 +445,156 @@ class RiscvSimulation(Simulation):
                 result.ExecuteImmediateToAdder.do_highlight
             )
             result.ExecuteUpperFetchPCOutText.text = (
-                save_to_str(pipeline_register.address_of_instruction)
+                save_to_str(pr.address_of_instruction)
                 if result.ExecuteUpperFetchPCOut.do_highlight
                 else ""
             )
 
             result.ExecuteAdd.do_highlight = result.ExecuteUpperFetchPCOut.do_highlight
             result.ExecuteAddText.text = (
-                save_to_str(pipeline_register.pc_plus_imm)
-                if result.ExecuteAdd.do_highlight
-                else ""
+                save_to_str(pr.pc_plus_imm) if result.ExecuteAdd.do_highlight else ""
             )
 
-            result.ExecuteLowerFetchPCOut.do_highlight = (
-                pipeline_register.control_unit_signals.alu_src_1 is False
-            )
+            result.ExecuteLowerFetchPCOut.do_highlight = csignals.alu_src_1 is False
 
-            result.ExecuteImmediateToMux.do_highlight = (
-                pipeline_register.control_unit_signals.alu_src_2
-            )
+            result.ExecuteImmediateToMux.do_highlight = csignals.alu_src_2
 
-            result.ExecuteImmediateToWbMux.do_highlight = (
-                pipeline_register.control_unit_signals.wb_src == 3
-            )
+            result.ExecuteImmediateToWbMux.do_highlight = csignals.wb_src == 3
             result.ExecuteImmGenText3.text = (
-                save_to_str(pipeline_register.imm)
+                save_to_str(pr.imm)
                 if result.ExecuteImmediateToWbMux.do_highlight
                 else ""
             )
 
             result.ExecuteImmediateInterediate.do_highlight = (
-                bool(pipeline_register.control_unit_signals.alu_src_2)
-                or result.ExecuteImmediateToAdder.do_highlight
+                bool(csignals.alu_src_2) or result.ExecuteImmediateToAdder.do_highlight
             )
 
             result.ExecuteRegisterFileReadData2ToMux.do_highlight = (
-                pipeline_register.control_unit_signals.alu_src_2 is False
+                csignals.alu_src_2 is False
             )
             result.ExecuteRegisterFileReadData2ToMemory.do_highlight = bool(
-                pipeline_register.control_unit_signals.mem_write
+                csignals.mem_write
             )
 
-            result.ControlUnitRegWriteEnable_2.do_highlight = bool(
-                pipeline_register.control_unit_signals.reg_write
-            )
-            result.ControlUnitMemWriteEnable_2.do_highlight = bool(
-                pipeline_register.control_unit_signals.mem_write
-            )
-            result.ControlUnitMemReadEnable_2.do_highlight = bool(
-                pipeline_register.control_unit_signals.mem_read
-            )
+            result.ControlUnitRegWriteEnable_2.do_highlight = bool(csignals.reg_write)
+            result.ControlUnitMemWriteEnable_2.do_highlight = bool(csignals.mem_write)
+            result.ControlUnitMemReadEnable_2.do_highlight = bool(csignals.mem_read)
 
         return result.export()
 
     def _get_riscv_five_stage_MEM_svg_update_values(self) -> list[tuple[str, str, Any]]:
         """Returns all information needed to update MEM stage part of svg."""
         result = RiscvFiveStageMEMSvgDirectives()
-        pipeline_register = self.state.pipeline.pipeline_registers[3]
+        pr = self.state.pipeline.pipeline_registers[3]
 
-        result.Memory.text = pipeline_register.instruction.mnemonic
+        result.Memory.text = pr.instruction.mnemonic
 
-        if isinstance(pipeline_register, MemoryAccessPipelineRegister):
-            result.DataMemoryAddressText.text = save_to_str(
-                pipeline_register.memory_address
-            )
+        if isinstance(pr, MemoryAccessPipelineRegister):
+            csignals = pr.control_unit_signals
+            result.DataMemoryAddressText.text = save_to_str(pr.memory_address)
 
-            result.MemoryExecuteAluResult.do_highlight = (
-                pipeline_register.result is not None
-            )
+            result.MemoryExecuteAluResult.do_highlight = pr.result is not None
 
-            result.MemoryRegisterFileReadData2.do_highlight = bool(
-                pipeline_register.control_unit_signals.mem_write
-            )
+            result.MemoryRegisterFileReadData2.do_highlight = bool(csignals.mem_write)
             result.DataMemoryWriteDataText.text = (
-                save_to_str(pipeline_register.memory_write_data)
+                save_to_str(pr.memory_write_data)
                 if result.MemoryRegisterFileReadData2.do_highlight
                 else ""
             )
 
-            result.DataMemoryReadDataText.text = save_to_str(
-                pipeline_register.memory_read_data
-            )
+            result.DataMemoryReadDataText.text = save_to_str(pr.memory_read_data)
             result.DataMemoryReadData.do_highlight = bool(
                 result.DataMemoryReadDataText.text
             )
 
-            result.MemoryInstructionMemory4Text.text = save_to_str(
-                pipeline_register.write_register
-            )
+            result.MemoryInstructionMemory4Text.text = save_to_str(pr.write_register)
             result.MemoryInstructionMemory4.do_highlight = bool(
                 result.MemoryInstructionMemory4Text.text
             )
 
-            result.MemoryALUComparison.do_highlight = bool(pipeline_register.comparison)
+            result.MemoryALUComparison.do_highlight = bool(pr.comparison)
 
-            result.MemoryJumpOut.do_highlight = bool(
-                pipeline_register.comparison_or_jump
-            )
+            result.MemoryJumpOut.do_highlight = bool(pr.comparison_or_jump)
 
             result.MemoryExecuteAddOut.do_highlight = result.MemoryJumpOut.do_highlight
 
-            result.MemoryFetchAddOut.do_highlight = (
-                pipeline_register.control_unit_signals.wb_src == 0
-            )
+            result.MemoryFetchAddOut.do_highlight = csignals.wb_src == 0
             result.MemoryFetchAddOutText.text = (
-                save_to_str(pipeline_register.pc_plus_instruction_length)
+                save_to_str(pr.pc_plus_instruction_length)
                 if result.MemoryFetchAddOut.do_highlight
                 else ""
             )
 
-            result.MemoryImmGen.do_highlight = (
-                pipeline_register.control_unit_signals.wb_src == 3
-            )
+            result.MemoryImmGen.do_highlight = csignals.wb_src == 3
             result.MemoryImmGenText.text = (
-                save_to_str(pipeline_register.imm)
-                if result.MemoryImmGen.do_highlight
-                else ""
+                save_to_str(pr.imm) if result.MemoryImmGen.do_highlight else ""
             )
 
-            result.ControlUnitLeftRight1_3.do_highlight = bool(
-                pipeline_register.control_unit_signals.jump
-            )
-            result.ControlUnitLeftRight2_3.do_highlight = bool(
-                pipeline_register.control_unit_signals.wb_src
-            )
-            result.ControlUnitLeft_3.do_highlight = bool(
-                pipeline_register.control_unit_signals.alu_to_pc
-            )
+            result.ControlUnitLeftRight1_3.do_highlight = bool(csignals.jump)
+            result.ControlUnitLeftRight2_3.do_highlight = bool(csignals.wb_src)
+            result.ControlUnitLeft_3.do_highlight = bool(csignals.alu_to_pc)
 
             result.MemoryExecuteAluResultToMemory.do_highlight = bool(
-                pipeline_register.control_unit_signals.mem_read
-            ) or bool(pipeline_register.control_unit_signals.mem_write)
+                csignals.mem_read
+            ) or bool(csignals.mem_write)
             result.MemoryExecuteAluResultToFetchMux.do_highlight = (
-                pipeline_register.control_unit_signals.alu_to_pc is True
+                csignals.alu_to_pc is True
             )
             result.MemoryExecuteAluResultIntermediate.do_highlight = (
                 result.MemoryExecuteAluResultToMemory.do_highlight
                 or result.MemoryExecuteAluResultToFetchMux.do_highlight
             )
-            result.MemoryExecuteAluResultToWbMux.do_highlight = (
-                pipeline_register.control_unit_signals.wb_src == 2
-            )
+            result.MemoryExecuteAluResultToWbMux.do_highlight = csignals.wb_src == 2
             result.MemoryExecuteAluResultText2.text = (
-                save_to_str(pipeline_register.result)
+                save_to_str(pr.result)
                 if result.MemoryExecuteAluResultToWbMux.do_highlight
                 else ""
             )
 
-            result.ControlUnitRegWriteEnable_3 = bool(
-                pipeline_register.control_unit_signals.reg_write
-            )
-            result.ControlUnitMemReadEnable_3 = bool(
-                pipeline_register.control_unit_signals.mem_read
-            )
-            result.ControlUnitMemWriteEnable_3 = bool(
-                pipeline_register.control_unit_signals.mem_write
-            )
+            result.ControlUnitRegWriteEnable_3 = bool(csignals.reg_write)
+            result.ControlUnitMemReadEnable_3 = bool(csignals.mem_read)
+            result.ControlUnitMemWriteEnable_3 = bool(csignals.mem_write)
         return result.export()
 
     def _get_riscv_five_stage_WB_svg_update_values(self) -> list[tuple[str, str, Any]]:
         """Returns all information needed to update WB stage part of svg."""
         result = RiscvFiveStageWBSvgDirectives()
-        pipeline_register = self.state.pipeline.pipeline_registers[4]
+        pr = self.state.pipeline.pipeline_registers[4]
 
-        result.WriteBack.text = pipeline_register.instruction.mnemonic
+        result.WriteBack.text = pr.instruction.mnemonic
 
-        if isinstance(pipeline_register, RegisterWritebackPipelineRegister):
-            result.RegisterFileWriteDataText.text = save_to_str(
-                pipeline_register.register_write_data
-            )
+        if isinstance(pr, RegisterWritebackPipelineRegister):
+            csignals = pr.control_unit_signals
+            result.RegisterFileWriteDataText.text = save_to_str(pr.register_write_data)
             result.WriteBackMuxOut.do_highlight = bool(
                 result.RegisterFileWriteDataText.text
             )
 
-            result.RegisterFileWriteRegisterText.text = save_to_str(
-                pipeline_register.write_register
-            )
+            result.RegisterFileWriteRegisterText.text = save_to_str(pr.write_register)
             result.WriteBackInstructionMemory4.do_highlight = bool(
                 result.RegisterFileWriteRegisterText.text
             )
 
-            result.WriteBackDataMemoryReadData.do_highlight = (
-                pipeline_register.control_unit_signals.wb_src == 1
-            )
+            result.WriteBackDataMemoryReadData.do_highlight = csignals.wb_src == 1
 
             result.WriteBackExecuteAluResult.do_highlight = (
-                pipeline_register.control_unit_signals.wb_src == 2
+                pr.control_unit_signals.wb_src == 2
             )
 
             result.WriteBackFetchAddOut.do_highlight = (
-                pipeline_register.control_unit_signals.wb_src == 0
+                pr.control_unit_signals.wb_src == 0
             )
 
-            result.WriteBackImmGen.do_highlight = (
-                pipeline_register.control_unit_signals.wb_src == 3
-            )
+            result.WriteBackImmGen.do_highlight = pr.control_unit_signals.wb_src == 3
 
-            result.wbsrc.text = save_to_str(
-                pipeline_register.control_unit_signals.wb_src
-            )
+            result.wbsrc.text = save_to_str(pr.control_unit_signals.wb_src)
             result.ControlUnitLeftRight2_4.do_highlight = bool(
-                pipeline_register.control_unit_signals.wb_src
+                pr.control_unit_signals.wb_src
             )
 
             result.ControlUnitRegWriteEnable_4.do_highlight = (
-                pipeline_register.control_unit_signals.reg_write is True
+                pr.control_unit_signals.reg_write is True
             )
         return result.export()
 
