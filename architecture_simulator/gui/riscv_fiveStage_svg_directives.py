@@ -140,6 +140,8 @@ class RiscvFiveStageMEMSvgDirectives(RiscvSvgDirectivesBase):
         self.ControlUnitLeft_3 = SvgFillDirectiveGreen()
         self.MemoryExecuteAluResultToMemory = SvgFillDirectiveBlue()
         self.MemoryExecuteAluResultToFetchMux = SvgFillDirectiveBlue()
+        self.MemoryExecuteAluResultIntermediate = SvgFillDirectiveBlue()
+        self.MemoryExecuteAluResultToWbMux = SvgFillDirectiveBlue()
         self.ControlUnitRegWriteEnable_3 = SvgFillDirectiveGreen()
         self.ControlUnitMemWriteEnable_3 = SvgFillDirectiveGreen()
         self.ControlUnitMemReadEnable_3 = SvgFillDirectiveGreen()
