@@ -545,22 +545,17 @@ class RiscvSimulation(Simulation):
                 pipeline_register.memory_address
             )
 
-            result.MemoryExecuteAluResultText.text = save_to_str(
-                pipeline_register.result
-            )
-            result.MemoryExecuteAluResultText2.text = save_to_str(
-                pipeline_register.result
+            result.MemoryExecuteAluResult.do_highlight = (
+                pipeline_register.result is not None
             )
 
-            result.MemoryExecuteAluResult.do_highlight = bool(
-                result.MemoryExecuteAluResultText.text
-            ) and bool(result.DataMemoryAddressText.text)
-
-            result.DataMemoryWriteDataText.text = save_to_str(
-                pipeline_register.memory_write_data
-            )
             result.MemoryRegisterFileReadData2.do_highlight = bool(
-                result.DataMemoryWriteDataText.text
+                pipeline_register.control_unit_signals.mem_write
+            )
+            result.DataMemoryWriteDataText.text = (
+                save_to_str(pipeline_register.memory_write_data)
+                if result.MemoryRegisterFileReadData2.do_highlight
+                else ""
             )
 
             result.DataMemoryReadDataText.text = save_to_str(
@@ -583,22 +578,30 @@ class RiscvSimulation(Simulation):
                 pipeline_register.comparison_or_jump
             )
 
-            result.MemoryExecuteAddOutText.text = save_to_str(
-                pipeline_register.pc_plus_imm
-            )
-            result.MemoryExecuteAddOut.do_highlight = bool(
-                result.MemoryExecuteAddOutText.text
-            )
-
-            result.MemoryFetchAddOutText.text = save_to_str(
-                pipeline_register.pc_plus_instruction_length
-            )
-            result.MemoryFetchAddOut.do_highlight = bool(
-                result.MemoryFetchAddOutText.text
+            result.MemoryExecuteAddOut.do_highlight = result.MemoryJumpOut.do_highlight
+            result.MemoryExecuteAddOutText.text = (
+                save_to_str(pipeline_register.pc_plus_imm)
+                if result.MemoryExecuteAddOut.do_highlight
+                else ""
             )
 
-            result.MemoryImmGenText.text = save_to_str(pipeline_register.imm)
-            result.MemoryImmGen.do_highlight = bool(result.MemoryImmGenText.text)
+            result.MemoryFetchAddOut.do_highlight = (
+                pipeline_register.control_unit_signals.wb_src == 0
+            )
+            result.MemoryFetchAddOutText.text = (
+                save_to_str(pipeline_register.pc_plus_instruction_length)
+                if result.MemoryFetchAddOut.do_highlight
+                else ""
+            )
+
+            result.MemoryImmGen.do_highlight = (
+                pipeline_register.control_unit_signals.wb_src == 3
+            )
+            result.MemoryImmGenText.text = (
+                save_to_str(pipeline_register.imm)
+                if result.MemoryImmGen.do_highlight
+                else ""
+            )
 
             result.ControlUnitLeftRight1_3.do_highlight = bool(
                 pipeline_register.control_unit_signals.jump
@@ -610,6 +613,39 @@ class RiscvSimulation(Simulation):
                 pipeline_register.control_unit_signals.alu_to_pc
             )
 
+            result.MemoryExecuteAluResultToMemory.do_highlight = bool(
+                pipeline_register.control_unit_signals.mem_read
+            ) or bool(pipeline_register.control_unit_signals.mem_write)
+            result.MemoryExecuteAluResultToFetchMux.do_highlight = (
+                pipeline_register.control_unit_signals.alu_to_pc is True
+            )
+            result.MemoryExecuteAluResultIntermediate.do_highlight = (
+                result.MemoryExecuteAluResultToMemory.do_highlight
+                or result.MemoryExecuteAluResultToFetchMux.do_highlight
+            )
+            result.MemoryExecuteAluResultText.text = (
+                save_to_str(pipeline_register.result)
+                if result.MemoryExecuteAluResultToFetchMux.do_highlight
+                else ""
+            )
+            result.MemoryExecuteAluResultToWbMux.do_highlight = (
+                pipeline_register.control_unit_signals.wb_src == 2
+            )
+            result.MemoryExecuteAluResultText2.text = (
+                save_to_str(pipeline_register.result)
+                if result.MemoryExecuteAluResultToWbMux.do_highlight
+                else ""
+            )
+
+            result.ControlUnitRegWriteEnable_3 = bool(
+                pipeline_register.control_unit_signals.reg_write
+            )
+            result.ControlUnitMemReadEnable_3 = bool(
+                pipeline_register.control_unit_signals.mem_read
+            )
+            result.ControlUnitMemWriteEnable_3 = bool(
+                pipeline_register.control_unit_signals.mem_write
+            )
         return result.export()
 
     def _get_riscv_five_stage_WB_svg_update_values(self) -> list[tuple[str, str, Any]]:
