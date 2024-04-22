@@ -25,9 +25,9 @@
      inkscape:deskcolor="#505050"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="0.70710678"
-     inkscape:cx="5534.5248"
-     inkscape:cy="3000.9612"
+     inkscape:zoom="0.1767767"
+     inkscape:cx="2621.9519"
+     inkscape:cy="2076.0655"
      inkscape:window-width="1920"
      inkscape:window-height="1007"
      inkscape:window-x="0"
@@ -249,8 +249,8 @@
        d="m 1603.0182,898.52528 -34.8019,3.6e-4 v -539.9765 l -18.9524,-1e-5"
        id="WriteBackFetchAddOut"
        sodipodi:nodetypes="cccc" /><path
-       style="display:inline;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:5;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#000000_ArchsimMarker_Triangle)"
-       d="m 1150.851,838.61538 2e-4,71.61692 -30.7078,9.9e-4"
+       style="display:inline;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:3;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#000000_ArchsimMarker_Triangle)"
+       d="m 1150.851,835.81538 2e-4,74.41692 -30.7078,9.9e-4"
        id="AluControl"
        sodipodi:nodetypes="ccc" /><path
        id="ControlUnitLeftRight3-1"
@@ -368,8 +368,8 @@
        d="m 527.11823,760.40509 -21.91483,5.7e-4"
        id="InstructionMemory"
        sodipodi:nodetypes="cc" /><path
-       style="display:inline;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:5;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#000000_ArchsimMarker_Triangle)"
-       d="m 329.41792,122.11539 6.3e-4,-32.499964 c 429.3662,0 743.51375,6e-5 1172.87995,1e-4 V 430.74153 l -109.5044,2.8e-4"
+       style="display:inline;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:3;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#000000_ArchsimMarker_Triangle)"
+       d="m 329.41792,124.81538 6.3e-4,-35.199954 c 429.3662,0 743.51375,6e-5 1172.87995,1e-4 V 430.74153 l -109.5044,2.8e-4"
        id="MemoryJumpOut"
        sodipodi:nodetypes="ccccc" /><path
        id="ControlUnitLeftRight1-1"
@@ -397,7 +397,7 @@
        style="display:inline;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:5;stroke-dasharray:none;stroke-opacity:1"
        d="m 865.67882,801.68768 h -1.29036 l -19.91104,5e-5"
        inkscape:label="RegisterFileReadData2" /><path
-       style="display:inline;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:5;stroke-dasharray:none;stroke-opacity:1"
+       style="display:inline;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:3;stroke-dasharray:none;stroke-opacity:1"
        d="M 1178.9011,730.32484 V 447.44887 l 49.4347,-10e-6"
        id="ALUComparison"
        sodipodi:nodetypes="ccc" /><path
@@ -1053,8 +1053,8 @@
        inkscape:label="MemoryInstructionMemory4"
        sodipodi:nodetypes="cc" /><path
        id="MemoryALUComparison"
-       style="display:inline;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:5;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#000000_ArchsimMarker_Triangle)"
-       d="m 1331.5182,447.46138 -88.3447,-1.1e-4"
+       style="display:inline;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:3;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#000000_ArchsimMarker_Triangle)"
+       d="m 1334.0912,447.46138 -90.9177,-1.1e-4"
        inkscape:label="MemoryALUComparison"
        sodipodi:nodetypes="cc" /><text
        xml:space="preserve"
