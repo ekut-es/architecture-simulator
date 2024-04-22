@@ -362,7 +362,7 @@ class RiscvSimulation(Simulation):
                 pr.instruction, EmptyInstruction
             )
             result.ControlUnitLeftRight1_1.do_highlight = bool(csignals.jump)
-            result.ControlUnitLeftRight2_1.do_highlight = bool(csignals.wb_src)
+            result.ControlUnitLeftRight2_1.do_highlight = csignals.wb_src is not None
             result.ControlUnitLeftRight3_1.do_highlight = bool(csignals.alu_src_1)
             result.ControlUnitLeftRight4_1.do_highlight = bool(csignals.alu_src_2)
             result.ControlUnitLeft_1.do_highlight = bool(csignals.alu_to_pc)
@@ -424,7 +424,7 @@ class RiscvSimulation(Simulation):
             result.ALUComparison.do_highlight = bool(pr.comparison)
 
             result.ControlUnitLeftRight1_2.do_highlight = bool(csignals.jump)
-            result.ControlUnitLeftRight2_2.do_highlight = bool(csignals.wb_src)
+            result.ControlUnitLeftRight2_2.do_highlight = csignals.wb_src is not None
             result.ControlUnitLeftRight3_2.do_highlight = bool(csignals.alu_src_1)
             result.ControlUnitLeftRight4_2.do_highlight = bool(csignals.alu_src_2)
             result.ControlUnitLeft_2.do_highlight = bool(csignals.alu_to_pc)
@@ -485,7 +485,6 @@ class RiscvSimulation(Simulation):
 
         if isinstance(pr, MemoryAccessPipelineRegister):
             csignals = pr.control_unit_signals
-            result.DataMemoryAddressText.text = save_to_str(pr.memory_address)
 
             result.MemoryExecuteAluResult.do_highlight = pr.result is not None
 
@@ -521,12 +520,15 @@ class RiscvSimulation(Simulation):
             )
 
             result.ControlUnitLeftRight1_3.do_highlight = bool(csignals.jump)
-            result.ControlUnitLeftRight2_3.do_highlight = bool(csignals.wb_src)
+            result.ControlUnitLeftRight2_3.do_highlight = csignals.wb_src is not None
             result.ControlUnitLeft_3.do_highlight = bool(csignals.alu_to_pc)
 
             result.MemoryExecuteAluResultToMemory.do_highlight = bool(
                 csignals.mem_read
             ) or bool(csignals.mem_write)
+            result.DataMemoryAddressText.text = save_to_str(
+                pr.memory_address, result.MemoryExecuteAluResultToMemory.do_highlight
+            )
             result.MemoryExecuteAluResultToFetchMux.do_highlight = (
                 csignals.alu_to_pc is True
             )
@@ -539,9 +541,9 @@ class RiscvSimulation(Simulation):
                 pr.result, result.MemoryExecuteAluResultToWbMux.do_highlight
             )
 
-            result.ControlUnitRegWriteEnable_3 = bool(csignals.reg_write)
-            result.ControlUnitMemReadEnable_3 = bool(csignals.mem_read)
-            result.ControlUnitMemWriteEnable_3 = bool(csignals.mem_write)
+            result.ControlUnitRegWriteEnable_3.do_highlight = bool(csignals.reg_write)
+            result.ControlUnitMemReadEnable_3.do_highlight = bool(csignals.mem_read)
+            result.ControlUnitMemWriteEnable_3.do_highlight = bool(csignals.mem_write)
         return result.export()
 
     def _get_riscv_five_stage_WB_svg_update_values(self) -> list[tuple[str, str, Any]]:
@@ -576,8 +578,8 @@ class RiscvSimulation(Simulation):
             result.WriteBackImmGen.do_highlight = pr.control_unit_signals.wb_src == 3
 
             result.wbsrc.text = save_to_str(pr.control_unit_signals.wb_src)
-            result.ControlUnitLeftRight2_4.do_highlight = bool(
-                pr.control_unit_signals.wb_src
+            result.ControlUnitLeftRight2_4.do_highlight = (
+                pr.control_unit_signals.wb_src is not None
             )
 
             result.ControlUnitRegWriteEnable_4.do_highlight = (
