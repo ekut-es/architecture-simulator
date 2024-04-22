@@ -567,24 +567,16 @@ class RiscvSimulation(Simulation):
 
             result.WriteBackDataMemoryReadData.do_highlight = csignals.wb_src == 1
 
-            result.WriteBackExecuteAluResult.do_highlight = (
-                pr.control_unit_signals.wb_src == 2
-            )
+            result.WriteBackExecuteAluResult.do_highlight = csignals.wb_src == 2
 
-            result.WriteBackFetchAddOut.do_highlight = (
-                pr.control_unit_signals.wb_src == 0
-            )
+            result.WriteBackFetchAddOut.do_highlight = csignals.wb_src == 0
 
-            result.WriteBackImmGen.do_highlight = pr.control_unit_signals.wb_src == 3
+            result.WriteBackImmGen.do_highlight = csignals.wb_src == 3
 
-            result.wbsrc.text = save_to_str(pr.control_unit_signals.wb_src)
-            result.ControlUnitLeftRight2_4.do_highlight = (
-                pr.control_unit_signals.wb_src is not None
-            )
+            result.wbsrc.text = save_to_str(csignals.wb_src)
+            result.ControlUnitLeftRight2_4.do_highlight = csignals.wb_src is not None
 
-            result.ControlUnitRegWriteEnable_4.do_highlight = (
-                pr.control_unit_signals.reg_write is True
-            )
+            result.ControlUnitRegWriteEnable_4.do_highlight = csignals.reg_write is True
         return result.export()
 
     def _get_riscv_five_stage_OTHER_svg_update_values(
