@@ -216,10 +216,14 @@ class ExecuteStage(Stage):
             return ExecutePipelineRegister()
 
         alu_in_1 = (
-            pipeline_register.register_read_data_1
-            if pipeline_register.control_unit_signals.alu_src_1
-            else pipeline_register.address_of_instruction
-        )
+            None
+            if pipeline_register.control_unit_signals.alu_src_1 is None
+            else (
+                pipeline_register.register_read_data_1
+                if pipeline_register.control_unit_signals.alu_src_1
+                else pipeline_register.address_of_instruction
+            )
+        )  # check if alu_src_1 is None because address_of_instruction always exists and might cause problems in the visualization
         alu_in_2 = (
             pipeline_register.imm
             if pipeline_register.control_unit_signals.alu_src_2
