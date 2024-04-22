@@ -94,16 +94,12 @@ class RiscvSingleStageSvgDirectives:
         self.alu_out_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
         self.alu_out_to_4mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
         self.alu_out_to_2mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
-        self.alu_comparison_to_and_path: SvgFillDirectiveGreen = (
-            SvgFillDirectiveGreen()
-        )  # Green since it is a binary value
+        self.alu_comparison_to_and_path: SvgFillDirectiveGreen = SvgFillDirectiveGreen()
         self.alu_to_data_memory_address_path: SvgFillDirectiveBlue = (
             SvgFillDirectiveBlue()
         )
 
-        self.and_to_mux_path: SvgFillDirectiveGreen = (
-            SvgFillDirectiveGreen()
-        )  # Green since it is a binary value (should be named or!)
+        self.and_to_mux_path: SvgFillDirectiveGreen = SvgFillDirectiveGreen()
 
         self.add_imm_to_mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
         self.add_instr_len_to_2mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
