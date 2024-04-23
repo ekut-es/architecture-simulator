@@ -178,7 +178,7 @@ class SvgFillDirectiveGreen(SvgFillDirective):
     """SVG Fill Directive: highlight: green, default: black"""
 
     def __init__(self):
-        super().__init__(color_on="#008000", color_off="#000000")
+        super().__init__(color_on="#A51E37", color_off="#000000")
 
 
 class SvgWriteLeftDirective(SvgDirective):
