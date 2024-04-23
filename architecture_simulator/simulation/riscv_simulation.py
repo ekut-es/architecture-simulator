@@ -370,9 +370,20 @@ class RiscvSimulation(Simulation):
             result.ControlUnitMemWriteEnable_1.do_highlight = bool(csignals.mem_write)
             result.ControlUnitMemReadEnable_1.do_highlight = bool(csignals.mem_read)
 
-            result.DecodeInstructionMemoryIntermediate.do_highlight = bool(
+            result.DecodeInstructionMemoryToAluCtl.do_highlight = (
+                csignals.alu_op is not None
+            )
+            result.ControlUnitAluOp_1.do_highlight = csignals.alu_op is not None
+
+            result.DecodeInstructionMemoryIntermediate1.do_highlight = (
+                bool(csignals.reg_write)
+                or (pr.imm is not None)
+                or csignals.alu_op is not None
+            )
+
+            result.DecodeInstructionMemoryIntermediate2.do_highlight = bool(
                 csignals.reg_write
-            ) | (pr.imm is not None)
+            ) or (pr.imm is not None)
 
         return result.export()
 
@@ -473,6 +484,11 @@ class RiscvSimulation(Simulation):
             result.ControlUnitRegWriteEnable_2.do_highlight = bool(csignals.reg_write)
             result.ControlUnitMemWriteEnable_2.do_highlight = bool(csignals.mem_write)
             result.ControlUnitMemReadEnable_2.do_highlight = bool(csignals.mem_read)
+
+            result.ExecuteInstructionMemoryToAluCtl.do_highlight = (
+                csignals.alu_op is not None
+            )
+            result.ControlUnitAluOp_2.do_highlight = csignals.alu_op is not None
 
         return result.export()
 

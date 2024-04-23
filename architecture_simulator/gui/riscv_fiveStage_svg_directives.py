@@ -65,10 +65,13 @@ class RiscvFiveStageIDSvgDirectives(RiscvSvgDirectivesBase):
         self.ControlUnitLeftRight3_1 = SvgFillDirectiveGreen()
         self.ControlUnitLeftRight4_1 = SvgFillDirectiveGreen()
         self.ControlUnitLeft_1 = SvgFillDirectiveGreen()
-        self.DecodeInstructionMemoryIntermediate = SvgFillDirectiveBlue()
+        self.DecodeInstructionMemoryIntermediate1 = SvgFillDirectiveBlue()
+        self.DecodeInstructionMemoryIntermediate2 = SvgFillDirectiveBlue()
         self.ControlUnitRegWriteEnable_1 = SvgFillDirectiveGreen()
         self.ControlUnitMemWriteEnable_1 = SvgFillDirectiveGreen()
         self.ControlUnitMemReadEnable_1 = SvgFillDirectiveGreen()
+        self.DecodeInstructionMemoryToAluCtl = SvgFillDirectiveBlue()
+        self.ControlUnitAluOp_1 = SvgFillDirectiveGreen()
 
 
 class RiscvFiveStageEXSvgDirectives(RiscvSvgDirectivesBase):
@@ -111,6 +114,8 @@ class RiscvFiveStageEXSvgDirectives(RiscvSvgDirectivesBase):
         self.ControlUnitMemWriteEnable_2 = SvgFillDirectiveGreen()
         self.ControlUnitMemReadEnable_2 = SvgFillDirectiveGreen()
         self.ExecuteImmediateToWbMux = SvgFillDirectiveBlue()
+        self.ExecuteInstructionMemoryToAluCtl = SvgFillDirectiveBlue()
+        self.ControlUnitAluOp_2 = SvgFillDirectiveGreen()
 
 
 class RiscvFiveStageMEMSvgDirectives(RiscvSvgDirectivesBase):
