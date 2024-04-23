@@ -661,8 +661,9 @@
 
         <h3 id="j-type">J-Type</h3>
         <p>
-            The immediate (<code>imm</code>) has a length of 21 bits and is sign
-            extended to 32 bits.<br />
+            The address to jump to (<code>addr</code>), is encoded relative to
+            the current pc in a 21 bit immediate that is sign extended to 32
+            bits and added to the current pc.<br />
             Offsets are optional, and in hexadecimal format.
         </p>
         <div class="table-responsive">
@@ -678,12 +679,12 @@
                     <tr>
                         <td>
                             <code
-                                >JAL rd, imm<br />
+                                >JAL rd, addr<br />
                                 JAL rd, label+offset</code
                             >
                         </td>
                         <td>
-                            <code>rd = PC + 4; PC = PC + imm</code>
+                            <code>rd = PC + 4; PC = addr</code>
                         </td>
                         <td>
                             Jump and link.
