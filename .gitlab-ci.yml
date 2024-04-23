@@ -48,8 +48,6 @@ build_webgui:
     - "build_py"
   image: node:20-alpine
   script:
-    - mkdir -p webgui/public
-    - cp dist/*.whl webgui/public
     - npm install
     - npm run build-dev-atreus
   artifacts:

@@ -50,9 +50,6 @@ jobs:
           pip install build
       - name: Build package
         run: python -m build
-      - name: Copy package to 'webgui'
-        run: |
-          cp dist/*.whl webgui/public/
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
