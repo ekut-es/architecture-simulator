@@ -420,7 +420,7 @@ class JTypeInstruction(RiscvInstruction):
         super().__init__(**args)
         self.rd = rd
         self.imm = (imm & (2**20) - 1) - (imm & 2**20)  # 21-bit sext
-        self.abs_addr = abs_addr
+        self.abs_addr = abs_addr  # only used in __repr__
 
     def __repr__(self) -> str:
         return f"{self.mnemonic} x{self.rd}, {self.abs_addr}"
