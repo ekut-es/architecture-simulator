@@ -1217,8 +1217,8 @@ class AUIPC(UTypeInstruction):
 
 
 class JAL(JTypeInstruction):
-    def __init__(self, rd: int, imm: int):
-        super().__init__(rd, imm, mnemonic="jal")
+    def __init__(self, rd: int, imm: int, abs_addr: int):
+        super().__init__(rd, imm, abs_addr, mnemonic="jal")
 
     def behavior(
         self, architectural_state: RiscvArchitecturalState
