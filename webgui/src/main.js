@@ -1,6 +1,7 @@
 import "./scss/styles.scss";
 import "./css/main.css";
 import "./css/splitjs.css";
+import architectureSimulatorPackageUrl from "../../dist/architecture_simulator-0.1.0-py3-none-any.whl";
 
 import { createApp } from "vue";
 
@@ -27,7 +28,7 @@ async function initializePyodide() {
     });
     await pyodide.loadPackage("micropip");
     const micropip = pyodide.pyimport("micropip");
-    await micropip.install("architecture_simulator-0.1.0-py3-none-any.whl");
+    await micropip.install(architectureSimulatorPackageUrl);
     await pyodide.runPython(`
 from architecture_simulator.gui.webgui import *
 `);

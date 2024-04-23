@@ -11,4 +11,14 @@ export default defineConfig({
             "@": fileURLToPath(new URL("./src", import.meta.url)),
         },
     },
+    assetsInclude: ["**/*.whl"],
+    build: {
+        rollupOptions: {
+            output: {
+                assetFileNames() {
+                    return "assets/[hash]/[name][extname]";
+                },
+            },
+        },
+    },
 });
