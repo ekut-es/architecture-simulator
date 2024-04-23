@@ -20,7 +20,7 @@ riscv_five_stage_markers = """
      id="000000_ArchsimMarker_Triangle_Path" /></marker>
 <marker
    style="overflow:visible"
-   id="008000_ArchsimMarker_Triangle"
+   id="A51E37_ArchsimMarker_Triangle"
    refX="0"
    refY="0"
    orient="auto-start-reverse"
@@ -32,9 +32,9 @@ riscv_five_stage_markers = """
    inkscape:collect="always"
    preserveAspectRatio="none"><path
      transform="scale(0.5)"
-     style="fill:#008000;fill-rule:evenodd;stroke:#008000;stroke-width:1pt"
+     style="fill:#A51E37;fill-rule:evenodd;stroke:#A51E37;stroke-width:1pt"
      d="M 5.77,0 -2.88,5 V -5 Z"
-     id="008000_ArchsimMarker_Triangle_Path" /></marker>
+     id="A51E37_ArchsimMarker_Triangle_Path" /></marker>
 <marker
    style="overflow:visible"
    id="0000FF_ArchsimMarker_Triangle"
