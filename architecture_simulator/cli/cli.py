@@ -106,7 +106,7 @@ def main():
     while True:
         read_command = []
         try:
-            read_command = session.prompt(">>>").strip().lower().split()
+            read_command = session.prompt(">>> ").strip().lower().split()
         except KeyboardInterrupt:
             break
         except EOFError:
