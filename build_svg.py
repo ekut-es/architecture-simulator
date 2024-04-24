@@ -1,6 +1,6 @@
 import re
 
-riscv_five_stage_markers = """
+riscv_markers = """
 <marker
    style="overflow:visible"
    id="000000_ArchsimMarker_Triangle"
@@ -90,130 +90,10 @@ riscv_five_stage_markers = """
      sodipodi:nodetypes="sssss" /></marker>
 """
 
-riscv_single_stage_markers = """
-<marker
-   style="overflow:visible"
-   id="000000_ArchsimMarker_Dot"
-   refX="0"
-   refY="0"
-   orient="auto"
-   inkscape:stockid="Dot"
-   markerWidth="0.40000001"
-   markerHeight="0.40000001"
-   viewBox="0 0 1 1"
-   inkscape:isstock="true"
-   inkscape:collect="always"
-   preserveAspectRatio="xMidYMid"><path
-     transform="scale(0.5)"
-     style="fill:#000000;fill-rule:evenodd;stroke:none"
-     d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
-     sodipodi:nodetypes="sssss"
-     id="path78" />
-</marker>
-
-<marker
-   style="overflow:visible"
-   id="008000_ArchsimMarker_Dot"
-   refX="0"
-   refY="0"
-   orient="auto"
-   inkscape:stockid="Dot"
-   markerWidth="0.40000001"
-   markerHeight="0.40000001"
-   viewBox="0 0 1 1"
-   inkscape:isstock="true"
-   inkscape:collect="always"
-   preserveAspectRatio="xMidYMid"><path
-     transform="scale(0.5)"
-     style="fill:#008000;fill-rule:evenodd;stroke:none"
-     d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
-     sodipodi:nodetypes="sssss"
-     id="path78" />
-</marker>
-
-<marker
-   style="overflow:visible"
-   id="0000FF_ArchsimMarker_Dot"
-   refX="0"
-   refY="0"
-   orient="auto"
-   inkscape:stockid="Dot"
-   markerWidth="0.40000001"
-   markerHeight="0.40000001"
-   viewBox="0 0 1 1"
-   inkscape:isstock="true"
-   inkscape:collect="always"
-   preserveAspectRatio="xMidYMid"><path
-     transform="scale(0.5)"
-     style="fill:#0000FF;fill-rule:evenodd;stroke:none"
-     d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
-     sodipodi:nodetypes="sssss"
-     id="path78" />
-</marker>
-
-
-<marker
-   style="overflow:visible"
-   id="000000_ArchsimMarker_Triangle_Reversed"
-   refX="0"
-   refY="0"
-   orient="auto-start-reverse"
-   inkscape:stockid="Triangle arrow"
-   markerWidth="0.40000001"
-   markerHeight="0.40000001"
-   viewBox="0 0 1 1"
-   inkscape:isstock="true"
-   inkscape:collect="always"
-   preserveAspectRatio="xMidYMid"><path
-     transform="scale(0.5)"
-     style="fill:#000000;fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
-     d="M 5.77,0 -2.88,5 V -5 Z"
-     id="path135" />
-</marker>
-
-<marker
-   style="overflow:visible"
-   id="008000_ArchsimMarker_Triangle_Reversed"
-   refX="0"
-   refY="0"
-   orient="auto-start-reverse"
-   inkscape:stockid="Triangle arrow"
-   markerWidth="0.40000001"
-   markerHeight="0.40000001"
-   viewBox="0 0 1 1"
-   inkscape:isstock="true"
-   inkscape:collect="always"
-   preserveAspectRatio="xMidYMid"><path
-     transform="scale(0.5)"
-     style="fill:#008000;fill-rule:evenodd;stroke:#008000;stroke-width:1pt"
-     d="M 5.77,0 -2.88,5 V -5 Z"
-     id="path135" />
-</marker>
-
-<marker
-   style="overflow:visible"
-   id="0000FF_ArchsimMarker_Triangle_Reversed"
-   refX="0"
-   refY="0"
-   orient="auto-start-reverse"
-   inkscape:stockid="Triangle arrow"
-   markerWidth="0.40000001"
-   markerHeight="0.40000001"
-   viewBox="0 0 1 1"
-   inkscape:isstock="true"
-   inkscape:collect="always"
-   preserveAspectRatio="xMidYMid"><path
-     transform="scale(0.5)"
-     style="fill:#0000FF;fill-rule:evenodd;stroke:#0000FF;stroke-width:1pt"
-     d="M 5.77,0 -2.88,5 V -5 Z"
-     id="path135" />
-</marker>
-"""
-
 if __name__ == "__main__":
     for filename, markers in [
-        ("riscv_five_stage_pipeline.svg", riscv_five_stage_markers),
-        ("riscv_single_stage_pipeline.svg", riscv_single_stage_markers),
+        ("riscv_five_stage_pipeline.svg", riscv_markers),
+        ("riscv_single_stage_pipeline.svg", riscv_markers),
     ]:
         # open with read permissions
         file = open("./webgui/src/img/" + filename, "r+")
