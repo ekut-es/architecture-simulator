@@ -37,27 +37,21 @@ class RiscvSingleStageSvgDirectives:
         # Control Unit paths
 
         # Binary signals
-        self.control_unit_2mux_pc_path: SvgFillDirectiveGreen = SvgFillDirectiveGreen()
-        self.control_unit_to_and_path: SvgFillDirectiveGreen = SvgFillDirectiveGreen()
-        self.alu_control_to_read_data_2mux_path: SvgFillDirectiveGreen = (
-            SvgFillDirectiveGreen()
+        self.control_unit_2mux_pc_path: SvgFillDirectiveRed = SvgFillDirectiveRed()
+        self.control_unit_to_and_path: SvgFillDirectiveRed = SvgFillDirectiveRed()
+        self.alu_control_to_read_data_2mux_path: SvgFillDirectiveRed = (
+            SvgFillDirectiveRed()
         )
-        self.alu_control_to_read_data_1_mux_path: SvgFillDirectiveGreen = (
-            SvgFillDirectiveGreen()
+        self.alu_control_to_read_data_1_mux_path: SvgFillDirectiveRed = (
+            SvgFillDirectiveRed()
         )
-        self.control_unit_write_data_path: SvgFillDirectiveGreen = (
-            SvgFillDirectiveGreen()
-        )
-        self.control_unit_read_data_path: SvgFillDirectiveGreen = (
-            SvgFillDirectiveGreen()
-        )
-        self.control_unit_to_reg_file_path: SvgFillDirectiveGreen = (
-            SvgFillDirectiveGreen()
-        )
+        self.control_unit_write_data_path: SvgFillDirectiveRed = SvgFillDirectiveRed()
+        self.control_unit_read_data_path: SvgFillDirectiveRed = SvgFillDirectiveRed()
+        self.control_unit_to_reg_file_path: SvgFillDirectiveRed = SvgFillDirectiveRed()
 
         # Non Binary signals
-        self.control_unit_to_4mux_path: SvgFillDirectiveGreen = SvgFillDirectiveGreen()
-        self.alu_control_to_alu_path: SvgFillDirectiveGreen = SvgFillDirectiveGreen()
+        self.control_unit_to_4mux_path: SvgFillDirectiveRed = SvgFillDirectiveRed()
+        self.alu_control_to_alu_path: SvgFillDirectiveRed = SvgFillDirectiveRed()
 
         # Other paths
         self.instr_to_aluctrl_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
@@ -95,12 +89,12 @@ class RiscvSingleStageSvgDirectives:
         self.alu_out_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
         self.alu_out_to_4mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
         self.alu_out_to_2mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
-        self.alu_comparison_to_and_path: SvgFillDirectiveGreen = SvgFillDirectiveGreen()
+        self.alu_comparison_to_and_path: SvgFillDirectiveRed = SvgFillDirectiveRed()
         self.alu_to_data_memory_address_path: SvgFillDirectiveBlue = (
             SvgFillDirectiveBlue()
         )
 
-        self.and_to_mux_path: SvgFillDirectiveGreen = SvgFillDirectiveGreen()
+        self.and_to_mux_path: SvgFillDirectiveRed = SvgFillDirectiveRed()
 
         self.add_imm_to_mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
         self.add_instr_len_to_2mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
@@ -166,8 +160,8 @@ class SvgFillDirectiveBlue(SvgFillDirective):
         super().__init__(color_on="#0000FF", color_off="#000000")
 
 
-class SvgFillDirectiveGreen(SvgFillDirective):
-    """SVG Fill Directive: highlight: green, default: black"""
+class SvgFillDirectiveRed(SvgFillDirective):
+    """SVG Fill Directive: highlight: red, default: black"""
 
     def __init__(self):
-        super().__init__(color_on="#008000", color_off="#000000")
+        super().__init__(color_on="#A51E37", color_off="#000000")
