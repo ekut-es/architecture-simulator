@@ -706,12 +706,11 @@ class RiscvSimulation(Simulation):
         result.alu_control_to_alu_path.do_highlight = (
             p_reg.control_unit_signals.alu_control
         )
+        result.instr_to_aluctrl_path.do_highlight = (
+            result.alu_control_to_alu_path.do_highlight
+        )
 
         # Other paths
-
-        result.pc_to_add_instr_len_path.do_highlight = bool(
-            result.add_instr_len_text.text
-        )
         result.pc_to_add_imm_path.do_highlight = bool(result.add_imm_text.text)
         result.pc_to_2mux_path.do_highlight = bool(p_reg.control_unit_signals.alu_src_1)
         result.pc_to_instr_mem_path.do_highlight = bool(result.pc_text.text)
@@ -728,6 +727,10 @@ class RiscvSimulation(Simulation):
         )
         result.instr_mem_to_imm_gen_path.do_highlight = bool(
             result.imm_gen_value_text.text
+        )
+        result.to_immgen_or_aluctrl_path.do_highlight = (
+            result.instr_mem_to_imm_gen_path.do_highlight
+            or result.instr_to_aluctrl_path.do_highlight
         )
         result.instr_mem_to_control_unit_path.do_highlight = bool(
             result.instr_mem_instr_text.text

@@ -60,7 +60,7 @@ class RiscvSingleStageSvgDirectives:
         self.alu_control_to_alu_path: SvgFillDirectiveGreen = SvgFillDirectiveGreen()
 
         # Other paths
-        self.pc_to_add_instr_len_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.instr_to_aluctrl_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
         self.pc_to_add_imm_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
         self.pc_to_2mux_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
         self.pc_to_instr_mem_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
@@ -70,6 +70,7 @@ class RiscvSingleStageSvgDirectives:
         self.instr_mem_to_read_addr2_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
         self.instr_mem_to_write_reg_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
         self.instr_mem_to_imm_gen_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
+        self.to_immgen_or_aluctrl_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
         self.instr_mem_to_control_unit_path: SvgFillDirectiveBlue = (
             SvgFillDirectiveBlue()
         )
