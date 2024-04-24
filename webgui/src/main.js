@@ -1,7 +1,7 @@
 import "./scss/styles.scss";
 import "./css/main.css";
 import "./css/splitjs.css";
-import architectureSimulatorPackageUrl from "../../dist/architecture_simulator-1.3.0-py3-none-any.whl";
+import architectureSimulatorPackageUrl from "../../dist/architecture_simulator-1.3.1.dev0-py3-none-any.whl";
 
 import { createApp } from "vue";
 
