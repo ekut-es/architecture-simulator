@@ -709,6 +709,9 @@ class RiscvSimulation(Simulation):
         result.instr_to_aluctrl_path.do_highlight = (
             result.alu_control_to_alu_path.do_highlight
         )
+        result.control_unit_to_alu_control_path.do_highlight = (
+            result.alu_control_to_alu_path.do_highlight
+        )
 
         # Other paths
         result.pc_to_add_imm_path.do_highlight = bool(result.add_imm_text.text)
