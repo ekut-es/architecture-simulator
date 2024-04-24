@@ -173,7 +173,7 @@ def display(sim: Union[ToySimulation, RiscvSimulation], display_mode: str) -> st
         if sim.mode == "five_stage_pipeline":
             res += five_stage_pipeline_repr(sim.state.pipeline.pipeline_registers)
             res += hline
-        res += f"PC: {sim.state.program_counter} | Instruction at PC: {'#####' if not sim.state.instruction_at_pc() else str(sim.state.instruction_memory.read_instruction(sim.state.program_counter))}\n"
+        res += f"PC: {hex(sim.state.program_counter)} | Instruction at PC: {'#####' if not sim.state.instruction_at_pc() else str(sim.state.instruction_memory.read_instruction(sim.state.program_counter))}\n"
         res += hline
         res += hline
         res += "Performance Metrics:\n"
