@@ -153,7 +153,7 @@ class InstructionDecodeStage(Stage):
         write_register = pipeline_register.instruction.get_write_register()
 
         # Data Hazard Detection
-        flush_signal = None
+        stall_signal = None
         if self.detect_data_hazards:
             # Put all the write registers of later stages, that are not done ahead of this stage into a list
             write_registers_of_later_stages = [
@@ -168,10 +168,7 @@ class InstructionDecodeStage(Stage):
                     continue
                 if register_read_addr_1 == register or register_read_addr_2 == register:
                     assert pipeline_register.address_of_instruction is not None
-                    flush_signal = FlushSignal(
-                        inclusive=True,
-                        address=pipeline_register.address_of_instruction,
-                    )
+                    stall_signal = StallSignal(2)
                     break
 
         # gets the control unit signals that are generated in the ID stage
@@ -186,7 +183,7 @@ class InstructionDecodeStage(Stage):
             write_register=write_register,
             control_unit_signals=control_unit_signals,
             branch_prediction=pipeline_register.branch_prediction,
-            flush_signal=flush_signal,
+            stall_signal=stall_signal,
             pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
             address_of_instruction=pipeline_register.address_of_instruction,
         )
@@ -239,21 +236,23 @@ class ExecuteStage(Stage):
         )
 
         # ECALL needs some special behavior (flush and print to output)
-        flush_signal = None
+        stall_signal = None
         if isinstance(pipeline_register.instruction, ECALL):
-            # assume that all further stages need to be empty
-            for other_pr in pipeline_registers[index_of_own_input_register + 1 : -1]:
+            # assume that all further stages need to be empty, unless this stage is already stalled and the value of the next register is only for display purposes
+            for other_pr in pipeline_registers[
+                index_of_own_input_register
+                + 1
+                + int(pipeline_register.is_of_stalled_value) : -1
+            ]:
                 if not isinstance(other_pr.instruction, EmptyInstruction):
                     assert pipeline_register.address_of_instruction is not None
-                    flush_signal = FlushSignal(
-                        True, pipeline_register.address_of_instruction
-                    )
+                    stall_signal = StallSignal(2)
                     break
-            if flush_signal is None:
+            if stall_signal is None:
                 pipeline_register.instruction.behavior(state)
 
         return ExecutePipelineRegister(
-            flush_signal=flush_signal,
+            stall_signal=stall_signal,
             instruction=pipeline_register.instruction,
             alu_in_1=alu_in_1,
             alu_in_2=alu_in_2,
@@ -571,3 +570,11 @@ class FlushSignal:
     inclusive: bool
     # address to return to
     address: int
+
+
+@dataclass
+class StallSignal:
+    """A signal that this stage and all previous stages should be stalled for a duration of cycles"""
+
+    # how many cycles to stall
+    duration: int

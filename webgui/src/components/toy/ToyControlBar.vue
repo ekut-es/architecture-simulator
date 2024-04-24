@@ -3,6 +3,10 @@
 import ToyElementToggle from "./ToyElementToggle.vue";
 import ToyControlButtons from "./ToyControlButtons.vue";
 import ToyVisToggle from "./ToyVisToggle.vue";
+import PerformanceMetrics from "../PerformanceMetrics.vue";
+import { useToySimulationStore } from "@/js/toy_simulation_store";
+
+const simulationStore = useToySimulationStore();
 </script>
 
 <template>
@@ -10,6 +14,10 @@ import ToyVisToggle from "./ToyVisToggle.vue";
         <ToyControlButtons />
         <ToyElementToggle class="ms-3" />
         <ToyVisToggle class="ms-auto me-3" />
+        <PerformanceMetrics
+            :simulation-store
+            class="performance-metrics me-3"
+        />
         <button
             class="archsim-icon-button settings-button"
             title="settings"
@@ -22,7 +30,8 @@ import ToyVisToggle from "./ToyVisToggle.vue";
 </template>
 
 <style scoped>
-.settings-button {
+.settings-button,
+.performance-metrics {
     font-size: 1.5rem;
 }
 

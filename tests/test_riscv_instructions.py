@@ -2196,49 +2196,49 @@ class TestRiscvInstructions(unittest.TestCase):
         self.assertEqual(int(state.register_file.registers[0]), fixedint.UInt32(-4092))
 
     def test_jtype(self):
-        jtype = JAL(rd=0, imm=0)
+        jtype = JAL(rd=0, imm=0, abs_addr=-1)
         self.assertEqual(jtype.imm, 0)
-        jtype = JAL(rd=0, imm=2)
+        jtype = JAL(rd=0, imm=2, abs_addr=-1)
         self.assertEqual(jtype.imm, 2)
-        jtype = JAL(rd=0, imm=-2)
+        jtype = JAL(rd=0, imm=-2, abs_addr=-1)
         self.assertEqual(jtype.imm, -2)
-        jtype = JAL(rd=0, imm=(2**20) - 2)
+        jtype = JAL(rd=0, imm=(2**20) - 2, abs_addr=-1)
         self.assertEqual(jtype.imm, (2**20) - 2)
-        jtype = JAL(rd=0, imm=-(2**20))
+        jtype = JAL(rd=0, imm=-(2**20), abs_addr=-1)
         self.assertEqual(jtype.imm, -(2**20))
-        jtype = JAL(rd=0, imm=(2**20))
+        jtype = JAL(rd=0, imm=(2**20), abs_addr=-1)
         self.assertEqual(jtype.imm, -(2**20))
-        jtype = JAL(rd=0, imm=-(2**20) - 2)
+        jtype = JAL(rd=0, imm=-(2**20) - 2, abs_addr=-1)
         self.assertEqual(jtype.imm, (2**20) - 2)
 
     def test_jal(self):
         state = RiscvArchitecturalState(register_file=RegisterFile(registers=[1, 1, 1]))
         state.program_counter = 0
-        jal_1 = JAL(rd=0, imm=4)
+        jal_1 = JAL(rd=0, imm=4, abs_addr=-1)
         state = jal_1.behavior(state)
         self.assertEqual(state.program_counter, 0)
         self.assertEqual(int(state.register_file.registers[0]), 4)
 
         state.program_counter = 2
-        jal_2 = JAL(rd=0, imm=10)
+        jal_2 = JAL(rd=0, imm=10, abs_addr=-1)
         state = jal_2.behavior(state)
         self.assertEqual(state.program_counter, 8)
         self.assertEqual(int(state.register_file.registers[0]), 6)
 
         state.program_counter = 2
-        jal_3 = JAL(rd=0, imm=8)
+        jal_3 = JAL(rd=0, imm=8, abs_addr=-1)
         state = jal_3.behavior(state)
         self.assertEqual(state.program_counter, 6)
         self.assertEqual(int(state.register_file.registers[0]), 6)
 
         state.program_counter = 4
-        jal_4 = JAL(rd=1, imm=8)
+        jal_4 = JAL(rd=1, imm=8, abs_addr=-1)
         state = jal_4.behavior(state)
         self.assertEqual(state.program_counter, 8)
         self.assertEqual(int(state.register_file.registers[1]), 8)
 
         state.program_counter = 8
-        jal_5 = JAL(rd=1, imm=10)
+        jal_5 = JAL(rd=1, imm=10, abs_addr=-1)
         state = jal_5.behavior(state)
         self.assertEqual(state.program_counter, 14)
         self.assertEqual(int(state.register_file.registers[1]), 12)
@@ -2412,7 +2412,7 @@ class TestRiscvInstructions(unittest.TestCase):
         self.assertEqual(u_type_ex_auipc.__repr__(), "auipc x31, -4")
 
         # Test J-Type
-        j_type_ex_jal = JAL(rd=23, imm=60)
+        j_type_ex_jal = JAL(rd=23, imm=60, abs_addr=60)
         self.assertEqual(j_type_ex_jal.__repr__(), "jal x23, 60")
 
         # TODO: Change me, if Fence gets implemented

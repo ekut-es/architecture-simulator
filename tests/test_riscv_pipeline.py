@@ -1381,3 +1381,40 @@ End:"""
 
         self.assert_steps(simulation=simulation, steps=9)
         self.assertEqual(simulation.state.register_file.registers[2], 2)
+
+    def test_stall(self):
+        program = """
+        addi x1, x0, 11
+        addi x2, x1, 22
+        """
+
+        sim = RiscvSimulation(mode="five_stage_pipeline")
+
+        sim.load_program(program)
+        sim.run()
+        self.assertEqual(sim.state.register_file.registers[2], 33)
+        self.assertEqual(sim.state.performance_metrics.cycles, 8)
+        self.assertEqual(sim.state.performance_metrics.stalls, 1)
+        self.assertEqual(sim.state.performance_metrics.flushes, 0)
+
+    def test_stall_2(self):
+        program = """
+        add x0, x0, x0
+        add x0, x0, x0
+        addi x1, x0, 11
+        addi x2, x1, 3
+        addi x3, x1, 4
+        addi x4, x2, 100
+        """
+
+        sim = RiscvSimulation(mode="five_stage_pipeline")
+
+        sim.load_program(program)
+        sim.run()
+        self.assertEqual(sim.state.register_file.registers[1], 11)
+        self.assertEqual(sim.state.register_file.registers[2], 14)
+        self.assertEqual(sim.state.register_file.registers[3], 15)
+        self.assertEqual(sim.state.register_file.registers[4], 114)
+        self.assertEqual(sim.state.performance_metrics.cycles, 14)
+        self.assertEqual(sim.state.performance_metrics.stalls, 2)
+        self.assertEqual(sim.state.performance_metrics.flushes, 0)

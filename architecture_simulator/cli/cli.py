@@ -106,7 +106,7 @@ def main():
     while True:
         read_command = []
         try:
-            read_command = session.prompt(">>>").strip().lower().split()
+            read_command = session.prompt(">>> ").strip().lower().split()
         except KeyboardInterrupt:
             break
         except EOFError:
@@ -173,10 +173,8 @@ def display(sim: Union[ToySimulation, RiscvSimulation], display_mode: str) -> st
         if sim.mode == "five_stage_pipeline":
             res += five_stage_pipeline_repr(sim.state.pipeline.pipeline_registers)
             res += hline
-        res += f"PC: {sim.state.program_counter} | Instruction at PC: {'#####' if not sim.state.instruction_at_pc() else str(sim.state.instruction_memory.read_instruction(sim.state.program_counter))}\n"
+        res += f"PC: {hex(sim.state.program_counter)} | Instruction at PC: {'#####' if not sim.state.instruction_at_pc() else str(sim.state.instruction_memory.read_instruction(sim.state.program_counter))}\n"
         res += hline
-        res += "Instruction Memory:\n"
-        res += instr_mem_repr(sim)
         res += hline
         res += "Performance Metrics:\n"
         res += sim.state.performance_metrics.__repr__()
@@ -598,6 +596,9 @@ class LoadCommand(Command):
             output = "The provided file caused a parsing exception:\n"
             output += e.__repr__() + "\n"
             return CommandResult(output, sim)
+        if isinstance(new_sim, RiscvSimulation):
+            print("Instruction Memory:")
+            print(instr_mem_repr(new_sim))
         # Excecute load or step argument
         if "-run" in command:
             run_command = RunCommand()

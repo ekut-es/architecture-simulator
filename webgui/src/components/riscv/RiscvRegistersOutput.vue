@@ -17,6 +17,7 @@ const additionalMessageGetter = () => simulationStore.output;
             class="output"
             :simulation-store="simulationStore"
             :additional-message-getter
+            :exit-code="simulationStore.exitCode"
         />
     </div>
 </template>
