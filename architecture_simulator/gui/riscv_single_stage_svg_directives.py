@@ -52,7 +52,9 @@ class RiscvSingleStageSvgDirectives:
         # Non Binary signals
         self.control_unit_to_4mux_path: SvgFillDirectiveRed = SvgFillDirectiveRed()
         self.alu_control_to_alu_path: SvgFillDirectiveRed = SvgFillDirectiveRed()
-
+        self.control_unit_to_alu_control_path: SvgFillDirectiveRed = (
+            SvgFillDirectiveRed()
+        )
         # Other paths
         self.instr_to_aluctrl_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
         self.pc_to_add_imm_path: SvgFillDirectiveBlue = SvgFillDirectiveBlue()
