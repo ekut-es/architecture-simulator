@@ -891,190 +891,277 @@
                     </div>
                 </div>
             </div>
-            <!--my_acc_marker-->
-            <h3 id="csr-type">CSR-Type</h3>
-            <p>
-                <i>Currently not implemented in 5-stage pipeline mode.</i>
-                <br />
-                The unsigned immediate (<code>uimm</code>) has a length of 5
-                bits.
-            </p>
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover table-instr-op">
-                    <thead>
-                        <tr>
-                            <th>Instruction</th>
-                            <th>Operation</th>
-                            <th>Notes</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <code>CSRRW rd, csr, rs1</code>
-                            </td>
-                            <td>
-                                <code>rd = csr; csr = rs1</code>
-                            </td>
-                            <td>Atomic read/write</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <code>CSRRS rd, csr, rs1</code>
-                            </td>
-                            <td>
-                                <code>rd = csr; csr = csr | rs1</code>
-                            </td>
-                            <td>
-                                Atomic read/set.
-                                <code>rs1</code>
-                                serves as a bit mask
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <code>CSRRC rd, csr, rs1</code>
-                            </td>
-                            <td>
-                                <code>rd = csr; csr = csr &amp; ~rs1</code>
-                            </td>
-                            <td>
-                                Atomic read/clear.
-                                <code>rs1</code>
-                                serves as a bit mask
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <code>CSRRWI rd, csr, uimm</code>
-                            </td>
-                            <td>
-                                <code>rd = csr; csr = uimm</code>
-                            </td>
-                            <td>Atomic read/write</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <code>CSRRSI rd, csr, uimm</code>
-                            </td>
-                            <td>
-                                <code>rd = csr; csr = csr | uimm</code>
-                            </td>
-                            <td>
-                                Atomic read/set.
-                                <code>uimm</code>
-                                serves as a bit mask
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <code>CSRRCI rd, csr, uimm</code>
-                            </td>
-                            <td>
-                                <code>rd = csr; csr = csr &amp; ~uimm</code>
-                            </td>
-                            <td>
-                                Atomic read/clear.
-                                <code>uimm</code>
-                                serves as a bit mask
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="accordion-item">
+                <h3 class="accordion-header" id="panelsStayOpen-headingSeven">
+                    <button
+                        class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#panelsStayOpen-collapseSeven"
+                        aria-expanded="false"
+                        aria-controls="panelsStayOpen-collapseSeven"
+                    >
+                        CSR-Type
+                    </button>
+                </h3>
+                <div
+                    id="panelsStayOpen-collapseSeven"
+                    class="accordion-collapse collapse"
+                    aria-labelledby="panelsStayOpen-headingSeven"
+                >
+                    <div class="accordion-body">
+                        <p>
+                            <i
+                                >Currently not implemented in 5-stage pipeline
+                                mode.</i
+                            >
+                            <br />
+                            The unsigned immediate (<code>uimm</code>) has a
+                            length of 5 bits.
+                        </p>
+                        <div class="table-responsive">
+                            <table
+                                class="table table-bordered table-hover table-instr-op"
+                            >
+                                <thead>
+                                    <tr>
+                                        <th>Instruction</th>
+                                        <th>Operation</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <code>CSRRW rd, csr, rs1</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = csr; csr = rs1</code>
+                                        </td>
+                                        <td>Atomic read/write</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>CSRRS rd, csr, rs1</code>
+                                        </td>
+                                        <td>
+                                            <code
+                                                >rd = csr; csr = csr | rs1</code
+                                            >
+                                        </td>
+                                        <td>
+                                            Atomic read/set.
+                                            <code>rs1</code>
+                                            serves as a bit mask
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>CSRRC rd, csr, rs1</code>
+                                        </td>
+                                        <td>
+                                            <code
+                                                >rd = csr; csr = csr &amp;
+                                                ~rs1</code
+                                            >
+                                        </td>
+                                        <td>
+                                            Atomic read/clear.
+                                            <code>rs1</code>
+                                            serves as a bit mask
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>CSRRWI rd, csr, uimm</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = csr; csr = uimm</code>
+                                        </td>
+                                        <td>Atomic read/write</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>CSRRSI rd, csr, uimm</code>
+                                        </td>
+                                        <td>
+                                            <code
+                                                >rd = csr; csr = csr |
+                                                uimm</code
+                                            >
+                                        </td>
+                                        <td>
+                                            Atomic read/set.
+                                            <code>uimm</code>
+                                            serves as a bit mask
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>CSRRCI rd, csr, uimm</code>
+                                        </td>
+                                        <td>
+                                            <code
+                                                >rd = csr; csr = csr &amp;
+                                                ~uimm</code
+                                            >
+                                        </td>
+                                        <td>
+                                            Atomic read/clear.
+                                            <code>uimm</code>
+                                            serves as a bit mask
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <h3 id="pseudoinstructions">Pseudoinstructions</h3>
-            <p>
-                <code>var</code> is a variable name, <code>index</code> is an
-                optional array index.
-            </p>
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover table-instr-op">
-                    <thead>
-                        <tr>
-                            <th>Instruction</th>
-                            <th>Operation</th>
-                            <th>Notes</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <code>NOP</code>
-                            </td>
-                            <td><code>-</code></td>
-                            <td>
-                                No operation. Translated to
-                                <code>ADDI x0, x0, 0</code>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <code>LA rd, var[index]</code>
-                            </td>
-                            <td>
-                                <code>rd = &var[index]</code>
-                            </td>
-                            <td>
-                                Load variable address into
-                                <code>rd</code>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <code>LI rd, imm</code>
-                            </td>
-                            <td>
-                                <code>rd = imm</code>
-                            </td>
-                            <td>
-                                Load 32 bit immediate into
-                                <code>rd</code>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <code>MV rd, rs</code>
-                            </td>
-                            <td><code>rd = rs</code></td>
-                            <td>
-                                Translated to
-                                <code>ADDI rd, rs, 0</code>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="accordion-item">
+                <h3 class="accordion-header" id="panelsStayOpen-headingEight">
+                    <button
+                        class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#panelsStayOpen-collapseEight"
+                        aria-expanded="false"
+                        aria-controls="panelsStayOpen-collapseEight"
+                    >
+                        Pseudoinstructions
+                    </button>
+                </h3>
+                <div
+                    id="panelsStayOpen-collapseEight"
+                    class="accordion-collapse collapse"
+                    aria-labelledby="panelsStayOpen-headingEight"
+                >
+                    <div class="accordion-body">
+                        <p>
+                            <code>var</code> is a variable name,
+                            <code>index</code> is an optional array index.
+                        </p>
+                        <div class="table-responsive">
+                            <table
+                                class="table table-bordered table-hover table-instr-op"
+                            >
+                                <thead>
+                                    <tr>
+                                        <th>Instruction</th>
+                                        <th>Operation</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <code>NOP</code>
+                                        </td>
+                                        <td><code>-</code></td>
+                                        <td>
+                                            No operation. Translated to
+                                            <code>ADDI x0, x0, 0</code>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>LA rd, var[index]</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = &var[index]</code>
+                                        </td>
+                                        <td>
+                                            Load variable address into
+                                            <code>rd</code>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>LI rd, imm</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = imm</code>
+                                        </td>
+                                        <td>
+                                            Load 32 bit immediate into
+                                            <code>rd</code>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>MV rd, rs</code>
+                                        </td>
+                                        <td><code>rd = rs</code></td>
+                                        <td>
+                                            Translated to
+                                            <code>ADDI rd, rs, 0</code>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <h3 id="misc">Miscellaneous</h3>
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover table-instr-op">
-                    <thead>
-                        <tr>
-                            <th>Instruction</th>
-                            <th>Operation</th>
-                            <th>Notes</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <code>EBREAK</code>
-                            </td>
-                            <td><code>-</code></td>
-                            <td>Recognized but currently not implemented</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <code>FENCE rd, rs1</code>
-                            </td>
-                            <td><code>-</code></td>
-                            <td>Recognized but currently not implemented</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="accordion-item">
+                <h3 class="accordion-header" id="panelsStayOpen-headingNine">
+                    <button
+                        class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#panelsStayOpen-collapseNine"
+                        aria-expanded="false"
+                        aria-controls="panelsStayOpen-collapseNine"
+                    >
+                        Miscellaneous
+                    </button>
+                </h3>
+                <div
+                    id="panelsStayOpen-collapseNine"
+                    class="accordion-collapse collapse"
+                    aria-labelledby="panelsStayOpen-headingNine"
+                >
+                    <div class="accordion-body">
+                        <div class="table-responsive">
+                            <table
+                                class="table table-bordered table-hover table-instr-op"
+                            >
+                                <thead>
+                                    <tr>
+                                        <th>Instruction</th>
+                                        <th>Operation</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <code>EBREAK</code>
+                                        </td>
+                                        <td><code>-</code></td>
+                                        <td>
+                                            Recognized but currently not
+                                            implemented
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>FENCE rd, rs1</code>
+                                        </td>
+                                        <td><code>-</code></td>
+                                        <td>
+                                            Recognized but currently not
+                                            implemented
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+        <!--my_acc_marker-->
 
         <h2 id="labels">Comments and labels</h2>
         <p>
