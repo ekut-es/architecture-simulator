@@ -7,8 +7,8 @@
             This simulator supports a subset of the RISC-V32 ISA. The supported
             instructions are listed below.
         </p>
-        <!--my_acc_marker-->
-        <div class="accordion" id="accordionPanelsStayOpenExample">
+
+        <div class="accordion" id="accordionPanelsStayOpenInstructions">
             <div class="accordion-item">
                 <h3 class="accordion-header" id="panelsStayOpen-headingOne">
                     <button
@@ -1161,10 +1161,10 @@
                 </div>
             </div>
         </div>
-        <!--my_acc_marker-->
-        <h2 id="instructions">Other</h2>
-        <!--my_acc_marker-->
-        <div class="accordion" id="accordionPanelsStayOpenExample">
+
+        <h2 id="other">Other</h2>
+
+        <div class="accordion" id="accordionPanelsStayOpenOther">
             <div class="accordion-item">
                 <h3 class="accordion-header" id="panelsStayOpen-headingTen">
                     <button
@@ -1358,6 +1358,7 @@ addi x3, x3, 1 # This line is never reached</pre
                         data-bs-target="#panelsStayOpen-collapseThirteen"
                         aria-expanded="false"
                         aria-controls="panelsStayOpen-collapseThirteen"
+                        id="riscv-help-ecalls"
                     >
                         ECALLs
                     </button>
@@ -1479,5 +1480,4 @@ addi x3, x3, 1 # This line is never reached</pre
             </div>
         </div>
     </div>
-    <!--my_acc_marker-->
 </template>
