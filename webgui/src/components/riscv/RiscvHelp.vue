@@ -1162,40 +1162,84 @@
             </div>
         </div>
         <!--my_acc_marker-->
-
-        <h2 id="labels">Comments and labels</h2>
-        <p>
-            Comments can be added to the code using
-            <code>#</code>.<br />
-            Labels are added by appending a colon
-            <code>:</code> to a label name. They can be used as jump targets.
-        </p>
-        <pre class="bg-light">
+        <h2 id="instructions">Other</h2>
+        <!--my_acc_marker-->
+        <div class="accordion" id="accordionPanelsStayOpenExample">
+            <div class="accordion-item">
+                <h3 class="accordion-header" id="panelsStayOpen-headingTen">
+                    <button
+                        class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#panelsStayOpen-collapseTen"
+                        aria-expanded="false"
+                        aria-controls="panelsStayOpen-collapseTen"
+                    >
+                        Comments and labels
+                    </button>
+                </h3>
+                <div
+                    id="panelsStayOpen-collapseTen"
+                    class="accordion-collapse collapse"
+                    aria-labelledby="panelsStayOpen-headingTen"
+                >
+                    <div class="accordion-body">
+                        <p>
+                            Comments can be added to the code using
+                            <code>#</code>.<br />
+                            Labels are added by appending a colon
+                            <code>:</code> to a label name. They can be used as
+                            jump targets.
+                        </p>
+                        <pre class="bg-light">
 # This is a comment
 my_label:
 addi x1, x1, 1
 jal x2, my_label
 addi x3, x3, 1 # This line is never reached</pre
-        >
-
-        <h2 id="variables">Segments and variables</h2>
-        <p>
-            In addition to the program code, the simulator supports a data
-            segment. It can be used to store variables and arrays in the
-            simulator's memory.
-        </p>
-        <p>
-            In order to define a data segment, the
-            <code>.data</code> directive is used, while the
-            <code>.text</code> directive designates the code segment.
-        </p>
-        <p>
-            The following example demonstrates how to declare and use variables
-            and arrays, employing all currently supported data types. Note that
-            all variables/arrays are word-aligned (addresses are multiples of
-            4), which is achieved by zero-padding preceding variables.
-        </p>
-        <pre class="bg-light">
+                        >
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header" id="panelsStayOpen-headingEleven">
+                    <button
+                        class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#panelsStayOpen-collapseEleven"
+                        aria-expanded="false"
+                        aria-controls="panelsStayOpen-collapseEleven"
+                    >
+                        Segments and variables
+                    </button>
+                </h3>
+                <div
+                    id="panelsStayOpen-collapseEleven"
+                    class="accordion-collapse collapse"
+                    aria-labelledby="panelsStayOpen-headingEleven"
+                >
+                    <div class="accordion-body">
+                        <p>
+                            In addition to the program code, the simulator
+                            supports a data segment. It can be used to store
+                            variables and arrays in the simulator's memory.
+                        </p>
+                        <p>
+                            In order to define a data segment, the
+                            <code>.data</code> directive is used, while the
+                            <code>.text</code> directive designates the code
+                            segment.
+                        </p>
+                        <p>
+                            The following example demonstrates how to declare
+                            and use variables and arrays, employing all
+                            currently supported data types. Note that all
+                            variables/arrays are word-aligned (addresses are
+                            multiples of 4), which is achieved by zero-padding
+                            preceding variables.
+                        </p>
+                        <pre class="bg-light">
 .data
     empty_array: .zero 64 # reserves space for 64 words (256 bytes)
     # The following two declarations of 'my_var1' are equivalent,
@@ -1212,146 +1256,228 @@ addi x3, x3, 1 # This line is never reached</pre
     lh x4, my_var2[2]  # x4 = 999
     lw x5, my_var3[1]  # x5 = 0b111
     lb x6, text1[11]   # x6 = '!'</pre
-        >
-        <p>
-            If no directives are given, the entire input is interpreted as
-            code.<br />
-            Similarly, if a <code>.data</code> but no
-            <code>.text</code> directive is given, every line before the data
-            segment is interpreted as code.
-            <br />
-            There is no fixed segmentation order. However, declaring multiple
-            segments of the same type will throw an error.
-        </p>
+                        >
+                        <p>
+                            If no directives are given, the entire input is
+                            interpreted as code.<br />
+                            Similarly, if a <code>.data</code> but no
+                            <code>.text</code> directive is given, every line
+                            before the data segment is interpreted as code.
+                            <br />
+                            There is no fixed segmentation order. However,
+                            declaring multiple segments of the same type will
+                            throw an error.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header" id="panelsStayOpen-headingTwelve">
+                    <button
+                        class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#panelsStayOpen-collapseTwelve"
+                        aria-expanded="false"
+                        aria-controls="panelsStayOpen-collapseTwelve"
+                    >
+                        Cache Simulation
+                    </button>
+                </h3>
+                <div
+                    id="panelsStayOpen-collapseTwelve"
+                    class="accordion-collapse collapse"
+                    aria-labelledby="panelsStayOpen-headingTwelve"
+                >
+                    <div class="accordion-body">
+                        <p>
+                            You can activate separate caches for data and
+                            instructions in the settings. These caches can be
+                            configured as Write-through with Write no-allocate
+                            or Write-back with Write allocate. The number of
+                            sets, block size and associativity are also
+                            configurable. You can also choose between LRU and
+                            PLRU for the replacement strategy.
+                        </p>
+                        <p>
+                            As the name implies, LRU (Least Recently Used) will
+                            always replace the block that was used least
+                            recently. The LRU value in the cache table shows the
+                            age of each block. Higher values indicate more
+                            recently used blocks.
+                        </p>
+                        <p>
+                            PLRU (Pseudo LRU) is an approximation of LRU which
+                            is easier to implement in hardware. It uses a binary
+                            tree with the blocks at its leaf nodes. On each
+                            non-leaf node is a single bit - a 0 indicates that
+                            older blocks are in the upper child tree while a 1
+                            indicates that older blocks are in the lower child
+                            tree. <br />
+                            When replacing a block, PLRU will choose the one
+                            which is oldest according to those bits. Then all
+                            bits along the path are flipped to mark it as the
+                            most recent. <br />
+                            When accessing any block that is stored in the
+                            cache, PLRU will update all bits along the path to
+                            the new block so they correctly identify it as the
+                            newest block. <br />
+                            Note that when using PLRU, associativity must be a
+                            power of 2 since PLRU uses a binary tree in its
+                            state.
+                        </p>
+                        <p>
+                            You can also get a visualization of the cache by
+                            selecting it in the drop down menu in the control
+                            bar. Note that for performance reasons, this option
+                            becomes unavailabe if the cache gets too big. Even
+                            with the visualization disabled, you should not make
+                            the cache too big since the site may become
+                            unresponsive.
+                        </p>
+                        <p>
+                            When using a data cache, misaligned access to the
+                            memory is not allowed because it would be unclear
+                            what exactly should happen in the cache. For
+                            example, the following piece of code would not work
+                            since the accessed value crosses a word boundary:
+                        </p>
+                        <pre class="bg-light">lw x1, -5(x0)</pre>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3
+                    class="accordion-header"
+                    id="panelsStayOpen-headingThirteen"
+                >
+                    <button
+                        class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#panelsStayOpen-collapseThirteen"
+                        aria-expanded="false"
+                        aria-controls="panelsStayOpen-collapseThirteen"
+                    >
+                        ECALLs
+                    </button>
+                </h3>
+                <div
+                    id="panelsStayOpen-collapseThirteen"
+                    class="accordion-collapse collapse"
+                    aria-labelledby="panelsStayOpen-headingThirteen"
+                >
+                    <div class="accordion-body">
+                        <p>
+                            Environment calls (ECALLs) can be used for
+                            interacting with the environment - currently, ECALLs
+                            can be used for printing to the console or stopping
+                            the simulation. Each ECALL has a different code
+                            which must be loaded into register <code>a7</code>.
+                            Some ECALLs also require an argument which must be
+                            loaded into register <code>a0</code>. The supported
+                            ECALLs are identical to those of Ripes.
+                        </p>
 
-        <h2>Cache Simulation</h2>
-        <p>
-            You can activate separate caches for data and instructions in the
-            settings. These caches can be configured as Write-through with Write
-            no-allocate or Write-back with Write allocate. The number of sets,
-            block size and associativity are also configurable. You can also
-            choose between LRU and PLRU for the replacement strategy.
-        </p>
-        <p>
-            As the name implies, LRU (Least Recently Used) will always replace
-            the block that was used least recently. The LRU value in the cache
-            table shows the age of each block. Higher values indicate more
-            recently used blocks.
-        </p>
-        <p>
-            PLRU (Pseudo LRU) is an approximation of LRU which is easier to
-            implement in hardware. It uses a binary tree with the blocks at its
-            leaf nodes. On each non-leaf node is a single bit - a 0 indicates
-            that older blocks are in the upper child tree while a 1 indicates
-            that older blocks are in the lower child tree. <br />
-            When replacing a block, PLRU will choose the one which is oldest
-            according to those bits. Then all bits along the path are flipped to
-            mark it as the most recent. <br />
-            When accessing any block that is stored in the cache, PLRU will
-            update all bits along the path to the new block so they correctly
-            identify it as the newest block. <br />
-            Note that when using PLRU, associativity must be a power of 2 since
-            PLRU uses a binary tree in its state.
-        </p>
-        <p>
-            You can also get a visualization of the cache by selecting it in the
-            drop down menu in the control bar. Note that for performance
-            reasons, this option becomes unavailabe if the cache gets too big.
-            Even with the visualization disabled, you should not make the cache
-            too big since the site may become unresponsive.
-        </p>
-        <p>
-            When using a data cache, misaligned access to the memory is not
-            allowed because it would be unclear what exactly should happen in
-            the cache. For example, the following piece of code would not work
-            since the accessed value crosses a word boundary:
-        </p>
-        <pre class="bg-light">lw x1, -5(x0)</pre>
+                        <p>
+                            Note that our visualization of the pipeline during
+                            an ECALL is not fully correct. The pipeline might
+                            get flushed unnecessarily and we also dont halt the
+                            pipeline until the ECALL has finished - instead, the
+                            entire ecall is being executed in a single cycle (in
+                            the execute stage).
+                        </p>
 
-        <h2 id="riscv-help-ecalls">ECALLs</h2>
-        <p>
-            Environment calls (ECALLs) can be used for interacting with the
-            environment - currently, ECALLs can be used for printing to the
-            console or stopping the simulation. Each ECALL has a different code
-            which must be loaded into register <code>a7</code>. Some ECALLs also
-            require an argument which must be loaded into register
-            <code>a0</code>. The supported ECALLs are identical to those of
-            Ripes.
-        </p>
-
-        <p>
-            Note that our visualization of the pipeline during an ECALL is not
-            fully correct. The pipeline might get flushed unnecessarily and we
-            also dont halt the pipeline until the ECALL has finished - instead,
-            the entire ecall is being executed in a single cycle (in the execute
-            stage).
-        </p>
-
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th>a7</th>
-                        <th>a0</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>integer to print</td>
-                        <td>Prints <code>a0</code> as signed integer.</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>float to print</td>
-                        <td>
-                            Prints <code>a0</code> as a floating point number.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>string to print</td>
-                        <td>
-                            Prints the null terminated string whose first
-                            character is stored at the address in
-                            <code>a0</code>.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>10</td>
-                        <td>-</td>
-                        <td>Stops the simulation with code 0.</td>
-                    </tr>
-                    <tr>
-                        <td>11</td>
-                        <td>char to print</td>
-                        <td>Prints <code>a0</code> as ASCII character</td>
-                    </tr>
-                    <tr>
-                        <td>34</td>
-                        <td>hex to print</td>
-                        <td>Prints <code>a0</code> as hexadecimal nuber</td>
-                    </tr>
-                    <tr>
-                        <td>35</td>
-                        <td>binary to print</td>
-                        <td>Prints <code>a0</code> as binary number.</td>
-                    </tr>
-                    <tr>
-                        <td>36</td>
-                        <td>integer to print</td>
-                        <td>Prints <code>a0</code> as unsigned integer.</td>
-                    </tr>
-                    <tr>
-                        <td>93</td>
-                        <td>exit code</td>
-                        <td>
-                            Stops the simulation with code in <code>a0</code>.
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>a7</th>
+                                        <th>a0</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>integer to print</td>
+                                        <td>
+                                            Prints <code>a0</code> as signed
+                                            integer.
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>float to print</td>
+                                        <td>
+                                            Prints <code>a0</code> as a floating
+                                            point number.
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>string to print</td>
+                                        <td>
+                                            Prints the null terminated string
+                                            whose first character is stored at
+                                            the address in
+                                            <code>a0</code>.
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>10</td>
+                                        <td>-</td>
+                                        <td>
+                                            Stops the simulation with code 0.
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>11</td>
+                                        <td>char to print</td>
+                                        <td>
+                                            Prints <code>a0</code> as ASCII
+                                            character
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>34</td>
+                                        <td>hex to print</td>
+                                        <td>
+                                            Prints <code>a0</code> as
+                                            hexadecimal nuber
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>35</td>
+                                        <td>binary to print</td>
+                                        <td>
+                                            Prints <code>a0</code> as binary
+                                            number.
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>36</td>
+                                        <td>integer to print</td>
+                                        <td>
+                                            Prints <code>a0</code> as unsigned
+                                            integer.
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>93</td>
+                                        <td>exit code</td>
+                                        <td>
+                                            Stops the simulation with code in
+                                            <code>a0</code>.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+    <!--my_acc_marker-->
 </template>
