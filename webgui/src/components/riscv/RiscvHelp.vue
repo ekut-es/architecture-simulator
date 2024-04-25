@@ -7,694 +7,891 @@
             This simulator supports a subset of the RISC-V32 ISA. The supported
             instructions are listed below.
         </p>
-        <h3 id="r-type">R-Type</h3>
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover table-instr-op">
-                <thead>
-                    <tr>
-                        <th>Instruction</th>
-                        <th>Operation</th>
-                        <th>Notes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <code>ADD rd, rs1, rs2</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 + rs2</code>
-                        </td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>SUB rd, rs1, rs2</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 - rs2</code>
-                        </td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>SLL rd, rs1, rs2</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 &lt;&lt; rs2</code>
-                        </td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>SRL rd, rs1, rs2</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 &gt;&gt; rs2</code>
-                        </td>
-                        <td>Logical right shift</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>SRA rd, rs1, rs2</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 &gt;&gt;a rs2</code>
-                        </td>
-                        <td>Arithmetic right shift</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>SLT rd, rs1, rs2</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 &lt;s rs2</code>
-                        </td>
-                        <td>
-                            Set <code>rd</code> to 1 if the value in
-                            <code>rs1</code> is less than the value in
-                            <code>rs2</code>, otherwise 0 (both values are
-                            treated as signed)
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>SLTU rd, rs1, rs2</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 &lt;u rs2</code>
-                        </td>
-                        <td>
-                            Set <code>rd</code> to 1 if the value in
-                            <code>rs1</code> is less than the value in
-                            <code>rs2</code>, otherwise 0 (both values are
-                            treated as unsigned)
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>AND rd, rs1, rs2</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 &amp; rs2</code>
-                        </td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>OR rd, rs1, rs2</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 | rs2</code>
-                        </td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>XOR rd, rs1, rs2</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 ^ rs2</code>
-                        </td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>MUL rd, rs1, rs2</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 * rs2</code>
-                        </td>
-                        <td>
-                            (M), places the lower 32 bits of the result in the
-                            destination register
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>MULH rd, rs1, rs2</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 s*s rs2</code>
-                        </td>
-                        <td>
-                            (M), places the upper 32 bits of the result in the
-                            destination register, both rs1 and rs2 are treated
-                            as signed
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>MULHU rd, rs1, rs2</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 u*u rs2</code>
-                        </td>
-                        <td>
-                            (M), places the upper 32 bits of the result in the
-                            destination register, both rs1 and rs2 are treated
-                            as unsigned
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>MULHSU rd, rs1, rs2</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 s*u rs2</code>
-                        </td>
-                        <td>
-                            (M), places the upper 32 bits of the result in the
-                            destination register, rs1 treated as signed, rs2
-                            treated as unsigned
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>DIV rd, rs1, rs2</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 /s rs2</code>
-                        </td>
-                        <td>(M), signed integer division</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>DIVU rd, rs1, rs2</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 /u rs2</code>
-                        </td>
-                        <td>(M), unsigned integer division</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>REM rd, rs1, rs2</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 %s rs2</code>
-                        </td>
-                        <td>(M), remainder of signed integer division</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>REMU rd, rs1, rs2</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 %u rs2</code>
-                        </td>
-                        <td>(M), remainder of unsigned integer division</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <p>
-            Note: Instructions marked with (M) are part of the "M” Standard
-            Extension for Integer Multiplication and Division.
-        </p>
-
-        <h3 id="i-type">I-Type</h3>
-        <p>
-            Unless otherwise specified, the immediate (<code>imm</code>) has a
-            length of 12 bits and is sign extended to 32 bits.
-            <br />
-            <code>var</code> is a variable name, <code>index</code> is an
-            optional array index.
-        </p>
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover table-instr-op">
-                <thead>
-                    <tr>
-                        <th>Instruction</th>
-                        <th>Operation</th>
-                        <th>Notes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <code>ADDI rd, rs1, imm</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 + imm</code>
-                        </td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>SLTI rd, rs1, imm</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 &lt;s imm</code>
-                        </td>
-                        <td>
-                            Set <code>rd</code> to 1 if the value in
-                            <code>rs1</code> is less than the value in
-                            <code>imm</code>, otherwise 0 (both values are
-                            treated as signed)
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>SLTIU rd, rs1, imm</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 &lt;u imm</code>
-                        </td>
-                        <td>
-                            Set <code>rd</code> to 1 if the value in
-                            <code>rs1</code> is less than the value in
-                            <code>imm</code>, otherwise 0 (both values are
-                            treated as unsigned)
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>ANDI rd, rs1, imm</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 &amp; imm</code>
-                        </td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>ORI rd, rs1, imm</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 | imm</code>
-                        </td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>XORI rd, rs1, imm</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 ^ imm</code>
-                        </td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>SLLI rd, rs1, imm</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 &lt;&lt; imm</code>
-                        </td>
-                        <td>
-                            <code>imm</code> is unsigned, with a length of 5
-                            bits
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>SRLI rd, rs1, imm</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 &gt;&gt; imm</code>
-                        </td>
-                        <td>
-                            Logical right shift.<br /><code>imm</code>
-                            is unsigned, with a length of 5 bits
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>SRAI rd, rs1, imm</code>
-                        </td>
-                        <td>
-                            <code>rd = rs1 &gt;&gt;a imm</code>
-                        </td>
-                        <td>
-                            Arithmetic right shift.<br /><code>imm</code>
-                            is unsigned, with a length of 5 bits
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code
-                                >LB rd, rs1, imm<br />
-                                LB rd, imm(rs1)<br />
-                                LB rd, var[index]</code
+        <!--my_acc_marker-->
+        <div class="accordion" id="accordionPanelsStayOpenExample">
+            <div class="accordion-item">
+                <h3 class="accordion-header" id="panelsStayOpen-headingOne">
+                    <button
+                        class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#panelsStayOpen-collapseOne"
+                        aria-expanded="false"
+                        aria-controls="panelsStayOpen-collapseOne"
+                    >
+                        R-Type
+                    </button>
+                </h3>
+                <div
+                    id="panelsStayOpen-collapseOne"
+                    class="accordion-collapse collapse"
+                    aria-labelledby="panelsStayOpen-headingOne"
+                >
+                    <div class="accordion-body">
+                        <div class="table-responsive">
+                            <table
+                                class="table table-bordered table-hover table-instr-op"
                             >
-                        </td>
-                        <td>
-                            <code
-                                >rd = M[rs1 + imm]<br />
-                                rd = var[index]</code
+                                <thead>
+                                    <tr>
+                                        <th>Instruction</th>
+                                        <th>Operation</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <code>ADD rd, rs1, rs2</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 + rs2</code>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>SUB rd, rs1, rs2</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 - rs2</code>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>SLL rd, rs1, rs2</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 &lt;&lt; rs2</code>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>SRL rd, rs1, rs2</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 &gt;&gt; rs2</code>
+                                        </td>
+                                        <td>Logical right shift</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>SRA rd, rs1, rs2</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 &gt;&gt;a rs2</code>
+                                        </td>
+                                        <td>Arithmetic right shift</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>SLT rd, rs1, rs2</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 &lt;s rs2</code>
+                                        </td>
+                                        <td>
+                                            Set <code>rd</code> to 1 if the
+                                            value in <code>rs1</code> is less
+                                            than the value in <code>rs2</code>,
+                                            otherwise 0 (both values are treated
+                                            as signed)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>SLTU rd, rs1, rs2</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 &lt;u rs2</code>
+                                        </td>
+                                        <td>
+                                            Set <code>rd</code> to 1 if the
+                                            value in <code>rs1</code> is less
+                                            than the value in <code>rs2</code>,
+                                            otherwise 0 (both values are treated
+                                            as unsigned)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>AND rd, rs1, rs2</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 &amp; rs2</code>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>OR rd, rs1, rs2</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 | rs2</code>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>XOR rd, rs1, rs2</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 ^ rs2</code>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>MUL rd, rs1, rs2</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 * rs2</code>
+                                        </td>
+                                        <td>
+                                            (M), places the lower 32 bits of the
+                                            result in the destination register
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>MULH rd, rs1, rs2</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 s*s rs2</code>
+                                        </td>
+                                        <td>
+                                            (M), places the upper 32 bits of the
+                                            result in the destination register,
+                                            both rs1 and rs2 are treated as
+                                            signed
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>MULHU rd, rs1, rs2</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 u*u rs2</code>
+                                        </td>
+                                        <td>
+                                            (M), places the upper 32 bits of the
+                                            result in the destination register,
+                                            both rs1 and rs2 are treated as
+                                            unsigned
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>MULHSU rd, rs1, rs2</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 s*u rs2</code>
+                                        </td>
+                                        <td>
+                                            (M), places the upper 32 bits of the
+                                            result in the destination register,
+                                            rs1 treated as signed, rs2 treated
+                                            as unsigned
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>DIV rd, rs1, rs2</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 /s rs2</code>
+                                        </td>
+                                        <td>(M), signed integer division</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>DIVU rd, rs1, rs2</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 /u rs2</code>
+                                        </td>
+                                        <td>(M), unsigned integer division</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>REM rd, rs1, rs2</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 %s rs2</code>
+                                        </td>
+                                        <td>
+                                            (M), remainder of signed integer
+                                            division
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>REMU rd, rs1, rs2</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 %u rs2</code>
+                                        </td>
+                                        <td>
+                                            (M), remainder of unsigned integer
+                                            division
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p>
+                            Note: Instructions marked with (M) are part of the
+                            "M" Standard Extension for Integer Multiplication
+                            and Division.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header" id="panelsStayOpen-headingTwo">
+                    <button
+                        class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#panelsStayOpen-collapseTwo"
+                        aria-expanded="false"
+                        aria-controls="panelsStayOpen-collapseTwo"
+                    >
+                        I-Type
+                    </button>
+                </h3>
+                <div
+                    id="panelsStayOpen-collapseTwo"
+                    class="accordion-collapse collapse"
+                    aria-labelledby="panelsStayOpen-headingTwo"
+                >
+                    <div class="accordion-body">
+                        <p>
+                            Unless otherwise specified, the immediate
+                            (<code>imm</code>) has a length of 12 bits and is
+                            sign extended to 32 bits.
+                            <br />
+                            <code>var</code> is a variable name,
+                            <code>index</code> is an optional array index.
+                        </p>
+                        <div class="table-responsive">
+                            <table
+                                class="table table-bordered table-hover table-instr-op"
                             >
-                        </td>
-                        <td>
-                            Load byte.<br /><code>rd</code>
-                            is sign extended to 32 bits
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code
-                                >LH rd, rs1, imm<br />
-                                LH rd, imm(rs1)<br />
-                                LH rd, var[index]</code
+                                <thead>
+                                    <tr>
+                                        <th>Instruction</th>
+                                        <th>Operation</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <code>ADDI rd, rs1, imm</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 + imm</code>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>SLTI rd, rs1, imm</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 &lt;s imm</code>
+                                        </td>
+                                        <td>
+                                            Set <code>rd</code> to 1 if the
+                                            value in <code>rs1</code> is less
+                                            than the value in <code>imm</code>,
+                                            otherwise 0 (both values are treated
+                                            as signed)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>SLTIU rd, rs1, imm</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 &lt;u imm</code>
+                                        </td>
+                                        <td>
+                                            Set <code>rd</code> to 1 if the
+                                            value in <code>rs1</code> is less
+                                            than the value in <code>imm</code>,
+                                            otherwise 0 (both values are treated
+                                            as unsigned)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>ANDI rd, rs1, imm</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 &amp; imm</code>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>ORI rd, rs1, imm</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 | imm</code>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>XORI rd, rs1, imm</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 ^ imm</code>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>SLLI rd, rs1, imm</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 &lt;&lt; imm</code>
+                                        </td>
+                                        <td>
+                                            <code>imm</code> is unsigned, with a
+                                            length of 5 bits
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>SRLI rd, rs1, imm</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 &gt;&gt; imm</code>
+                                        </td>
+                                        <td>
+                                            Logical right shift.<br /><code
+                                                >imm</code
+                                            >
+                                            is unsigned, with a length of 5 bits
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>SRAI rd, rs1, imm</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = rs1 &gt;&gt;a imm</code>
+                                        </td>
+                                        <td>
+                                            Arithmetic right shift.<br /><code
+                                                >imm</code
+                                            >
+                                            is unsigned, with a length of 5 bits
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code
+                                                >LB rd, rs1, imm<br />
+                                                LB rd, imm(rs1)<br />
+                                                LB rd, var[index]</code
+                                            >
+                                        </td>
+                                        <td>
+                                            <code
+                                                >rd = M[rs1 + imm]<br />
+                                                rd = var[index]</code
+                                            >
+                                        </td>
+                                        <td>
+                                            Load byte.<br /><code>rd</code>
+                                            is sign extended to 32 bits
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code
+                                                >LH rd, rs1, imm<br />
+                                                LH rd, imm(rs1)<br />
+                                                LH rd, var[index]</code
+                                            >
+                                        </td>
+                                        <td>
+                                            <code
+                                                >rd = M[rs1 + imm]<br />
+                                                rd = var[index]</code
+                                            >
+                                        </td>
+                                        <td>
+                                            Load two bytes.<br /><code>rd</code>
+                                            is sign extended to 32 bits
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code
+                                                >LW rd, rs1, imm<br />
+                                                LW rd, imm(rs1)<br />
+                                                LW rd, var[index]</code
+                                            >
+                                        </td>
+                                        <td>
+                                            <code
+                                                >rd = M[rs1 + imm]<br />
+                                                rd = var[index]</code
+                                            >
+                                        </td>
+                                        <td>
+                                            Load four bytes.<br /><code
+                                                >rd</code
+                                            >
+                                            is sign extended to 32 bits
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code
+                                                >LBU rd, rs1, imm<br />
+                                                LBU rd, imm(rs1)<br />
+                                                LBU rd, var[index]</code
+                                            >
+                                        </td>
+                                        <td>
+                                            <code
+                                                >rd = M[rs1 + imm]<br />
+                                                rd = var[index]</code
+                                            >
+                                        </td>
+                                        <td>Load byte</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code
+                                                >LHU rd, rs1, imm<br />
+                                                LHU rd, imm(rs1)<br />
+                                                LHU rd, var[index]</code
+                                            >
+                                        </td>
+                                        <td>
+                                            <code
+                                                >rd = M[rs1 + imm]<br />
+                                                rd = var[index]</code
+                                            >
+                                        </td>
+                                        <td>Load two bytes</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>JALR rd, rs1, imm</code>
+                                        </td>
+                                        <td>
+                                            <code
+                                                >rd = PC + 4; PC = rs1 +
+                                                imm</code
+                                            >
+                                        </td>
+                                        <td>
+                                            Jump and link register.
+                                            <code>rd</code> is set to the
+                                            address of the instruction following
+                                            the jump. The jump target is
+                                            <code>rs1 + imm</code>
+                                            with the least significant bit
+                                            cleared.
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>ECALL</code>
+                                        </td>
+                                        <td>
+                                            <code>environment call</code>
+                                        </td>
+                                        <td>
+                                            See section
+                                            <a href="#riscv-help-ecalls"
+                                                >ECALLs</a
+                                            >.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header" id="panelsStayOpen-headingThree">
+                    <button
+                        class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#panelsStayOpen-collapseThree"
+                        aria-expanded="false"
+                        aria-controls="panelsStayOpen-collapseThree"
+                    >
+                        S-Type
+                    </button>
+                </h3>
+                <div
+                    id="panelsStayOpen-collapseThree"
+                    class="accordion-collapse collapse"
+                    aria-labelledby="panelsStayOpen-headingThree"
+                >
+                    <div class="accordion-body">
+                        <p>
+                            The immediate (<code>imm</code>) has a length of 12
+                            bits and is sign extended to 32 bits. <br />
+                            <code>var</code> is a variable name,
+                            <code>index</code> is an optional array index.
+                        </p>
+                        <div class="table-responsive">
+                            <table
+                                class="table table-bordered table-hover table-instr-op"
                             >
-                        </td>
-                        <td>
-                            <code
-                                >rd = M[rs1 + imm]<br />
-                                rd = var[index]</code
+                                <thead>
+                                    <tr>
+                                        <th>Instruction</th>
+                                        <th>Operation</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <code
+                                                >SB rs1, rs2, imm<br />
+                                                SB rs1, imm(rs2)<br />
+                                                SB rs1, var[index], rs2</code
+                                            >
+                                        </td>
+                                        <td>
+                                            <code
+                                                >M[rs2 + imm] = rs1<br />
+                                                var[index] = rs1</code
+                                            >
+                                        </td>
+                                        <td>
+                                            Store byte.<br />If a variable is
+                                            modified, <code>rs2</code> is used
+                                            as a temporary register, that will
+                                            be overwritten.
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code
+                                                >SH rs1, rs2, imm<br />
+                                                SH rs1, imm(rs2)<br />
+                                                SH rs1, var[index], rs2</code
+                                            >
+                                        </td>
+                                        <td>
+                                            <code
+                                                >M[rs2 + imm] = rs1<br />
+                                                var[index] = rs1</code
+                                            >
+                                        </td>
+                                        <td>
+                                            Store two bytes.<br />If a variable
+                                            is modified, <code>rs2</code> is
+                                            used as a temporary register, that
+                                            will be overwritten.
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code
+                                                >SW rs1, rs2, imm<br />
+                                                SW rs1, imm(rs2)<br />
+                                                SW rs1, var[index], rs2</code
+                                            >
+                                        </td>
+                                        <td>
+                                            <code
+                                                >M[rs2 + imm] = rs1<br />
+                                                var[index] = rs1</code
+                                            >
+                                        </td>
+                                        <td>
+                                            Store four bytes.<br />If a variable
+                                            is modified, <code>rs2</code> is
+                                            used as a temporary register, that
+                                            will be overwritten.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header" id="panelsStayOpen-headingFour">
+                    <button
+                        class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#panelsStayOpen-collapseFour"
+                        aria-expanded="false"
+                        aria-controls="panelsStayOpen-collapseFour"
+                    >
+                        B-Type
+                    </button>
+                </h3>
+                <div
+                    id="panelsStayOpen-collapseFour"
+                    class="accordion-collapse collapse"
+                    aria-labelledby="panelsStayOpen-headingFour"
+                >
+                    <div class="accordion-body">
+                        <p>
+                            The immediate (<code>imm</code>) has a length of 13
+                            bits and is sign extended to 32 bits. <br />
+                            Offsets are optional, and in hexadecimal format.
+                        </p>
+                        <div class="table-responsive">
+                            <table
+                                class="table table-bordered table-hover table-instr-op"
                             >
-                        </td>
-                        <td>
-                            Load two bytes.<br /><code>rd</code>
-                            is sign extended to 32 bits
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code
-                                >LW rd, rs1, imm<br />
-                                LW rd, imm(rs1)<br />
-                                LW rd, var[index]</code
+                                <thead>
+                                    <tr>
+                                        <th>Instruction</th>
+                                        <th>Operation</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <code
+                                                >BEQ rs1, rs2, imm<br />
+                                                BEQ rs1, rs2, label+offset</code
+                                            >
+                                        </td>
+                                        <td>
+                                            <code
+                                                >if (rs1 == rs2) PC = PC +
+                                                imm</code
+                                            >
+                                        </td>
+                                        <td>Branch if equal</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code
+                                                >BNE rs1, rs2, imm<br />
+                                                BNE rs1, rs2, label+offset</code
+                                            >
+                                        </td>
+                                        <td>
+                                            <code
+                                                >if (rs1 != rs2) PC = PC +
+                                                imm</code
+                                            >
+                                        </td>
+                                        <td>Branch if not equal</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code
+                                                >BLT rs1, rs2, imm<br />
+                                                BLT rs1, rs2, label+offset</code
+                                            >
+                                        </td>
+                                        <td>
+                                            <code
+                                                >if (rs1 &lt;s rs2) PC = PC +
+                                                imm</code
+                                            >
+                                        </td>
+                                        <td>Branch if less than</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code
+                                                >BGE rs1, rs2, imm<br />
+                                                BGE rs1, rs2, label+offset</code
+                                            >
+                                        </td>
+                                        <td>
+                                            <code
+                                                >if (rs1 &gt;=s rs2) PC = PC +
+                                                imm</code
+                                            >
+                                        </td>
+                                        <td>Branch if greater than or equal</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code
+                                                >BLTU rs1, rs2, imm<br />
+                                                BLTU rs1, rs2,
+                                                label+offset</code
+                                            >
+                                        </td>
+                                        <td>
+                                            <code
+                                                >if (rs1 &lt;u rs2) PC = PC +
+                                                imm</code
+                                            >
+                                        </td>
+                                        <td>Branch if less than (unsigned)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code
+                                                >BGEU rs1, rs2, imm<br />
+                                                BGEU rs1, rs2,
+                                                label+offset</code
+                                            >
+                                        </td>
+                                        <td>
+                                            <code
+                                                >if (rs1 &gt;=u rs2) PC = PC +
+                                                imm</code
+                                            >
+                                        </td>
+                                        <td>
+                                            Branch if greater than or equal
+                                            (unsigned)
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header" id="panelsStayOpen-headingFive">
+                    <button
+                        class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#panelsStayOpen-collapseFive"
+                        aria-expanded="false"
+                        aria-controls="panelsStayOpen-collapseFive"
+                    >
+                        U-Type
+                    </button>
+                </h3>
+                <div
+                    id="panelsStayOpen-collapseFive"
+                    class="accordion-collapse collapse"
+                    aria-labelledby="panelsStayOpen-headingFive"
+                >
+                    <div class="accordion-body">
+                        <p>
+                            The immediate (<code>imm</code>) has a length of 20
+                            bits and is sign extended to 32 bits.
+                        </p>
+                        <div class="table-responsive">
+                            <table
+                                class="table table-bordered table-hover table-instr-op"
                             >
-                        </td>
-                        <td>
-                            <code
-                                >rd = M[rs1 + imm]<br />
-                                rd = var[index]</code
+                                <thead>
+                                    <tr>
+                                        <th>Instruction</th>
+                                        <th>Operation</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <code>LUI rd, imm</code>
+                                        </td>
+                                        <td>
+                                            <code>rd = imm &lt;&lt; 12</code>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <code>AUIPC rd, imm</code>
+                                        </td>
+                                        <td>
+                                            <code
+                                                >rd = PC + (imm &lt;&lt;
+                                                12)</code
+                                            >
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header" id="panelsStayOpen-headingSix">
+                    <button
+                        class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#panelsStayOpen-collapseSix"
+                        aria-expanded="false"
+                        aria-controls="panelsStayOpen-collapseSix"
+                    >
+                        J-Type
+                    </button>
+                </h3>
+                <div
+                    id="panelsStayOpen-collapseSix"
+                    class="accordion-collapse collapse"
+                    aria-labelledby="panelsStayOpen-headingSix"
+                >
+                    <div class="accordion-body">
+                        <p>
+                            The address to jump to (<code>addr</code>), is
+                            encoded relative to the current pc in a 21 bit
+                            immediate that is sign extended to 32 bits and added
+                            to the current pc.<br />
+                            Offsets are optional, and in hexadecimal format.
+                        </p>
+                        <div class="table-responsive">
+                            <table
+                                class="table table-bordered table-hover table-instr-op"
                             >
-                        </td>
-                        <td>
-                            Load four bytes.<br /><code>rd</code>
-                            is sign extended to 32 bits
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code
-                                >LBU rd, rs1, imm<br />
-                                LBU rd, imm(rs1)<br />
-                                LBU rd, var[index]</code
-                            >
-                        </td>
-                        <td>
-                            <code
-                                >rd = M[rs1 + imm]<br />
-                                rd = var[index]</code
-                            >
-                        </td>
-                        <td>Load byte</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code
-                                >LHU rd, rs1, imm<br />
-                                LHU rd, imm(rs1)<br />
-                                LHU rd, var[index]</code
-                            >
-                        </td>
-                        <td>
-                            <code
-                                >rd = M[rs1 + imm]<br />
-                                rd = var[index]</code
-                            >
-                        </td>
-                        <td>Load two bytes</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>JALR rd, rs1, imm</code>
-                        </td>
-                        <td>
-                            <code>rd = PC + 4; PC = rs1 + imm</code>
-                        </td>
-                        <td>
-                            Jump and link register.
-                            <code>rd</code> is set to the address of the
-                            instruction following the jump. The jump target is
-                            <code>rs1 + imm</code>
-                            with the least significant bit cleared.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>ECALL</code>
-                        </td>
-                        <td>
-                            <code>environment call</code>
-                        </td>
-                        <td>
-                            See section <a href="#riscv-help-ecalls">ECALLs</a>.
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <h3 id="s-type">S-Type</h3>
-        <p>
-            The immediate (<code>imm</code>) has a length of 12 bits and is sign
-            extended to 32 bits. <br />
-            <code>var</code> is a variable name, <code>index</code> is an
-            optional array index.
-        </p>
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover table-instr-op">
-                <thead>
-                    <tr>
-                        <th>Instruction</th>
-                        <th>Operation</th>
-                        <th>Notes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <code
-                                >SB rs1, rs2, imm<br />
-                                SB rs1, imm(rs2)<br />
-                                SB rs1, var[index], rs2</code
-                            >
-                        </td>
-                        <td>
-                            <code
-                                >M[rs2 + imm] = rs1<br />
-                                var[index] = rs1</code
-                            >
-                        </td>
-                        <td>
-                            Store byte.<br />If a variable is modified,
-                            <code>rs2</code> is used as a temporary register,
-                            that will be overwritten.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code
-                                >SH rs1, rs2, imm<br />
-                                SH rs1, imm(rs2)<br />
-                                SH rs1, var[index], rs2</code
-                            >
-                        </td>
-                        <td>
-                            <code
-                                >M[rs2 + imm] = rs1<br />
-                                var[index] = rs1</code
-                            >
-                        </td>
-                        <td>
-                            Store two bytes.<br />If a variable is modified,
-                            <code>rs2</code> is used as a temporary register,
-                            that will be overwritten.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code
-                                >SW rs1, rs2, imm<br />
-                                SW rs1, imm(rs2)<br />
-                                SW rs1, var[index], rs2</code
-                            >
-                        </td>
-                        <td>
-                            <code
-                                >M[rs2 + imm] = rs1<br />
-                                var[index] = rs1</code
-                            >
-                        </td>
-                        <td>
-                            Store four bytes.<br />If a variable is modified,
-                            <code>rs2</code> is used as a temporary register,
-                            that will be overwritten.
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <h3 id="b-type">B-Type</h3>
-        <p>
-            The immediate (<code>imm</code>) has a length of 13 bits and is sign
-            extended to 32 bits. <br />
-            Offsets are optional, and in hexadecimal format.
-        </p>
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover table-instr-op">
-                <thead>
-                    <tr>
-                        <th>Instruction</th>
-                        <th>Operation</th>
-                        <th>Notes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <code
-                                >BEQ rs1, rs2, imm<br />
-                                BEQ rs1, rs2, label+offset</code
-                            >
-                        </td>
-                        <td>
-                            <code>if (rs1 == rs2) PC = PC + imm</code>
-                        </td>
-                        <td>Branch if equal</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code
-                                >BNE rs1, rs2, imm<br />
-                                BNE rs1, rs2, label+offset</code
-                            >
-                        </td>
-                        <td>
-                            <code>if (rs1 != rs2) PC = PC + imm</code>
-                        </td>
-                        <td>Branch if not equal</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code
-                                >BLT rs1, rs2, imm<br />
-                                BLT rs1, rs2, label+offset</code
-                            >
-                        </td>
-                        <td>
-                            <code>if (rs1 &lt;s rs2) PC = PC + imm</code>
-                        </td>
-                        <td>Branch if less than</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code
-                                >BGE rs1, rs2, imm<br />
-                                BGE rs1, rs2, label+offset</code
-                            >
-                        </td>
-                        <td>
-                            <code>if (rs1 &gt;=s rs2) PC = PC + imm</code>
-                        </td>
-                        <td>Branch if greater than or equal</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code
-                                >BLTU rs1, rs2, imm<br />
-                                BLTU rs1, rs2, label+offset</code
-                            >
-                        </td>
-                        <td>
-                            <code>if (rs1 &lt;u rs2) PC = PC + imm</code>
-                        </td>
-                        <td>Branch if less than (unsigned)</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code
-                                >BGEU rs1, rs2, imm<br />
-                                BGEU rs1, rs2, label+offset</code
-                            >
-                        </td>
-                        <td>
-                            <code>if (rs1 &gt;=u rs2) PC = PC + imm</code>
-                        </td>
-                        <td>Branch if greater than or equal (unsigned)</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <h3 id="u-type">U-Type</h3>
-        <p>
-            The immediate (<code>imm</code>) has a length of 20 bits and is sign
-            extended to 32 bits.
-        </p>
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover table-instr-op">
-                <thead>
-                    <tr>
-                        <th>Instruction</th>
-                        <th>Operation</th>
-                        <th>Notes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <code>LUI rd, imm</code>
-                        </td>
-                        <td>
-                            <code>rd = imm &lt;&lt; 12</code>
-                        </td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <code>AUIPC rd, imm</code>
-                        </td>
-                        <td>
-                            <code>rd = PC + (imm &lt;&lt; 12)</code>
-                        </td>
-                        <td></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <h3 id="j-type">J-Type</h3>
-        <p>
-            The address to jump to (<code>addr</code>), is encoded relative to
-            the current pc in a 21 bit immediate that is sign extended to 32
-            bits and added to the current pc.<br />
-            Offsets are optional, and in hexadecimal format.
-        </p>
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover table-instr-op">
-                <thead>
-                    <tr>
-                        <th>Instruction</th>
-                        <th>Operation</th>
-                        <th>Notes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <code
-                                >JAL rd, addr<br />
-                                JAL rd, label+offset</code
-                            >
-                        </td>
-                        <td>
-                            <code>rd = PC + 4; PC = addr</code>
-                        </td>
-                        <td>
-                            Jump and link.
-                            <code>rd</code> is set to the address of the
-                            instruction following the jump.
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
+                                <thead>
+                                    <tr>
+                                        <th>Instruction</th>
+                                        <th>Operation</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <code
+                                                >JAL rd, addr<br />
+                                                JAL rd, label+offset</code
+                                            >
+                                        </td>
+                                        <td>
+                                            <code>rd = PC + 4; PC = addr</code>
+                                        </td>
+                                        <td>
+                                            Jump and link.
+                                            <code>rd</code> is set to the
+                                            address of the instruction following
+                                            the jump.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--my_acc_marker-->
             <h3 id="csr-type">CSR-Type</h3>
             <p>
                 <i>Currently not implemented in 5-stage pipeline mode.</i>
