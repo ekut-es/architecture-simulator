@@ -37,3 +37,7 @@ class SingleStageControlUnitSignals:
 
     jump: bool = False  # False if no jump instruction (jal) is selected
     pc_from_alu_res: bool = False  # True if the alu result is used as new pc -> needs inversion for highlighting of control unit path
+
+    reg_write: Optional[bool] = None
+    mem_read: Optional[bool] = None
+    mem_write: Optional[bool] = None

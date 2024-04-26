@@ -825,38 +825,56 @@ class ECALL(ITypeInstruction):
         self, architectural_state: RiscvArchitecturalState
     ) -> RiscvArchitecturalState:
         """RaiseException(EnvironmentCall)"""
+        result = self.process_ecall(architectural_state)
+        if type(result) is int:
+            architectural_state.exit_code = result
+        elif type(result) is str:
+            architectural_state.output += result
+        return architectural_state
+
+    def process_ecall(self, architectural_state: RiscvArchitecturalState) -> str | int:
+        """Processes this ecall. Returns the action to be applied to the architectural state.
+
+        Args:
+            architectural_state (RiscvArchitecturalState): The state on which the ecall shall be applied.
+
+        Raises:
+            ValueError: Raises an error if the ECALL code is invalid.
+
+        Returns:
+            str|int: Returns either a string to be printed to the output or an exit code.
+        """
         code = int(architectural_state.register_file.registers[17])
         arg = int(architectural_state.register_file.registers[10])
 
         match code:
             case 1:  # print arg as sint
-                architectural_state.output += str(fixedint.Int32(arg))
+                return str(fixedint.Int32(arg))
             case 2:  # print arg as 32-bit float
-                architectural_state.output += str(
-                    unpack(">f", arg.to_bytes(4, "big"))[0]
-                )
+                return str(unpack(">f", arg.to_bytes(4, "big"))[0])
             case 4:  # print null-terminated string stored at address in arg
                 address = arg
+                result = ""
                 while (
                     byte := architectural_state.memory.read_byte(address, False)
                 ) != 0:
-                    architectural_state.output += chr(byte % 128)
+                    result += chr(byte % 128)
                     address += 1
+                return result
             case 11:  # print arg as ascii char
-                architectural_state.output += chr(arg % 128)
+                return chr(arg % 128)
             case 34:  # print arg as hex
-                architectural_state.output += "0x" + "{:X}".format(arg)
+                return "0x" + "{:X}".format(arg)
             case 35:  # print arg as bin
-                architectural_state.output += bin(arg)
+                return bin(arg)
             case 36:  # print arg as uint
-                architectural_state.output += str(arg)
+                return str(arg)
             case 10:  # exit with status 0
-                architectural_state.exit_code = 0
+                return 0
             case 93:  # exit with arg as status
-                architectural_state.exit_code = arg
+                return arg
             case _:
                 raise ValueError(f"{code} (register a7) is not a valid code for ECALL")
-        return architectural_state
 
     def alu_compute(
         self, alu_in_1: int | None, alu_in_2: int | None

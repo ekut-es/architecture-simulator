@@ -98,12 +98,14 @@ class InstructionFetchStage(Stage):
         instruction = state.instruction_memory.read_instruction(address_of_instruction)
         state.program_counter += instruction.length
         pc_plus_instruction_length = address_of_instruction + instruction.length
+        control_unit_signals = instruction.control_unit_signals()
 
         return InstructionFetchPipelineRegister(
             instruction=instruction,
             address_of_instruction=address_of_instruction,
             branch_prediction=False,
             pc_plus_instruction_length=pc_plus_instruction_length,
+            control_unit_signals=control_unit_signals,
         )
 
 
@@ -171,8 +173,6 @@ class InstructionDecodeStage(Stage):
                     stall_signal = StallSignal(2)
                     break
 
-        # gets the control unit signals that are generated in the ID stage
-        control_unit_signals = pipeline_register.instruction.control_unit_signals()
         return InstructionDecodePipelineRegister(
             instruction=pipeline_register.instruction,
             register_read_addr_1=register_read_addr_1,
@@ -181,7 +181,7 @@ class InstructionDecodeStage(Stage):
             register_read_data_2=register_read_data_2,
             imm=imm,
             write_register=write_register,
-            control_unit_signals=control_unit_signals,
+            control_unit_signals=pipeline_register.control_unit_signals,
             branch_prediction=pipeline_register.branch_prediction,
             stall_signal=stall_signal,
             pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
@@ -216,10 +216,14 @@ class ExecuteStage(Stage):
             return ExecutePipelineRegister()
 
         alu_in_1 = (
-            pipeline_register.register_read_data_1
-            if pipeline_register.control_unit_signals.alu_src_1
-            else pipeline_register.address_of_instruction
-        )
+            None
+            if pipeline_register.control_unit_signals.alu_src_1 is None
+            else (
+                pipeline_register.register_read_data_1
+                if pipeline_register.control_unit_signals.alu_src_1
+                else pipeline_register.address_of_instruction
+            )
+        )  # check if alu_src_1 is None because address_of_instruction always exists and might cause problems in the visualization
         alu_in_2 = (
             pipeline_register.imm
             if pipeline_register.control_unit_signals.alu_src_2
@@ -237,6 +241,8 @@ class ExecuteStage(Stage):
 
         # ECALL needs some special behavior (flush and print to output)
         stall_signal = None
+        exit_code = None
+        flush_signal = None  # Needed for exiting the simulation (ecall 10/93)
         if isinstance(pipeline_register.instruction, ECALL):
             # assume that all further stages need to be empty, unless this stage is already stalled and the value of the next register is only for display purposes
             for other_pr in pipeline_registers[
@@ -249,7 +255,15 @@ class ExecuteStage(Stage):
                     stall_signal = StallSignal(2)
                     break
             if stall_signal is None:
-                pipeline_register.instruction.behavior(state)
+                ecall_result = pipeline_register.instruction.process_ecall(state)
+                if type(ecall_result) is str:
+                    state.output += ecall_result
+                elif type(ecall_result) is int:
+                    exit_code = ecall_result
+                    assert pipeline_register.pc_plus_instruction_length is not None
+                    flush_signal = FlushSignal(
+                        False, pipeline_register.pc_plus_instruction_length
+                    )
 
         return ExecutePipelineRegister(
             stall_signal=stall_signal,
@@ -267,6 +281,8 @@ class ExecuteStage(Stage):
             branch_prediction=pipeline_register.branch_prediction,
             pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
             address_of_instruction=pipeline_register.address_of_instruction,
+            exit_code=exit_code,
+            flush_signal=flush_signal,
         )
 
 
@@ -325,6 +341,12 @@ class MemoryAccessStage(Stage):
             flush_signal = FlushSignal(
                 inclusive=False, address=pipeline_register.result
             )
+        elif pipeline_register.exit_code is not None:
+            # Exit codes stem from ecalls which cannot cause branches and thus cannot generate other flush signals
+            assert pipeline_register.pc_plus_instruction_length is not None
+            flush_signal = FlushSignal(
+                False, pipeline_register.pc_plus_instruction_length
+            )
         else:
             flush_signal = None
 
@@ -349,6 +371,7 @@ class MemoryAccessStage(Stage):
             pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
             imm=pipeline_register.imm,
             address_of_instruction=pipeline_register.address_of_instruction,
+            exit_code=pipeline_register.exit_code,
         )
 
 
@@ -402,6 +425,14 @@ class RegisterWritebackStage(Stage):
             architectural_state=state,
         )
 
+        flush_signal = None
+        if pipeline_register.exit_code is not None:
+            assert pipeline_register.pc_plus_instruction_length is not None
+            flush_signal = FlushSignal(
+                False, pipeline_register.pc_plus_instruction_length
+            )
+            state.exit_code = pipeline_register.exit_code
+
         return RegisterWritebackPipelineRegister(
             instruction=pipeline_register.instruction,
             register_write_data=register_write_data,
@@ -412,6 +443,7 @@ class RegisterWritebackStage(Stage):
             pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
             imm=pipeline_register.imm,
             address_of_instruction=pipeline_register.address_of_instruction,
+            flush_signal=flush_signal,
         )
 
 
@@ -481,6 +513,15 @@ class SingleStage(Stage):
             result_pr.control_unit_signals.pc_from_alu_res = (
                 result_pr.instruction.mnemonic == "jalr"
             )
+            result_pr.control_unit_signals.reg_write = (
+                five_stage_control_unit_signals.reg_write
+            )
+            result_pr.control_unit_signals.mem_read = (
+                five_stage_control_unit_signals.mem_read
+            )
+            result_pr.control_unit_signals.mem_write = (
+                five_stage_control_unit_signals.mem_write
+            )
 
             (
                 result_pr.register_read_addr_1,
@@ -504,12 +545,16 @@ class SingleStage(Stage):
                 result_pr.pc_plus_imm = state.program_counter + result_pr.imm
 
             a_comparison, a_result = result_pr.instruction.alu_compute(
-                state.program_counter
-                if result_pr.control_unit_signals.alu_src_1
-                else result_pr.register_read_data_1,
-                result_pr.imm
-                if result_pr.control_unit_signals.alu_src_2
-                else result_pr.register_read_data_2,
+                (
+                    state.program_counter
+                    if result_pr.control_unit_signals.alu_src_1
+                    else result_pr.register_read_data_1
+                ),
+                (
+                    result_pr.imm
+                    if result_pr.control_unit_signals.alu_src_2
+                    else result_pr.register_read_data_2
+                ),
             )
 
             result_pr.alu_comparison = bool(a_comparison)
@@ -527,17 +572,6 @@ class SingleStage(Stage):
                 else None
             )
 
-            result_pr.register_write_data = defaultdict(
-                lambda: None,
-                {
-                    None: None,  # to stop mypy complaining
-                    0: result_pr.pc_plus_instruction_length,
-                    1: result_pr.memory_read_data,
-                    2: result_pr.alu_result,
-                    3: result_pr.imm,
-                },
-            )[five_stage_control_unit_signals.wb_src]
-
             try:
                 result_pr.instruction.behavior(state)
                 result_pr.memory_read_data = (
@@ -547,6 +581,18 @@ class SingleStage(Stage):
                     if type(result_pr.instruction) in SingleStage.TYPE_LOAD_INSTRUCTION
                     else None
                 )
+
+                result_pr.register_write_data = defaultdict(
+                    lambda: None,
+                    {
+                        None: None,  # to stop mypy complaining
+                        0: result_pr.pc_plus_instruction_length,
+                        1: result_pr.memory_read_data,
+                        2: result_pr.alu_result,
+                        3: result_pr.imm,
+                    },
+                )[five_stage_control_unit_signals.wb_src]
+
                 state.program_counter += result_pr.instruction.length
                 if (
                     not type(result_pr.instruction)
