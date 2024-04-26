@@ -238,6 +238,7 @@ class ExecuteStage(Stage):
         # ECALL needs some special behavior (flush and print to output)
         stall_signal = None
         exit_code = None
+        flush_signal = None  # Needed for exiting the simulation (ecall 10/93)
         if isinstance(pipeline_register.instruction, ECALL):
             # assume that all further stages need to be empty, unless this stage is already stalled and the value of the next register is only for display purposes
             for other_pr in pipeline_registers[
@@ -255,6 +256,10 @@ class ExecuteStage(Stage):
                     state.output += ecall_result
                 elif type(ecall_result) is int:
                     exit_code = ecall_result
+                    assert pipeline_register.pc_plus_instruction_length is not None
+                    flush_signal = FlushSignal(
+                        False, pipeline_register.pc_plus_instruction_length
+                    )
 
         return ExecutePipelineRegister(
             stall_signal=stall_signal,
@@ -273,6 +278,7 @@ class ExecuteStage(Stage):
             pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
             address_of_instruction=pipeline_register.address_of_instruction,
             exit_code=exit_code,
+            flush_signal=flush_signal,
         )
 
 
@@ -330,6 +336,12 @@ class MemoryAccessStage(Stage):
             assert pipeline_register.result is not None
             flush_signal = FlushSignal(
                 inclusive=False, address=pipeline_register.result
+            )
+        elif pipeline_register.exit_code is not None:
+            # Exit codes stem from ecalls which cannot cause branches and thus cannot generate other flush signals
+            assert pipeline_register.pc_plus_instruction_length is not None
+            flush_signal = FlushSignal(
+                False, pipeline_register.pc_plus_instruction_length
             )
         else:
             flush_signal = None
@@ -409,7 +421,12 @@ class RegisterWritebackStage(Stage):
             architectural_state=state,
         )
 
+        flush_signal = None
         if pipeline_register.exit_code is not None:
+            assert pipeline_register.pc_plus_instruction_length is not None
+            flush_signal = FlushSignal(
+                False, pipeline_register.pc_plus_instruction_length
+            )
             state.exit_code = pipeline_register.exit_code
 
         return RegisterWritebackPipelineRegister(
@@ -422,6 +439,7 @@ class RegisterWritebackStage(Stage):
             pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
             imm=pipeline_register.imm,
             address_of_instruction=pipeline_register.address_of_instruction,
+            flush_signal=flush_signal,
         )
 
 
