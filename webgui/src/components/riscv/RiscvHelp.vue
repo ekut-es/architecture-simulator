@@ -8,8 +8,8 @@ import RiscvHelpTable from "./RiscvHelpTable.vue";
         <h1>RISC-V</h1>
         <h2 id="instructions">Instructions</h2>
         <p>
-            This simulator supports a subset of the RISC-V32 ISA. The supported
-            instructions are listed below.
+            This simulator supports a subset of the RISC-V RV32IM ISA. The
+            supported instructions are listed below.
         </p>
         <div class="accordion" id="accordionPanelsStayOpenInstructions">
             <div class="accordion-item">
