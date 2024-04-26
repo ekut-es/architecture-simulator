@@ -63,6 +63,7 @@ class ExecutePipelineRegister(PipelineRegister):
     pc_plus_imm: Optional[int] = None
     branch_prediction: Optional[bool] = None
     pc_plus_instruction_length: Optional[int] = None
+    exit_code: Optional[int] = None
     abbreviation = "EX"
 
 
@@ -80,6 +81,7 @@ class MemoryAccessPipelineRegister(PipelineRegister):
     pc_plus_imm: Optional[int] = None
     pc_plus_instruction_length: Optional[int] = None
     imm: Optional[int] = None
+    exit_code: Optional[int] = None
     abbreviation = "MEM"
 
 
