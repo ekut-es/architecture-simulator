@@ -8,6 +8,25 @@
             instructions are listed below.
         </p>
 
+        <table id="tableComponent" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <!-- loop through each value of the fields to get the table header -->
+                    <th v-for="field in fields" :key="field">
+                        {{ field }}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Loop through the list get the each student data -->
+                <tr v-for="item in riscv_instructions" :key="item">
+                    <td v-for="field in fields" :key="field">
+                        {{ item[field] }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
         <div class="accordion" id="accordionPanelsStayOpenInstructions">
             <div class="accordion-item">
                 <h3 class="accordion-header" id="panelsStayOpen-headingOne">
@@ -1481,3 +1500,23 @@ addi x3, x3, 1 # This line is never reached</pre
         </div>
     </div>
 </template>
+<script>
+import riscv_instructions from "@/data/riscv_instructions.json";
+
+export default {
+    name: "TableComponent",
+    props: {
+        //
+        riscv_instructions: {
+            type: Array,
+        },
+        fields: {
+            type: Array,
+        },
+    },
+    setup() {
+        const fields = ["Instruction", "Operation", "Notes", "Format"];
+        return { riscv_instructions, fields };
+    },
+};
+</script>
