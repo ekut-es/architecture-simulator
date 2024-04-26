@@ -162,31 +162,31 @@
     "Format":"I-type"
   },
   {
-    "Instruction":"LB rd, rs1, imm  LB rd, imm(rs1)  LB rd, var[index]",
+    "Instruction":"LB rd, rs1, imm\nLB rd, imm(rs1)\nLB rd, var[index]",
     "Operation":"rd = M[rs1 + imm]  rd = var[index]",
     "Notes":"Load byte. rd is sign extended to 32 bits",
     "Format":"I-type"
   },
   {
-    "Instruction":"LH rd, rs1, imm  LH rd, imm(rs1)  LH rd, var[index]",
+    "Instruction":"LH rd, rs1, imm\nLH rd, imm(rs1)\nLH rd, var[index]",
     "Operation":"rd = M[rs1 + imm]  rd = var[index]",
     "Notes":"Load two bytes. rd is sign extended to 32 bits",
     "Format":"I-type"
   },
   {
-    "Instruction":"LW rd, rs1, imm  LW rd, imm(rs1)  LW rd, var[index]",
+    "Instruction":"LW rd, rs1, imm\nLW rd, imm(rs1)\nLW rd, var[index]",
     "Operation":"rd = M[rs1 + imm]  rd = var[index]",
     "Notes":"Load four bytes. rd is sign extended to 32  bits",
     "Format":"I-type"
   },
   {
-    "Instruction":"LBU rd, rs1, imm  LBU rd, imm(rs1)  LBU rd, var[index]",
+    "Instruction":"LBU rd, rs1, imm\nLBU rd, imm(rs1)\nLBU rd, var[index]",
     "Operation":"rd = M[rs1 + imm]  rd = var[index]",
     "Notes":"Load byte",
     "Format":"I-type"
   },
   {
-    "Instruction":"LHU rd, rs1, imm  LHU rd, imm(rs1)  LHU rd, var[index]",
+    "Instruction":"LHU rd, rs1, imm\nLHU rd, imm(rs1)\nLHU rd, var[index]",
     "Operation":"rd = M[rs1 + imm]  rd = var[index]",
     "Notes":"Load two bytes",
     "Format":"I-type"
@@ -204,55 +204,55 @@
     "Format":"I-type"
   },
   {
-    "Instruction":"SB rs1, rs2, imm  SB rs1, imm(rs2)  SB rs1, var[index], rs2",
+    "Instruction":"SB rs1, rs2, imm\nSB rs1, imm(rs2)\nSB rs1, var[index], rs2",
     "Operation":"M[rs2 + imm] = rs1  var[index] = rs1",
     "Notes":"Store byte. If a variable is modified, rs2 is  used as a temporary register, that will be overwritten.",
     "Format":"S-type"
   },
   {
-    "Instruction":"SH rs1, rs2, imm  SH rs1, imm(rs2)  SH rs1, var[index], rs2",
+    "Instruction":"SH rs1, rs2, imm\nSH rs1, imm(rs2)\nSH rs1, var[index], rs2",
     "Operation":"M[rs2 + imm] = rs1  var[index] = rs1",
     "Notes":"Store two bytes. If a variable is modified,  rs2 is used as a temporary register, that will be  overwritten.",
     "Format":"S-type"
   },
   {
-    "Instruction":"SW rs1, rs2, imm  SW rs1, imm(rs2)  SW rs1, var[index], rs2",
+    "Instruction":"SW rs1, rs2, imm\nSW rs1, imm(rs2)\nSW rs1, var[index], rs2",
     "Operation":"M[rs2 + imm] = rs1  var[index] = rs1",
     "Notes":"Store four bytes. If a variable is modified,  rs2 is used as a temporary register, that will be  overwritten.",
     "Format":"S-type"
   },
   {
-    "Instruction":"BEQ rs1, rs2, imm  BEQ rs1, rs2, label+offset",
+    "Instruction":"BEQ rs1, rs2, imm\nBEQ rs1, rs2, label+offset",
     "Operation":"if (rs1 == rs2) PC = PC + imm",
     "Notes":"Branch if equal",
     "Format":"B-type"
   },
   {
-    "Instruction":"BNE rs1, rs2, imm  BNE rs1, rs2, label+offset",
+    "Instruction":"BNE rs1, rs2, imm\nBNE rs1, rs2, label+offset",
     "Operation":"if (rs1 != rs2) PC = PC + imm",
     "Notes":"Branch if not equal",
     "Format":"B-type"
   },
   {
-    "Instruction":"BLT rs1, rs2, imm  BLT rs1, rs2, label+offset",
+    "Instruction":"BLT rs1, rs2, imm\nBLT rs1, rs2, label+offset",
     "Operation":"if (rs1 <s rs2) PC = PC + imm",
     "Notes":"Branch if less than",
     "Format":"B-type"
   },
   {
-    "Instruction":"BGE rs1, rs2, imm  BGE rs1, rs2, label+offset",
+    "Instruction":"BGE rs1, rs2, imm\nBGE rs1, rs2, label+offset",
     "Operation":"if (rs1 >=s rs2) PC = PC + imm",
     "Notes":"Branch if greater than or equal",
     "Format":"B-type"
   },
   {
-    "Instruction":"BLTU rs1, rs2, imm  BLTU rs1, rs2, label+offset",
+    "Instruction":"BLTU rs1, rs2, imm\nBLTU rs1, rs2, label+offset",
     "Operation":"if (rs1 <u rs2) PC = PC + imm",
     "Notes":"Branch if less than (unsigned)",
     "Format":"B-type"
   },
   {
-    "Instruction":"BGEU rs1, rs2, imm  BGEU rs1, rs2, label+offset",
+    "Instruction":"BGEU rs1, rs2, imm\nBGEU rs1, rs2, label+offset",
     "Operation":"if (rs1 >=u rs2) PC = PC + imm",
     "Notes":"Branch if greater than or equal (unsigned)",
     "Format":"B-type"
@@ -270,7 +270,7 @@
     "Format":"U"
   },
   {
-    "Instruction":"JAL rd, addr  JAL rd, label+offset",
+    "Instruction":"JAL rd, addr\nJAL rd, label+offset",
     "Operation":"rd = PC + 4; PC = addr",
     "Notes":"Jump and link. rd is set to the address of the  instruction following the jump.",
     "Format":"J-type"
