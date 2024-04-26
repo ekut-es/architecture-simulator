@@ -1419,7 +1419,7 @@ End:"""
         self.assertEqual(sim.state.performance_metrics.stalls, 2)
         self.assertEqual(sim.state.performance_metrics.flushes, 0)
 
-    def test_exit(self):
+    def test_exit_1(self):
         program = """li a7, 10
         ecall
         nop
@@ -1434,3 +1434,19 @@ End:"""
         sim.run()
         self.assertEqual(sim.state.performance_metrics.cycles, 8)
         self.assertEqual(sim.state.performance_metrics.instruction_count, 2)
+
+    def test_exit_2(self):
+        # make sure instructions are flushed to prevent unwanted "side effects"
+        program = """li x3, 555
+li a7, 10
+ecall
+sw x3, -4(x0)
+nop
+nop"""
+        sim = RiscvSimulation(mode="five_stage_pipeline")
+
+        sim.load_program(program)
+        sim.run()
+        self.assertEqual(sim.state.performance_metrics.cycles, 9)
+        self.assertEqual(sim.state.performance_metrics.instruction_count, 3)
+        self.assertEqual(sim.state.memory.read_word(-4, False), 0)
