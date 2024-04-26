@@ -98,12 +98,14 @@ class InstructionFetchStage(Stage):
         instruction = state.instruction_memory.read_instruction(address_of_instruction)
         state.program_counter += instruction.length
         pc_plus_instruction_length = address_of_instruction + instruction.length
+        control_unit_signals = instruction.control_unit_signals()
 
         return InstructionFetchPipelineRegister(
             instruction=instruction,
             address_of_instruction=address_of_instruction,
             branch_prediction=False,
             pc_plus_instruction_length=pc_plus_instruction_length,
+            control_unit_signals=control_unit_signals,
         )
 
 
@@ -171,8 +173,6 @@ class InstructionDecodeStage(Stage):
                     stall_signal = StallSignal(2)
                     break
 
-        # gets the control unit signals that are generated in the ID stage
-        control_unit_signals = pipeline_register.instruction.control_unit_signals()
         return InstructionDecodePipelineRegister(
             instruction=pipeline_register.instruction,
             register_read_addr_1=register_read_addr_1,
@@ -181,7 +181,7 @@ class InstructionDecodeStage(Stage):
             register_read_data_2=register_read_data_2,
             imm=imm,
             write_register=write_register,
-            control_unit_signals=control_unit_signals,
+            control_unit_signals=pipeline_register.control_unit_signals,
             branch_prediction=pipeline_register.branch_prediction,
             stall_signal=stall_signal,
             pc_plus_instruction_length=pipeline_register.pc_plus_instruction_length,
@@ -216,10 +216,14 @@ class ExecuteStage(Stage):
             return ExecutePipelineRegister()
 
         alu_in_1 = (
-            pipeline_register.register_read_data_1
-            if pipeline_register.control_unit_signals.alu_src_1
-            else pipeline_register.address_of_instruction
-        )
+            None
+            if pipeline_register.control_unit_signals.alu_src_1 is None
+            else (
+                pipeline_register.register_read_data_1
+                if pipeline_register.control_unit_signals.alu_src_1
+                else pipeline_register.address_of_instruction
+            )
+        )  # check if alu_src_1 is None because address_of_instruction always exists and might cause problems in the visualization
         alu_in_2 = (
             pipeline_register.imm
             if pipeline_register.control_unit_signals.alu_src_2
@@ -509,6 +513,15 @@ class SingleStage(Stage):
             result_pr.control_unit_signals.pc_from_alu_res = (
                 result_pr.instruction.mnemonic == "jalr"
             )
+            result_pr.control_unit_signals.reg_write = (
+                five_stage_control_unit_signals.reg_write
+            )
+            result_pr.control_unit_signals.mem_read = (
+                five_stage_control_unit_signals.mem_read
+            )
+            result_pr.control_unit_signals.mem_write = (
+                five_stage_control_unit_signals.mem_write
+            )
 
             (
                 result_pr.register_read_addr_1,
@@ -559,17 +572,6 @@ class SingleStage(Stage):
                 else None
             )
 
-            result_pr.register_write_data = defaultdict(
-                lambda: None,
-                {
-                    None: None,  # to stop mypy complaining
-                    0: result_pr.pc_plus_instruction_length,
-                    1: result_pr.memory_read_data,
-                    2: result_pr.alu_result,
-                    3: result_pr.imm,
-                },
-            )[five_stage_control_unit_signals.wb_src]
-
             try:
                 result_pr.instruction.behavior(state)
                 result_pr.memory_read_data = (
@@ -579,6 +581,18 @@ class SingleStage(Stage):
                     if type(result_pr.instruction) in SingleStage.TYPE_LOAD_INSTRUCTION
                     else None
                 )
+
+                result_pr.register_write_data = defaultdict(
+                    lambda: None,
+                    {
+                        None: None,  # to stop mypy complaining
+                        0: result_pr.pc_plus_instruction_length,
+                        1: result_pr.memory_read_data,
+                        2: result_pr.alu_result,
+                        3: result_pr.imm,
+                    },
+                )[five_stage_control_unit_signals.wb_src]
+
                 state.program_counter += result_pr.instruction.length
                 if (
                     not type(result_pr.instruction)

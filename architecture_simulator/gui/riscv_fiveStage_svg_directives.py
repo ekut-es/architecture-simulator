@@ -28,10 +28,13 @@ class RiscvFiveStageIFSvgDirectives(RiscvSvgDirectivesBase):
         self.InstructionReadAddressText = SvgWriteLeftDirective()
         self.PC = SvgWriteCenterDirective()
         self.FetchPCOut = SvgFillDirectiveBlue()
-        self.FetchAddOutText = SvgWriteCenterDirective()
         self.FetchAddOut = SvgFillDirectiveBlue()
         self.I_LengthText = SvgWriteCenterDirective()
         self.FetchI_Length = SvgFillDirectiveBlue()
+        self.PCFetchOutToExAdder = SvgFillDirectiveBlue()
+        self.PCFetchOutToExMux = SvgFillDirectiveBlue()
+        self.FetchAddOutToPReg = SvgFillDirectiveBlue()
+        self.FetchAddOutToMux = SvgFillDirectiveBlue()
 
 
 class RiscvFiveStageIDSvgDirectives(RiscvSvgDirectivesBase):
@@ -58,10 +61,17 @@ class RiscvFiveStageIDSvgDirectives(RiscvSvgDirectivesBase):
         self.DecodeLowerFetchPCOut = SvgFillDirectiveBlue()
         self.DecodeInstructionMemory = SvgFillDirectiveBlue()
         self.ControlUnitLeftRight1_1 = SvgFillDirectiveGreen()
-        self.ControlUnitLeftRight2_1 = SvgFillDirectiveBlue()
+        self.ControlUnitLeftRight2_1 = SvgFillDirectiveGreen()
         self.ControlUnitLeftRight3_1 = SvgFillDirectiveGreen()
         self.ControlUnitLeftRight4_1 = SvgFillDirectiveGreen()
         self.ControlUnitLeft_1 = SvgFillDirectiveGreen()
+        self.DecodeInstructionMemoryIntermediate1 = SvgFillDirectiveBlue()
+        self.DecodeInstructionMemoryIntermediate2 = SvgFillDirectiveBlue()
+        self.ControlUnitRegWriteEnable_1 = SvgFillDirectiveGreen()
+        self.ControlUnitMemWriteEnable_1 = SvgFillDirectiveGreen()
+        self.ControlUnitMemReadEnable_1 = SvgFillDirectiveGreen()
+        self.DecodeInstructionMemoryToAluCtl = SvgFillDirectiveBlue()
+        self.ControlUnitAluOp_1 = SvgFillDirectiveGreen()
 
 
 class RiscvFiveStageEXSvgDirectives(RiscvSvgDirectivesBase):
@@ -90,18 +100,28 @@ class RiscvFiveStageEXSvgDirectives(RiscvSvgDirectivesBase):
         self.ExecuteLowerFetchPCOut = SvgFillDirectiveBlue()
         self.ALUComparison = SvgFillDirectiveGreen()
         self.ControlUnitLeftRight1_2 = SvgFillDirectiveGreen()
-        self.ControlUnitLeftRight2_2 = SvgFillDirectiveBlue()
+        self.ControlUnitLeftRight2_2 = SvgFillDirectiveGreen()
         self.ControlUnitLeftRight3_2 = SvgFillDirectiveGreen()
         self.ControlUnitLeftRight4_2 = SvgFillDirectiveGreen()
         self.ControlUnitLeft_2 = SvgFillDirectiveGreen()
-        self.AluControl = SvgFillDirectiveBlue()
+        self.AluControl = SvgFillDirectiveGreen()
+        self.ExecuteImmediateToAdder = SvgFillDirectiveBlue()
+        self.ExecuteImmediateToMux = SvgFillDirectiveBlue()
+        self.ExecuteImmediateInterediate = SvgFillDirectiveBlue()
+        self.ExecuteRegisterFileReadData2ToMux = SvgFillDirectiveBlue()
+        self.ExecuteRegisterFileReadData2ToMemory = SvgFillDirectiveBlue()
+        self.ControlUnitRegWriteEnable_2 = SvgFillDirectiveGreen()
+        self.ControlUnitMemWriteEnable_2 = SvgFillDirectiveGreen()
+        self.ControlUnitMemReadEnable_2 = SvgFillDirectiveGreen()
+        self.ExecuteImmediateToWbMux = SvgFillDirectiveBlue()
+        self.ExecuteInstructionMemoryToAluCtl = SvgFillDirectiveBlue()
+        self.ControlUnitAluOp_2 = SvgFillDirectiveGreen()
 
 
 class RiscvFiveStageMEMSvgDirectives(RiscvSvgDirectivesBase):
     def __init__(self):
         self.Memory = SvgWriteCenterDirective()
         self.DataMemoryAddressText = SvgWriteLeftDirective()
-        self.MemoryExecuteAluResultText = SvgWriteCenterDirective()
         self.MemoryExecuteAluResultText2 = SvgWriteCenterDirective()
         self.MemoryExecuteAluResult = SvgFillDirectiveBlue()
         self.DataMemoryWriteDataText = SvgWriteLeftDirective()
@@ -112,15 +132,21 @@ class RiscvFiveStageMEMSvgDirectives(RiscvSvgDirectivesBase):
         self.MemoryInstructionMemory4 = SvgFillDirectiveBlue()
         self.MemoryALUComparison = SvgFillDirectiveGreen()
         self.MemoryJumpOut = SvgFillDirectiveGreen()
-        self.MemoryExecuteAddOutText = SvgWriteCenterDirective()
         self.MemoryExecuteAddOut = SvgFillDirectiveBlue()
         self.MemoryFetchAddOutText = SvgWriteCenterDirective()
         self.MemoryFetchAddOut = SvgFillDirectiveBlue()
         self.MemoryImmGenText = SvgWriteCenterDirective()
         self.MemoryImmGen = SvgFillDirectiveBlue()
         self.ControlUnitLeftRight1_3 = SvgFillDirectiveGreen()
-        self.ControlUnitLeftRight2_3 = SvgFillDirectiveBlue()
+        self.ControlUnitLeftRight2_3 = SvgFillDirectiveGreen()
         self.ControlUnitLeft_3 = SvgFillDirectiveGreen()
+        self.MemoryExecuteAluResultToMemory = SvgFillDirectiveBlue()
+        self.MemoryExecuteAluResultToFetchMux = SvgFillDirectiveBlue()
+        self.MemoryExecuteAluResultIntermediate = SvgFillDirectiveBlue()
+        self.MemoryExecuteAluResultToWbMux = SvgFillDirectiveBlue()
+        self.ControlUnitRegWriteEnable_3 = SvgFillDirectiveGreen()
+        self.ControlUnitMemWriteEnable_3 = SvgFillDirectiveGreen()
+        self.ControlUnitMemReadEnable_3 = SvgFillDirectiveGreen()
 
 
 class RiscvFiveStageWBSvgDirectives(RiscvSvgDirectivesBase):
@@ -130,26 +156,20 @@ class RiscvFiveStageWBSvgDirectives(RiscvSvgDirectivesBase):
         self.WriteBackMuxOut = SvgFillDirectiveBlue()
         self.RegisterFileWriteRegisterText = SvgWriteLeftDirective()
         self.WriteBackInstructionMemory4 = SvgFillDirectiveBlue()
-        self.WriteBackDataMemoryReadDataText = SvgWriteCenterDirective()
         self.WriteBackDataMemoryReadData = SvgFillDirectiveBlue()
-        self.WriteBackExecuteAluResultText = SvgWriteCenterDirective()
         self.WriteBackExecuteAluResult = SvgFillDirectiveBlue()
-        self.WriteBackFetchAddOutText = SvgWriteCenterDirective()
         self.WriteBackFetchAddOut = SvgFillDirectiveBlue()
-        self.WriteBackImmGenText = SvgWriteCenterDirective()
         self.WriteBackImmGen = SvgFillDirectiveBlue()
         self.wbsrc = SvgWriteCenterDirective()
-        self.ControlUnitLeftRight2_4 = SvgFillDirectiveBlue()
+        self.ControlUnitLeftRight2_4 = SvgFillDirectiveGreen()
+        self.ControlUnitRegWriteEnable_4 = SvgFillDirectiveGreen()
 
 
 class RiscvFiveStageOTHERSvgDirectives(RiscvSvgDirectivesBase):
     def __init__(self):
-        self.FetchRightMuxOutText = SvgWriteCenterDirective()
         self.FetchLeftMuxOutText = SvgWriteCenterDirective()
         self.FetchRightMuxOut = SvgFillDirectiveBlue()
-        self.path2453_0_7_7_9 = SvgFillDirectiveBlue()
-        self.path2453_2_5_7_0_7_5_1_0_4 = SvgFillDirectiveBlue()
-        self.path2453_2_5_7_0_7_6_2_29 = SvgFillDirectiveBlue()
+        self.FetchPCIn = SvgFillDirectiveBlue()
 
 
 class SvgFillDirectiveBlue(SvgFillDirective):
@@ -163,7 +183,7 @@ class SvgFillDirectiveGreen(SvgFillDirective):
     """SVG Fill Directive: highlight: green, default: black"""
 
     def __init__(self):
-        super().__init__(color_on="#008000", color_off="#000000")
+        super().__init__(color_on="#A51E37", color_off="#000000")
 
 
 class SvgWriteLeftDirective(SvgDirective):
