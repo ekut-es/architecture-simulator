@@ -21,7 +21,15 @@
                 <!-- Loop through the list get the each student data -->
                 <tr v-for="item in riscv_instructions" :key="item">
                     <td v-for="field in fields" :key="field">
-                        {{ item[field] }}
+                        <code
+                            v-if="
+                                field == 'Instruction' || field == 'Operation'
+                            "
+                            style="white-space: pre"
+                        >
+                            {{ item[field] }}
+                        </code>
+                        <div v-else>{{ item[field] }}</div>
                     </td>
                 </tr>
             </tbody>
