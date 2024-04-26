@@ -1,5 +1,5 @@
 {
-    "all": [
+    "computational": [
         {
             "Instruction": "ADD rd, rs1, rs2",
             "Operation": "rd = rs1 + rs2",
@@ -163,6 +163,44 @@
             "Format": "I-type"
         },
         {
+            "Instruction": "LUI rd, imm",
+            "Operation": "rd = imm << 12",
+            "Notes": null,
+            "Format": "U"
+        },
+        {
+            "Instruction": "AUIPC rd, imm",
+            "Operation": "rd = PC + (imm << 12)",
+            "Notes": null,
+            "Format": "U"
+        },
+        {
+            "Instruction": "NOP",
+            "Operation": "-",
+            "Notes": "No operation. Translated to ADDI x0, x0, 0",
+            "Format": "Pseudo"
+        },
+        {
+            "Instruction": "LA rd, var[index]",
+            "Operation": "rd = &var[index]",
+            "Notes": "Load variable address into rd",
+            "Format": "Pseudo"
+        },
+        {
+            "Instruction": "LI rd, imm",
+            "Operation": "rd = imm",
+            "Notes": "Load 32 bit immediate into rd",
+            "Format": "Pseudo"
+        },
+        {
+            "Instruction": "MV rd, rs",
+            "Operation": "rd = rs",
+            "Notes": "Translated to ADDI rd, rs, 0",
+            "Format": "Pseudo"
+        }
+    ],
+    "memory-accesses": [
+        {
             "Instruction": "LB rd, rs1, imm\nLB rd, imm(rs1)\nLB rd, var[index]",
             "Operation": "rd = M[rs1 + imm]  rd = var[index]",
             "Notes": "Load byte. rd is sign extended to 32 bits",
@@ -193,18 +231,6 @@
             "Format": "I-type"
         },
         {
-            "Instruction": "JALR rd, rs1, imm",
-            "Operation": "rd = PC + 4; PC = rs1 + imm",
-            "Notes": "Jump and link register. rd is set to the address of  the instruction following the jump. The jump target is  rs1 + imm with the least significant bit cleared.",
-            "Format": "I-type"
-        },
-        {
-            "Instruction": "ECALL",
-            "Operation": "environment call",
-            "Notes": "See section ECALLs.",
-            "Format": "I-type"
-        },
-        {
             "Instruction": "SB rs1, rs2, imm\nSB rs1, imm(rs2)\nSB rs1, var[index], rs2",
             "Operation": "M[rs2 + imm] = rs1  var[index] = rs1",
             "Notes": "Store byte. If a variable is modified, rs2 is  used as a temporary register, that will be overwritten.",
@@ -221,6 +247,14 @@
             "Operation": "M[rs2 + imm] = rs1  var[index] = rs1",
             "Notes": "Store four bytes. If a variable is modified,  rs2 is used as a temporary register, that will be  overwritten.",
             "Format": "S-type"
+        }
+    ],
+    "jumps and branches": [
+        {
+            "Instruction": "JALR rd, rs1, imm",
+            "Operation": "rd = PC + 4; PC = rs1 + imm",
+            "Notes": "Jump and link register. rd is set to the address of  the instruction following the jump. The jump target is  rs1 + imm with the least significant bit cleared.",
+            "Format": "I-type"
         },
         {
             "Instruction": "BEQ rs1, rs2, imm\nBEQ rs1, rs2, label+offset",
@@ -259,22 +293,18 @@
             "Format": "B-type"
         },
         {
-            "Instruction": "LUI rd, imm",
-            "Operation": "rd = imm << 12",
-            "Notes": null,
-            "Format": "U"
-        },
-        {
-            "Instruction": "AUIPC rd, imm",
-            "Operation": "rd = PC + (imm << 12)",
-            "Notes": null,
-            "Format": "U"
-        },
-        {
             "Instruction": "JAL rd, addr\nJAL rd, label+offset",
             "Operation": "rd = PC + 4; PC = addr",
             "Notes": "Jump and link. rd is set to the address of the  instruction following the jump.",
             "Format": "J-type"
+        }
+    ],
+    "system instructions": [
+        {
+            "Instruction": "ECALL",
+            "Operation": "environment call",
+            "Notes": "See section ECALLs.",
+            "Format": "I-type"
         },
         {
             "Instruction": "CSRRW rd, csr, rs1",
@@ -311,31 +341,6 @@
             "Operation": "rd = csr; csr = csr & ~uimm",
             "Notes": "Atomic read/clear. uimm serves as a bit mask",
             "Format": "CSR"
-        },
-        {
-            "Instruction": "NOP",
-            "Operation": "-",
-            "Notes": "No operation. Translated to ADDI x0, x0, 0",
-            "Format": "Pseudo"
-        },
-        {
-            "Instruction": "LA rd, var[index]",
-            "Operation": "rd = &var[index]",
-            "Notes": "Load variable address into rd",
-            "Format": "Pseudo"
-        },
-        {
-            "Instruction": "LI rd, imm",
-            "Operation": "rd = imm",
-            "Notes": "Load 32 bit immediate into rd",
-            "Format": "Pseudo"
-        },
-        {
-            "Instruction": "MV rd, rs",
-            "Operation": "rd = rs",
-            "Notes": "Translated to ADDI rd, rs, 0",
-            "Format": "Pseudo"
         }
-    ],
-    "other": []
+    ]
 }
