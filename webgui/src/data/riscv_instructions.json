@@ -181,12 +181,6 @@
             "Format": "Pseudo"
         },
         {
-            "Instruction": "LA rd, var[index]",
-            "Operation": "rd = &var[index]",
-            "Notes": "Load variable address into rd",
-            "Format": "Pseudo"
-        },
-        {
             "Instruction": "LI rd, imm",
             "Operation": "rd = imm",
             "Notes": "Load 32 bit immediate into rd",
@@ -247,9 +241,21 @@
             "Operation": "M[rs2 + imm] = rs1  var[index] = rs1",
             "Notes": "Store four bytes. If a variable is modified,  rs2 is used as a temporary register, that will be  overwritten.",
             "Format": "S-type"
+        },
+        {
+            "Instruction": "LA rd, var[index]",
+            "Operation": "rd = &var[index]",
+            "Notes": "Load variable address into rd",
+            "Format": "Pseudo"
         }
     ],
     "jumps and branches": [
+        {
+            "Instruction": "JAL rd, addr\nJAL rd, label+offset",
+            "Operation": "rd = PC + 4; PC = addr",
+            "Notes": "Jump and link. rd is set to the address of the  instruction following the jump.",
+            "Format": "J-type"
+        },
         {
             "Instruction": "JALR rd, rs1, imm",
             "Operation": "rd = PC + 4; PC = rs1 + imm",
@@ -291,12 +297,6 @@
             "Operation": "if (rs1 >=u rs2) PC = PC + imm",
             "Notes": "Branch if greater than or equal (unsigned)",
             "Format": "B-type"
-        },
-        {
-            "Instruction": "JAL rd, addr\nJAL rd, label+offset",
-            "Operation": "rd = PC + 4; PC = addr",
-            "Notes": "Jump and link. rd is set to the address of the  instruction following the jump.",
-            "Format": "J-type"
         }
     ],
     "system instructions": [
