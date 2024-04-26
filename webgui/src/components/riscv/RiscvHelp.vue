@@ -34,20 +34,25 @@ import RiscvHelpTable from "./RiscvHelpTable.vue";
                         <RiscvHelpTable
                             :instructions="riscv_instructions['computational']"
                         />
-                        <p>
-                            Notes: <br />
-                            - Instructions marked with (M) are part of the "M”
-                            Standard Extension for Integer Multiplication and
-                            Division.
-                            <br />
-                            - Unless otherwise specified, the immediate
-                            (<code>imm</code>) of I-type instructions has a
-                            length of 12 bits and is sign extended to 32 bits.
-                            <br />
-                            - The immediate (<code>imm</code>) of U-Type
-                            instructions has a length of 20 bits and is sign
-                            extended to 32 bits.
-                        </p>
+                        <p>Notes:</p>
+                        <ul>
+                            <li>
+                                Instructions marked with (M) are part of the "M”
+                                Standard Extension for Integer Multiplication
+                                and Division.
+                            </li>
+                            <li>
+                                Unless otherwise specified, the immediate
+                                (<code>imm</code>) of I-type instructions has a
+                                length of 12 bits and is sign extended to 32
+                                bits.
+                            </li>
+                            <li>
+                                The immediate (<code>imm</code>) of U-Type
+                                instructions has a length of 20 bits and is sign
+                                extended to 32 bits.
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -75,15 +80,18 @@ import RiscvHelpTable from "./RiscvHelpTable.vue";
                                 riscv_instructions['memory-accesses']
                             "
                         />
-                        <p>
-                            Notes: <br />
-                            - The immediate (imm) of the instructions in this
-                            paragraph has a length of 12 bits and is sign
-                            extended to 32 bits.
-                            <br />
-                            - <code>var</code> is a variable name,
-                            <code>index</code> is an optional array index.
-                        </p>
+                        <p>Notes:</p>
+                        <ul>
+                            <li>
+                                The immediate (imm) of the instructions in this
+                                paragraph has a length of 12 bits and is sign
+                                extended to 32 bits.
+                            </li>
+                            <li>
+                                <code>var</code> is a variable name,
+                                <code>index</code> is an optional array index.
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -111,20 +119,29 @@ import RiscvHelpTable from "./RiscvHelpTable.vue";
                                 riscv_instructions['jumps and branches']
                             "
                         />
-                        <p>
-                            Notes: <br />
-                            - JAL instructions encode the address to jump to
-                            (<code>addr</code>), relative to the current pc in a
-                            21 bit immediate that is sign extended to 32 bits
-                            and added to the current pc.<br />
-                            - The JALR immediate (<code>imm</code>) has a length
-                            of 12 bits and is sign extended to 32 bits.<br />
-                            - The immediate (<code>imm</code> ) of B-type
-                            instructions has a length of 13 bits and is sign
-                            extended to 32 bits.<br />
-                            - <code>offset</code> is optional, and in
-                            hexadecimal format.
-                        </p>
+                        <p>Notes:</p>
+                        <ul>
+                            <li>
+                                JAL instructions encode the address to jump to
+                                (<code>addr</code>), relative to the current pc
+                                in a 21 bit immediate that is sign extended to
+                                32 bits and added to the current pc.
+                            </li>
+                            <li>
+                                The JALR immediate (<code>imm</code>) has a
+                                length of 12 bits and is sign extended to 32
+                                bits.
+                            </li>
+                            <li>
+                                The immediate (<code>imm</code> ) of B-type
+                                instructions has a length of 13 bits and is sign
+                                extended to 32 bits.
+                            </li>
+                            <li>
+                                <code>offset</code> is optional, and in
+                                hexadecimal format.
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -152,16 +169,17 @@ import RiscvHelpTable from "./RiscvHelpTable.vue";
                                 riscv_instructions['system instructions']
                             "
                         />
-                        <p>
-                            Notes: <br />
-                            -
-                            <i
-                                >CSR Currently not implemented in 5-stage
-                                pipeline mode.</i
-                            ><br />
-                            - The unsigned immediate (<code>uimm</code>) has a
-                            length of 5 bits.
-                        </p>
+                        <p>Notes:</p>
+                        <ul>
+                            <li>
+                                CSR Currently not implemented in 5-stage
+                                pipeline mode.
+                            </li>
+                            <li>
+                                The unsigned immediate (<code>uimm</code>) has a
+                                length of 5 bits.
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
