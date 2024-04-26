@@ -1,4 +1,9 @@
 <!-- The riscv help page content. -->
+<script setup>
+import riscv_instructions from "@/data/riscv_instructions.json";
+import RiscvHelpTable from "./RiscvHelpTable.vue";
+const fields = ["Instruction", "Operation", "Notes", "Format"];
+</script>
 <template>
     <div class="container-fluid">
         <h1>RISC-V</h1>
@@ -8,32 +13,7 @@
             instructions are listed below.
         </p>
 
-        <table id="tableComponent" class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <!-- loop through each value of the fields to get the table header -->
-                    <th v-for="field in fields" :key="field">
-                        {{ field }}
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Loop through the list get the each student data -->
-                <tr v-for="item in riscv_instructions" :key="item">
-                    <td v-for="field in fields" :key="field">
-                        <code
-                            v-if="
-                                field == 'Instruction' || field == 'Operation'
-                            "
-                            style="white-space: pre"
-                        >
-                            {{ item[field] }}
-                        </code>
-                        <div v-else>{{ item[field] }}</div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <RiscvHelpTable :instructions="riscv_instructions['all']" />
 
         <div class="accordion" id="accordionPanelsStayOpenInstructions">
             <div class="accordion-item">
@@ -1508,23 +1488,3 @@ addi x3, x3, 1 # This line is never reached</pre
         </div>
     </div>
 </template>
-<script>
-import riscv_instructions from "@/data/riscv_instructions.json";
-
-export default {
-    name: "TableComponent",
-    props: {
-        //
-        riscv_instructions: {
-            type: Array,
-        },
-        fields: {
-            type: Array,
-        },
-    },
-    setup() {
-        const fields = ["Instruction", "Operation", "Notes", "Format"];
-        return { riscv_instructions, fields };
-    },
-};
-</script>

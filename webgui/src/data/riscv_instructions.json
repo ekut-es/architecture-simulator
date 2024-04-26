@@ -1,338 +1,341 @@
-[
-  {
-    "Instruction":"ADD rd, rs1, rs2",
-    "Operation":"rd = rs1 + rs2",
-    "Notes":null,
-    "Format":"R-type"
-  },
-  {
-    "Instruction":"SUB rd, rs1, rs2",
-    "Operation":"rd = rs1 - rs2",
-    "Notes":null,
-    "Format":"R-type"
-  },
-  {
-    "Instruction":"SLL rd, rs1, rs2",
-    "Operation":"rd = rs1 << rs2",
-    "Notes":null,
-    "Format":"R-type"
-  },
-  {
-    "Instruction":"SRL rd, rs1, rs2",
-    "Operation":"rd = rs1 >> rs2",
-    "Notes":"Logical right shift",
-    "Format":"R-type"
-  },
-  {
-    "Instruction":"SRA rd, rs1, rs2",
-    "Operation":"rd = rs1 >>a rs2",
-    "Notes":"Arithmetic right shift",
-    "Format":"R-type"
-  },
-  {
-    "Instruction":"SLT rd, rs1, rs2",
-    "Operation":"rd = rs1 <s rs2",
-    "Notes":"Set rd to 1 if the value in rs1 is  less than the value in rs2, otherwise 0 (both  values are treated as signed)",
-    "Format":"R-type"
-  },
-  {
-    "Instruction":"SLTU rd, rs1, rs2",
-    "Operation":"rd = rs1 <u rs2",
-    "Notes":"Set rd to 1 if the value in rs1 is  less than the value in rs2, otherwise 0 (both  values are treated as unsigned)",
-    "Format":"R-type"
-  },
-  {
-    "Instruction":"AND rd, rs1, rs2",
-    "Operation":"rd = rs1 & rs2",
-    "Notes":null,
-    "Format":"R-type"
-  },
-  {
-    "Instruction":"OR rd, rs1, rs2",
-    "Operation":"rd = rs1 | rs2",
-    "Notes":null,
-    "Format":"R-type"
-  },
-  {
-    "Instruction":"XOR rd, rs1, rs2",
-    "Operation":"rd = rs1 ^ rs2",
-    "Notes":null,
-    "Format":"R-type"
-  },
-  {
-    "Instruction":"MUL rd, rs1, rs2",
-    "Operation":"rd = rs1 * rs2",
-    "Notes":"(M), places the lower 32 bits of the result in the destination  register",
-    "Format":"R-type"
-  },
-  {
-    "Instruction":"MULH rd, rs1, rs2",
-    "Operation":"rd = rs1 s*s rs2",
-    "Notes":"(M), places the upper 32 bits of the result in the destination  register, both rs1 and rs2 are treated as signed",
-    "Format":"R-type"
-  },
-  {
-    "Instruction":"MULHU rd, rs1, rs2",
-    "Operation":"rd = rs1 u*u rs2",
-    "Notes":"(M), places the upper 32 bits of the result in the destination  register, both rs1 and rs2 are treated as unsigned",
-    "Format":"R-type"
-  },
-  {
-    "Instruction":"MULHSU rd, rs1, rs2",
-    "Operation":"rd = rs1 s*u rs2",
-    "Notes":"(M), places the upper 32 bits of the result in the destination  register, rs1 treated as signed, rs2 treated as unsigned",
-    "Format":"R-type"
-  },
-  {
-    "Instruction":"DIV rd, rs1, rs2",
-    "Operation":"rd = rs1 \/s rs2",
-    "Notes":"(M), signed integer division",
-    "Format":"R-type"
-  },
-  {
-    "Instruction":"DIVU rd, rs1, rs2",
-    "Operation":"rd = rs1 \/u rs2",
-    "Notes":"(M), unsigned integer division",
-    "Format":"R-type"
-  },
-  {
-    "Instruction":"REM rd, rs1, rs2",
-    "Operation":"rd = rs1 %s rs2",
-    "Notes":"(M), remainder of signed integer division",
-    "Format":"R-type"
-  },
-  {
-    "Instruction":"REMU rd, rs1, rs2",
-    "Operation":"rd = rs1 %u rs2",
-    "Notes":"(M), remainder of unsigned integer division",
-    "Format":"R-type"
-  },
-  {
-    "Instruction":"ADDI rd, rs1, imm",
-    "Operation":"rd = rs1 + imm",
-    "Notes":null,
-    "Format":"I-type"
-  },
-  {
-    "Instruction":"SLTI rd, rs1, imm",
-    "Operation":"rd = rs1 <s imm",
-    "Notes":"Set rd to 1 if the value in rs1 is  less than the value in imm, otherwise 0 (both  values are treated as signed)",
-    "Format":"I-type"
-  },
-  {
-    "Instruction":"SLTIU rd, rs1, imm",
-    "Operation":"rd = rs1 <u imm",
-    "Notes":"Set rd to 1 if the value in rs1 is  less than the value in imm, otherwise 0 (both  values are treated as unsigned)",
-    "Format":"I-type"
-  },
-  {
-    "Instruction":"ANDI rd, rs1, imm",
-    "Operation":"rd = rs1 & imm",
-    "Notes":null,
-    "Format":"I-type"
-  },
-  {
-    "Instruction":"ORI rd, rs1, imm",
-    "Operation":"rd = rs1 | imm",
-    "Notes":null,
-    "Format":"I-type"
-  },
-  {
-    "Instruction":"XORI rd, rs1, imm",
-    "Operation":"rd = rs1 ^ imm",
-    "Notes":null,
-    "Format":"I-type"
-  },
-  {
-    "Instruction":"SLLI rd, rs1, imm",
-    "Operation":"rd = rs1 << imm",
-    "Notes":"imm is unsigned, with a length of 5 bits",
-    "Format":"I-type"
-  },
-  {
-    "Instruction":"SRLI rd, rs1, imm",
-    "Operation":"rd = rs1 >> imm",
-    "Notes":"Logical right shift. imm is unsigned, with a  length of 5 bits",
-    "Format":"I-type"
-  },
-  {
-    "Instruction":"SRAI rd, rs1, imm",
-    "Operation":"rd = rs1 >>a imm",
-    "Notes":"Arithmetic right shift. imm is unsigned, with  a length of 5 bits",
-    "Format":"I-type"
-  },
-  {
-    "Instruction":"LB rd, rs1, imm\nLB rd, imm(rs1)\nLB rd, var[index]",
-    "Operation":"rd = M[rs1 + imm]  rd = var[index]",
-    "Notes":"Load byte. rd is sign extended to 32 bits",
-    "Format":"I-type"
-  },
-  {
-    "Instruction":"LH rd, rs1, imm\nLH rd, imm(rs1)\nLH rd, var[index]",
-    "Operation":"rd = M[rs1 + imm]  rd = var[index]",
-    "Notes":"Load two bytes. rd is sign extended to 32 bits",
-    "Format":"I-type"
-  },
-  {
-    "Instruction":"LW rd, rs1, imm\nLW rd, imm(rs1)\nLW rd, var[index]",
-    "Operation":"rd = M[rs1 + imm]  rd = var[index]",
-    "Notes":"Load four bytes. rd is sign extended to 32  bits",
-    "Format":"I-type"
-  },
-  {
-    "Instruction":"LBU rd, rs1, imm\nLBU rd, imm(rs1)\nLBU rd, var[index]",
-    "Operation":"rd = M[rs1 + imm]  rd = var[index]",
-    "Notes":"Load byte",
-    "Format":"I-type"
-  },
-  {
-    "Instruction":"LHU rd, rs1, imm\nLHU rd, imm(rs1)\nLHU rd, var[index]",
-    "Operation":"rd = M[rs1 + imm]  rd = var[index]",
-    "Notes":"Load two bytes",
-    "Format":"I-type"
-  },
-  {
-    "Instruction":"JALR rd, rs1, imm",
-    "Operation":"rd = PC + 4; PC = rs1 + imm",
-    "Notes":"Jump and link register. rd is set to the address of  the instruction following the jump. The jump target is  rs1 + imm with the least significant bit cleared.",
-    "Format":"I-type"
-  },
-  {
-    "Instruction":"ECALL",
-    "Operation":"environment call",
-    "Notes":"See section ECALLs.",
-    "Format":"I-type"
-  },
-  {
-    "Instruction":"SB rs1, rs2, imm\nSB rs1, imm(rs2)\nSB rs1, var[index], rs2",
-    "Operation":"M[rs2 + imm] = rs1  var[index] = rs1",
-    "Notes":"Store byte. If a variable is modified, rs2 is  used as a temporary register, that will be overwritten.",
-    "Format":"S-type"
-  },
-  {
-    "Instruction":"SH rs1, rs2, imm\nSH rs1, imm(rs2)\nSH rs1, var[index], rs2",
-    "Operation":"M[rs2 + imm] = rs1  var[index] = rs1",
-    "Notes":"Store two bytes. If a variable is modified,  rs2 is used as a temporary register, that will be  overwritten.",
-    "Format":"S-type"
-  },
-  {
-    "Instruction":"SW rs1, rs2, imm\nSW rs1, imm(rs2)\nSW rs1, var[index], rs2",
-    "Operation":"M[rs2 + imm] = rs1  var[index] = rs1",
-    "Notes":"Store four bytes. If a variable is modified,  rs2 is used as a temporary register, that will be  overwritten.",
-    "Format":"S-type"
-  },
-  {
-    "Instruction":"BEQ rs1, rs2, imm\nBEQ rs1, rs2, label+offset",
-    "Operation":"if (rs1 == rs2) PC = PC + imm",
-    "Notes":"Branch if equal",
-    "Format":"B-type"
-  },
-  {
-    "Instruction":"BNE rs1, rs2, imm\nBNE rs1, rs2, label+offset",
-    "Operation":"if (rs1 != rs2) PC = PC + imm",
-    "Notes":"Branch if not equal",
-    "Format":"B-type"
-  },
-  {
-    "Instruction":"BLT rs1, rs2, imm\nBLT rs1, rs2, label+offset",
-    "Operation":"if (rs1 <s rs2) PC = PC + imm",
-    "Notes":"Branch if less than",
-    "Format":"B-type"
-  },
-  {
-    "Instruction":"BGE rs1, rs2, imm\nBGE rs1, rs2, label+offset",
-    "Operation":"if (rs1 >=s rs2) PC = PC + imm",
-    "Notes":"Branch if greater than or equal",
-    "Format":"B-type"
-  },
-  {
-    "Instruction":"BLTU rs1, rs2, imm\nBLTU rs1, rs2, label+offset",
-    "Operation":"if (rs1 <u rs2) PC = PC + imm",
-    "Notes":"Branch if less than (unsigned)",
-    "Format":"B-type"
-  },
-  {
-    "Instruction":"BGEU rs1, rs2, imm\nBGEU rs1, rs2, label+offset",
-    "Operation":"if (rs1 >=u rs2) PC = PC + imm",
-    "Notes":"Branch if greater than or equal (unsigned)",
-    "Format":"B-type"
-  },
-  {
-    "Instruction":"LUI rd, imm",
-    "Operation":"rd = imm << 12",
-    "Notes":null,
-    "Format":"U"
-  },
-  {
-    "Instruction":"AUIPC rd, imm",
-    "Operation":"rd = PC + (imm << 12)",
-    "Notes":null,
-    "Format":"U"
-  },
-  {
-    "Instruction":"JAL rd, addr\nJAL rd, label+offset",
-    "Operation":"rd = PC + 4; PC = addr",
-    "Notes":"Jump and link. rd is set to the address of the  instruction following the jump.",
-    "Format":"J-type"
-  },
-  {
-    "Instruction":"CSRRW rd, csr, rs1",
-    "Operation":"rd = csr; csr = rs1",
-    "Notes":"Atomic read\/write",
-    "Format":"CSR"
-  },
-  {
-    "Instruction":"CSRRS rd, csr, rs1",
-    "Operation":"rd = csr; csr = csr | rs1",
-    "Notes":"Atomic read\/set. rs1 serves as a bit mask",
-    "Format":"CSR"
-  },
-  {
-    "Instruction":"CSRRC rd, csr, rs1",
-    "Operation":"rd = csr; csr = csr & ~rs1",
-    "Notes":"Atomic read\/clear. rs1 serves as a bit mask",
-    "Format":"CSR"
-  },
-  {
-    "Instruction":"CSRRWI rd, csr, uimm",
-    "Operation":"rd = csr; csr = uimm",
-    "Notes":"Atomic read\/write",
-    "Format":"CSR"
-  },
-  {
-    "Instruction":"CSRRSI rd, csr, uimm",
-    "Operation":"rd = csr; csr = csr | uimm",
-    "Notes":"Atomic read\/set. uimm serves as a bit mask",
-    "Format":"CSR"
-  },
-  {
-    "Instruction":"CSRRCI rd, csr, uimm",
-    "Operation":"rd = csr; csr = csr & ~uimm",
-    "Notes":"Atomic read\/clear. uimm serves as a bit mask",
-    "Format":"CSR"
-  },
-  {
-    "Instruction":"NOP",
-    "Operation":"-",
-    "Notes":"No operation. Translated to ADDI x0, x0, 0",
-    "Format":"Pseudo"
-  },
-  {
-    "Instruction":"LA rd, var[index]",
-    "Operation":"rd = &var[index]",
-    "Notes":"Load variable address into rd",
-    "Format":"Pseudo"
-  },
-  {
-    "Instruction":"LI rd, imm",
-    "Operation":"rd = imm",
-    "Notes":"Load 32 bit immediate into rd",
-    "Format":"Pseudo"
-  },
-  {
-    "Instruction":"MV rd, rs",
-    "Operation":"rd = rs",
-    "Notes":"Translated to ADDI rd, rs, 0",
-    "Format":"Pseudo"
-  }
-]
+{
+    "all": [
+        {
+            "Instruction": "ADD rd, rs1, rs2",
+            "Operation": "rd = rs1 + rs2",
+            "Notes": null,
+            "Format": "R-type"
+        },
+        {
+            "Instruction": "SUB rd, rs1, rs2",
+            "Operation": "rd = rs1 - rs2",
+            "Notes": null,
+            "Format": "R-type"
+        },
+        {
+            "Instruction": "SLL rd, rs1, rs2",
+            "Operation": "rd = rs1 << rs2",
+            "Notes": null,
+            "Format": "R-type"
+        },
+        {
+            "Instruction": "SRL rd, rs1, rs2",
+            "Operation": "rd = rs1 >> rs2",
+            "Notes": "Logical right shift",
+            "Format": "R-type"
+        },
+        {
+            "Instruction": "SRA rd, rs1, rs2",
+            "Operation": "rd = rs1 >>a rs2",
+            "Notes": "Arithmetic right shift",
+            "Format": "R-type"
+        },
+        {
+            "Instruction": "SLT rd, rs1, rs2",
+            "Operation": "rd = rs1 <s rs2",
+            "Notes": "Set rd to 1 if the value in rs1 is  less than the value in rs2, otherwise 0 (both  values are treated as signed)",
+            "Format": "R-type"
+        },
+        {
+            "Instruction": "SLTU rd, rs1, rs2",
+            "Operation": "rd = rs1 <u rs2",
+            "Notes": "Set rd to 1 if the value in rs1 is  less than the value in rs2, otherwise 0 (both  values are treated as unsigned)",
+            "Format": "R-type"
+        },
+        {
+            "Instruction": "AND rd, rs1, rs2",
+            "Operation": "rd = rs1 & rs2",
+            "Notes": null,
+            "Format": "R-type"
+        },
+        {
+            "Instruction": "OR rd, rs1, rs2",
+            "Operation": "rd = rs1 | rs2",
+            "Notes": null,
+            "Format": "R-type"
+        },
+        {
+            "Instruction": "XOR rd, rs1, rs2",
+            "Operation": "rd = rs1 ^ rs2",
+            "Notes": null,
+            "Format": "R-type"
+        },
+        {
+            "Instruction": "MUL rd, rs1, rs2",
+            "Operation": "rd = rs1 * rs2",
+            "Notes": "(M), places the lower 32 bits of the result in the destination  register",
+            "Format": "R-type"
+        },
+        {
+            "Instruction": "MULH rd, rs1, rs2",
+            "Operation": "rd = rs1 s*s rs2",
+            "Notes": "(M), places the upper 32 bits of the result in the destination  register, both rs1 and rs2 are treated as signed",
+            "Format": "R-type"
+        },
+        {
+            "Instruction": "MULHU rd, rs1, rs2",
+            "Operation": "rd = rs1 u*u rs2",
+            "Notes": "(M), places the upper 32 bits of the result in the destination  register, both rs1 and rs2 are treated as unsigned",
+            "Format": "R-type"
+        },
+        {
+            "Instruction": "MULHSU rd, rs1, rs2",
+            "Operation": "rd = rs1 s*u rs2",
+            "Notes": "(M), places the upper 32 bits of the result in the destination  register, rs1 treated as signed, rs2 treated as unsigned",
+            "Format": "R-type"
+        },
+        {
+            "Instruction": "DIV rd, rs1, rs2",
+            "Operation": "rd = rs1 /s rs2",
+            "Notes": "(M), signed integer division",
+            "Format": "R-type"
+        },
+        {
+            "Instruction": "DIVU rd, rs1, rs2",
+            "Operation": "rd = rs1 /u rs2",
+            "Notes": "(M), unsigned integer division",
+            "Format": "R-type"
+        },
+        {
+            "Instruction": "REM rd, rs1, rs2",
+            "Operation": "rd = rs1 %s rs2",
+            "Notes": "(M), remainder of signed integer division",
+            "Format": "R-type"
+        },
+        {
+            "Instruction": "REMU rd, rs1, rs2",
+            "Operation": "rd = rs1 %u rs2",
+            "Notes": "(M), remainder of unsigned integer division",
+            "Format": "R-type"
+        },
+        {
+            "Instruction": "ADDI rd, rs1, imm",
+            "Operation": "rd = rs1 + imm",
+            "Notes": null,
+            "Format": "I-type"
+        },
+        {
+            "Instruction": "SLTI rd, rs1, imm",
+            "Operation": "rd = rs1 <s imm",
+            "Notes": "Set rd to 1 if the value in rs1 is  less than the value in imm, otherwise 0 (both  values are treated as signed)",
+            "Format": "I-type"
+        },
+        {
+            "Instruction": "SLTIU rd, rs1, imm",
+            "Operation": "rd = rs1 <u imm",
+            "Notes": "Set rd to 1 if the value in rs1 is  less than the value in imm, otherwise 0 (both  values are treated as unsigned)",
+            "Format": "I-type"
+        },
+        {
+            "Instruction": "ANDI rd, rs1, imm",
+            "Operation": "rd = rs1 & imm",
+            "Notes": null,
+            "Format": "I-type"
+        },
+        {
+            "Instruction": "ORI rd, rs1, imm",
+            "Operation": "rd = rs1 | imm",
+            "Notes": null,
+            "Format": "I-type"
+        },
+        {
+            "Instruction": "XORI rd, rs1, imm",
+            "Operation": "rd = rs1 ^ imm",
+            "Notes": null,
+            "Format": "I-type"
+        },
+        {
+            "Instruction": "SLLI rd, rs1, imm",
+            "Operation": "rd = rs1 << imm",
+            "Notes": "imm is unsigned, with a length of 5 bits",
+            "Format": "I-type"
+        },
+        {
+            "Instruction": "SRLI rd, rs1, imm",
+            "Operation": "rd = rs1 >> imm",
+            "Notes": "Logical right shift. imm is unsigned, with a  length of 5 bits",
+            "Format": "I-type"
+        },
+        {
+            "Instruction": "SRAI rd, rs1, imm",
+            "Operation": "rd = rs1 >>a imm",
+            "Notes": "Arithmetic right shift. imm is unsigned, with  a length of 5 bits",
+            "Format": "I-type"
+        },
+        {
+            "Instruction": "LB rd, rs1, imm\nLB rd, imm(rs1)\nLB rd, var[index]",
+            "Operation": "rd = M[rs1 + imm]  rd = var[index]",
+            "Notes": "Load byte. rd is sign extended to 32 bits",
+            "Format": "I-type"
+        },
+        {
+            "Instruction": "LH rd, rs1, imm\nLH rd, imm(rs1)\nLH rd, var[index]",
+            "Operation": "rd = M[rs1 + imm]  rd = var[index]",
+            "Notes": "Load two bytes. rd is sign extended to 32 bits",
+            "Format": "I-type"
+        },
+        {
+            "Instruction": "LW rd, rs1, imm\nLW rd, imm(rs1)\nLW rd, var[index]",
+            "Operation": "rd = M[rs1 + imm]  rd = var[index]",
+            "Notes": "Load four bytes. rd is sign extended to 32  bits",
+            "Format": "I-type"
+        },
+        {
+            "Instruction": "LBU rd, rs1, imm\nLBU rd, imm(rs1)\nLBU rd, var[index]",
+            "Operation": "rd = M[rs1 + imm]  rd = var[index]",
+            "Notes": "Load byte",
+            "Format": "I-type"
+        },
+        {
+            "Instruction": "LHU rd, rs1, imm\nLHU rd, imm(rs1)\nLHU rd, var[index]",
+            "Operation": "rd = M[rs1 + imm]  rd = var[index]",
+            "Notes": "Load two bytes",
+            "Format": "I-type"
+        },
+        {
+            "Instruction": "JALR rd, rs1, imm",
+            "Operation": "rd = PC + 4; PC = rs1 + imm",
+            "Notes": "Jump and link register. rd is set to the address of  the instruction following the jump. The jump target is  rs1 + imm with the least significant bit cleared.",
+            "Format": "I-type"
+        },
+        {
+            "Instruction": "ECALL",
+            "Operation": "environment call",
+            "Notes": "See section ECALLs.",
+            "Format": "I-type"
+        },
+        {
+            "Instruction": "SB rs1, rs2, imm\nSB rs1, imm(rs2)\nSB rs1, var[index], rs2",
+            "Operation": "M[rs2 + imm] = rs1  var[index] = rs1",
+            "Notes": "Store byte. If a variable is modified, rs2 is  used as a temporary register, that will be overwritten.",
+            "Format": "S-type"
+        },
+        {
+            "Instruction": "SH rs1, rs2, imm\nSH rs1, imm(rs2)\nSH rs1, var[index], rs2",
+            "Operation": "M[rs2 + imm] = rs1  var[index] = rs1",
+            "Notes": "Store two bytes. If a variable is modified,  rs2 is used as a temporary register, that will be  overwritten.",
+            "Format": "S-type"
+        },
+        {
+            "Instruction": "SW rs1, rs2, imm\nSW rs1, imm(rs2)\nSW rs1, var[index], rs2",
+            "Operation": "M[rs2 + imm] = rs1  var[index] = rs1",
+            "Notes": "Store four bytes. If a variable is modified,  rs2 is used as a temporary register, that will be  overwritten.",
+            "Format": "S-type"
+        },
+        {
+            "Instruction": "BEQ rs1, rs2, imm\nBEQ rs1, rs2, label+offset",
+            "Operation": "if (rs1 == rs2) PC = PC + imm",
+            "Notes": "Branch if equal",
+            "Format": "B-type"
+        },
+        {
+            "Instruction": "BNE rs1, rs2, imm\nBNE rs1, rs2, label+offset",
+            "Operation": "if (rs1 != rs2) PC = PC + imm",
+            "Notes": "Branch if not equal",
+            "Format": "B-type"
+        },
+        {
+            "Instruction": "BLT rs1, rs2, imm\nBLT rs1, rs2, label+offset",
+            "Operation": "if (rs1 <s rs2) PC = PC + imm",
+            "Notes": "Branch if less than",
+            "Format": "B-type"
+        },
+        {
+            "Instruction": "BGE rs1, rs2, imm\nBGE rs1, rs2, label+offset",
+            "Operation": "if (rs1 >=s rs2) PC = PC + imm",
+            "Notes": "Branch if greater than or equal",
+            "Format": "B-type"
+        },
+        {
+            "Instruction": "BLTU rs1, rs2, imm\nBLTU rs1, rs2, label+offset",
+            "Operation": "if (rs1 <u rs2) PC = PC + imm",
+            "Notes": "Branch if less than (unsigned)",
+            "Format": "B-type"
+        },
+        {
+            "Instruction": "BGEU rs1, rs2, imm\nBGEU rs1, rs2, label+offset",
+            "Operation": "if (rs1 >=u rs2) PC = PC + imm",
+            "Notes": "Branch if greater than or equal (unsigned)",
+            "Format": "B-type"
+        },
+        {
+            "Instruction": "LUI rd, imm",
+            "Operation": "rd = imm << 12",
+            "Notes": null,
+            "Format": "U"
+        },
+        {
+            "Instruction": "AUIPC rd, imm",
+            "Operation": "rd = PC + (imm << 12)",
+            "Notes": null,
+            "Format": "U"
+        },
+        {
+            "Instruction": "JAL rd, addr\nJAL rd, label+offset",
+            "Operation": "rd = PC + 4; PC = addr",
+            "Notes": "Jump and link. rd is set to the address of the  instruction following the jump.",
+            "Format": "J-type"
+        },
+        {
+            "Instruction": "CSRRW rd, csr, rs1",
+            "Operation": "rd = csr; csr = rs1",
+            "Notes": "Atomic read/write",
+            "Format": "CSR"
+        },
+        {
+            "Instruction": "CSRRS rd, csr, rs1",
+            "Operation": "rd = csr; csr = csr | rs1",
+            "Notes": "Atomic read/set. rs1 serves as a bit mask",
+            "Format": "CSR"
+        },
+        {
+            "Instruction": "CSRRC rd, csr, rs1",
+            "Operation": "rd = csr; csr = csr & ~rs1",
+            "Notes": "Atomic read/clear. rs1 serves as a bit mask",
+            "Format": "CSR"
+        },
+        {
+            "Instruction": "CSRRWI rd, csr, uimm",
+            "Operation": "rd = csr; csr = uimm",
+            "Notes": "Atomic read/write",
+            "Format": "CSR"
+        },
+        {
+            "Instruction": "CSRRSI rd, csr, uimm",
+            "Operation": "rd = csr; csr = csr | uimm",
+            "Notes": "Atomic read/set. uimm serves as a bit mask",
+            "Format": "CSR"
+        },
+        {
+            "Instruction": "CSRRCI rd, csr, uimm",
+            "Operation": "rd = csr; csr = csr & ~uimm",
+            "Notes": "Atomic read/clear. uimm serves as a bit mask",
+            "Format": "CSR"
+        },
+        {
+            "Instruction": "NOP",
+            "Operation": "-",
+            "Notes": "No operation. Translated to ADDI x0, x0, 0",
+            "Format": "Pseudo"
+        },
+        {
+            "Instruction": "LA rd, var[index]",
+            "Operation": "rd = &var[index]",
+            "Notes": "Load variable address into rd",
+            "Format": "Pseudo"
+        },
+        {
+            "Instruction": "LI rd, imm",
+            "Operation": "rd = imm",
+            "Notes": "Load 32 bit immediate into rd",
+            "Format": "Pseudo"
+        },
+        {
+            "Instruction": "MV rd, rs",
+            "Operation": "rd = rs",
+            "Notes": "Translated to ADDI rd, rs, 0",
+            "Format": "Pseudo"
+        }
+    ],
+    "other": []
+}
