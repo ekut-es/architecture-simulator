@@ -35,7 +35,7 @@ watchEffect(() => {
         // update the current instruction row if a current instruction can be found
         // else just keep the old row
         if (row.cycle !== "") {
-            currentInstructionRow.value = index;
+            currentInstructionRow.value = index + 1; // +1 because of the head row
         }
         result.push(row);
     }
@@ -51,9 +51,15 @@ watch(
         }
         const rows = table.value.rows;
         if (rows.length > rowIndex) {
-            rows[rowIndex].scrollIntoView({
+            const scrollAmount =
+                rows[rowIndex].offsetTop +
+                rows[rowIndex].offsetHeight / 2 -
+                table.value.parentNode.offsetHeight / 2;
+            table.value.parentNode.scroll({
+                // scrollIntoView also scrolls horizontally, so I dont use it here
+                top: scrollAmount,
+                left: 0,
                 behavior: "smooth",
-                block: "center",
             });
         }
     }
