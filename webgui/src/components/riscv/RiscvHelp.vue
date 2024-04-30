@@ -404,12 +404,14 @@ addi x3, x3, 1 # This line is never reached</pre
                         </p>
 
                         <p>
-                            Note that our visualization of the pipeline during
-                            an ECALL is not fully correct. The pipeline might
-                            get flushed unnecessarily and we also dont halt the
-                            pipeline until the ECALL has finished - instead, the
-                            entire ecall is being executed in a single cycle (in
-                            the execute stage).
+                            ECALLs will be processed without any additional
+                            delay. If you are using the five stage pipeline,
+                            this will happen in the execute stage. The pipeline
+                            will always get stalled until there are no more
+                            instructions in later stages to prevent data
+                            hazards. Note that in the real world, the
+                            environment might need more than one cycle to
+                            process an ECALL.
                         </p>
 
                         <div class="table-responsive">
