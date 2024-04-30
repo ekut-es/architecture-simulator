@@ -27,11 +27,19 @@ watch(selectedIsa, (selection) => {
             <div class="modal-content">
                 <div class="modal-header">
                     <h1
-                        class="modal-title fs-2 text-light"
+                        class="modal-title text-light fs-2"
                         id="settingsModalLabel"
                     >
-                        Settings
+                        <i class="bi bi-gear-fill"></i>
+                        <span> Settings </span>
                     </h1>
+                    <button
+                        class="ms-auto archsim-icon-button fs-2 text-light"
+                        data-bs-dismiss="modal"
+                        title="exit"
+                    >
+                        <i class="bi bi-x-circle"></i>
+                    </button>
                 </div>
                 <div class="modal-body">
                     <div

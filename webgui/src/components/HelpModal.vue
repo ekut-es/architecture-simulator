@@ -20,13 +20,16 @@ import { globalSettings } from "@/js/global_settings";
                         class="modal-title fs-2 text-light"
                         id="help-modal-label"
                     >
-                        <i
-                            class="bi bi-question-circle-fill"
-                            width="35px"
-                            height="35px"
-                        ></i>
+                        <i class="bi bi-question-circle-fill"></i>
                         <span> Help </span>
                     </h1>
+                    <button
+                        class="ms-auto archsim-icon-button fs-2 text-light"
+                        data-bs-dismiss="modal"
+                        title="exit"
+                    >
+                        <i class="bi bi-x-circle"></i>
+                    </button>
                 </div>
                 <div id="help-modal-body" class="modal-body">
                     <!--Insert custom help pages here-->
