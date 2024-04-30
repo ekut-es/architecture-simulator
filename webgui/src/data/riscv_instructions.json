@@ -195,57 +195,105 @@
     ],
     "memory-accesses": [
         {
-            "Instruction": "LB rd, rs1, imm\nLB rd, imm(rs1)\nLB rd, var[index]",
-            "Operation": "rd = M[rs1 + imm]  rd = var[index]",
-            "Notes": "Load byte. rd is sign extended to 32 bits",
+            "Instruction": "LB rd, rs1, imm\nLB rd, imm(rs1)",
+            "Operation": "rd = M[rs1 + imm]",
+            "Notes": "Load byte. rd is sign extended to 32 bits.",
             "Format": "I-type"
         },
         {
-            "Instruction": "LH rd, rs1, imm\nLH rd, imm(rs1)\nLH rd, var[index]",
-            "Operation": "rd = M[rs1 + imm]  rd = var[index]",
-            "Notes": "Load two bytes. rd is sign extended to 32 bits",
+            "Instruction": "LB rd, var[index]",
+            "Operation": "t0 = &var[index], rd = M[t0]",
+            "Notes": "Load byte. rd is sign extended to 32 bits. t0 will be overwritten.",
+            "Format": "Pseudoe"
+        },
+        {
+            "Instruction": "LH rd, rs1, imm\nLH rd, imm(rs1)",
+            "Operation": "rd = M[rs1 + imm]",
+            "Notes": "Load two bytes. rd is sign extended to 32 bits.",
             "Format": "I-type"
         },
         {
-            "Instruction": "LW rd, rs1, imm\nLW rd, imm(rs1)\nLW rd, var[index]",
-            "Operation": "rd = M[rs1 + imm]  rd = var[index]",
-            "Notes": "Load four bytes. rd is sign extended to 32  bits",
+            "Instruction": "LH rd, var[index]",
+            "Operation": "t0 = &var[index], rd = M[t0]",
+            "Notes": "Load two bytes. rd is sign extended to 32 bits. t0 will be overwritten.",
+            "Format": "Pseudo"
+        },
+        {
+            "Instruction": "LW rd, rs1, imm\nLW rd, imm(rs1)",
+            "Operation": "rd = M[rs1 + imm]",
+            "Notes": "Load four bytes.",
             "Format": "I-type"
         },
         {
-            "Instruction": "LBU rd, rs1, imm\nLBU rd, imm(rs1)\nLBU rd, var[index]",
-            "Operation": "rd = M[rs1 + imm]  rd = var[index]",
-            "Notes": "Load byte",
+            "Instruction": "LW rd, var[index]",
+            "Operation": "t0 = &var[index], rd = M[t0]",
+            "Notes": "Load four bytes. t0 will be overwritten.",
+            "Format": "Pseudo"
+        },
+        {
+            "Instruction": "LBU rd, rs1, imm\nLBU rd, imm(rs1)",
+            "Operation": "rd = M[rs1 + imm]",
+            "Notes": "Load byte. rd is zero extended to 32 bits.",
             "Format": "I-type"
         },
         {
-            "Instruction": "LHU rd, rs1, imm\nLHU rd, imm(rs1)\nLHU rd, var[index]",
-            "Operation": "rd = M[rs1 + imm]  rd = var[index]",
-            "Notes": "Load two bytes",
+            "Instruction": "LBU rd, var[index]",
+            "Operation": "t0 = &var[index], rd = M[t0]",
+            "Notes": "Load byte. rd is zero extended to 32 bits. t0 will be overwritten.",
+            "Format": "Pseudo"
+        },
+        {
+            "Instruction": "LHU rd, rs1, imm\nLHU rd, imm(rs1)",
+            "Operation": "rd = M[rs1 + imm]",
+            "Notes": "Load two bytes. rd is zero extended to 32 bits.",
             "Format": "I-type"
         },
         {
-            "Instruction": "SB rs1, rs2, imm\nSB rs1, imm(rs2)\nSB rs1, var[index], rs2",
-            "Operation": "M[rs2 + imm] = rs1  var[index] = rs1",
-            "Notes": "Store byte. If a variable is modified, rs2 is  used as a temporary register, that will be overwritten.",
+            "Instruction": "LHU rd, var[index]",
+            "Operation": "t0 = &var[index], rd = M[t0]",
+            "Notes": "Load two bytes. rd is zero extended to 32 bits. t0 will be overwritten.",
+            "Format": "Pseudo"
+        },
+        {
+            "Instruction": "SB rs1, rs2, imm\nSB rs1, imm(rs2)",
+            "Operation": "M[rs2 + imm] = rs1",
+            "Notes": "Store byte.",
             "Format": "S-type"
         },
         {
-            "Instruction": "SH rs1, rs2, imm\nSH rs1, imm(rs2)\nSH rs1, var[index], rs2",
-            "Operation": "M[rs2 + imm] = rs1  var[index] = rs1",
-            "Notes": "Store two bytes. If a variable is modified,  rs2 is used as a temporary register, that will be  overwritten.",
+            "Instruction": "SB rs1, var[index], rs2",
+            "Operation": "rs2 = &var[index], M[rs2] = rs1",
+            "Notes": "Store byte. rs2 will be overwritten.",
+            "Format": "Pseudo"
+        },
+        {
+            "Instruction": "SH rs1, rs2, imm\nSH rs1, imm(rs2)",
+            "Operation": "M[rs2 + imm] = rs1",
+            "Notes": "Store two bytes.",
             "Format": "S-type"
         },
         {
-            "Instruction": "SW rs1, rs2, imm\nSW rs1, imm(rs2)\nSW rs1, var[index], rs2",
-            "Operation": "M[rs2 + imm] = rs1  var[index] = rs1",
-            "Notes": "Store four bytes. If a variable is modified,  rs2 is used as a temporary register, that will be  overwritten.",
+            "Instruction": "SH rs1, var[index], rs2",
+            "Operation": "rs2 = &var[index], M[rs2] = rs1",
+            "Notes": "Store two bytes. rs2 will be overwritten.",
+            "Format": "Pseudo"
+        },
+        {
+            "Instruction": "SW rs1, rs2, imm\nSW rs1, imm(rs2)",
+            "Operation": "M[rs2 + imm] = rs1",
+            "Notes": "Store four bytes.",
             "Format": "S-type"
+        },
+        {
+            "Instruction": "SW rs1, var[index], rs2",
+            "Operation": "rs2 = &var[index], M[rs2] = rs1",
+            "Notes": "Store four bytes. rs2 will be overwritten.",
+            "Format": "Pseudo"
         },
         {
             "Instruction": "LA rd, var[index]",
             "Operation": "rd = &var[index]",
-            "Notes": "Load variable address into rd",
+            "Notes": "Load variable address into rd.",
             "Format": "Pseudo"
         }
     ],
