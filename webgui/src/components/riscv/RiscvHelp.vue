@@ -4,7 +4,7 @@ import riscv_instructions from "@/data/riscv_instructions.json";
 import RiscvHelpTable from "./RiscvHelpTable.vue";
 </script>
 <template>
-    <div class="container-fluid">
+    <div>
         <h1>RISC-V</h1>
         <h2 id="instructions">Instructions</h2>
         <p>
