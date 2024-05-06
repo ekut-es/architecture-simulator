@@ -166,13 +166,13 @@
             "Instruction": "LUI rd, imm",
             "Operation": "rd = imm << 12",
             "Notes": null,
-            "Format": "U"
+            "Format": "U-type"
         },
         {
             "Instruction": "AUIPC rd, imm",
             "Operation": "rd = PC + (imm << 12)",
             "Notes": null,
-            "Format": "U"
+            "Format": "U-type"
         },
         {
             "Instruction": "NOP",
