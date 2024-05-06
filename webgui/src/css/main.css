@@ -13,6 +13,10 @@ body {
     overflow: hidden;
 }
 
+.accordion {
+    margin: 0 0 1rem 0;
+}
+
 #app {
     height: 100%;
     display: flex;
