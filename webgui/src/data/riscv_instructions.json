@@ -204,7 +204,7 @@
             "Instruction": "LB rd, var[index]",
             "Operation": "t0 = &var[index], rd = M[t0]",
             "Notes": "Load byte. rd is sign extended to 32 bits. t0 will be overwritten.",
-            "Format": "Pseudoe"
+            "Format": "Pseudo"
         },
         {
             "Instruction": "LH rd, rs1, imm\nLH rd, imm(rs1)",
