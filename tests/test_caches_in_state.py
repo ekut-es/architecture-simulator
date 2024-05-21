@@ -7,6 +7,9 @@ from architecture_simulator.uarch.riscv.riscv_architectural_state import (
 from architecture_simulator.uarch.memory.write_through_memory_system import (
     WriteThroughMemorySystem,
 )
+from architecture_simulator.uarch.memory.write_back_memory_system import (
+    WriteBackMemorySystem,
+)
 from architecture_simulator.uarch.memory.instruction_memory_cache_system import (
     InstructionMemoryCacheSystem,
 )
@@ -16,6 +19,8 @@ from architecture_simulator.uarch.memory.memory import AddressingType
 from architecture_simulator.uarch.riscv.riscv_performance_metrics import (
     RiscvPerformanceMetrics,
 )
+from architecture_simulator.uarch.memory.cache import CacheOptions
+from tests.riscv_programs.fibonacci_recursive import get_fibonacci_recursive
 
 
 class TestCache(TestCase):
@@ -327,3 +332,67 @@ add x0, x0, x0
             simulation.state.instruction_memory.get_cache_stats()["accesses"], "8"
         )
         self.assertEqual(simulation.state.performance_metrics.cycles, 36)
+
+    def test_write_back_dirty_on_write(self):
+        # Regression test for a bug where a write miss would not set the dirty bit
+        # in a write back cache system
+        simulation = RiscvSimulation(
+            state=RiscvArchitecturalState(
+                memory=WriteBackMemorySystem(
+                    Memory(AddressingType.BYTE, 32), 1, 0, 1, RiscvPerformanceMetrics()
+                )
+            )
+        )
+
+        simulation.load_program(
+            """
+li x1, 0x4000
+
+li x2, 80
+sw x2, 8(x1)
+
+li x2, 160
+sw x2, 16(x1)
+
+lw x3, 8(x1)
+"""
+        )
+        simulation.run()
+        self.assertEqual(simulation.state.register_file.registers[3], 80)
+
+    def test_fibonacci_write_through(self):
+        # test on a small cache
+        simulation = RiscvSimulation(
+            data_cache=CacheOptions(True, 0, 0, 1, "wt", "plru", 0),
+            instruction_cache=CacheOptions(True, 0, 0, 1, "wt", "plru", 0),
+        )
+        simulation.load_program(get_fibonacci_recursive(10))
+        simulation.run()
+        self.assertEqual(simulation.state.register_file.registers[10], 55)
+
+        # test on a larger cache
+        simulation = RiscvSimulation(
+            data_cache=CacheOptions(True, 1, 1, 2, "wt", "plru", 0),
+            instruction_cache=CacheOptions(True, 1, 1, 2, "wt", "plru", 0),
+        )
+        simulation.load_program(get_fibonacci_recursive(10))
+        simulation.run()
+        self.assertEqual(simulation.state.register_file.registers[10], 55)
+
+    def test_fibonacci_write_back(self):
+        simulation = RiscvSimulation(
+            data_cache=CacheOptions(True, 0, 0, 1, "wb", "plru", 0),
+            instruction_cache=CacheOptions(True, 0, 0, 1, "wb", "plru", 0),
+        )
+        simulation.load_program(get_fibonacci_recursive(10))
+        simulation.run()
+        self.assertEqual(simulation.state.register_file.registers[10], 55)
+
+        # test on a larger cache
+        simulation = RiscvSimulation(
+            data_cache=CacheOptions(True, 1, 1, 2, "wb", "plru", 0),
+            instruction_cache=CacheOptions(True, 1, 1, 2, "wb", "plru", 0),
+        )
+        simulation.load_program(get_fibonacci_recursive(10))
+        simulation.run()
+        self.assertEqual(simulation.state.register_file.registers[10], 55)
