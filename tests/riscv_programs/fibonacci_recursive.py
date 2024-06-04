@@ -2,10 +2,8 @@ from architecture_simulator.simulation.riscv_simulation import RiscvSimulation
 from fixedint import UInt32
 
 
-def fibonacci_recursive_simulation(n: int) -> RiscvSimulation:
-    simulation = RiscvSimulation()
-    simulation.load_program(
-        f"""addi a0, zero, {n} # load n
+def get_fibonacci_recursive(n: int) -> str:
+    return f"""addi a0, zero, {n} # load n
 addi s0, zero, 1 # load 1 for comparison
 jal ra, Fib # fib(n)
 beq zero, zero, End # go to end
@@ -27,7 +25,11 @@ add a0, a0, t0 # a0 = fib(n-2) + fib(n-1)
 FibReturn:
 jalr zero, ra, 0
 End:"""
-    )
+
+
+def fibonacci_recursive_simulation(n: int) -> RiscvSimulation:
+    simulation = RiscvSimulation()
+    simulation.load_program(get_fibonacci_recursive(n))
     return simulation
 
 

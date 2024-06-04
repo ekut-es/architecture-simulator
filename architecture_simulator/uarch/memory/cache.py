@@ -168,7 +168,7 @@ class CacheSet(Generic[T]):
             replaced = None
             if block.dirty_bit:
                 replaced = (block.decoded_address, block.values)
-                block.dirty_bit = False
+            block.dirty_bit = True  # Bugfix: Always set to True because write back will not write that data to the memory on a write miss
             block.write(block_values, address)
             self.replacement_strategy.access(block_index)
             return False, replaced
