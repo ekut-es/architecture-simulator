@@ -212,12 +212,16 @@ function validateAssociativity(number, strategy) {
                 </p>
                 <p>
                     <label>associativity (sets):</label>
-                    <input
-                        class="number-input"
-                        type="number"
-                        min="1"
-                        v-model="associativity"
-                    />
+                    <select v-model="associativity">
+                        <option
+                            v-for="option in Array.from({ length: 9 }, (x, i) =>
+                                Math.pow(2, i)
+                            )"
+                            :value="option"
+                        >
+                            {{ option }}
+                        </option>
+                    </select>
                     <ErrorTooltip
                         v-if="associativityStatus"
                         :message="associativityStatus"
