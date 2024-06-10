@@ -54,11 +54,21 @@ const tableValues = computed(() => {
             abiName: abiNames[i],
             index: "x" + String(i),
             value: entry[0][riscvSettings.registerRepresentation.value],
+            values: entry[0],
             doHighlight: entry[1] && simulationStore.hasStarted,
         });
     }
     return result;
 });
+
+function valuesTooltipText(entry) {
+    let values = "";
+    values += "binary: " + entry.values[0] + "\n";
+    values += "unsigned decimal: " + entry.values[1] + "\n";
+    values += "signed decimal: " + entry.values[3] + "\n";
+    values += "hexadecimal: " + entry.values[2];
+    return values;
+}
 </script>
 
 <template>
@@ -76,8 +86,11 @@ const tableValues = computed(() => {
                 <tr v-for="entry of tableValues">
                     <td>{{ entry.abiName }}</td>
                     <td>{{ entry.index }}</td>
-                    <td :class="{ highlight: entry.doHighlight }">
-                        {{ entry.value }}
+                    <td
+                        :title="valuesTooltipText(entry)"
+                        :class="{ highlight: entry.doHighlight }"
+                    >
+                        <div>{{ entry.value }}</div>
                     </td>
                 </tr>
             </tbody>
