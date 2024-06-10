@@ -144,72 +144,86 @@ function validateAssociativity(number, strategy) {
     <div v-if="cacheSettings.enable" class="row">
         <div class="col-4"></div>
         <div class="col-8">
-            <p v-if="props.isDataCache">
-                Type:
-                <select v-model="cacheType">
-                    <option value="wb">Write-back, Write allocate</option>
-                    <option value="wt">Write-through, Write no-allocate</option>
-                </select>
-            </p>
-            <p>
-                Replacement Strategy:
-                <select v-model="replacementStrategy">
-                    <option value="lru">LRU</option>
-                    <option value="plru">PLRU</option>
-                </select>
-                <label
+            <form class="archsim-form-table">
+                <p v-if="props.isDataCache">
+                    <label>Type:</label>
+                    <select v-model="cacheType">
+                        <option value="wb">Write-back, Write allocate</option>
+                        <option value="wt">
+                            Write-through, Write no-allocate
+                        </option>
+                    </select>
+                </p>
+                <p>
+                    <label>Replacement Strategy:</label>
+                    <select v-model="replacementStrategy">
+                        <option value="lru">LRU</option>
+                        <option value="plru">PLRU</option>
+                    </select>
+                </p>
+                <p
                     v-if="cacheSettings.replacement_strategy === 'plru'"
                     class="ms-2"
                     :for="props.baseId + '-show-plru'"
                 >
+                    <label>Show PLRU Tree:</label>
                     <input
                         type="checkbox"
                         :id="props.baseId + '-show-plru'"
                         :checked="cacheSettings.showPlruTree"
                         v-model="cacheSettings.showPlruTree"
                     />
-                    Show PLRU Tree
-                </label>
-            </p>
-            <p>
-                2<sup>N</sup> sets:
-                <input
-                    class="number-input"
-                    type="number"
-                    min="0"
-                    v-model="indexBits"
-                />
-                <ErrorTooltip
-                    v-if="indexBitsStatus"
-                    :message="indexBitsStatus"
-                />
-            </p>
-            <p>
-                2<sup>N</sup> words per block:
-                <input
-                    class="number-input"
-                    type="number"
-                    min="0"
-                    v-model="blockBits"
-                />
-                <ErrorTooltip
-                    v-if="blockBitsStatus"
-                    :message="blockBitsStatus"
-                />
-            </p>
-            <p>
-                associativity:
-                <input
-                    class="number-input"
-                    type="number"
-                    min="1"
-                    v-model="associativity"
-                />
-                <ErrorTooltip
-                    v-if="associativityStatus"
-                    :message="associativityStatus"
-                />
-            </p>
+                </p>
+                <p>
+                    <label>ways (blocks per set):</label>
+                    <select v-model="indexBits">
+                        <option
+                            v-for="option in Array.from(
+                                { length: 9 },
+                                (x, i) => i
+                            )"
+                            :value="option"
+                        >
+                            {{ Math.pow(2, option) }}
+                        </option>
+                    </select>
+                    <ErrorTooltip
+                        v-if="indexBitsStatus"
+                        :message="indexBitsStatus"
+                    />
+                </p>
+                <p>
+                    <label>words per block:</label>
+                    <select v-model="blockBits">
+                        <option
+                            v-for="option in Array.from(
+                                { length: 9 },
+                                (x, i) => i
+                            )"
+                            :value="option"
+                        >
+                            {{ Math.pow(2, option) }}
+                        </option>
+                    </select>
+                    <ErrorTooltip
+                        v-if="blockBitsStatus"
+                        :message="blockBitsStatus"
+                    />
+                </p>
+                <p>
+                    <label>associativity (sets):</label>
+                    <input
+                        class="number-input"
+                        type="number"
+                        min="1"
+                        v-model="associativity"
+                    />
+                    <ErrorTooltip
+                        v-if="associativityStatus"
+                        :message="associativityStatus"
+                    />
+                </p>
+            </form>
         </div>
     </div>
 </template>
