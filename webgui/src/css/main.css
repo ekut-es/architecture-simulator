@@ -66,6 +66,25 @@ body {
     text-align: start;
 }
 
+.archsim-form-table form {
+    display: table;
+}
+
+.archsim-form-table p {
+    display: table-row;
+}
+
+.archsim-form-table label,
+input,
+select {
+    display: table-cell;
+    margin-bottom: 0.4em;
+}
+
+.archsim-form-table label {
+    padding-right: 1em;
+}
+
 /* Overwrites */
 
 .cm-focused {
