@@ -9,7 +9,17 @@ const props = defineProps(["message", "iconName", "options"]);
 watch(
     () => props.message,
     (msg) => {
-        tooltipObject.setContent({ ".tooltip-inner": msg });
+        try {
+            tooltipObject.setContent({ ".tooltip-inner": msg });
+        } catch (err) {
+            if (err instanceof TypeError) {
+                console.log(
+                    "Ignored TypeError on tooltipObject: " + err.message
+                );
+            } else {
+                throw err;
+            }
+        }
     }
 );
 
