@@ -175,7 +175,7 @@ function validateAssociativity(number, strategy) {
                     />
                 </p>
                 <p>
-                    <label>ways (blocks per set):</label>
+                    <label>sets:</label>
                     <select v-model="indexBits">
                         <option
                             v-for="option in Array.from(
@@ -211,7 +211,7 @@ function validateAssociativity(number, strategy) {
                     />
                 </p>
                 <p>
-                    <label>associativity (sets):</label>
+                    <label>associativity (blocks per set):</label>
                     <select v-model="associativity">
                         <option
                             v-for="option in Array.from({ length: 9 }, (x, i) =>
