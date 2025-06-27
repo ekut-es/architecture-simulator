@@ -83,7 +83,9 @@ class WriteBackMemorySystem(BaseCacheMemorySystem):
 
         # Place the byte to write into block and write to cache
         block_values = byte_into_block(decoded_address, block_values, value)
-        _, displaced_block = self.cache.write_block(decoded_address, block_values)
+        _, displaced_block = self.cache.write_block(
+            decoded_address, block_values, write_access=True
+        )
 
         # Displaced block -> write back
         if displaced_block is not None:
@@ -127,7 +129,9 @@ class WriteBackMemorySystem(BaseCacheMemorySystem):
 
         # Place the byte to write into block and write to cache
         block_values = halfword_into_block(decoded_address, block_values, value)
-        _, displaced_block = self.cache.write_block(decoded_address, block_values)
+        _, displaced_block = self.cache.write_block(
+            decoded_address, block_values, write_access=True
+        )
 
         # Displaced block -> write back
         if displaced_block is not None:
@@ -171,7 +175,9 @@ class WriteBackMemorySystem(BaseCacheMemorySystem):
 
         # Place the byte to write into block and write to cache
         block_values = word_into_block(decoded_address, block_values, value)
-        _, displaced_block = self.cache.write_block(decoded_address, block_values)
+        _, displaced_block = self.cache.write_block(
+            decoded_address, block_values, write_access=True
+        )
 
         # Displaced block -> write back
         if displaced_block is not None:
@@ -212,7 +218,9 @@ class WriteBackMemorySystem(BaseCacheMemorySystem):
         hit = block_values is not None
         if block_values is None:
             block_values = self._read_block_from_memory(decoded_address)
-            h, displaced_block = self.cache.write_block(decoded_address, block_values)
+            h, displaced_block = self.cache.write_block(
+                decoded_address, block_values, write_access=False
+            )
             if displaced_block is not None:
                 db_addr, db_block = displaced_block
                 self._write_block_to_memory(db_addr, db_block)

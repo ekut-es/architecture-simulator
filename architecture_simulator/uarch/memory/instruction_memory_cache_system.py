@@ -173,7 +173,7 @@ class InstructionMemoryCacheSystem(InstructionMemorySystem):
         hit = block_values is not None
         if block_values is None:
             block_values = self._read_block_from_memory(decoded_address)
-            self.cache.write_block(decoded_address, block_values)
+            self.cache.write_block(decoded_address, block_values, write_access=False)
         return block_values, hit
 
     def _read_block_from_memory(

@@ -84,7 +84,7 @@ class WriteThroughMemorySystem(BaseCacheMemorySystem):
 
         if block_values is not None:
             block_values = byte_into_block(decoded_address, block_values, value)
-            self.cache.write_block(decoded_address, block_values)
+            self.cache.write_block(decoded_address, block_values, write_access=True)
         self.memory.write_byte(address, value)
 
     def write_halfword(
@@ -119,7 +119,7 @@ class WriteThroughMemorySystem(BaseCacheMemorySystem):
 
         if block_values is not None:
             block_values = halfword_into_block(decoded_address, block_values, value)
-            self.cache.write_block(decoded_address, block_values)
+            self.cache.write_block(decoded_address, block_values, write_access=True)
         self.memory.write_halfword(address, value)
 
     def write_word(
@@ -154,7 +154,7 @@ class WriteThroughMemorySystem(BaseCacheMemorySystem):
 
         if block_values is not None:
             block_values = word_into_block(decoded_address, block_values, value)
-            self.cache.write_block(decoded_address, block_values)
+            self.cache.write_block(decoded_address, block_values, write_access=True)
         self.memory.write_word(address, value)
 
     def _read_block(self, decoded_address: DecodedAddress) -> tuple[list[UInt32], bool]:
@@ -171,5 +171,5 @@ class WriteThroughMemorySystem(BaseCacheMemorySystem):
         hit = block_values is not None
         if block_values is None:
             block_values = self._read_block_from_memory(decoded_address)
-            self.cache.write_block(decoded_address, block_values)
+            self.cache.write_block(decoded_address, block_values, write_access=False)
         return block_values, hit

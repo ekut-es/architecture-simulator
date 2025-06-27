@@ -148,7 +148,7 @@ class CacheSet(Generic[T]):
         return None
 
     def write(
-        self, address: DecodedAddress, block_values: list[T]
+        self, address: DecodedAddress, block_values: list[T], write_access: bool
     ) -> tuple[bool, Optional[tuple[DecodedAddress, list[T]]]]:
         """Writes the given block to the set.
 
@@ -168,7 +168,7 @@ class CacheSet(Generic[T]):
             replaced = None
             if block.dirty_bit:
                 replaced = (block.decoded_address, block.values)
-            block.dirty_bit = True  # Bugfix: Always set to True because write back will not write that data to the memory on a write miss
+            block.dirty_bit = write_access  # Bugfix: Always set to True if write is issued by a store instruction because write back will not write that data to the memory on a write miss
             block.write(block_values, address)
             self.replacement_strategy.access(block_index)
             return False, replaced
@@ -261,7 +261,7 @@ class Cache(Generic[T]):
         return self.sets[decoded_address.cache_set_index].read(decoded_address)
 
     def write_block(
-        self, decoded_address: DecodedAddress, block_values: list[T]
+        self, decoded_address: DecodedAddress, block_values: list[T], write_access: bool
     ) -> tuple[bool, Optional[tuple[DecodedAddress, list[T]]]]:
         """
         Writes block to cache.
@@ -274,7 +274,7 @@ class Cache(Generic[T]):
             tuple[bool, Optional[tuple[DecodedAddress, list[T]]]]: hit, address and values of displaced cache block if necessary.
         """
         return self.sets[decoded_address.cache_set_index].write(
-            decoded_address, block_values
+            decoded_address, block_values, write_access
         )
 
     def contains(self, decoded_address: DecodedAddress) -> bool:
