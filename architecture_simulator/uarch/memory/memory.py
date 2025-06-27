@@ -36,10 +36,10 @@ class AddressingType(Enum):
     Enum that stores addressing types (byte, half_word, word, double_word) and the corresponding UInt.
     """
 
-    BYTE: Type[UInt8] = UInt8
-    HALF_WORD: Type[UInt16] = UInt16
-    WORD: Type[UInt32] = UInt32
-    DOUBLE_WORD: Type[UInt64] = UInt64
+    BYTE = UInt8
+    HALF_WORD = UInt16
+    WORD = UInt32
+    DOUBLE_WORD = UInt64
 
 
 T = TypeVar("T", UInt8, UInt16, UInt32, UInt64)
