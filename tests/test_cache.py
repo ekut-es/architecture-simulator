@@ -63,6 +63,9 @@ class TestCache(TestCase):
         memory_system.read_word(16)
         memory_system.read_word(60)
 
+        for set in memory_system.cache.sets:
+            for block in set.blocks:
+                self.assertFalse(block.dirty_bit)
         self.assertEqual(memory_system.hits, 4)
         self.assertEqual(memory_system.accesses, 8)
 
