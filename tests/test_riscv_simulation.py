@@ -56,6 +56,29 @@ class TestRiscvSimulation(unittest.TestCase):
             simulation.state.program_counter, expected_state.program_counter + 4
         )
 
+    def test_simulation_jal_fivestage(self):
+        simulation = RiscvSimulation(
+            mode="five_stage_pipeline",
+            state=RiscvArchitecturalState(
+                register_file=RegisterFile(registers=[0, 2, 0, 0]),
+                memory=Memory(AddressingType.BYTE, 32),
+            ),
+        )
+        simulation.load_program("nop\nnop\nnop\nnop\njal x1, 8")
+        # simulation.append_instructions("sub x0, x0, x1")
+        simulation.step()
+        simulation.step()
+        simulation.step()
+        simulation.step()
+        jal_instruction = JAL(rd=1, imm=8, abs_addr=-1)
+        expected_state = deepcopy(simulation.state)
+        expected_state = jal_instruction.behavior(expected_state)
+        simulation.step()
+        self.assertEqual(simulation.state.register_file.registers[1], 20)
+        self.assertEqual(
+            simulation.state.program_counter, expected_state.program_counter + 4
+        )
+
     def test_run_simulation(self):
         simulation = RiscvSimulation(
             state=RiscvArchitecturalState(
