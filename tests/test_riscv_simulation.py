@@ -47,7 +47,7 @@ class TestRiscvSimulation(unittest.TestCase):
         simulation.step()
         simulation.step()
         simulation.step()
-        jal_instruction = JAL(rd=1, imm=8, abs_addr=-1)
+        jal_instruction = JAL(rd=1, imm=8)
         expected_state = deepcopy(simulation.state)
         expected_state = jal_instruction.behavior(expected_state)
         simulation.step()
@@ -70,7 +70,7 @@ class TestRiscvSimulation(unittest.TestCase):
         simulation.step()
         simulation.step()
         simulation.step()
-        jal_instruction = JAL(rd=1, imm=8, abs_addr=-1)
+        jal_instruction = JAL(rd=1, imm=-8)
         expected_state = deepcopy(simulation.state)
         expected_state = jal_instruction.behavior(expected_state)
         simulation.step()
@@ -162,10 +162,10 @@ class TestRiscvSimulation(unittest.TestCase):
         )
         simulation.state.instruction_memory.instructions = {
             0: ADDI(rd=3, rs1=0, imm=8),
-            4: JAL(rd=2, imm=8, abs_addr=12),
+            4: JAL(rd=2, imm=8),
             8: ADDI(rd=1, rs1=1, imm=1),
             12: BEQ(rs1=0, rs2=0, imm=4),
-            16: JAL(rd=2, imm=4, abs_addr=20),
+            16: JAL(rd=2, imm=4),
             20: ADDI(rd=1, rs1=1, imm=-10),
         }
         simulation.run()

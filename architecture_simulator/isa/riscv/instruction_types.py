@@ -416,14 +416,13 @@ class UTypeInstruction(RiscvInstruction):
 
 
 class JTypeInstruction(RiscvInstruction):
-    def __init__(self, rd: int, imm: int, abs_addr: int, **args):
+    def __init__(self, rd: int, imm: int, **args):
         super().__init__(**args)
         self.rd = rd
         self.imm = (imm & (2**20) - 1) - (imm & 2**20)  # 21-bit sext
-        self.abs_addr = abs_addr  # only used in __repr__
 
     def __repr__(self) -> str:
-        return f"{self.mnemonic} x{self.rd}, {self.abs_addr}"
+        return f"{self.mnemonic} x{self.rd}, {self.imm}"
 
     def control_unit_signals(self) -> ControlUnitSignals:
         return ControlUnitSignals(

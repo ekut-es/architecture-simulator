@@ -753,9 +753,7 @@ class RiscvParser(Parser):
 
                 instructions.append(
                     instruction_class(
-                        rd=self._convert_register_name(line_parsed.rd),
-                        imm=imm_val,
-                        abs_addr=imm_val + address_count,
+                        rd=self._convert_register_name(line_parsed.rd), imm=imm_val
                     )
                 )
             elif issubclass(instruction_class, instruction_types.CSRTypeInstruction):
