@@ -748,8 +748,6 @@ class RiscvParser(Parser):
                     line_number=line_number,
                     line=line,
                 )
-                if line_parsed.get("imm"):
-                    imm_val -= address_count
 
                 instructions.append(
                     instruction_class(
