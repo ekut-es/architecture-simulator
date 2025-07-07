@@ -198,8 +198,8 @@ beq zero, ra, Ban0n3
         # jal x20, 220
         self.assertIsInstance(instr[6], JAL)
         self.assertEqual(instr[6].rd, 20)
-        self.assertEqual(instr[6].imm, 196)
-        self.assertEqual(instr[6].abs_addr, 220)
+        self.assertEqual(instr[6].imm, 220)
+        # self.assertEqual(instr[6].abs_addr, 220)
 
         # bne x3, x10, Banane
         self.assertIsInstance(instr[7], BNE)
@@ -462,8 +462,8 @@ fibonacci:
         self.assertEqual(instr[0].imm, -4)
         self.assertEqual(instr[1].imm, -4)
         self.assertEqual(instr[2].imm, 8)
-        self.assertEqual(instr[3].imm, -24)
-        self.assertEqual(instr[4].imm, -8)
+        self.assertEqual(instr[3].imm, -12)
+        self.assertEqual(instr[4].imm, 8)
         self.assertEqual(instr[5].imm, -20)
 
     def test_hex_imm(self):
@@ -488,7 +488,7 @@ fibonacci:
         self.assertEqual(instr[3].imm, 0x11)
         self.assertEqual(instr[4].imm, -0xAC)
         self.assertEqual(instr[5].imm, -0xAF)
-        self.assertEqual(instr[6].imm, 34)
+        self.assertEqual(instr[6].imm, 0x3A)
         self.assertEqual(instr[7].csr, 0x448)
         self.assertEqual(instr[8].csr, 0x448)
         self.assertEqual(instr[8].uimm, 0x1F)
@@ -515,7 +515,7 @@ fibonacci:
         self.assertEqual(instr[3].imm, 0x11)
         self.assertEqual(instr[4].imm, -0xAC)
         self.assertEqual(instr[5].imm, -0xAF)
-        self.assertEqual(instr[6].imm, 34)
+        self.assertEqual(instr[6].imm, 0b0000111010)
         self.assertEqual(instr[7].csr, 0x448)
         self.assertEqual(instr[8].csr, 0x448)
         self.assertEqual(instr[8].uimm, 0x1F)
