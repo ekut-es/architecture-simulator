@@ -24,7 +24,7 @@ import { setPyodide as setToyPyodide } from "@/js/toy_simulation_store";
  */
 async function initializePyodide() {
     const pyodide = await loadPyodide({
-        indexURL: "https://cdn.jsdelivr.net/pyodide/v0.22.1/full/",
+        indexURL: "https://cdn.jsdelivr.net/pyodide/v0.28.0/full/",
     });
     await pyodide.loadPackage("micropip");
     const micropip = pyodide.pyimport("micropip");
