@@ -9,4 +9,8 @@ python -m build
 python build_svg.py
 # ensure js packages are available and run npm scripts
 npm install
+
+if [ "$1" = "preview*" ]; then
+    npm run build
+fi
 npm run $1
