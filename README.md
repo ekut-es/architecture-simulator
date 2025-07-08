@@ -50,7 +50,7 @@ cd architecture-simulator
 
 ```bash
 pyenv install 3.10.8
-nvm install v20.10.0
+nvm install v22
 git clone https://github.com/ekut-es/architecture-simulator.git
 cd architecture-simulator
 pyenv local 3.10.8
