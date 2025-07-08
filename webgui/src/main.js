@@ -23,7 +23,9 @@ import { setPyodide as setToyPyodide } from "@/js/toy_simulation_store";
  * @returns {PyodideInterface} The loaded pyodide interface.
  */
 async function initializePyodide() {
-    const pyodide = await loadPyodide();
+    const pyodide = await loadPyodide({
+        indexURL: "https://cdn.jsdelivr.net/pyodide/v0.28.0/full/",
+    });
     await pyodide.loadPackage("micropip");
     const micropip = pyodide.pyimport("micropip");
     await micropip.install(architectureSimulatorPackageUrl);
