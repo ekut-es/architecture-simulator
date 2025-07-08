@@ -12,19 +12,19 @@
     "preview-docker": "vite preview webgui --host 0.0.0.0"
   },
   "devDependencies": {
-    "sass": "^1.74.1",
-    "vite": "^5.2.8",
-    "@vitejs/plugin-vue": "^5.0.4"
+    "@vitejs/plugin-vue": "^5.2.4",
+    "sass": "^1.79.6",
+    "vite": "^6"
   },
   "dependencies": {
     "@codemirror/commands": "^6.3.3",
     "@codemirror/language": "^6.10.1",
     "@codemirror/legacy-modes": "^6.3.3",
+    "@codemirror/lint": "^6.5.0",
     "@codemirror/state": "^6.4.1",
     "@codemirror/view": "^6.26.1",
-    "@codemirror/lint": "^6.5.0",
     "@popperjs/core": "^2.11.8",
-    "bootstrap": "^5.3.3",
+    "bootstrap": "^5.3.7",
     "bootstrap-icons": "^1.11.3",
     "pyodide": "0.22.1",
     "split.js": "^1.6.5",
