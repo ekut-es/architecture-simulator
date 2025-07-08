@@ -46,7 +46,7 @@ build_webgui:
   stage: build
   needs:
     - "build_py"
-  image: node:20-alpine
+  image: node:22-alpine
   script:
     - npm install
     - npm run build-dev-atreus
